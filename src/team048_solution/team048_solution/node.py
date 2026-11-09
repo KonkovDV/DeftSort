@@ -59,6 +59,12 @@ PLACE_TOL=.04         # m, release TCP error: one correction before opening (v7 
 SIDE_DZ=(0.,.02,.04)  # m, raise a side grasp when the low one is not collision-free against the measured table
 EMPTY_OBS_MAX=2       # consecutive observations with nothing to pick before giving up (an observation whose
                       # attempt touched the scene and was re-observed does not count as 'nothing to pick')
+HEAVY_KG=.22          # kg (objects.yaml masses in priors.json). v7+v8 TRACE (force 1.0, 16 attempts): 4 of 10 attempts
+                      # on objects <= 0.20 kg were held after the lift, 0 of 6 on objects >= 0.22 kg (Crunch 0.22, Utana and
+                      # Crayola 0.35, mustard 0.43); failed attempts also push neighbours (v8 Crunch, v9a frames_end).
+                      # -> light objects first within an observation, heavy ones afterwards (still attempted).
+MOVE_SETTLE_S=2.6     # s per arm move on top of the 1.6x speed line (move_arm: PD undershoot, refine). v8 Perricone TRACE:
+                      # lifted->carry 2.8 s for |dq| 0.30 (line 0.6 s), carry->over_tray 4.9 s for |dq| 1.15 (line 2.3 s)
 FAILS_MAX=2           # failed attempts per object before it is skipped (per round)
 RETRY_ROUNDS=1        # extra round with reset failure counters when time is left (v9a: stop at 124 s of 405 s)
 HAND_LOG_DT=.1        # s sim: hand-state log period during the guarded approach and the closing (10 Hz, v8 fix 4)
@@ -441,7 +447,7 @@ class Sol(Node):
             s.log('observe t',round(s.budget.elapsed(s.now()),1),'dets',len(dets),'assigned',
                   [(x[1][:18],round(x[3],2),round(x[5],2)) for x in allid])
             ids=[x for x in allid if x[3]>ID_CONF_MIN and x[5]<ID_COST_MAX]
-            ids.sort(key=lambda x:-x[3])     # most confident first
+            ids.sort(key=lambda x:(heavy(x[1]),-x[3]))     # light objects first (HEAVY_KG), then most confident
             did=False;stop=False;touched=False
             for det,name,cat,conf,cloud,cost in ids:
                 if fails.get(name,0)>=FAILS_MAX:continue
@@ -602,7 +608,7 @@ class Sol(Node):
                     s.log('grasp check (contact): empty',name);s.hand_open(side);s.retreat(side);return False
                 # #595 end-of-run policy: a lifted object outside a tray (or in the hand) at the limit is -10, an
                 # untouched one 0 -> lift only if lift + transport + release + retreat still fit before the limit.
-                need=place_time(A,p['q_lift'],place,yaw)
+                need=place_time(A,p['q_lift'],place,yaw,q_from=p['q_grasp'])
                 if s.budget.remaining(s.now())<need+s.budget.safety:
                     s.log('deadline: not lifting',name,'need',round(need,1),'s left',round(s.budget.remaining(s.now()),1))
                     s.hand_open(side);s.wait_fingers(side,tmin=.3);s.retreat(side);return None
@@ -720,12 +726,18 @@ def plan_place_yaw(A,q_from,tx,ty,plane,trays,fallback=None,tray_h=TRAY_H):
         return None
     finally:
         A.set_scene((n,d),list(trays))
-def place_time(A,q_lift,place,yaw,vmax=.8,release_s=None):
+def move_time(a,b,vmax=.8,settle=None):
+    """Pessimistic sim seconds of one move_arm from a to b (see MOVE_SETTLE_S)."""
+    return float(np.max(np.abs(np.asarray(b)-np.asarray(a))))/vmax*1.6+(MOVE_SETTLE_S if settle is None else settle)
+def heavy(name):return float(PRI.get(name,{}).get('mass',0.))>=HEAVY_KG
+def place_time(A,q_lift,place,yaw,vmax=.8,release_s=None,q_from=None,settle=None):
     """Pessimistic seconds from 'fingers closed' to 'arm home, waist back': joint-space moves at <= vmax (max joint
-    delta / vmax, x1.6 PD margin as move_arm), waist out and back, finger opening (one stroke) and settling."""
+    delta / vmax, x1.6 PD margin as move_arm) plus MOVE_SETTLE_S each, the lift itself (q_from = q_grasp -> q_lift,
+    + 0.3 s pause; v7/v8 closed->lifted 3.3-3.6 s), waist out and back, finger opening (one stroke) and settling."""
     release_s=GRIP.finger_stroke_time()+.5 if release_s is None else release_s
-    q_place,q_up,q_carry=place;seq=[q_lift]+[q for q in (q_carry,q_place,q_up) if q is not None]+[A.home]
-    mv=sum(float(np.max(np.abs(np.asarray(b)-np.asarray(a))))/vmax*1.6+.3 for a,b in zip(seq,seq[1:]))
+    settle=MOVE_SETTLE_S if settle is None else settle
+    q_place,q_up,q_carry=place;seq=([q_from] if q_from is not None else [])+[q_lift]+[q for q in (q_carry,q_place,q_up) if q is not None]+[A.home]
+    mv=sum(move_time(a,b,vmax,settle) for a,b in zip(seq,seq[1:]))+(.3 if q_from is not None else 0.)
     return mv+(2*abs(yaw)/vmax+1. if yaw else 0.)+release_s
 def self_w(s):return min(s.arms['l'].hand['opposed_open']-.01,.11)
 def main():
