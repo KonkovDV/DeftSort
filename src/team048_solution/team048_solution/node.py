@@ -57,7 +57,9 @@ PRE_TOL=.05           # m, pre-grasp TCP error above which the pick is aborted (
 RELEASE_OPEN_MIN=.8    # fingers 1-4 mean after release; v7: 0.96-0.97 released, 0.99 home
 PLACE_TOL=.04         # m, release TCP error: one correction before opening (v7 s101 Ecoforms released 13.7 cm off)
 SIDE_DZ=(0.,.02,.04)  # m, raise a side grasp when the low one is not collision-free against the measured table
-EMPTY_OBS_MAX=2       # consecutive observations with nothing to pick before giving up
+EMPTY_OBS_MAX=2       # consecutive observations with nothing to pick before giving up (an observation whose
+                      # attempt touched the scene and was re-observed does not count as 'nothing to pick')
+HAND_LOG_DT=.1        # s sim: hand-state log period during the guarded approach and the closing (10 Hz, v8 fix 4)
 def quat_to_T(t,q):
     x,y,z,w=q;T=np.eye(4)
     T[:3,:3]=[[1-2*(y*y+z*z),2*(x*y-z*w),2*(x*z+y*w)],[2*(x*y+z*w),1-2*(x*x+z*z),2*(y*z-x*w)],[2*(x*z-y*w),2*(y*z+x*w),1-2*(x*x+y*y)]]
@@ -67,7 +69,7 @@ class Sol(Node):
         super().__init__('team048_solution')
         lat=QoSProfile(depth=1,durability=DurabilityPolicy.TRANSIENT_LOCAL,reliability=ReliabilityPolicy.RELIABLE)
         s.task=None;s.js={};s.info=None;s.lock=threading.Lock();s.frames=PairBuffer()
-        s.wrench={};s.hstate={};s.hvel={'l':[],'r':[]}
+        s.wrench={};s.hstate={};s.hvel={'l':[],'r':[]};s.hpos={'l':[],'r':[]};s.hand_log_t={}
         s.create_subscription(String,'/sim/task',lambda m:setattr(s,'task',json.loads(m.data)),lat)
         s.create_subscription(JointState,'/joint_states',s.on_js,20)
         s.create_subscription(Image,'/cam_head/color/image_raw',s.frames.add_rgb,qos_profile_sensor_data)
@@ -96,6 +98,19 @@ class Sol(Node):
         with s.lock:s.js.update(zip(m.name,m.position))
     def on_hand(s,k,m):
         s.hstate[k]=m;h=s.hvel[k];h.append(list(m.velocity));del h[:-10]
+        try:t=s.now()
+        except Exception:t=None
+        if t is not None:hp=s.hpos[k];hp.append((t,list(m.position)));del hp[:-60]
+    def hand_log(s,side,phase,force=False,**extra):
+        """Hand state (position/velocity/effort + command) at <= 10 Hz (HAND_LOG_DT, sim time) during guarded phases."""
+        t=s.now()
+        if not force and t-s.hand_log_t.get(side,-1e9)<HAND_LOG_DT:return
+        s.hand_log_t[side]=t;h=s.hstate.get(side)
+        r=lambda v:None if v is None else [round(float(x),3) for x in v]
+        rec=dict(t=round(s.budget.elapsed(t),2) if getattr(s,'budget',None) else round(t,2),phase=phase,side=side,
+                 pos=r(None if h is None else h.position),vel=r(None if h is None else h.velocity),
+                 eff=r(None if h is None else h.effort),cmd=r(s.hand_target.get(side)))
+        rec.update(extra);s.log('HAND',json.dumps(rec))
     def now(s):return s.get_clock().now().nanoseconds*1e-9
     def sleep(s,dt):
         t=s.now()
@@ -110,7 +125,9 @@ class Sol(Node):
     def q_now(s,side):
         names=[f'{n}_{side}_joint' for n in ARMMOD.ARM]
         with s.lock:return np.array([s.js.get(n,0.) for n in names])
-    def move_arm(s,side,q,tol=.02,timeout=None,refine=2,vmax=.8):
+    def move_arm(s,side,q,tol=.02,timeout=None,refine=2,vmax=.8,guard=None):
+        """guard: optional callable polled every cycle; a truthy return stops the arm where it is (hold command at the
+        measured joints), stores it in s.guard_trip and returns False (v8 fix 4: guarded approach)."""
         vmax=min(.8,vmax)
         q=np.asarray(q,float);q0=s.q_now(side);dq=np.abs(q-q0);m=max(dq.max(),1e-3)
         spd=np.maximum(vmax*dq/m,.05*vmax/.8)     # synchronized: every joint arrives together (straight joint-space line)
@@ -120,6 +137,10 @@ class Sol(Node):
             while s.now()-t<T:
                 e=q-s.q_now(side)
                 if np.abs(e).max()<tol:return True
+                if guard is not None:
+                    g=guard()
+                    if g:
+                        s.cmd('arm',IDS[side],s.q_now(side),np.full(7,.3));s.guard_trip=g;return False
                 time.sleep(.02)
             e=q-s.q_now(side)
             if k<refine:   # PD undershoot under gravity: bias the target by the residual (bounded by joint limits)
@@ -156,21 +177,25 @@ class Sol(Node):
         empty, settled). empty=True: the fingers ran to the closed target (nothing grasped) -> caller opens without
         lifting (untouched object = 0 points)."""
         t0=s.closed_target(kind);s.hand_set(side,t0)
-        settled=s.wait_fingers(side)
+        settled=s.wait_fingers(side,log_phase='close1')
         h=s.hstate.get(side);pc=None if h is None else [float(x) for x in h.position]
         if pc is None:return dict(contact=None,target2=None,empty=None,settled=settled,closed=t0)
-        empty=GRIP.contact_empty(pc,t0)
+        empty=GRIP.contact_empty(pc,t0);jam=GRIP.jammed(pc,t0)
+        if jam:s.log('jammed fingers (bent back past open, not re-targeted):',jam)
         t2=None
         if not empty and GRIP.CLOSE_PAST>0:
-            t2=GRIP.contact_target(pc,t0);s.hand_set(side,t2);s.wait_fingers(side,tmin=.2)
-        return dict(contact=pc,target2=t2,empty=empty,settled=settled,closed=t0)
-    def wait_fingers(s,side,tmin=.3,tmax=None):
-        """Until the fingers stop (blocked by the object or at target), from /inspire_hand/state velocities.
-        Default timeout = one full stroke at the configured finger speed + 0.5 s (speed 0.5 -> 2.1 s)."""
+            t2=GRIP.contact_target(pc,t0);s.hand_set(side,t2);s.wait_fingers(side,tmin=.2,log_phase='close2')
+        return dict(contact=pc,target2=t2,empty=empty,settled=settled,closed=t0,jam=jam)
+    def wait_fingers(s,side,tmin=.3,tmax=None,log_phase=None):
+        """Until the fingers stop (blocked by the object or at target), by POSITION (v8 fix 5: the velocity criterion
+        fired in 3 of 16 v7+v8 closes): every finger moved < GRIP.STALL_TOL over GRIP.STALL_WINDOW s, on samples newer
+        than the command. Default timeout = one full stroke at the configured finger speed + 0.5 s (speed 0.5 -> 2.1 s).
+        log_phase: hand state logged at 10 Hz meanwhile."""
         tmax=GRIP.finger_stroke_time()+.5 if tmax is None else tmax
         t=s.now();s.hvel[side].clear()
         while s.now()-t<tmax:
-            if s.now()-t>=tmin and GRIP.fingers_settled(s.hvel[side]):return True
+            if log_phase:s.hand_log(side,log_phase)
+            if s.now()-t>=tmin and GRIP.fingers_stalled(s.hpos[side],s.now(),since=t):return True
             time.sleep(.02)
         return False
     def hand_settings(s):
@@ -185,14 +210,20 @@ class Sol(Node):
                 for i in range(6):setattr(r,f'speed{i}_ratio',float(GRIP.HAND_SPEED_RATIO))
                 s.cli_speed[k].call_async(r)
     def hand_verdict(s,side,grasp=None):
-        """Finger-based; wrist F/T only logged. After a two-phase close the 'past' criterion is used (fingers still
-        blocked short of the phase-2 target); otherwise the v7-calibrated position+effort criterion with the effort
-        threshold rescaled to the force ratio."""
+        """v8 fix 2: held iff a closing finger deviates >= GRIP.HELD_DEV from its current command with effort >=
+        GRIP.HELD_EFF (15/15 on v7+v8). Wrist F/T, past_verdict and the v7 finger_verdict are LOG-ONLY
+        (hand_shadow)."""
         h=s.hstate.get(side)
         if h is None:return None
-        if grasp and grasp.get('target2') is not None:
-            return GRIP.past_verdict(list(h.position),grasp['target2'],grasp['closed'])
-        return GRIP.finger_verdict(list(h.position),list(h.effort),(grasp or {}).get('closed') or s.hand_target.get(side))
+        t0=(grasp or {}).get('closed') or s.closed_target('side')
+        return GRIP.held_rule(list(h.position),list(h.effort),s.hand_target.get(side),t0)
+    def hand_shadow(s,side,grasp=None):
+        """Old criteria, logged only: past_verdict (phase-2) and the v7 finger_verdict."""
+        h=s.hstate.get(side)
+        if h is None:return dict(past=None,v7=None)
+        t0=(grasp or {}).get('closed') or s.hand_target.get(side)
+        past=None if not grasp or grasp.get('target2') is None else GRIP.past_verdict(list(h.position),grasp['target2'],grasp['closed'])
+        return dict(past=past,v7=GRIP.finger_verdict(list(h.position),list(h.effort),t0))
     def look(s,pitch=HEAD_PITCH,tol=HEAD_TOL,tmax=HEAD_TMAX,yaw=None):
         """Command the head pitch (and yaw, motor 3, if given) and WAIT until /joint_states shows it there and still
         (v6: the first observation was taken while the head was still rising from 0 -> objects outside the view / TF
@@ -332,6 +363,8 @@ class Sol(Node):
             except Exception as e:s.log('tray re-look failed',n,e)
         missing=[n for n in need if n not in s.trays]
         if missing:s.log('trays NOT found (their categories are skipped, never a stored pose):',missing)
+        s.log('tray sources',json.dumps({n:({'source':'camera','center':[round(float(x),3) for x in s.trays[n]['center']]}
+                                          if n in s.trays else {'source':'missing'}) for n in sorted(need)}))
         t=s.look(pitch,yaw=0.)
         s.measure_near_edge(t)
         return t
@@ -382,12 +415,14 @@ class Sol(Node):
         s.use_robot_description()
         s.arms={k:ARMMOD.Arm(k) for k in 'lr'}
         s.log('startup',round(s.budget.elapsed(s.now()),1),'s of',s.budget.limit)
+        s.log('accel',*accel_status())
         s.hand_settings()
         while not s.js:time.sleep(.05)
         for k in 'lr':s.hand_open(k)
         for k in 'lr':s.go_home(k)     # from the start posture along a certified path (planning assumes home)
         t_head=s.survey()
         handled=set();fails={};empty=0;nofeas={};resurveys=0   # nofeas[name]=len(handled) when no pick+place plan existed
+        s.last_contact=False
         while s.budget.can_start(s.now()):
             try:P,rgb,plane,dets=s.observe(t_head)
             except Exception as e:s.log('observe failed',e);break
@@ -399,27 +434,32 @@ class Sol(Node):
                   [(x[1][:18],round(x[3],2),round(x[5],2)) for x in allid])
             ids=[x for x in allid if x[3]>ID_CONF_MIN and x[5]<ID_COST_MAX]
             ids.sort(key=lambda x:-x[3])     # most confident first
-            did=False;stop=False
+            did=False;stop=False;touched=False
             for det,name,cat,conf,cloud,cost in ids:
                 if fails.get(name,0)>=2:continue
-                if not replan_infeasible(nofeas,name,handled):continue   # same scene: the deterministic planner fails again
+                if not replan_infeasible(nofeas,name,handled):   # same scene: the deterministic planner fails again
+                    s.log('no plan:',name,json.dumps({'reason':'unchanged scene since the last failed planning'}));continue
                 cat=objs.get(name,cat)        # category from /sim/task is authoritative
                 tray=cats.get(cat)
-                if tray not in s.trays:continue
+                if tray not in s.trays:
+                    s.log('no plan:',name,json.dumps({'reason':'tray not found by the cameras','tray':tray}));continue
                 others=[P[d.pixels[:,0],d.pixels[:,1]] for d in dets if d is not det]   # every segment is an obstacle
-                t=s.now();s.last_infeasible=False;ok=s.pick_place(name,cat,cloud,plane,others,tray)
+                t=s.now();s.last_infeasible=False;s.last_contact=False;ok=s.pick_place(name,cat,cloud,plane,others,tray)
                 if ok is False and s.last_infeasible:nofeas[name]=len(handled)
                 if ok is None:stop=True;break           # budget: no time to finish another object
                 if ok:handled.add(name);did=True;s.budget.record_cycle(s.now()-t);break
                 fails[name]=fails.get(name,0)+1
+                if s.last_contact:           # v8 fix 6: the hand touched the scene -> the other clouds are stale
+                    s.log('re-observe after contact',name);touched=True;break
             if stop:break
             if not did and resurveys<TRAY_RESURVEY_MAX and any(cats.get(objs.get(x[1],x[2])) not in s.trays for x in ids):
                 resurveys+=1;s.log('needed tray missing: re-survey');t_head=s.survey();continue
-            empty=0 if did else empty+1
+            empty=0 if (did or touched) else empty+1
             if empty>=EMPTY_OBS_MAX:break
         for k in 'lr':s.retreat(k)
         if abs(s.js.get('body_yaw_joint',0.))>.05:s.waist(0.)
         s.done.publish(Empty());s.log('done at',round(s.budget.elapsed(s.now()),1),'handled',sorted(handled))
+        s.log('accel at end',*accel_status())
     def use_robot_description(s,wait=1.):
         """#595.4: prefer the URDF the simulator publishes on /robot_description (TRANSIENT_LOCAL, latched). It is
         used only if it contains every link the planner needs; otherwise the bundled copy of the same organiser URDF
@@ -462,6 +502,20 @@ class Sol(Node):
             qu=A.lift(np.clip(q,A.chain.lower,A.chain.upper),RETREAT_DZ)
             if qu is not None:s.move_arm(side,qu,tol=.03)
         s.go_home(side)
+    def finger_dev(s,side,kind):
+        """Deviation of this grasp kind's CLOSING fingers from the current (open) command."""
+        h=s.hstate.get(side)
+        return GRIP.approach_deviation(None if h is None else list(h.position),s.hand_target.get(side),s.closed_target(kind))
+    def approach_guard(s,side,kind):
+        """Polled by move_arm on the pre-grasp -> grasp segment: hand state at 10 Hz; trip on a deflected finger."""
+        s.hand_log(side,'approach')
+        dev,fl=s.finger_dev(side,kind)
+        return dict(dev=round(dev,3),fingers=fl) if fl else None
+    def guard_abort(s,side,name,where,info):
+        """Guarded approach tripped: hand stays open, lift straight up and home, mark contact -> re-observe."""
+        s.hand_log(side,'guard_'+where,force=True,**info);s.trace('guard',side,name,where=where,**info)
+        s.log('guard: finger contact during',where,name,json.dumps(info),'-> no close, re-observe')
+        s.last_contact=True;s.retreat(side);return False
     def pick_place(s,name,cat,cloud,plane,others,tray):
         """True placed / False failed (safe, nothing lifted left outside) / None not started for lack of time."""
         f,C=candidates(cloud,plane,cat,others,W_MAX=self_w(s),robot_xy=(0.,0.))
@@ -469,6 +523,7 @@ class Sol(Node):
         order='lr' if ty>.1 else ('rl' if ty<-.1 else ('lr' if f['center'][1]>=0 else 'rl'))
         k=s.placed.get(tray,0);dl=TR.slot_offset(k,.5*f['length'],size=(ts,tl),ty=ty)   # along the MEASURED long axis
         sx,sy=tx+dl*ax,ty+dl*ay
+        why={'candidates':len(C),'feasible':int(sum(1 for g in C if g['feasible'])),'pick_ik':{},'place':{}}   # v8 fix 7
         for side in order:
             A=s.arms[side];A.set_other(s.q_now('r' if side=='l' else 'l'))   # #625 arm-to-arm at the measured posture
             for g in C:
@@ -488,9 +543,11 @@ class Sol(Node):
                     c3=np.array([g['center'][0],g['center'][1],top+g['z']+dz])
                     p=A.plan_pick(c3,ca,ap,g['width'],point=pt)
                     if p is not None:break
-                if p is None:continue
+                if p is None:
+                    why['pick_ik'][side]=why['pick_ik'].get(side,0)+1;continue
                 yp=plan_place_yaw(A,p['q_lift'],sx,sy,plane,list(s.trays.values()),fallback=(tx,ty) if dl else None,tray_h=th)
-                if yp is None:continue
+                if yp is None:
+                    why['place'][side]=why['place'].get(side,0)+1;continue
                 yaw,place=yp
                 if not s.budget.can_start(s.now(),p['duration']+(2*abs(yaw)/.8+1. if yaw else 0.)):   # waist out and back at 0.8 rad/s
                     s.log('skip',name,'remaining',round(s.budget.remaining(s.now()),1),'s');return None
@@ -500,15 +557,30 @@ class Sol(Node):
                 thumb=s.wait_thumb(side)      # #648: thumb in opposition before anything closes (usually already there)
                 if A.position_error(np.clip(s.q_now(side),A.chain.lower,A.chain.upper),Tp)>PRE_TOL:
                     s.log('pre-grasp not reached, abort',name);s.retreat(side);return False
-                s.move_arm(side,p['q_grasp'],tol=.015,vmax=APPROACH_VMAX)
+                # v8 fix 4, guarded approach: the open fingers must follow their command; a finger off by > GRIP.GUARD_DEV
+                # is touching something -> stop, do not close, re-observe. At pre-grasp the open command is re-sent once
+                # first (a deflection that survives it is a contact, not motion transient).
+                dev,fl=s.finger_dev(side,g['kind'])
+                if fl:
+                    s.hand_log(side,'pre',force=True,dev=dev,fingers=fl);s.hand_open(side);s.wait_fingers(side,tmin=.2,tmax=1.,log_phase='pre_reopen')
+                    dev,fl=s.finger_dev(side,g['kind'])
+                if fl:return s.guard_abort(side,name,'pre',dict(dev=dev,fingers=fl))
+                s.guard_trip=None
+                s.move_arm(side,p['q_grasp'],tol=.015,vmax=APPROACH_VMAX,guard=lambda side=side,kind=g['kind']:s.approach_guard(side,kind))
+                if s.guard_trip:return s.guard_abort(side,name,'approach',s.guard_trip)
                 qm=s.q_now(side);s.trace('at_grasp',side,name,Tg)
                 if A.position_error(np.clip(qm,A.chain.lower,A.chain.upper),Tg)>TCP_TOL:
                     qc=A.correct(np.clip(qm,A.chain.lower,A.chain.upper),p['q_grasp'])
-                    if qc is not None:s.move_arm(side,qc,tol=.01,vmax=APPROACH_VMAX,refine=0);s.trace('corrected',side,name,Tg)
+                    if qc is None:s.log('TCP correction: no solution',name,'err',round(float(A.position_error(np.clip(qm,A.chain.lower,A.chain.upper),Tg)),4))
+                    else:
+                        s.move_arm(side,qc,tol=.01,vmax=APPROACH_VMAX,refine=0,guard=lambda side=side,kind=g['kind']:s.approach_guard(side,kind))
+                        if s.guard_trip:return s.guard_abort(side,name,'correction',s.guard_trip)
+                        s.trace('corrected',side,name,Tg)
                 s.monitor.baseline(s.wrench.get(side))
                 gr=s.grasp_close(side,g['kind'])
                 s.trace('closed',side,name,Tg,settled=gr['settled'],thumb=thumb,contact=gr['contact'],target2=gr['target2'],
-                        empty=gr['empty'],force=GRIP.HAND_FORCE_RATIO,speed=GRIP.HAND_SPEED_RATIO,past=GRIP.CLOSE_PAST)
+                        empty=gr['empty'],jam=gr.get('jam'),force=GRIP.HAND_FORCE_RATIO,speed=GRIP.HAND_SPEED_RATIO,past=GRIP.CLOSE_PAST)
+                if gr.get('jam') or not gr['empty']:s.last_contact=True   # the hand touched the scene (v8 fix 6)
                 if gr['empty']:       # fingers ran to the closed target: nothing between them -> do not lift (0, not -10)
                     s.log('grasp check (contact): empty',name);s.hand_open(side);s.retreat(side);return False
                 # #595 end-of-run policy: a lifted object outside a tray (or in the hand) at the limit is -10, an
@@ -518,11 +590,11 @@ class Sol(Node):
                     s.log('deadline: not lifting',name,'need',round(need,1),'s left',round(s.budget.remaining(s.now()),1))
                     s.hand_open(side);s.wait_fingers(side,tmin=.3);s.retreat(side);return None
                 s.move_arm(side,p['q_lift']);s.sleep(.3)
-                held=s.hand_verdict(side,gr)
+                held=s.hand_verdict(side,gr);old=s.hand_shadow(side,gr)
                 F=s.wrench.get(side);f0=s.monitor.f0
                 shadow=None if F is None or f0 is None else bool(np.linalg.norm(F-f0)>=SHADOW_DF_N)
-                s.trace('lifted',side,name,A.tcp(p['q_lift']),verdict=held,shadow=shadow,
-                        eff_thr=round(GRIP.effort_held_threshold(),3))
+                s.trace('lifted',side,name,A.tcp(p['q_lift']),verdict=held,shadow=shadow,verdict_past=old['past'],
+                        verdict_v7=old['v7'],cmd=s.hand_target.get(side),eff_thr=round(GRIP.effort_held_threshold(),3))
                 if held is False:      # nothing in the hand: open, retreat, re-observe (object untouched => 0, not -10)
                     s.log('grasp check: empty',name);s.hand_open(side);s.retreat(side);return False
                 q_place,q_up,q_carry=place
@@ -533,8 +605,9 @@ class Sol(Node):
                 if A.position_error(qm,Tq)>PLACE_TOL:
                     qc=A.correct(qm,q_place,max_step=.15)
                     if qc is not None:s.move_arm(side,qc,tol=.02,refine=1)
+                old=s.hand_shadow(side,gr)
                 s.trace('over_tray',side,name,Tq,tray=tray,tray_xy=[round(sx,3),round(sy,3)],yaw=round(yaw,3),
-                        verdict=s.hand_verdict(side,gr))   # slip during transport shows up here (recalibration data)
+                        verdict=s.hand_verdict(side,gr),verdict_past=old['past'],verdict_v7=old['v7'])   # slip during transport shows up here (recalibration data)
                 s.hand_open(side);s.wait_fingers(side,tmin=.4,tmax=1.0)
                 if s.fingers_open(side) is False:s.log('fingers not open after release, re-open',name);s.hand_open(side);s.wait_fingers(side,tmin=.4,tmax=1.0)
                 s.trace('released',side,name,A.tcp(q_place))
@@ -545,7 +618,18 @@ class Sol(Node):
                 s.placed[tray]=k+1
                 return True
         s.last_infeasible=True   # nothing executed: no candidate had a collision-free pick + place plan
+        why['reason']=('no grasp candidate' if not C else 'no feasible grasp candidate' if not why['feasible'] else
+                       'no collision-free pick IK' if not why['place'] else 'no place plan (tray reach / collisions)')
+        s.log('no plan:',name,json.dumps(why))
         return False
+def accel_status():
+    """('on'|'off', reason) of the optional Rust extension (v8 fix 7: logged at start and at the end of the run)."""
+    try:
+        from . import _accel as A
+        on=A.enabled() if hasattr(A,'enabled') else bool(getattr(A,'AVAILABLE',False))
+        return ('on' if on else 'off'),str(getattr(A,'REASON',''))
+    except Exception as e:
+        return 'off',f'{type(e).__name__}: {e}'
 def replan_infeasible(nofeas,name,handled):
     """False when the last planning for `name` found no pick+place plan and no object has been removed since
     (obstacles unchanged -> the deterministic planner would fail again and only burn sim time; v7: observe->start
