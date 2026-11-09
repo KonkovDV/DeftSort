@@ -74,7 +74,8 @@ class CollisionModel:
 
     @environment.setter
     def environment(self,values):
-        self._environment=tuple(Sphere(s.link,s.center,s.radius) for s in values)
+        # Sphere is frozen with a private read-only centre copy: reuse instances, re-validate anything else
+        self._environment=tuple(s if type(s) is Sphere else Sphere(s.link,s.center,s.radius) for s in values)
         values=self._environment
         if not values or any(s.link!=self.chain.base for s in values): raise ValueError("nonempty base-frame environment required")
         self._env_centers=np.array([s.center for s in values],dtype=float).reshape(-1,3)

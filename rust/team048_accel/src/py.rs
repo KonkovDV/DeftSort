@@ -106,7 +106,7 @@ struct FastCollision {
 #[pymethods]
 impl FastCollision {
     #[new]
-    #[pyo3(signature = (chain, frame, centers, radii, pairs, levers, margin, parallel=true))]
+    #[pyo3(signature = (chain, frame, centers, radii, pairs, levers, margin, parallel=false))]
     #[allow(clippy::too_many_arguments)]
     fn new(chain: &FastChain, frame: Vec<usize>, centers: PyReadonlyArray2<f64>, radii: Vec<f64>, pairs: Vec<(u16, u16)>, levers: PyReadonlyArray2<f64>, margin: f64, parallel: bool) -> PyResult<Self> {
         let c = centers.as_array();
@@ -148,14 +148,15 @@ impl FastCollision {
 }
 
 #[pyfunction]
-fn plane_inlier_counts<'py>(py: Python<'py>, points: PyReadonlyArray2<f64>, planes: PyReadonlyArray2<f64>, tol: f64) -> PyResult<Bound<'py, PyArray1<u64>>> {
+#[pyo3(signature = (points, planes, tol, parallel=false))]
+fn plane_inlier_counts<'py>(py: Python<'py>, points: PyReadonlyArray2<f64>, planes: PyReadonlyArray2<f64>, tol: f64, parallel: bool) -> PyResult<Bound<'py, PyArray1<u64>>> {
     if points.shape()[1] != 3 || planes.shape()[1] != 4 {
         return Err(PyValueError::new_err("points (n,3), planes (m,4)"));
     }
     let p = points.as_slice().map_err(|_| PyValueError::new_err("points contiguous"))?;
     let pl = planes.as_array();
     let pv: Vec<[f64; 4]> = (0..pl.shape()[0]).map(|i| [pl[[i, 0]], pl[[i, 1]], pl[[i, 2]], pl[[i, 3]]]).collect();
-    let c = py.detach(|| perc::plane_inlier_counts(p, &pv, tol));
+    let c = py.detach(|| perc::plane_inlier_counts(p, &pv, tol, parallel));
     Ok(c.into_pyarray(py))
 }
 

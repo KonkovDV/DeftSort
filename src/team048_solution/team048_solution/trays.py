@@ -44,7 +44,11 @@ def locate(P, rgb, valid, name, colour, plane=None, window=.15, min_px=150, max_
     if plane is not None:
         h = P@np.asarray(plane[0], float)+float(plane[1])
         m &= (h > -.01) & (h < TRAY_H+.02)
-    m &= chroma_mask(rgb, colour)
+    # chroma only on the pixels still selected (same per-pixel arithmetic as chroma_mask on the full image)
+    idx = np.nonzero(m)
+    if len(idx[0]):
+        sel = chroma_mask(np.asarray(rgb)[idx], colour)
+        m = np.zeros_like(m); m[tuple(i[sel] for i in idx)] = True
     if int(m.sum()) < min_px:
         return np.array([nx, ny]), 'nominal'
     xy = P[m][:, :2]

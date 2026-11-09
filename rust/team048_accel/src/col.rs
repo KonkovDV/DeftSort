@@ -8,6 +8,9 @@
 use crate::kin::{Chain, Q, Rt, MAXJ, N, V3};
 use rayon::prelude::*;
 
+/// Environment spheres in a uniform xy grid (exact broad phase): a query visits every cell overlapping the square
+/// [p ± reach], reach = largest possible threshold + 1e-9 m. A sphere outside that square has |dx| or |dy| > reach,
+/// so its distance exceeds every threshold and the reference would not report it either.
 #[derive(Clone, Debug, Default)]
 pub struct Env {
     x: Vec<f64>,
@@ -15,17 +18,54 @@ pub struct Env {
     z: Vec<f64>,
     r: Vec<f64>,
     rmax: f64,
+    x0: f64,
+    y0: f64,
+    inv: f64,
+    nx: usize,
+    ny: usize,
+    start: Vec<u32>, // CSR: cell c holds spheres start[c]..start[c+1] (spheres stored cell by cell)
 }
+pub const CELL: f64 = 0.08;
 impl Env {
     pub fn new(c: &[[f64; 3]], r: &[f64]) -> Env {
-        let mut idx: Vec<usize> = (0..c.len()).collect();
-        idx.sort_by(|a, b| c[*a][0].partial_cmp(&c[*b][0]).unwrap_or(std::cmp::Ordering::Equal));
-        let mut e = Env { rmax: r.iter().cloned().fold(0., f64::max), ..Default::default() };
-        for i in idx {
-            e.x.push(c[i][0]);
-            e.y.push(c[i][1]);
-            e.z.push(c[i][2]);
-            e.r.push(r[i]);
+        let n = c.len();
+        let rmax = r.iter().cloned().fold(0., f64::max);
+        if n == 0 {
+            return Env { rmax, inv: 1. / CELL, start: vec![0, 0], nx: 1, ny: 1, ..Default::default() };
+        }
+        let (mut x0, mut y0, mut x1, mut y1) = (f64::INFINITY, f64::INFINITY, f64::NEG_INFINITY, f64::NEG_INFINITY);
+        for p in c {
+            x0 = x0.min(p[0]);
+            y0 = y0.min(p[1]);
+            x1 = x1.max(p[0]);
+            y1 = y1.max(p[1]);
+        }
+        let inv = 1. / CELL;
+        let nx = (((x1 - x0) * inv).floor() as usize + 1).min(4096);
+        let ny = (((y1 - y0) * inv).floor() as usize + 1).min(4096);
+        let cell = |p: &[f64; 3]| -> usize {
+            let i = (((p[0] - x0) * inv).floor().max(0.) as usize).min(nx - 1);
+            let j = (((p[1] - y0) * inv).floor().max(0.) as usize).min(ny - 1);
+            i * ny + j
+        };
+        let mut count = vec![0u32; nx * ny + 1];
+        for p in c {
+            count[cell(p) + 1] += 1;
+        }
+        for k in 0..nx * ny {
+            count[k + 1] += count[k];
+        }
+        let start = count.clone();
+        let mut fill = count;
+        let mut e = Env { x: vec![0.; n], y: vec![0.; n], z: vec![0.; n], r: vec![0.; n], rmax, x0, y0, inv, nx, ny, start };
+        for (i, p) in c.iter().enumerate() {
+            let k = cell(p);
+            let at = fill[k] as usize;
+            fill[k] += 1;
+            e.x[at] = p[0];
+            e.y[at] = p[1];
+            e.z[at] = p[2];
+            e.r[at] = r[i];
         }
         e
     }
@@ -35,19 +75,42 @@ impl Env {
     pub fn is_empty(&self) -> bool {
         self.x.is_empty()
     }
+    #[inline(always)]
+    fn range(&self, lo: f64, hi: f64, o: f64, n: usize) -> Option<(usize, usize)> {
+        let a = ((lo - o) * self.inv).floor();
+        let b = ((hi - o) * self.inv).floor();
+        if b < 0. || a > (n - 1) as f64 {
+            return None;
+        }
+        Some((a.max(0.) as usize, (b as usize).min(n - 1)))
+    }
     /// true if sphere (p, r) with margin+inflation touches any environment sphere (reference `<=` semantics).
     #[inline(always)]
     fn hits(&self, p: &V3, r: f64, margin: f64, infl: f64) -> bool {
+        if self.x.is_empty() {
+            return false;
+        }
         let reach = ((r + self.rmax) + margin) + infl + 1e-9;
-        let lo = self.x.partition_point(|v| *v < p[0] - reach);
-        let hi = self.x.partition_point(|v| *v <= p[0] + reach);
-        for i in lo..hi {
-            let dx = self.x[i] - p[0];
-            let dy = self.y[i] - p[1];
-            let dz = self.z[i] - p[2];
-            let d = ((dx * dx + dy * dy) + dz * dz).sqrt();
-            if d <= ((r + self.r[i]) + margin) + infl {
-                return true;
+        // floor((x - x0) / cell) is monotonic in x, so every sphere with x in [p-reach, p+reach] lies in [i0, i1].
+        let (i0, i1) = match self.range(p[0] - reach, p[0] + reach, self.x0, self.nx) {
+            Some(v) => v,
+            None => return false,
+        };
+        let (j0, j1) = match self.range(p[1] - reach, p[1] + reach, self.y0, self.ny) {
+            Some(v) => v,
+            None => return false,
+        };
+        for i in i0..=i1 {
+            let row = i * self.ny;
+            let (s, e) = (self.start[row + j0] as usize, self.start[row + j1 + 1] as usize);
+            for k in s..e {
+                let dx = self.x[k] - p[0];
+                let dy = self.y[k] - p[1];
+                let dz = self.z[k] - p[2];
+                let d = ((dx * dx + dy * dy) + dz * dz).sqrt();
+                if d <= ((r + self.r[k]) + margin) + infl {
+                    return true;
+                }
             }
         }
         false
@@ -141,9 +204,10 @@ impl Collision {
         let (steps, infl, d) = self.sweep_setup(a, b, max_step);
         let sample = |i: usize| -> Q { a + d * (i as f64 / steps as f64) };
         let order = coarse_to_fine(steps);
-        if parallel && steps >= 48 {
+        if parallel && steps >= 128 {
             // chunks in coarse-to-fine order; rayon's all() stops the other workers at the first collision.
-            return order.par_chunks(8).all(|ch| {
+            let chunk = (order.len() / (4 * rayon::current_num_threads())).max(16);
+            return order.par_chunks(chunk).all(|ch| {
                 let mut w = Vec::with_capacity(self.center.len());
                 ch.iter().all(|&i| self.valid_buf(&sample(i), &infl, &mut w))
             });

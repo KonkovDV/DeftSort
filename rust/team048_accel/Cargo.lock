@@ -909,6 +909,7 @@ dependencies = [
  "proptest",
  "pyo3",
  "rayon",
+ "serde_json",
 ]
 
 [[package]]

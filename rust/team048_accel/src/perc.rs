@@ -5,11 +5,9 @@ use rayon::prelude::*;
 
 /// For each candidate plane (n, offset) count points with |p.n + offset| < tol. Points: N x 3 row-major.
 /// Returns the counts (same order as candidates). Parallel over candidates.
-pub fn plane_inlier_counts(points: &[f64], planes: &[[f64; 4]], tol: f64) -> Vec<u64> {
+pub fn plane_inlier_counts(points: &[f64], planes: &[[f64; 4]], tol: f64, parallel: bool) -> Vec<u64> {
     let npts = points.len() / 3;
-    planes
-        .par_iter()
-        .map(|pl| {
+    let count = |pl: &[f64; 4]| -> u64 {
             let (a, b, c, d) = (pl[0], pl[1], pl[2], pl[3]);
             let mut cnt = 0u64;
             for i in 0..npts {
@@ -19,8 +17,12 @@ pub fn plane_inlier_counts(points: &[f64], planes: &[[f64; 4]], tol: f64) -> Vec
                 cnt += (h.abs() < tol) as u64;
             }
             cnt
-        })
-        .collect()
+    };
+    if parallel {
+        planes.par_iter().map(count).collect()
+    } else {
+        planes.iter().map(count).collect()
+    }
 }
 
 /// Exact port of the DFS in perception.segment: seeds in row-major (np.nonzero) order, explicit stack, neighbour
@@ -90,7 +92,7 @@ mod tests {
             let mut s = seed | 1; let mut r = move || { s ^= s << 13; s ^= s >> 7; s ^= s << 17; (s >> 11) as f64 / (1u64<<53) as f64 };
             let pts: Vec<f64> = (0..3*n).map(|_| r() - 0.5).collect();
             let planes: Vec<[f64;4]> = (0..5).map(|_| [r()-0.5, r()-0.5, 1.0, r()*0.1]).collect();
-            let c = plane_inlier_counts(&pts, &planes, 0.05);
+            let c = plane_inlier_counts(&pts, &planes, 0.05, seed % 2 == 0);
             for (k, pl) in planes.iter().enumerate() {
                 let m = (0..n).filter(|&i| ((((pts[3*i]*pl[0]) + pts[3*i+1]*pl[1]) + pts[3*i+2]*pl[2]) + pl[3]).abs() < 0.05).count();
                 prop_assert_eq!(c[k] as usize, m);

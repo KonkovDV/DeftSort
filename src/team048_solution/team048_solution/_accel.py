@@ -19,6 +19,9 @@ except Exception as e:      # ImportError, or an ABI mismatch surfacing as anoth
     _ext = None; AVAILABLE = False; REASON = '%s: %s' % (type(e).__name__, e)
 
 _disabled = False
+# rayon threads are opt-in: the simulator shares the evaluation machine's CPU, and on the 2-core-equivalent box
+# parallel sweeps measured slower (certify 3.3 vs 2.7 ms). TEAM048_ACCEL_PARALLEL=1 enables them.
+PARALLEL = os.environ.get('TEAM048_ACCEL_PARALLEL', '0') == '1'
 
 
 def enabled():
@@ -64,7 +67,7 @@ def fast_collision(model):
                  if S[i].link != S[k].link and frozenset((S[i].link, S[k].link)) not in model.ignored]
         f = _ext.FastCollision(fc, [index[s.link] for s in S], np.ascontiguousarray([s.center for s in S], float),
                                [float(s.radius) for s in S], pairs, np.ascontiguousarray(model.levers, float),
-                               float(model.margin), os.environ.get('TEAM048_ACCEL_PARALLEL', '1') != '0')
+                               float(model.margin), PARALLEL)
         f.set_env(np.ascontiguousarray(model._env_centers, float), [float(r) for r in model._env_radii])
         return f
     except BaseException as e:
@@ -72,7 +75,7 @@ def fast_collision(model):
 
 
 def plane_inlier_counts(points, planes, tol):
-    return _ext.plane_inlier_counts(np.ascontiguousarray(points, float), np.ascontiguousarray(planes, float), float(tol))
+    return _ext.plane_inlier_counts(np.ascontiguousarray(points, float), np.ascontiguousarray(planes, float), float(tol), PARALLEL)
 
 
 def flood_fill(mask, points, max_jump):

@@ -123,7 +123,20 @@ def body_env(side,other_q=None):
     # legs/hips below the table are fixed: one sphere per hip
     for hs in ('l','r'):E.append(Sphere('pelvis',P(f'hip_pitch_{hs}_link'),.07))
     return E
-def table_env(x=(.32,.85),y=(-.95,.95),R=.1,step=.03,top=TABLE_TOP,plane=None):   # near edge x=.22 (table.front_gap)
+_ENV_CACHE={}
+def _cached(key,build):
+    """Scene sphere lists are pure functions of their arguments and Spheres are immutable: memoise (bounded)."""
+    v=_ENV_CACHE.get(key)
+    if v is None:
+        if len(_ENV_CACHE)>256:_ENV_CACHE.clear()
+        v=_ENV_CACHE[key]=tuple(build())
+    return list(v)
+def _key(*a):
+    return tuple(np.asarray(x,float).tobytes() if isinstance(x,(np.ndarray,list,tuple)) else x for x in a)
+def table_env(x=(.32,.85),y=(-.95,.95),R=.1,step=.03,top=TABLE_TOP,plane=None):
+    pk=None if plane is None else (np.asarray(plane[0],float).tobytes(),float(plane[1]))
+    return _cached(('table',_key(x,y,R,step,top),pk),lambda:table_env_build(x,y,R,step,top,plane))
+def table_env_build(x=(.32,.85),y=(-.95,.95),R=.1,step=.03,top=TABLE_TOP,plane=None):   # near edge x=.22 (table.front_gap)
     """Table as spheres tangent to the top surface. plane=(n,d) (pelvis frame, n.p+d=0, from the head camera) replaces
     the flat scene.yaml height: v7 Kaggle frames show the table tilted 4.0 deg in the pelvis frame (n_x=-0.070 in all
     31 frames), i.e. 1.2-3.8 cm higher than the flat model over x=0.3-0.55."""
@@ -136,6 +149,9 @@ def table_env(x=(.32,.85),y=(-.95,.95),R=.1,step=.03,top=TABLE_TOP,plane=None): 
             z=-(d+n[0]*a+n[1]*b)/n[2];out.append(Sphere('pelvis',np.array([a,b,z])-R*n,R))
     return out
 def tray_env(trays,plane,size=(.22,.32),height=.07,r=.02,step=.03):
+    key=('tray',np.asarray(trays,float).tobytes(),np.asarray(plane[0],float).tobytes(),float(plane[1]),_key(size,height,r,step))
+    return _cached(key,lambda:tray_env_build(trays,plane,size,height,r,step))
+def tray_env_build(trays,plane,size=(.22,.32),height=.07,r=.02,step=.03):
     """Tray walls as spheres (centres r below the rim): v7 Kaggle s103 the hand was carried into the tray_right wall
     (82 N, TCP 14 cm below plan) because trays were not obstacles."""
     n,d=np.asarray(plane[0],float),float(plane[1]);out=[]
