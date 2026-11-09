@@ -39,6 +39,10 @@ ID_CONF_MIN=.7        # identify(): category margin; render-set study 2026-11-09
 ID_COST_MAX=2.5
 TRACE_DIR=os.environ.get('TEAM048_TRACE_DIR')   # offline test harness only: per-object JSON trace + RGB-D frames
 SHADOW_DF_N=.5*.08*9.81   # NOT used for decisions: logged 'would-be' verdict, 1/2 weight of the lightest pool-3 object (sim cfg 0.08 kg)
+PRE_TOL=.05           # m, pre-grasp TCP error above which the pick is aborted (v7 s101 mustard: 26.6 cm, then knocked)
+RELEASE_OPEN_MIN=.8    # fingers 1-4 mean after release; v7: 0.96-0.97 released, 0.99 home
+PLACE_TOL=.04         # m, release TCP error: one correction before opening (v7 s101 Ecoforms released 13.7 cm off)
+SIDE_DZ=(0.,.02,.04)  # m, raise a side grasp when the low one is not collision-free against the measured table
 EMPTY_OBS_MAX=2       # consecutive observations with nothing to pick before giving up
 def quat_to_T(t,q):
     x,y,z,w=q;T=np.eye(4)
@@ -64,7 +68,8 @@ class Sol(Node):
         s.cli_speed={k:s.create_client(SetSpeed,f'/inspire_hand/set_speed/{n}_hand') for k,n in SIDE_NAME.items()}
         s.done=s.create_publisher(Empty,'/sim/task/done',10)
         s.tfb=tf2_ros.Buffer();s.tfl=tf2_ros.TransformListener(s.tfb,s)
-        s.t0=None;s.trays=dict(TR.NOMINAL);s.placed={};s.monitor=GRIP.GraspMonitor()
+        s.wall_ready=time.monotonic()   # subscriptions exist from here: later waiting for /clock costs no sim time
+        s.hand_target={'l':None,'r':None};s.t0=None;s.trays=dict(TR.NOMINAL);s.placed={};s.monitor=GRIP.GraspMonitor()
     def on_js(s,m):
         with s.lock:s.js.update(zip(m.name,m.position))
     def on_hand(s,k,m):
@@ -99,8 +104,13 @@ class Sol(Node):
                 goal=np.clip(goal+e,s.arms[side].chain.lower,s.arms[side].chain.upper);s.cmd('arm',IDS[side],goal,np.full(7,.3));t=s.now();T=1.5
         return np.abs(q-s.q_now(side)).max()<.06
     def hand_set(s,side,v):
-        m=JointState();m.name=['1','2','3','4','5','6'];m.position=[float(x) for x in v];s.hand[SIDE_NAME[side]].publish(m)
+        s.hand_target[side]=list(v);m=JointState();m.name=['1','2','3','4','5','6'];m.position=[float(x) for x in v];s.hand[SIDE_NAME[side]].publish(m)
     def hand_open(s,side):s.hand_set(side,[1,1,1,1,1,0.])      # fingers open, thumb rotated into opposition
+    def fingers_open(s,side,min_open=RELEASE_OPEN_MIN):
+        """/inspire_hand/state position is a fraction, 1.0 open / 0.0 closed (INTERFACES.md); v7 releases read 0.96-0.97."""
+        h=s.hstate.get(side)
+        if h is None or len(h.position)<4:return None
+        return bool(np.mean(np.asarray(h.position,float)[:4])>=min_open)
     def hand_close(s,side,kind):
         s.hand_set(side,[0,0,0,0,0,0.] if kind=='side' else [1,1,.1,.1,.2,0.])
     def wait_fingers(s,side,tmin=.3,tmax=1.5):
@@ -122,8 +132,10 @@ class Sol(Node):
                 for i in range(6):setattr(r,f'speed{i}_ratio',float(GRIP.HAND_SPEED_RATIO))
                 s.cli_speed[k].call_async(r)
     def hand_verdict(s,side):
+        """Finger-based (calibrated on v7); wrist F/T only logged."""
         h=s.hstate.get(side)
-        return s.monitor.verdict(s.wrench.get(side),None if h is None else list(h.position),None if h is None else list(h.effort))
+        if h is None:return None
+        return GRIP.finger_verdict(list(h.position),list(h.effort),s.hand_target.get(side))
     def look(s,pitch=HEAD_PITCH,tol=HEAD_TOL,tmax=HEAD_TMAX):
         """Command the head pitch and WAIT until /joint_states shows it there and still (v6: the first observation
         was taken while the head was still rising from 0 -> objects outside the view / TF mismatch -> nothing picked).
@@ -146,7 +158,7 @@ class Sol(Node):
                  dF=None if F is None or s.monitor.f0 is None else round(float(np.linalg.norm(F-s.monitor.f0)),3),
                  fing=None if h is None else [round(float(x),3) for x in h.position],
                  eff=None if h is None else [round(float(x),3) for x in h.effort],
-                 tcp=[round(float(x),4) for x in tcp])
+                 tcp=[round(float(x),4) for x in tcp],q=[round(float(x),3) for x in qm])
         if T_plan is not None:rec['tcp_plan']=[round(float(x),4) for x in T_plan[:3,3]];rec['tcp_err']=round(float(np.linalg.norm(tcp-T_plan[:3,3])),4)
         rec.update(extra);s.log('TRACE',json.dumps(rec))
         if TRACE_DIR and phase in ('closed','lifted','released'):
@@ -226,7 +238,9 @@ class Sol(Node):
     # ---------------- task ----------------
     def run(s):
         while s.task is None or s.now()<=0:time.sleep(.05)
-        t0=BUD.start_time(s.now(),time.monotonic(),WALL_IMPORT)
+        # v7 s101: 'startup 206.9 s' -- the wait for the (not yet running) sim clock was counted as sim time.
+        # Only process start-up before the node could receive /clock is charged (pessimistically, RTF<=1).
+        t0=BUD.start_time(s.now(),getattr(s,'wall_ready',time.monotonic()),WALL_IMPORT)
         task=s.task;s.log('task',task.get('task'),task.get('objects_from'))
         if task.get('task') not in BUD.LIMITS:
             s.done.publish(Empty());return
@@ -243,6 +257,8 @@ class Sol(Node):
             try:P,rgb,plane,dets=s.observe(t_head)
             except Exception as e:s.log('observe failed',e);break
             t_head=s.now()                   # later observations: frames newer than the end of the last motion
+            if plane is not None:
+                for A in s.arms.values():A.set_scene(plane,list(s.trays.values()))   # measured table (tilted 4 deg in pelvis) + tray walls
             allid=s.identify(dets,P,plane,[n for n in objs if n not in handled])
             s.log('observe t',round(s.budget.elapsed(s.now()),1),'dets',len(dets),'assigned',
                   [(x[1][:18],round(x[3],2),round(x[5],2)) for x in allid])
@@ -263,7 +279,16 @@ class Sol(Node):
             empty=0 if did else empty+1
             if empty>=EMPTY_OBS_MAX:break
         for k in 'lr':s.retreat(k)
+        if abs(s.js.get('body_yaw_joint',0.))>.05:s.waist(0.)
         s.done.publish(Empty());s.log('done at',round(s.budget.elapsed(s.now()),1),'handled',sorted(handled))
+    def waist(s,theta,tol=.02,tmax=6.):
+        """body_yaw_joint (motor 31) to theta at <=0.8 rad/s; waits on /joint_states."""
+        s.cmd('waist',[31],[theta],[.8]);t=s.now()
+        while s.now()-t<tmax:
+            with s.lock:q=s.js.get('body_yaw_joint')
+            if q is not None and abs(q-theta)<tol:return True
+            time.sleep(.02)
+        s.log('waist not settled',s.js.get('body_yaw_joint'),'target',theta);return False
     def go_home(s,side):
         s.move_arm(side,s.arms[side].home,tol=.05)
     def retreat(s,side):
@@ -279,24 +304,31 @@ class Sol(Node):
         """True placed / False failed (safe, nothing lifted left outside) / None not started for lack of time."""
         f,C=candidates(cloud,plane,cat,others,W_MAX=self_w(s),robot_xy=(0.,0.))
         tx,ty=s.trays[tray];order='lr' if ty>.1 else ('rl' if ty<-.1 else ('lr' if f['center'][1]>=0 else 'rl'))
-        k=s.placed.get(tray,0);dy=TR.slot_offset(k,.5*f['length'])
+        k=s.placed.get(tray,0);dy=TR.slot_offset(k,.5*f['length'],ty=ty)
         for side in order:
             A=s.arms[side]
             for g in C:
                 if not g['feasible']:continue
                 top=-(plane[1]+plane[0][:2]@g['center'])/plane[0][2]
-                c3=np.array([g['center'][0],g['center'][1],top+g['z']])
                 ap=np.r_[g['approach'],0.] if g['kind']=='side' else np.array([0,0,-1.])
                 ca=np.r_[g['close_axis'],0.]
-                p=A.plan_pick(c3,ca,ap,g['width'])
+                p=None
+                for dz in (SIDE_DZ if g['kind']=='side' else (0.,)):
+                    if g['kind']=='side' and dz>0 and g['z']+dz>f['height']-.015:break
+                    c3=np.array([g['center'][0],g['center'][1],top+g['z']+dz])
+                    p=A.plan_pick(c3,ca,ap,g['width'],point='pinch' if g['kind']=='rim' else 'grip')
+                    if p is not None:break
                 if p is None:continue
-                place=plan_place(A,p['q_lift'],tx,ty+dy,top,fallback=(tx,ty) if dy else None)
-                if place is None:continue
+                yp=plan_place_yaw(A,p['q_lift'],tx,ty+dy,plane,list(s.trays.values()),fallback=(tx,ty) if dy else None)
+                if yp is None:continue
+                yaw,place=yp
                 if not s.budget.can_start(s.now(),p['duration']):
                     s.log('skip',name,'remaining',round(s.budget.remaining(s.now()),1),'s');return None
                 s.log('pick',name,cat,'->',tray,'slot',k,'arm',side,g['kind'],'w',round(g['width'],3),'z',round(g['z'],3))
                 Tg=A.tcp(p['q_grasp']);s.trace('start',side,name,kind=g['kind'],center=[round(float(x),3) for x in c3])
-                s.hand_open(side);s.move_arm(side,p['q_pre']);s.trace('pre',side,name,A.tcp(p['q_pre']))
+                s.hand_open(side);s.move_arm(side,p['q_pre']);Tp=A.tcp(p['q_pre']);s.trace('pre',side,name,Tp)
+                if A.position_error(np.clip(s.q_now(side),A.chain.lower,A.chain.upper),Tp)>PRE_TOL:
+                    s.log('pre-grasp not reached, abort',name);s.retreat(side);return False
                 s.move_arm(side,p['q_grasp'],tol=.015,vmax=APPROACH_VMAX)
                 qm=s.q_now(side);s.trace('at_grasp',side,name,Tg)
                 if A.position_error(np.clip(qm,A.chain.lower,A.chain.upper),Tg)>TCP_TOL:
@@ -311,21 +343,33 @@ class Sol(Node):
                 s.trace('lifted',side,name,A.tcp(p['q_lift']),verdict=held,shadow=shadow)
                 if held is False:      # nothing in the hand: open, retreat, re-observe (object untouched => 0, not -10)
                     s.log('grasp check: empty',name);s.hand_open(side);s.retreat(side);return False
-                q_place,q_up=place
-                s.move_arm(side,q_place,tol=.03);s.trace('over_tray',side,name,A.tcp(q_place),tray=tray,tray_xy=[round(tx,3),round(ty+dy,3)])
-                s.hand_open(side);s.wait_fingers(side,tmin=.4,tmax=1.0);s.trace('released',side,name,A.tcp(q_place))
+                q_place,q_up,q_carry=place
+                if q_carry is not None:s.move_arm(side,q_carry,tol=.03);s.trace('carry',side,name,A.tcp(q_carry))
+                if yaw:s.waist(yaw);s.trace('yawed',side,name,yaw=round(yaw,3))
+                s.move_arm(side,q_place,tol=.03);Tq=A.tcp(q_place)
+                qm=np.clip(s.q_now(side),A.chain.lower,A.chain.upper)
+                if A.position_error(qm,Tq)>PLACE_TOL:
+                    qc=A.correct(qm,q_place,max_step=.15)
+                    if qc is not None:s.move_arm(side,qc,tol=.02,refine=1)
+                s.trace('over_tray',side,name,Tq,tray=tray,tray_xy=[round(tx,3),round(ty+dy,3)],yaw=round(yaw,3))
+                s.hand_open(side);s.wait_fingers(side,tmin=.4,tmax=1.0)
+                if s.fingers_open(side) is False:s.log('fingers not open after release, re-open',name);s.hand_open(side);s.wait_fingers(side,tmin=.4,tmax=1.0)
+                s.trace('released',side,name,A.tcp(q_place))
                 if q_up is not None:s.move_arm(side,q_up,tol=.03)
-                s.go_home(side);s.trace('home',side,name)
+                s.go_home(side)
+                if yaw:s.waist(0.)
+                s.trace('home',side,name)
                 s.placed[tray]=k+1
                 return True
         return False
 PLACE_AXES=(np.array([1.,0,0]),np.array([0,1.,0]),np.array([-1.,0,0]),np.array([0,-1.,0]))
 def plan_place(A,q_from,tx,ty,top,fallback=None):
-    """Release pose over (tx,ty) at the lowest feasible height, plus a straight-up retreat pose (or None).
-    Closing axis tried with BOTH signs: the Inspire hand is not symmetric (thumb vs fingers), the right arm reaches
-    tray_right only with the mirrored axis (offline 2026-11-09: +x/+y -> IK fails for every height, -y -> ok).
-    v6 root cause: no box was ever picked because tray_right had no release pose. fallback=(x,y) (tray centre)
-    is tried when the slot position is out of reach."""
+    """Release pose over (tx,ty) at the lowest feasible height -> (q_place, q_up, q_carry) or None.
+    q_carry: straight-up lift from q_from to the release height (carry high over the tray walls), None if not needed
+    or not feasible (then q_from->q_place must be certified directly). q_up: straight-up retreat after release.
+    Closing axis tried with BOTH signs (v6: tray_right reachable only with the mirrored axis); fallback=(x,y) (tray
+    centre) is tried when the slot is out of reach."""
+    z_from=A.tcp(q_from)[2,3]
     for (x,y) in [(tx,ty)]+([fallback] if fallback is not None else []):
         for dz in (.20,.25,.30):            # unchanged heights; lowering needs payload-vs-tray-wall data (TODO)
             c=np.array([x,y,top+TRAY_H+dz-.1])
@@ -333,9 +377,47 @@ def plan_place(A,q_from,tx,ty,top,fallback=None):
                 T=A.grasp_pose(c,ca,np.array([0,0,-1.]))
                 q=A.solve(T,q_from)
                 if q is None:continue
-                if A.col.certify(q_from,q) and A.col.certify(q,A.home):
-                    return q,A.lift(q,RETREAT_DZ)
+                if not A.col.certify(q,A.home):continue
+                zr=A.tcp(q)[2,3];qc=A.lift(q_from,zr-z_from) if zr-z_from>.02 else None
+                if qc is not None and A.col.certify(qc,q):return q,A.lift(q,RETREAT_DZ),qc
+                if A.col.certify(q_from,q):return q,A.lift(q,RETREAT_DZ),None
     return None
+def rotz(a):
+    c,s_=np.cos(a),np.sin(a);return np.array([[c,-s_,0],[s_,c,0],[0,0,1.]])
+YAW_MAX=1.6           # rad, |body_yaw| used for placing (INTERFACES.md: body_yaw_joint motor 31, [-2.97, 3.14], plus = left)
+def yaw_candidates(side,tx,ty):
+    """Torso yaw angles that bring the tray in front of this arm's shoulder (rotation about pelvis z, joint at origin).
+    Offline (2026-11-09, reach-p3 30 layouts): with body_yaw locked no object reached both trays with one arm."""
+    phi=np.arctan2(ty,tx);out=[]
+    sg=1. if side=='l' else -1.
+    for aim in (.5,.25,0.,.75,-.25):          # tray direction in the torso frame, this arm's side first
+        th=float(phi-sg*aim)
+        if abs(th)<=YAW_MAX and abs(th)>.15 and all(abs(th-o)>.1 for o in out):out.append(th)
+    return out
+def plan_place_yaw(A,q_from,tx,ty,plane,trays,fallback=None):
+    """(theta, (q_place,q_up,q_carry)) or None. theta=0 first; otherwise the torso is yawed by theta while the arm holds
+    q_carry (or q_from); the scene (table plane, trays) is expressed in the rotated torso frame. The hold posture is
+    checked against the rotated scene at 5 intermediate angles (sampled, not swept)."""
+    n,d=np.asarray(plane[0],float),float(plane[1])
+    zt=lambda x,y,n=n:-(d+n[0]*x+n[1]*y)/n[2]
+    r=plan_place(A,q_from,tx,ty,zt(tx,ty),fallback)
+    if r is not None:return 0.,r
+    try:
+        for th in yaw_candidates(A.side,tx,ty):
+            R=rotz(-th);n2=R@n
+            A.set_scene((n2,d),[tuple((R@np.r_[x,y,0.])[:2]) for x,y in trays])
+            t2=(R@np.r_[tx,ty,0.])[:2];fb=None if fallback is None else tuple((R@np.r_[fallback[0],fallback[1],0.])[:2])
+            r=plan_place(A,q_from,t2[0],t2[1],zt(t2[0],t2[1],n2),fb)
+            if r is None:continue
+            hold=r[2] if r[2] is not None else q_from
+            ok=True
+            for a in np.linspace(0,th,5):
+                Ra=rotz(-a);A.set_scene((Ra@n,d),[tuple((Ra@np.r_[x,y,0.])[:2]) for x,y in trays])
+                if not A.col.valid(hold):ok=False;break
+            if ok:return th,r
+        return None
+    finally:
+        A.set_scene((n,d),list(trays))
 def self_w(s):return min(s.arms['l'].hand['opposed_open']-.01,.11)
 def main():
     rclpy.init();n=Sol();ex=MultiThreadedExecutor(4);ex.add_node(n)

@@ -31,12 +31,27 @@ class Budget(unittest.TestCase):          # I2 (time budget)
         with s.assertRaises(ValueError):budget.TimeBudget(0,0)
 
 class Grip(unittest.TestCase):            # I1 plumbing + I4
-    def test_uncalibrated_is_unknown(s):
-        m=grip.GraspMonitor();s.assertFalse(m.calibrated);m.baseline([0,0,0])
-        s.assertIsNone(m.verdict([0,0,-5.],[.3]*6,[.9]*6))
-    def test_constants_are_todo(s):
-        s.assertIsNone(grip.GRASP_DF_MIN_N);s.assertIsNone(grip.FINGER_BLOCKED_MIN);s.assertIsNone(grip.EFFORT_MIN)
+    def test_force_not_used_finger_calibrated(s):
+        s.assertIsNone(grip.GRASP_DF_MIN_N)          # F/T offsets 0.05-5.5 N empty (v7): not a decision signal
+        s.assertEqual(grip.FINGER_DEV_HELD,.35);s.assertEqual(grip.FINGER_EFF_HELD,.67)
         s.assertEqual(grip.HAND_FORCE_RATIO,1.0);s.assertEqual(grip.HAND_SPEED_RATIO,1.0)
+    def test_finger_verdict_on_v7_frames(s):
+        rim=[1,1,.1,.1,.2,0.];side=[0,0,0,0,0,0.]
+        # real v7 'lifted' frames (position, effort)
+        loaded=[([1.,.99,.78,.77,.2],[.06,.05,1.,1.,.06],rim),        # s101 Ecoforms (later released outside: arm not at tray)
+                ([1.,.99,.79,.78,.19],[.05,.02,1.,1.,.03],rim),        # s103 Ecoforms (ended in tray_left)
+                ([.99,.98,1.1,1.06,.22],[.74,.82,1.,1.,.37],rim)]      # s102 Threshold (lost during transport)
+        empty=[([.98,.97,.12,.12,.23],[.12,.14,.07,.06,.04],rim),      # s101 Threshold
+               ([.98,.97,.12,.12,.23],[.12,.14,.07,.06,.04],rim),      # s102 Utana
+               ([0,0,0,.08,.03],[.01,0,.01,.33,.32],side),             # s101 mustard
+               ([0,0,0,.08,.01],[.01,.02,.02,.33,.01],side),           # s102 Crayola
+               ([0,0,0,0,0],[0,0,0,0,0],side),                         # s102 Hyaluronic
+               ([0,0,0,.08,.01],[.01,.01,.01,.33,.01],side),           # s103 Perricone
+               ([0,0,0,0,0],[0,0,0,0,0],side)]                         # s103 Hyaluronic
+        for p,e,t in loaded:s.assertTrue(grip.finger_verdict(p,e,t))
+        for p,e,t in empty:s.assertIs(grip.finger_verdict(p,e,t),False)
+        s.assertIsNone(grip.finger_verdict([1,1,.9,.9,.2],[.1,.1,.1,.1,.1],rim))   # conflicting -> unknown
+        s.assertIsNone(grip.finger_verdict(None,None,rim))
     def test_force_vote(s):
         m=grip.GraspMonitor(df_min=1.);m.baseline([0,0,0])
         s.assertTrue(m.verdict([0,0,-2.]));s.assertFalse(m.verdict([0,0,-.2]))
@@ -180,3 +195,33 @@ class V6Fixes(unittest.TestCase):
         f,C=candidates(cl,(np.array([0,0,1.]),.18),'dish')
         g=[c for c in C if c['kind']=='rim'][0]
         self.assertAlmostEqual(g['z'],f['height']-min(RIM_DEPTH,.3*f['height']),6);self.assertLess(g['z'],f['height'])
+
+class V7Fixes(unittest.TestCase):
+    def test_startup_charges_process_start_only(self):
+        # node ready 3 s after import, sim clock first seen 200 s later at sim t=10: t0 = 10-3, not 10-203
+        self.assertAlmostEqual(budget.start_time(10.,3.,0.),7.)
+    def test_table_env_follows_measured_plane(self):
+        n=np.array([-.0699,0,.9976]);d=.1788          # v7 Kaggle plane (pelvis frame)
+        T=arm.table_env(plane=(n,d))
+        for sp in T[::50]:
+            top=sp.center+sp.radius*n/np.linalg.norm(n)
+            self.assertAlmostEqual(float(top@n/np.linalg.norm(n)+d/np.linalg.norm(n)),0.,6)
+        z=lambda x:-(d+n[0]*x)/n[2]
+        self.assertGreater(z(.5)-arm.TABLE_TOP,.03)    # 3.5 cm above the flat model at x=0.5
+    def test_tray_walls_are_obstacles(self):
+        n=np.array([0,0,1.]);d=-arm.TABLE_TOP
+        W=arm.tray_env([(.34,-.69)],(n,d))
+        self.assertTrue(W);top=max(s.center[2]+s.radius for s in W)
+        self.assertAlmostEqual(top,arm.TABLE_TOP+.07,6)
+    def test_thumb_in_collision_envelope(self):
+        A=arm.Arm('l');hm=arm.hand_mesh('l');self.assertIsNotNone(hm)
+        tip=[s for s in A.col.spheres if s.link==arm.SIDE['l']['tip']]
+        self.assertGreaterEqual(len(tip),4+len(hm['thumb_env_hand']))
+        self.assertTrue(A.col.valid(A.home))
+    def test_pinch_point_deeper_than_open_tip_midpoint(self):
+        A=arm.Arm('l');hm=arm.hand_mesh('l')
+        self.assertLess(hm['pad_gap_open'],A.hand['opposed_open'])   # 7.8 cm pads vs 10.5 cm tip estimate
+        g=np.asarray(A.hand['grip_center_hand']);p=np.asarray(hm['pinch_point_hand'])
+        self.assertLess(p[2],g[2]-.01)
+    def test_slot_inner_first(self):
+        self.assertLess(trays.slot_offset(1,.03,ty=.69),0);self.assertGreater(trays.slot_offset(1,.03,ty=-.69),0)

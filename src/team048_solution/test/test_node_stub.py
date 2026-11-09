@@ -69,7 +69,7 @@ class NodeWiring(unittest.TestCase):
         A=s.s.arms['l'];top=ARM.TABLE_TOP;tx,ty=TR.NOMINAL['tray_left']
         res=[N.plan_place(A,A.home,tx,ty+dy,top) for dy in (0.,.08,-.08)]
         ok=[r for r in res if r is not None];s.assertTrue(ok,'no feasible place pose for the left tray')
-        for q,qu in ok:
+        for q,qu,_ in ok:
             if qu is not None:s.assertGreater(A.tcp(qu)[2,3],A.tcp(q)[2,3]+.07)
     @unittest.skipUnless(os.path.exists(V5),'v5 fixture missing')
     def test_observe_on_real_v5_frame(s):

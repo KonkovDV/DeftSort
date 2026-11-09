@@ -29,7 +29,9 @@ def chroma_mask(rgb, colour, chroma_min=CHROMA_MIN):
     return (c[..., k]-others.max(axis=-1)) >= chroma_min
 
 
-def locate(P, rgb, valid, name, colour, plane=None, window=.15, min_px=150, max_shift=.10, min_cover=.6):
+def locate(P, rgb, valid, name, colour, plane=None, window=.15, min_px=150, max_shift=.03, min_cover=.6):
+    # max_shift .10 -> .03: v7 Kaggle tray_left (cut by the image border) was 'located' 6 cm off (y .629 vs .69) in 3
+    # observations while the fully visible tray_center stayed within 0.5 cm of nominal; scene.yaml positions are fixed.
     """Tray centre (x, y) in pelvis and the source ('camera'|'nominal').
 
     Uses only points in a window around the nominal slot, at most TRAY_H+2 cm above the table plane, with the tray
@@ -56,11 +58,13 @@ def locate(P, rgb, valid, name, colour, plane=None, window=.15, min_px=150, max_
     return c, ('camera' if not np.allclose(c, [nx, ny]) else 'nominal')
 
 
-def slot_offset(k, half_extent, step=SLOT_STEP, size=TRAY_SIZE, wall=TRAY_WALL, clearance=.01):
-    """Offset along the tray long axis (pelvis y) for the k-th object placed in this tray: 0, +s, -s, 0, ...
+def slot_offset(k, half_extent, step=SLOT_STEP, size=TRAY_SIZE, wall=TRAY_WALL, clearance=.01, ty=0.):
+    """Offset along the tray long axis (pelvis y) for the k-th object placed in this tray: 0, inner, outer, 0, ...
+    inner = toward the robot midline (v7 Kaggle: the outer slot y=.77 of tray_left was not reached, TCP 13.7 cm off).
 
     s = min(step, room) where room keeps the object's footprint half-extent inside the walls with clearance.
     """
     room = size[1]/2-wall-clearance-max(0., float(half_extent))
     s = max(0., min(step, room))
-    return (0., s, -s)[int(k) % 3]
+    inner = -s if ty > 0 else s
+    return (0., inner, -inner)[int(k) % 3]

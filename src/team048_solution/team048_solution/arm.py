@@ -77,6 +77,12 @@ def mesh_spheres(path=MESH_SPHERES,require_validated=True):
     if require_validated and d.get('validated') is not True:return None
     try:return [Sphere(e['link'],np.asarray(e['center'],float),float(e['radius'])) for e in d['spheres']]
     except (KeyError,TypeError,ValueError):return None
+HAND_MESH=os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','hand_mesh_geometry.json')
+def hand_mesh(side):
+    """Mesh-derived hand geometry (tools/hand_from_meshes.py) or None."""
+    try:
+        import json;return json.load(open(HAND_MESH))[side]
+    except Exception:return None
 def arm_spheres(side,chain):
     if USE_MESH_SPHERES:
         M=mesh_spheres()
@@ -94,6 +100,11 @@ def arm_spheres(side,chain):
     tip=SIDE[s]['tip']   # hand + fingers: palm and finger region along hand z in tcp frame (hand frame == tcp up to rotation)
     R=J[f"{'left' if s=='l' else 'right'}_hand_to_tcp"]['T'][:3,:3]
     for z,r in ((.03,.045),(.08,.045),(.13,.04),(.17,.035)):S.append(Sphere(tip,R@np.array([0,0,z]),r))
+    # thumb (off the hand axis by up to 9 cm, NOT covered by the axis spheres): v7 Kaggle side grasps pressed the
+    # table with +11..+32 N (pelvis z) while the thumb tip was the lowest hand point (FK) -> mesh-derived thumb spheres
+    hm=hand_mesh(s)
+    if hm:
+        for c in hm['thumb_env_hand']:S.append(Sphere(tip,R@np.asarray(c,float),max(.012,hm['thumb_env_radius'])))
     return S
 def body_env(side,other_q=None):
     """Torso, head and the other arm (at its posture) as pelvis-frame spheres. Table added separately."""
@@ -112,12 +123,34 @@ def body_env(side,other_q=None):
     # legs/hips below the table are fixed: one sphere per hip
     for hs in ('l','r'):E.append(Sphere('pelvis',P(f'hip_pitch_{hs}_link'),.07))
     return E
-def table_env(x=(.32,.85),y=(-.95,.95),R=.1,step=.03,top=TABLE_TOP):   # near edge x=.22 (table.front_gap)
-    return [Sphere('pelvis',np.array([a,b,top-R]),R) for a in np.arange(x[0],x[1]+1e-9,step) for b in np.arange(y[0],y[1]+1e-9,step)]
+def table_env(x=(.32,.85),y=(-.95,.95),R=.1,step=.03,top=TABLE_TOP,plane=None):   # near edge x=.22 (table.front_gap)
+    """Table as spheres tangent to the top surface. plane=(n,d) (pelvis frame, n.p+d=0, from the head camera) replaces
+    the flat scene.yaml height: v7 Kaggle frames show the table tilted 4.0 deg in the pelvis frame (n_x=-0.070 in all
+    31 frames), i.e. 1.2-3.8 cm higher than the flat model over x=0.3-0.55."""
+    if plane is None:
+        return [Sphere('pelvis',np.array([a,b,top-R]),R) for a in np.arange(x[0],x[1]+1e-9,step) for b in np.arange(y[0],y[1]+1e-9,step)]
+    n,d=np.asarray(plane[0],float),float(plane[1]);nn=np.linalg.norm(n);n=n/nn;d=d/nn
+    out=[]
+    for a in np.arange(x[0],x[1]+1e-9,step):
+        for b in np.arange(y[0],y[1]+1e-9,step):
+            z=-(d+n[0]*a+n[1]*b)/n[2];out.append(Sphere('pelvis',np.array([a,b,z])-R*n,R))
+    return out
+def tray_env(trays,plane,size=(.22,.32),height=.07,r=.02,step=.03):
+    """Tray walls as spheres (centres r below the rim): v7 Kaggle s103 the hand was carried into the tray_right wall
+    (82 N, TCP 14 cm below plan) because trays were not obstacles."""
+    n,d=np.asarray(plane[0],float),float(plane[1]);out=[]
+    for tx,ty in trays:
+        hx,hy=size[0]/2,size[1]/2;pts=[]
+        for a in np.arange(-hx,hx+1e-9,step):pts+=[(tx+a,ty-hy),(tx+a,ty+hy)]
+        for b in np.arange(-hy,hy+1e-9,step):pts+=[(tx-hx,ty+b),(tx+hx,ty+b)]
+        for x,y in pts:
+            z0=-(d+n[0]*x+n[1]*y)/n[2]
+            for h in (height-r,max(r,height-3*r)):out.append(Sphere('pelvis',np.array([x,y,z0+h]),r))
+    return out
 class Arm:
     def __init__(self,side,margin=.015,table=True):
         self.side=side;self.chain=arm_chain(side);self.hand=hand_opening(side)
-        env=body_env(side)+(table_env() if table else [])
+        self.body=body_env(side);env=self.body+(table_env() if table else [])
         # ignore adjacent arm links and the shoulder link vs torso handled by env; within-chain adjacency:
         links=[J[f'{n}_{side}_joint']['child'] for n in ARM]+[SIDE[side]['tip']]
         ign=[(a,b) for i,a in enumerate(links) for b in links[i+1:i+3]]
@@ -129,6 +162,9 @@ class Arm:
         q=dict(zip([f'{n}_{side}_joint' for n in ARM],[-.6,.25*s,0.,-1.2,0.,0.,0.]))
         self.seeds.insert(0,np.clip([q.get(n,0.) for n in self.chain.names],self.chain.lower,self.chain.upper))
         self.home=self.seeds[0]
+    def set_scene(self,plane,trays=()):
+        """Obstacles from the latest observation: measured table plane + tray walls (body unchanged)."""
+        self.col.environment=self.body+table_env(plane=plane)+(tray_env(trays,plane) if trays else [])
     def tcp(self,q):
         return self.chain.fk(q)
     def lift(self,q,dz=.08):
@@ -150,10 +186,14 @@ class Arm:
     def position_error(self,q_measured,T_goal):
         """Distance between the TCP at the measured joints and the goal TCP (m)."""
         return float(np.linalg.norm(self.chain.fk(q_measured)[:3,3]-T_goal[:3,3]))
-    def grasp_pose(self,center_xyz,close_axis,approach):
-        """TCP pose so that the hand's thumb->finger closing axis maps to close_axis and fingers point along approach."""
+    def grasp_pose(self,center_xyz,close_axis,approach,point='grip'):
+        """TCP pose so that the hand's thumb->finger closing axis maps to close_axis and fingers point along approach.
+        point='grip': midpoint of the OPEN finger tips; 'pinch': where thumb and index/middle meshes first touch when
+        closing (mesh-derived, 1.8 cm deeper toward the palm) -- used for rim pinches."""
         Rh=J[f"{'left' if self.side=='l' else 'right'}_hand_to_tcp"]['T'][:3,:3]   # hand frame in tcp frame
-        c_t=Rh@self.hand['close_axis_hand'];z_t=Rh@np.array([0,0,1.]);g_t=Rh@self.hand['grip_center_hand']
+        hm=hand_mesh(self.side)
+        gp=np.asarray(hm['pinch_point_hand'],float) if (point=='pinch' and hm) else self.hand['grip_center_hand']
+        c_t=Rh@self.hand['close_axis_hand'];z_t=Rh@np.array([0,0,1.]);g_t=Rh@gp
         z_t=z_t-c_t*(z_t@c_t);z_t/=np.linalg.norm(z_t)
         u=close_axis/np.linalg.norm(close_axis);a=approach-u*(approach@u);a/=np.linalg.norm(a)
         A=np.c_[c_t,z_t,np.cross(c_t,z_t)];B=np.c_[u,a,np.cross(u,a)];R=B@A.T
@@ -166,14 +206,14 @@ class Arm:
                 if self.col.valid(q):return q
             except ValueError:pass
         return None
-    def plan_pick(self,center,close_axis,approach,width,pre=.08,lift=.08,tilts=(0,.35,.6)):
+    def plan_pick(self,center,close_axis,approach,width,pre=.08,lift=.08,tilts=(0,.35,.6),point='grip'):
         """Returns dict(q_pre,q_grasp,q_lift,traj) or None. Speed capped at 0.8 rad/s by joint_path/Chain.velocity."""
         if width>self.hand['opposed_open']-.01:return None
         import itertools
         for t,sg in itertools.product(tilts,(1.,-1.)):
             a=np.asarray(approach,float);u=sg*np.asarray(close_axis,float)   # a 2-finger-opposed grasp is symmetric in the closing axis
             if abs(a[2])<.9: a=a*np.cos(t)+np.array([0,0,-np.sin(t)])  # tilt fingers downward
-            Tg=self.grasp_pose(center,u,a);Tp=Tg.copy();Tp[:3,3]-=pre*(a/np.linalg.norm(a));Tl=Tg.copy();Tl[2,3]+=lift
+            Tg=self.grasp_pose(center,u,a,point);Tp=Tg.copy();Tp[:3,3]-=pre*(a/np.linalg.norm(a));Tl=Tg.copy();Tl[2,3]+=lift
             qp=self.solve(Tp);
             if qp is None:continue
             qg=self.solve(Tg,qp)
