@@ -337,7 +337,7 @@ def tray_env_build(trays,plane,size=(.22,.32),height=.07,r=.02,step=.03):
     obstacles."""
     n,d=np.asarray(plane[0],float),float(plane[1]);out=[]
     for t in trays:
-        tx,ty,ax,ay,sa,sb,height=tray_geom(t,size,height)
+        tx,ty,ax,ay,sa,sb,h_w=tray_geom(t,size,height)   # per-tray wall height; `height` stays the default for every tray
         v=np.array([ax,ay])/max(1e-9,np.hypot(ax,ay));u=np.array([v[1],-v[0]])   # u: short axis, v: long axis
         hx,hy=sa/2,sb/2;loc=[]
         for a in np.arange(-hx,hx+1e-9,step):loc+=[(a,-hy),(a,hy)]
@@ -345,7 +345,7 @@ def tray_env_build(trays,plane,size=(.22,.32),height=.07,r=.02,step=.03):
         pts=[(tx+a*u[0]+b*v[0],ty+a*u[1]+b*v[1]) for a,b in loc]
         for x,y in pts:
             z0=-(d+n[0]*x+n[1]*y)/n[2]
-            for h in (height-r,max(r,height-3*r)):out.append((x,y,z0+h))
+            for h in (h_w-r,max(r,h_w-3*r)):out.append((x,y,z0+h))
     return spheres_bulk('pelvis',out,r) if out else []
 HOME_Q=(-.6,.25,0.,-1.2,0.,0.,0.)   # forward-reaching elbow-bent home posture (robot posture; y-sign mirrored per side)
 def home_dict(side):

@@ -185,7 +185,7 @@ class Phase2(unittest.TestCase):
         for pl in (s.plane,(np.array([.03,-.02,.99]),.2)):
             got=arm.tray_env_build(dets,pl);n,d=np.asarray(pl[0],float),float(pl[1]);ref=[];h0=.07
             for t in dets:
-                tx,ty,ax,ay,sa,sb,h0=arm.tray_geom(t,(.22,.32),h0)   # same carry-over of the height default as tray_env_build
+                tx,ty,ax,ay,sa,sb,h0=arm.tray_geom(t,(.22,.32),.07)   # each tray: its measured height or the default
                 v=np.array([ax,ay])/max(1e-9,np.hypot(ax,ay));u=np.array([v[1],-v[0]]);hx,hy=sa/2,sb/2;loc=[]
                 for a in np.arange(-hx,hx+1e-9,.03):loc+=[(a,-hy),(a,hy)]
                 for b in np.arange(-hy,hy+1e-9,.03):loc+=[(-hx,b),(hx,b)]
@@ -194,6 +194,11 @@ class Phase2(unittest.TestCase):
                     for hh in (h0-.02,max(.02,h0-.06)):ref.append(planning.Sphere('pelvis',np.array([x,y,z0+hh]),.02))
             s.assertEqual(repr(got),repr(ref))
             s.assertTrue(all(np.array_equal(g.center,r.center) for g,r in zip(got,ref)))
+    def test_tray_env_default_height_not_carried_over(s):
+        # regression: a tray without a measured height used to inherit the previous tray's measured height
+        meas=dict(center=(.34,.69),size=(.22,.32),axis=(0.,1.),height=.05)
+        a=arm.tray_env_build([meas,(.53,0.)],s.plane);b=arm.tray_env_build([(.53,0.)],s.plane)
+        s.assertEqual(repr(a[len(a)-len(b):]),repr(b))
     def test_certify_skip_and_levers_bound(s):
         rng=np.random.default_rng(8);n=agree=nn=0;viol=0.
         for A in s.arms.values():
