@@ -63,6 +63,15 @@ HEAVY_KG=.22          # kg (objects.yaml masses in priors.json). v7+v8 TRACE (fo
                       # on objects <= 0.20 kg were held after the lift, 0 of 6 on objects >= 0.22 kg (Crunch 0.22, Utana and
                       # Crayola 0.35, mustard 0.43); failed attempts also push neighbours (v8 Crunch, v9a frames_end).
                       # -> light objects first within an observation, heavy ones afterwards (still attempted).
+# move_arm / waist / release timeouts (sim s). They bound the worst case of every step while an object is in the hand
+# (hold_time_bound) -- the #595 guarantee 'nothing in the hand at the limit' must hold even if every step times out.
+MOVE_T_PAD=2.         # s added to the 1.6x speed-line time of the first move_arm attempt
+REFINE_T=1.5          # s per refine re-command of move_arm
+MOVE_RES=.06          # rad, largest residual move_arm accepts as reached (start of the next move may differ by this)
+WAIST_TMAX=6.         # s, waist() waits at most this
+RELEASE_WAIT=1.       # s, wait_fingers tmax after the release command (done at most twice: re-open)
+HOLD_MARGIN_S=1.      # s, design margin for the solver's own sim time between the lift check and the release
+                      # (IK correction, trace/log lines); not a measured value
 MOVE_SETTLE_S=2.6     # s per arm move on top of the 1.6x speed line (move_arm: PD undershoot, refine). v8 Perricone TRACE:
                       # lifted->carry 2.8 s for |dq| 0.30 (line 0.6 s), carry->over_tray 4.9 s for |dq| 1.15 (line 2.3 s)
 FAILS_MAX=2           # failed attempts per object before it is skipped (per round)
@@ -139,7 +148,7 @@ class Sol(Node):
         vmax=min(.8,vmax)
         q=np.asarray(q,float);q0=s.q_now(side);dq=np.abs(q-q0);m=max(dq.max(),1e-3)
         spd=np.maximum(vmax*dq/m,.05*vmax/.8)     # synchronized: every joint arrives together (straight joint-space line)
-        T=timeout or (m/vmax*1.6+2.)
+        T=timeout or (m/vmax*1.6+MOVE_T_PAD)
         s.cmd('arm',IDS[side],q,spd);t=s.now();goal=q.copy()
         for k in range(refine+1):
             while s.now()-t<T:
@@ -152,7 +161,7 @@ class Sol(Node):
                 time.sleep(.02)
             e=q-s.q_now(side)
             if k<refine:   # PD undershoot under gravity: bias the target by the residual (bounded by joint limits)
-                goal=np.clip(goal+e,s.arms[side].chain.lower,s.arms[side].chain.upper);s.cmd('arm',IDS[side],goal,np.full(7,.3));t=s.now();T=1.5
+                goal=np.clip(goal+e,s.arms[side].chain.lower,s.arms[side].chain.upper);s.cmd('arm',IDS[side],goal,np.full(7,.3));t=s.now();T=REFINE_T
         return np.abs(q-s.q_now(side)).max()<.06
     def hand_set(s,side,v):
         s.hand_target[side]=list(v);m=JointState();m.name=['1','2','3','4','5','6'];m.position=[float(x) for x in v];s.hand[SIDE_NAME[side]].publish(m)
@@ -495,7 +504,7 @@ class Sol(Node):
             s.log('robot_description:', 'in use' if ok else f'bundled URDF kept ({why})');return ok
         except Exception as e:
             s.log('robot_description: parse failed, bundled URDF kept',type(e).__name__);return False
-    def waist(s,theta,tol=.02,tmax=6.):
+    def waist(s,theta,tol=.02,tmax=WAIST_TMAX):
         """body_yaw_joint (motor 31) to theta at <=0.8 rad/s; waits on /joint_states."""
         s.cmd('waist',[31],[theta],[.8]);t=s.now()
         while s.now()-t<tmax:
@@ -611,9 +620,9 @@ class Sol(Node):
                     s.log('grasp check (contact): empty',name);s.hand_open(side);s.retreat(side);return False
                 # #595 end-of-run policy: a lifted object outside a tray (or in the hand) at the limit is -10, an
                 # untouched one 0 -> lift only if lift + transport + release + retreat still fit before the limit.
-                need=place_time(A,p['q_lift'],place,yaw,q_from=p['q_grasp'])
-                if s.budget.remaining(s.now())<need+s.budget.safety:
-                    s.log('deadline: not lifting',name,'need',round(need,1),'s left',round(s.budget.remaining(s.now()),1))
+                need=place_time(A,p['q_lift'],place,yaw,q_from=p['q_grasp']);hold=hold_time_bound(p['q_grasp'],p['q_lift'],place,yaw)
+                if not lift_allowed(s.budget.remaining(s.now()),need,hold,s.budget.safety):
+                    s.log('deadline: not lifting',name,'need',round(need,1),'hold bound',round(hold,1),'s left',round(s.budget.remaining(s.now()),1))
                     s.hand_open(side);s.wait_fingers(side,tmin=.3);s.retreat(side);return None
                 s.move_arm(side,p['q_lift']);s.sleep(.3)
                 held=s.hand_verdict(side,gr);old=s.hand_shadow(side,gr)
@@ -634,8 +643,8 @@ class Sol(Node):
                 old=s.hand_shadow(side,gr)
                 s.trace('over_tray',side,name,Tq,tray=tray,tray_xy=[round(sx,3),round(sy,3)],yaw=round(yaw,3),
                         verdict=s.hand_verdict(side,gr),verdict_past=old['past'],verdict_v7=old['v7'])   # slip during transport shows up here (recalibration data)
-                s.hand_open(side);s.wait_fingers(side,tmin=.4,tmax=1.0)
-                if s.fingers_open(side) is False:s.log('fingers not open after release, re-open',name);s.hand_open(side);s.wait_fingers(side,tmin=.4,tmax=1.0)
+                s.hand_open(side);s.wait_fingers(side,tmin=.4,tmax=RELEASE_WAIT)
+                if s.fingers_open(side) is False:s.log('fingers not open after release, re-open',name);s.hand_open(side);s.wait_fingers(side,tmin=.4,tmax=RELEASE_WAIT)
                 s.trace('released',side,name,A.tcp(q_place))
                 if q_up is not None:s.move_arm(side,q_up,tol=.03)
                 s.go_home(side)
@@ -742,6 +751,25 @@ def place_time(A,q_lift,place,yaw,vmax=.8,release_s=None,q_from=None,settle=None
     q_place,q_up,q_carry=place;seq=([q_from] if q_from is not None else [])+[q_lift]+[q for q in (q_carry,q_place,q_up) if q is not None]+[A.home]
     mv=sum(move_time(a,b,vmax,settle) for a,b in zip(seq,seq[1:]))+(.3 if q_from is not None else 0.)
     return mv+(2*abs(yaw)/vmax+1. if yaw else 0.)+release_s
+def move_bound(a,b,vmax=.8,refine=2):
+    """Worst-case sim seconds of one move_arm(a->b) as coded: first attempt T = 1.6 x (|dq|max + MOVE_RES)/vmax +
+    MOVE_T_PAD (the measured start may be off the planned one by up to MOVE_RES), then `refine` re-commands of REFINE_T."""
+    return (float(np.max(np.abs(np.asarray(b)-np.asarray(a))))+MOVE_RES)/vmax*1.6+MOVE_T_PAD+refine*REFINE_T
+def hold_time_bound(q_grasp,q_lift,place,yaw,vmax=.8):
+    """#595: upper bound of the sim time from the lift command to the end of the release when EVERY step times out:
+    lift (+0.3 s pause), carry, waist (WAIST_TMAX), place, one TCP correction (A.correct max_step 0.15 rad, refine 1),
+    release with one re-open (2 x RELEASE_WAIT). Lifting only when this fits guarantees no object in the hand at the
+    limit regardless of the typical-time model place_time."""
+    q_place,q_up,q_carry=place
+    seq=[q_grasp,q_lift]+([q_carry] if q_carry is not None else [])+[q_place]
+    t=sum(move_bound(a,b,vmax) for a,b in zip(seq,seq[1:]))+.3
+    t+=WAIST_TMAX if yaw else 0.
+    t+=(.15+2*MOVE_RES)/vmax*1.6+MOVE_T_PAD+REFINE_T   # correction move_arm(qc, refine=1): |qc-q_measured| <= residual + max_step
+    return t+2*RELEASE_WAIT
+def lift_allowed(remaining,need,hold,safety):
+    """#595 lift decision: the typical-time model (place_time + safety: lift, transport, release, retreat home) AND the
+    worst-case hold bound (every in-hand step timing out) must both fit in the remaining sim time."""
+    return remaining>=max(need+safety,hold+HOLD_MARGIN_S)
 def self_w(s):return min(s.arms['l'].hand['opposed_open']-.01,.11)
 def main():
     rclpy.init();n=Sol();ex=MultiThreadedExecutor(4);ex.add_node(n)
