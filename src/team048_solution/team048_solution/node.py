@@ -546,7 +546,7 @@ class Sol(Node):
         order='lr' if ty>.1 else ('rl' if ty<-.1 else ('lr' if f['center'][1]>=0 else 'rl'))
         k=s.placed.get(tray,0);dl=TR.slot_offset(k,.5*f['length'],size=(ts,tl),ty=ty)   # along the MEASURED long axis
         sx,sy=tx+dl*ax,ty+dl*ay
-        why={'candidates':len(C),'feasible':int(sum(1 for g in C if g['feasible'])),'pick_ik':{},'place':{}}   # v8 fix 7
+        why={'candidates':len(C),'feasible':int(sum(1 for g in C if g['feasible'])),'pick_ik':{},'place':{},'hand_clear':{}}   # v8 fix 7
         for side in order:
             A=s.arms[side];A.set_other(s.q_now('r' if side=='l' else 'l'))   # #625 arm-to-arm at the measured posture
             for g in C:
@@ -564,7 +564,8 @@ class Sol(Node):
                 for dz in (SIDE_DZ if g['kind']=='side' else (0.,)):
                     if g['kind']=='side' and dz>0 and g['z']+dz>f['height']-.015:break
                     c3=np.array([g['center'][0],g['center'][1],top+g['z']+dz])
-                    p=A.plan_pick(c3,ca,ap,g['width'],point=pt)
+                    p=A.plan_pick(c3,ca,ap,g['width'],point=pt,obj=None if 'box' not in g else dict(g['box'],z0=top))
+                    if p is None and getattr(A,'last_clear_fail',0):why['hand_clear'][side]=why['hand_clear'].get(side,0)+A.last_clear_fail
                     if p is not None:break
                 if p is None:
                     why['pick_ik'][side]=why['pick_ik'].get(side,0)+1;continue
@@ -574,7 +575,9 @@ class Sol(Node):
                 yaw,place=yp
                 if not s.budget.can_start(s.now(),p['duration']+(2*abs(yaw)/.8+1. if yaw else 0.)):   # waist out and back at 0.8 rad/s
                     s.log('skip',name,'remaining',round(s.budget.remaining(s.now()),1),'s');return None
-                s.log('pick',name,cat,'->',tray,'slot',k,'arm',side,g['kind'],'w',round(g['width'],3),'z',round(g['z'],3))
+                cl=p.get('clear') or {}
+                s.log('pick',name,cat,'->',tray,'slot',k,'arm',side,g['kind'],'w',round(g['width'],3),'z',round(g['z'],3),
+                      'clear',json.dumps({k_:(None if cl.get(k_) is None else round(cl[k_],3)) for k_ in ('du','dr','margin')}))
                 Tg=A.tcp(p['q_grasp']);s.trace('start',side,name,kind=g['kind'],center=[round(float(x),3) for x in c3])
                 s.hand_open(side);s.move_arm(side,p['q_pre']);Tp=A.tcp(p['q_pre']);s.trace('pre',side,name,Tp)
                 thumb=s.wait_thumb(side)      # #648: thumb in opposition before anything closes (usually already there)

@@ -1,0 +1,239 @@
+{
+ "source": "Kaggle out_v7/out_v8 logs/run_sort3_*.log TRACE: side grasps, wrist force (hand weight subtracted by the sim) and finger positions at the grasp pose BEFORE closing",
+ "attempts": [
+  {
+   "run": "v7",
+   "seed": 101,
+   "obj": "006_mustard_bottle",
+   "side": "r",
+   "kind": "side",
+   "center": [
+    0.314,
+    0.045,
+    -0.061
+   ],
+   "at_grasp_F": [
+    15.916,
+    -7.895,
+    1.518
+   ],
+   "at_grasp_fing": [
+    0.921,
+    0.921,
+    1.018,
+    0.956,
+    1.066,
+    -0.001
+   ],
+   "t": 324.07
+  },
+  {
+   "run": "v7",
+   "seed": 101,
+   "obj": "Hyaluronic_Acid",
+   "side": "l",
+   "kind": "side",
+   "center": [
+    0.449,
+    0.233,
+    -0.099
+   ],
+   "at_grasp_F": [
+    -1.818,
+    -0.535,
+    0.853
+   ],
+   "at_grasp_fing": [
+    0.993,
+    0.991,
+    0.947,
+    0.891,
+    1.004,
+    0.0
+   ],
+   "t": 359.08
+  },
+  {
+   "run": "v7",
+   "seed": 102,
+   "obj": "Crayola_Bonus_64_Crayons",
+   "side": "r",
+   "kind": "side",
+   "center": [
+    0.464,
+    -0.387,
+    -0.084
+   ],
+   "at_grasp_F": [
+    -17.36,
+    2.96,
+    4.647
+   ],
+   "at_grasp_fing": [
+    0.995,
+    0.994,
+    0.993,
+    0.993,
+    1.0,
+    0.0
+   ],
+   "t": 74.15
+  },
+  {
+   "run": "v7",
+   "seed": 102,
+   "obj": "Hyaluronic_Acid",
+   "side": "l",
+   "kind": "side",
+   "center": [
+    0.464,
+    0.247,
+    -0.097
+   ],
+   "at_grasp_F": [
+    -39.135,
+    14.356,
+    0.507
+   ],
+   "at_grasp_fing": [
+    1.002,
+    1.002,
+    1.002,
+    1.001,
+    1.002,
+    0.0
+   ],
+   "t": 160.47
+  },
+  {
+   "run": "v7",
+   "seed": 103,
+   "obj": "Perricone_MD_AcylGlutathione_Eye_Lid_Serum",
+   "side": "r",
+   "kind": "side",
+   "center": [
+    0.322,
+    -0.395,
+    -0.098
+   ],
+   "at_grasp_F": [
+    2.225,
+    -1.224,
+    1.296
+   ],
+   "at_grasp_fing": [
+    1.258,
+    1.399,
+    1.39,
+    1.205,
+    1.008,
+    -0.0
+   ],
+   "t": 69.58
+  },
+  {
+   "run": "v7",
+   "seed": 103,
+   "obj": "Hyaluronic_Acid",
+   "side": "l",
+   "kind": "side",
+   "center": [
+    0.336,
+    0.074,
+    -0.107
+   ],
+   "at_grasp_F": [
+    -2.562,
+    13.573,
+    2.186
+   ],
+   "at_grasp_fing": [
+    0.546,
+    0.883,
+    0.892,
+    0.9,
+    0.989,
+    -0.0
+   ],
+   "t": 111.93
+  },
+  {
+   "run": "v8",
+   "seed": 103,
+   "obj": "Crunch_Girl_Scouts_Candy_Bars_Peanut_Butter_Creme_78_oz_box",
+   "side": "l",
+   "kind": "side",
+   "center": [
+    0.344,
+    -0.111,
+    -0.033
+   ],
+   "at_grasp_F": [
+    14.601,
+    1.183,
+    5.127
+   ],
+   "at_grasp_fing": [
+    1.256,
+    1.384,
+    1.461,
+    0.952,
+    1.051,
+    0.011
+   ],
+   "t": 103.29
+  },
+  {
+   "run": "v8",
+   "seed": 103,
+   "obj": "006_mustard_bottle",
+   "side": "r",
+   "kind": "side",
+   "center": [
+    0.314,
+    0.045,
+    -0.061
+   ],
+   "at_grasp_F": [
+    3.189,
+    0.558,
+    4.064
+   ],
+   "at_grasp_fing": [
+    1.597,
+    0.978,
+    0.992,
+    0.98,
+    1.0,
+    -0.0
+   ],
+   "t": 126.27
+  },
+  {
+   "run": "v8",
+   "seed": 103,
+   "obj": "Perricone_MD_AcylGlutathione_Eye_Lid_Serum",
+   "side": "r",
+   "kind": "side",
+   "center": [
+    0.325,
+    -0.435,
+    -0.102
+   ],
+   "at_grasp_F": [
+    -1.381,
+    -1.545,
+    2.406
+   ],
+   "at_grasp_fing": [
+    0.995,
+    0.989,
+    0.993,
+    0.981,
+    0.998,
+    0.0
+   ],
+   "t": 153.66
+  }
+ ]
+}

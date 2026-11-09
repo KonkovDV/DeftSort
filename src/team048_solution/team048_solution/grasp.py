@@ -49,14 +49,22 @@ def footprint(cloud,plane):
 def circle_fit(xy):
     A=np.c_[2*xy,np.ones(len(xy))];b=(xy**2).sum(1);c,*_=np.linalg.lstsq(A,b,rcond=None);r=np.sqrt(c[2]+c[0]**2+c[1]**2);return c[:2],r
 
+def _box(f,ax,w,cyl):
+    """MEASURED object box for the open-hand clearance check (arm.grasp_clear_shift): footprint centre, closing-axis
+    direction ax with the extent w across it, the other footprint extent along the approach, visible height; cyl = jar
+    circle fit accepted (vertical cylinder of diameter w). z0 (table top) is added by the caller."""
+    L=f['length'] if abs(w-f['width'])<1e-12 else f['width']
+    return dict(center=np.asarray(f['center'],float).copy(),u=np.asarray(ax,float)[:2].copy(),w=float(w),L=float(L),
+                h=float(f['height']),cyl=bool(cyl))
+
 def candidates(cloud,plane,category,others=(),W_MAX=.09,finger=.02,depth=.04,margin=.01,robot_xy=(0.,0.)):
-    f=footprint(cloud,plane);out=[]
+    f=footprint(cloud,plane);out=[];cyl=False
     if category=='jar':   # visible arc of a cylinder under-estimates the diameter: circle fit on mid-height slice
         h=cloud@plane[0]+plane[1];sl=cloud[np.abs(h-.5*f['height'])<.01,:2]
         if len(sl)>30:
             c,r=circle_fit(sl)
             res=np.std(np.linalg.norm(sl-c,axis=1))
-            if .015<r<.06 and res<.004 and f['width']<=2*r<=1.15*f['length']:f['width']=f['length']=float(2*r);f['center']=c
+            if .015<r<.06 and res<.004 and f['width']<=2*r<=1.15*f['length']:f['width']=f['length']=float(2*r);f['center']=c;cyl=True
     toward=np.asarray(robot_xy,float)-f['center'];toward/=np.linalg.norm(toward)+1e-9
     if category in ('box','jar','electronics'):
         z=max(.5*f['height'],min(.04,f['height']-.01))
@@ -64,7 +72,7 @@ def candidates(cloud,plane,category,others=(),W_MAX=.09,finger=.02,depth=.04,mar
             if w+2*margin>W_MAX:continue
             appr=np.array([-ax[1],ax[0]]);appr*=-(np.sign(appr@toward) or 1)   # fingers move away from the robot (approach from the robot side)
             out.append(dict(kind='side',center=f['center'],close_axis=ax,approach=appr,width=w,z=z,
-                            score=(W_MAX-w)/W_MAX-.5*float(appr@toward)))
+                            score=(W_MAX-w)/W_MAX-.5*float(appr@toward),box=_box(f,ax,w,cyl)))
         # Top-down: same width gate as plan_pick (opposed_open-margin). Prefer side when both exist (lower score).
         # Offline: recovers gelatin (8.9 cm) when side margin gate rejects it; Razer (10 cm) still rejected.
         if category in ('box','electronics'):
@@ -72,7 +80,7 @@ def candidates(cloud,plane,category,others=(),W_MAX=.09,finger=.02,depth=.04,mar
                 if w>W_MAX:continue
                 out.append(dict(kind='top',center=f['center'],close_axis=np.r_[ax,0.],approach3=np.array([0.,0.,-1.]),
                                 width=float(w),z=max(f['height']-TOP_DEPTH,.5*f['height']),
-                                score=.35+(W_MAX-w)/W_MAX))   # below a typical clear side (~1.0+)
+                                score=.35+(W_MAX-w)/W_MAX,box=_box(f,ax,w,False)))   # below a typical clear side (~1.0+)
     if category=='dish':
         hull=f['hull'];c0,r0=circle_fit(hull) if len(hull)>5 else (f['center'],float(f['width'])/2)
         a0=float(np.arctan2(toward[1],toward[0]))

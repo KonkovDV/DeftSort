@@ -120,6 +120,78 @@ def hand_mesh(side):
             _HAND_MESH_CACHE.clear();_HAND_MESH_CACHE[key]=d
         return d[side]
     except Exception:return None
+# ---------------- open-hand mesh vs measured object box (side/top grasps) ----------------
+# v7+v8 Kaggle TRACE (fixes/V10_HEAVY_RU.md): the side grasps of the long boxes pushed the object with the hand BEFORE
+# closing (wrist |F| at the grasp pose 17.8 N Crayola v7, 15.4 N Crunch v8; fingers bent back 1.26-1.46 in Crunch v8,
+# Perricone v7) while the sphere envelope saw no contact (object = obstacle-free target). Cause, from the hand meshes
+# (tools/hand_open_points.py): at the grasp pose the object box overlaps the open hand -- the proximal phalanges of
+# the fingers reach 6 mm past the grip point toward the thumb and the palm starts 5.7 cm behind it, so a box longer than
+# ~6 cm along the approach, or wider than the asymmetric pad gap (fingers +2.8 cm, thumb -4.6 cm from the grip
+# point), is hit on the way in. grasp_clear_shift moves the grip point along the closing axis (centring the object in
+# the REAL pad gap) and back along the approach (as little as possible: every cm is a gravity lever about the closing
+# axis) until the open hand clears the measured footprint box at the grasp pose and along the whole approach.
+HAND_OPEN_PTS=os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','hand_open_points.json')
+_HOP_CACHE={}
+def hand_open_points(side):
+    """(points (N,3) in the TCP frame, part names (N,)) of the open hand, or None if the data file is missing."""
+    try:
+        st=os.stat(HAND_OPEN_PTS);key=(side,st.st_mtime_ns,st.st_size)
+        v=_HOP_CACHE.get(key)
+        if v is None:
+            import json
+            with open(HAND_OPEN_PTS) as f:d=json.load(f)[side]
+            P=np.asarray(d['points_tcp'],float).reshape(-1,3);parts=np.array([n for n,k in d['parts'] for _ in range(int(k))])
+            if len(parts)!=len(P):return None
+            P.setflags(write=False);v=_HOP_CACHE[key]=(P,parts)
+        return v
+    except Exception:return None
+CLEAR_MARGINS=(.004,.002,0.)            # m, tried in this order (most clearance first); 0 = touching is the limit
+SHIFT_U=tuple(np.round(np.arange(-.018,.01801,.003),3))   # m along the closing axis (centring in the pad gap)
+SHIFT_R=tuple(np.round(np.arange(0.,.0601,.005),3))       # m back along the approach (toward the robot)
+APPROACH_SWEEP_STEP=.01                 # m, approach sampling (< the thinnest object side, 3 cm)
+PAD_PARTS=('index_2','middle_2','thumb_4')   # distal pads that must close ON the object (pinch pair of every kind)
+def box_coords(W,box):
+    """World points -> object box frame (u: closing-axis direction of the footprint, v: in-plane normal, z above the
+    measured table top at the box centre)."""
+    c=np.asarray(box['center'],float)[:2];eu=np.asarray(box['u'],float)[:2];eu=eu/np.linalg.norm(eu);ev=np.array([-eu[1],eu[0]])
+    d=W[:,:2]-c;return np.c_[d@eu,d@ev,W[:,2]-float(box['z0'])]
+def box_inside(B,box,m=0.):
+    """Points (box frame) strictly inside the object (box, or vertical cylinder when box['cyl']) inflated by m."""
+    w,L,h=float(box['w']),float(box['L']),float(box['h'])
+    zin=(B[...,2]>0.)&(B[...,2]<h+m)
+    if box.get('cyl'):return zin&(np.hypot(B[...,0],B[...,1])<w/2+m)
+    return zin&(np.abs(B[...,0])<w/2+m)&(np.abs(B[...,1])<L/2+m)
+def grasp_clear_shift(side,Tg,approach,box,pre=.08,margins=CLEAR_MARGINS,su=SHIFT_U,sr=SHIFT_R):
+    """Smallest retreat dr (then smallest |du|) such that the OPEN hand at Tg shifted by du*u_box - dr*approach does
+    not overlap the measured object box (inflated by the margin) at the grasp pose and at every APPROACH_SWEEP_STEP
+    along the last `pre` metres, and the distal pads (index/middle/thumb) still project onto the object (the closing
+    fingers meet it). Returns dict(du,dr,margin,shift (3,)) or None (no clear shift: the hand cannot take this object
+    this way). Without hand data -> zero shift (old behaviour)."""
+    hp=hand_open_points(side)
+    if hp is None:return dict(du=0.,dr=0.,margin=None,shift=np.zeros(3))
+    P,parts=hp;a=np.asarray(approach,float);a=a/np.linalg.norm(a)
+    W=(Tg[:3,:3]@P.T).T+Tg[:3,3];B=box_coords(W,box)
+    eu3=np.r_[np.asarray(box['u'],float)[:2]/np.linalg.norm(np.asarray(box['u'],float)[:2]),0.]
+    ab=box_coords(np.vstack([a,np.zeros(3)]),dict(box,center=(0.,0.),z0=0.));ab=ab[0]   # approach in box axes
+    ub=np.array([1.,0.,0.])
+    w,L,h=float(box['w']),float(box['L']),float(box['h'])
+    ext=np.array([w/2,L/2 if not box.get('cyl') else w/2,h])+max(margins)+max(abs(x) for x in su)+max(sr)+pre
+    near=(np.abs(B[:,0])<ext[0])&(np.abs(B[:,1])<ext[1])&(B[:,2]>-ext[2])&(B[:,2]<h+ext[2])   # can reach the box
+    Bn=B[near];pad={k:B[parts==k] for k in PAD_PARTS}
+    ks=np.arange(int(np.ceil(pre/APPROACH_SWEEP_STEP))+1)*APPROACH_SWEEP_STEP;ks[-1]=min(ks[-1],pre)
+    grid=sorted(((dr,abs(du),du) for du in su for dr in sr))
+    for m in margins:
+        for dr,_,du in grid:
+            d=du*ub-dr*ab
+            ok=True
+            for k,pk in pad.items():   # closing pads must face the object (projection along u onto its v-z extent)
+                c=pk.mean(0)+d
+                if not (0.<c[2]<h and (abs(c[1])<(w/2 if box.get('cyl') else L/2))):ok=False;break
+            if not ok:continue
+            if len(Bn) and box_inside(Bn+d,box,m).any():continue
+            if len(Bn) and any(box_inside(Bn+d-s*ab,box,m).any() for s in ks[1:]):continue
+            return dict(du=float(du),dr=float(dr),margin=float(m),shift=du*eu3-dr*a)
+    return None
 def arm_spheres(side,chain,mesh=True):
     if mesh and USE_MESH_SPHERES and chain is not None:
         M=mesh_spheres()
@@ -479,15 +551,23 @@ class Arm:
                 if self.col.valid(q):return q
             except ValueError:pass
         return None
-    def plan_pick(self,center,close_axis,approach,width,pre=.08,lift=.08,tilts=(0,.35,.6),point='grip'):
-        """Returns dict(q_pre,q_grasp,q_lift,traj) or None. Speed capped at 0.8 rad/s by joint_path/Chain.velocity."""
+    def plan_pick(self,center,close_axis,approach,width,pre=.08,lift=.08,tilts=(0,.35,.6),point='grip',obj=None):
+        """Returns dict(q_pre,q_grasp,q_lift,traj) or None. Speed capped at 0.8 rad/s by joint_path/Chain.velocity.
+        obj: MEASURED object box (grasp_clear_shift) -> the grip point is shifted so the open hand clears it on the way
+        in (dict 'clear' in the result); a tilt/sign whose hand cannot clear it is skipped (self.last_clear_fail)."""
         if width>self.hand['opposed_open']-.01:return None
         if not self.scene_ready:return None   # no measured table yet: never plan against an assumed scene (#645)
         import itertools
+        self.last_clear_fail=0
         for t,sg in itertools.product(tilts,(1.,-1.)):
             a=np.asarray(approach,float);u=sg*np.asarray(close_axis,float)   # a 2-finger-opposed grasp is symmetric in the closing axis
             if abs(a[2])<.9: a=a*np.cos(t)+np.array([0,0,-np.sin(t)])  # tilt fingers downward
-            Tg=self.grasp_pose(center,u,a,point);Tp=Tg.copy();Tp[:3,3]-=pre*(a/np.linalg.norm(a));Tl=Tg.copy();Tl[2,3]+=lift
+            Tg=self.grasp_pose(center,u,a,point);cl=None
+            if obj is not None:
+                cl=grasp_clear_shift(self.side,Tg,a,obj,pre=pre)
+                if cl is None:self.last_clear_fail+=1;continue
+                Tg=self.grasp_pose(np.asarray(center,float)+cl['shift'],u,a,point)
+            Tp=Tg.copy();Tp[:3,3]-=pre*(a/np.linalg.norm(a));Tl=Tg.copy();Tl[2,3]+=lift
             qp=self.solve(Tp);
             if qp is None:continue
             qg=self.solve(Tg,qp)
@@ -498,6 +578,6 @@ class Arm:
                 # approach path: the hand spheres get close to the object on purpose; table/body are the obstacles
                 tr=joint_path(self.chain,self.col,[self.home,qp,qg,ql],speed=.8)
             except ValueError:continue
-            return dict(q_pre=qp,q_grasp=qg,q_lift=ql,traj=tr,tilt=t,duration=float(tr.times[-1]),
+            return dict(q_pre=qp,q_grasp=qg,q_lift=ql,traj=tr,tilt=t,duration=float(tr.times[-1]),clear=cl,
                         max_speed=float(np.max(np.abs(np.diff(tr.points,axis=0))/np.diff(tr.times)[:,None])))
         return None
