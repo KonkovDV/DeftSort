@@ -153,6 +153,7 @@ class NodeWiring(unittest.TestCase):
         sol.retreat=lambda k:None;sol.go_home=lambda k:calls.append('home');sol.js={'x':0.}
         sol.survey=lambda *a,**k:(calls.append('survey'),Clock.t)[1];sol.robot_description='<robot/>'
         sol.run()
-        s.assertEqual(calls[:3],['home','home','survey']);s.assertEqual(calls.count('obs'),N.EMPTY_OBS_MAX)
+        # v9fix: survey first (arms in the start posture), then home along a path certified against the measured table
+        s.assertEqual(calls[:3],['survey','home','home']);s.assertEqual(calls.count('obs'),N.EMPTY_OBS_MAX)
         s.assertTrue(sol.pubs['/sim/task/done'].sent)
 if __name__=='__main__':unittest.main()

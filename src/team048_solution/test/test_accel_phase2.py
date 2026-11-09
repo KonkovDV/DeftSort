@@ -168,12 +168,18 @@ class Phase2(unittest.TestCase):
         A.col.environment=A.body+arm.table_env(s.plane,A.table_x)+arm.tray_env(tr,s.plane);s.assertEqual(e1,repr(A.col.environment))
     def test_table_env_vectorised_exact(s):
         for pl,x,y in ((s.plane,(.12,1.),(-1.,1.)),((np.array([.03,-.02,.99]),.2),(.3,.85),(-.95,.95))):
-            n,d=np.asarray(pl[0],float),float(pl[1]);nn=np.linalg.norm(n);n=n/nn;d=d/nn;ref=[]
-            for a in np.arange(x[0],x[1]+1e-9,.03):
-                for b in np.arange(y[0],y[1]+1e-9,.03):
-                    z=-(d+n[0]*a+n[1]*b)/n[2];ref.append(planning.Sphere('pelvis',np.array([a,b,z])-.1*n,.1))
+            n,d=np.asarray(pl[0],float),float(pl[1]);nn=np.linalg.norm(n);n=n/nn;d=d/nn;ref=[];r=arm.TABLE_EDGE_R
+            zt=lambda a,b:-(d+n[0]*a+n[1]*b)/n[2]
+            # v9fix model (scalar reference): big spheres from edge+R, top lip band, front face column
+            for a in np.arange(x[0]+.1,x[1]+1e-9,.03):
+                for b in np.arange(y[0],y[1]+1e-9,.03):ref.append(planning.Sphere('pelvis',np.array([a,b,zt(a,b)])-.1*n,.1))
+            for a in np.arange(x[0]+r,x[0]+.1+1e-9,.03):
+                for b in np.arange(y[0],y[1]+1e-9,.03):ref.append(planning.Sphere('pelvis',np.array([a,b,zt(a,b)])-r*n,r))
+            for b in np.arange(y[0],y[1]+1e-9,.03):
+                for dz in np.arange(r,arm.TABLE_FRONT_DEPTH+1e-9,.03):
+                    a=x[0]+r;ref.append(planning.Sphere('pelvis',np.array([a,b,zt(a,b)-dz]),r))
             got=arm.table_env_build(pl,x,y);s.assertEqual(len(got),len(ref))
-            for g,r in zip(got,ref):s.assertTrue(g.link==r.link and np.array_equal(g.center,r.center) and g.radius==r.radius and not g.center.flags.writeable)
+            for g,q in zip(got,ref):s.assertTrue(g.link==q.link and np.allclose(g.center,q.center,atol=1e-12) and g.radius==q.radius and not g.center.flags.writeable)
     def test_tray_env_bulk_exact(s):
         dets=[dict(center=(.34,.69),size=(.22,.32),axis=(.1,.995),height=.068),(.53,0.)]
         for pl in (s.plane,(np.array([.03,-.02,.99]),.2)):

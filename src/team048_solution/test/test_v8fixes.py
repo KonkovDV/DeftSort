@@ -84,12 +84,15 @@ class GuardedApproach(unittest.TestCase):
             if a['held_at_lift']:self.assertFalse(self.trips(a),(a['run'],a['seed'],a['obj']))
     def test_most_failed_grasps_trip_before_closing(self):
         bad=[a for a in FX if not a['held_at_lift']]
-        self.assertEqual(len(bad),12);self.assertGreaterEqual(sum(self.trips(a) for a in bad),11)
+        self.assertEqual(len(bad),12);self.assertGreaterEqual(sum(self.trips(a) for a in bad),10)   # v9fix GUARD_DEV .16: v7 Hyaluronic (0.109) no longer
     def test_all_finger_guard_would_abort_v7_success(self):
         """Why only the closing fingers are guarded: v7 Ecoforms (rim) ring finger 1.14/1.17 at the grasp pose."""
         eco=[a for a in FX if a['held_at_lift'] and a['obj'].startswith('Ecoforms')]
         self.assertEqual(len(eco),2)
-        for a in eco:self.assertTrue(G.approach_deviation(a['phases']['at_grasp']['fing'],OPEN)[1])
+        # ring finger 1.137 / 1.173 (non-closing for the rim pinch): above the v8 threshold 0.10 in both, and above the
+        # v9fix threshold 0.16 in one -> guarding every finger would still abort a held grasp
+        for a in eco:self.assertGreater(G.approach_deviation(a['phases']['at_grasp']['fing'],OPEN)[0],.10)
+        self.assertTrue(any(G.approach_deviation(a['phases']['at_grasp']['fing'],OPEN)[1] for a in eco))
     def test_move_arm_stops_on_guard(self):
         s=N.Sol();s.arms={k:ARM.Arm(k) for k in 'lr'};A=s.arms['l']
         s.js=dict(zip(A.chain.names,A.home));sent=[]
@@ -150,8 +153,10 @@ class RunLoopReobserve(unittest.TestCase):
         sol.retreat=lambda k:None;sol.go_home=lambda k:None;sol.js={'x':0.};sol.robot_description='<robot/>'
         try:sol.run()
         finally:TS.Clock.t=100.
-        # each failed contact attempt triggers a new observation; the object is retried at most twice
-        self.assertEqual(picks,['a','a','b','b'])
+        # each failed contact attempt triggers a new observation; the object is retried at most twice per round,
+        # v9fix: plus one retry round with reset counters while time is left (RETRY_ROUNDS=1)
+        self.assertEqual(picks,['a','a','b','b']*(1+N.RETRY_ROUNDS))
+        self.assertTrue(any(l.startswith('retry round 1') for l in logs))
         self.assertGreaterEqual(len(obs),5)
         self.assertTrue(any(l.startswith('re-observe after contact a') for l in logs))
         self.assertTrue(any(l.startswith('no plan: c') and 'tray not found' in l for l in logs))

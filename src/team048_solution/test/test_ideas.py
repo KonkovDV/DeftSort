@@ -215,10 +215,14 @@ class V7Fixes(unittest.TestCase):
         self.assertAlmostEqual(budget.start_time(10.,3.,0.),7.)
     def test_table_env_follows_measured_plane(self):
         n=np.array([-.0699,0,.9976]);d=.1788          # v7 Kaggle plane (pelvis frame)
-        T=arm.table_env((n,d))
-        for sp in T[::50]:
-            top=sp.center+sp.radius*n/np.linalg.norm(n)
-            self.assertAlmostEqual(float(top@n/np.linalg.norm(n)+d/np.linalg.norm(n)),0.,6)
+        T=arm.table_env((n,d));nu=n/np.linalg.norm(n);du=d/np.linalg.norm(n)
+        x0=min(sp.center[0]-sp.radius for sp in T);tangent=0
+        for sp in T:
+            sd=float(sp.center@nu+du)
+            if abs(sd+sp.radius)<1e-6:tangent+=1        # top spheres: tangent to the measured plane
+            else:                                        # v9fix front face: at the edge, below the top
+                self.assertAlmostEqual(sp.center[0]-sp.radius,x0,6);self.assertLess(sd,-.9*sp.radius)
+        self.assertGreater(tangent,len(T)//2)
         z=lambda x:-(d+n[0]*x)/n[2]
         self.assertGreater(z(.5)-SF.TABLE_TOP,.03)    # 3.5 cm above the flat model at x=0.5
     def test_tray_walls_are_obstacles(self):
