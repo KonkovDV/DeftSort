@@ -2,7 +2,9 @@
 //! PyO3 bindings (`--features python`, built by maturin). The Python package keeps a NumPy reference
 //! implementation of everything here and falls back to it automatically if this module is missing.
 pub mod col;
+pub mod grasp;
 pub mod kin;
 pub mod perc;
 #[cfg(feature = "python")]
 mod py;
+pub mod rng;

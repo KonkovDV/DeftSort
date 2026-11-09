@@ -5,8 +5,9 @@ Limitations: the URDF STL meshes are absent, so link envelopes are spheres sized
 import sys,os,numpy as np,xml.etree.ElementTree as ET
 
 from .kinematics import Chain
-from .planning import Sphere,CollisionModel,joint_path
-from .geometry import pose,rotation
+from .planning import Sphere,CollisionModel,joint_path,spheres_bulk
+from . import _accel
+from .geometry import pose,rotation,check_transform,check_rotation,finite
 URDF=os.environ.get('HACK_URDF',os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','tiangong_pro_with_hands.urdf'))
 import re
 XML=re.sub(r'<axis\s+xyz="0 0 0"\s*/>','',open(URDF).read());ROOT=ET.fromstring(XML)
@@ -78,10 +79,18 @@ def mesh_spheres(path=MESH_SPHERES,require_validated=True):
     try:return [Sphere(e['link'],np.asarray(e['center'],float),float(e['radius'])) for e in d['spheres']]
     except (KeyError,TypeError,ValueError):return None
 HAND_MESH=os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','hand_mesh_geometry.json')
+_HAND_MESH_CACHE={}
 def hand_mesh(side):
-    """Mesh-derived hand geometry (tools/hand_from_meshes.py) or None."""
+    """Mesh-derived hand geometry (tools/hand_from_meshes.py) or None. Parsed once per file version (path, mtime,
+    size): grasp_pose calls this for every candidate pose (was 248 JSON parses per 10 objects). Treat as read-only."""
     try:
-        import json;return json.load(open(HAND_MESH))[side]
+        st=os.stat(HAND_MESH);key=(HAND_MESH,st.st_mtime_ns,st.st_size)
+        d=_HAND_MESH_CACHE.get(key)
+        if d is None:
+            import json
+            with open(HAND_MESH) as f:d=json.load(f)
+            _HAND_MESH_CACHE.clear();_HAND_MESH_CACHE[key]=d
+        return d[side]
     except Exception:return None
 def arm_spheres(side,chain):
     if USE_MESH_SPHERES:
@@ -124,18 +133,24 @@ def body_env(side,other_q=None):
     for hs in ('l','r'):E.append(Sphere('pelvis',P(f'hip_pitch_{hs}_link'),.07))
     return E
 _ENV_CACHE={}
-def _cached(key,build):
-    """Scene sphere lists are pure functions of their arguments and Spheres are immutable: memoise (bounded)."""
+def _cached_entry(key,build):
+    """(tuple of Spheres, centers (n,3) read-only, radii (n,) read-only); scene sphere lists are pure functions of
+    their arguments and Spheres are immutable: memoise (bounded)."""
     v=_ENV_CACHE.get(key)
     if v is None:
         if len(_ENV_CACHE)>256:_ENV_CACHE.clear()
-        v=_ENV_CACHE[key]=tuple(build())
-    return list(v)
+        t=tuple(build());C=np.array([s.center for s in t],dtype=float).reshape(-1,3);R=np.array([s.radius for s in t],dtype=float)
+        C.setflags(write=False);R.setflags(write=False);v=_ENV_CACHE[key]=(t,C,R)
+    return v
+def _cached(key,build):
+    return list(_cached_entry(key,build)[0])
 def _key(*a):
     return tuple(np.asarray(x,float).tobytes() if isinstance(x,(np.ndarray,list,tuple)) else x for x in a)
-def table_env(x=(.32,.85),y=(-.95,.95),R=.1,step=.03,top=TABLE_TOP,plane=None):
+def _table_entry(x=(.32,.85),y=(-.95,.95),R=.1,step=.03,top=TABLE_TOP,plane=None):
     pk=None if plane is None else (np.asarray(plane[0],float).tobytes(),float(plane[1]))
-    return _cached(('table',_key(x,y,R,step,top),pk),lambda:table_env_build(x,y,R,step,top,plane))
+    return _cached_entry(('table',_key(x,y,R,step,top),pk),lambda:table_env_build(x,y,R,step,top,plane))
+def table_env(x=(.32,.85),y=(-.95,.95),R=.1,step=.03,top=TABLE_TOP,plane=None):
+    return list(_table_entry(x,y,R,step,top,plane)[0])
 def table_env_build(x=(.32,.85),y=(-.95,.95),R=.1,step=.03,top=TABLE_TOP,plane=None):   # near edge x=.22 (table.front_gap)
     """Table as spheres tangent to the top surface. plane=(n,d) (pelvis frame, n.p+d=0, from the head camera) replaces
     the flat scene.yaml height: v7 Kaggle frames show the table tilted 4.0 deg in the pelvis frame (n_x=-0.070 in all
@@ -143,14 +158,15 @@ def table_env_build(x=(.32,.85),y=(-.95,.95),R=.1,step=.03,top=TABLE_TOP,plane=N
     if plane is None:
         return [Sphere('pelvis',np.array([a,b,top-R]),R) for a in np.arange(x[0],x[1]+1e-9,step) for b in np.arange(y[0],y[1]+1e-9,step)]
     n,d=np.asarray(plane[0],float),float(plane[1]);nn=np.linalg.norm(n);n=n/nn;d=d/nn
-    out=[]
-    for a in np.arange(x[0],x[1]+1e-9,step):
-        for b in np.arange(y[0],y[1]+1e-9,step):
-            z=-(d+n[0]*a+n[1]*b)/n[2];out.append(Sphere('pelvis',np.array([a,b,z])-R*n,R))
-    return out
-def tray_env(trays,plane,size=(.22,.32),height=.07,r=.02,step=.03):
+    # vectorised, element-wise identical to the scalar loop  z=-(d+n0*a+n1*b)/n2; centre=[a,b,z]-R*n  (a outer, b inner)
+    A,B=np.meshgrid(np.arange(x[0],x[1]+1e-9,step),np.arange(y[0],y[1]+1e-9,step),indexing='ij');A=A.ravel();B=B.ravel()
+    Z=-(d+n[0]*A+n[1]*B)/n[2]
+    return spheres_bulk('pelvis',np.stack([A,B,Z],axis=1)-R*n,R)
+def _tray_entry(trays,plane,size=(.22,.32),height=.07,r=.02,step=.03):
     key=('tray',np.asarray(trays,float).tobytes(),np.asarray(plane[0],float).tobytes(),float(plane[1]),_key(size,height,r,step))
-    return _cached(key,lambda:tray_env_build(trays,plane,size,height,r,step))
+    return _cached_entry(key,lambda:tray_env_build(trays,plane,size,height,r,step))
+def tray_env(trays,plane,size=(.22,.32),height=.07,r=.02,step=.03):
+    return list(_tray_entry(trays,plane,size,height,r,step)[0])
 def tray_env_build(trays,plane,size=(.22,.32),height=.07,r=.02,step=.03):
     """Tray walls as spheres (centres r below the rim): v7 Kaggle s103 the hand was carried into the tray_right wall
     (82 N, TCP 14 cm below plan) because trays were not obstacles."""
@@ -161,8 +177,8 @@ def tray_env_build(trays,plane,size=(.22,.32),height=.07,r=.02,step=.03):
         for b in np.arange(-hy,hy+1e-9,step):pts+=[(tx-hx,ty+b),(tx+hx,ty+b)]
         for x,y in pts:
             z0=-(d+n[0]*x+n[1]*y)/n[2]
-            for h in (height-r,max(r,height-3*r)):out.append(Sphere('pelvis',np.array([x,y,z0+h]),r))
-    return out
+            for h in (height-r,max(r,height-3*r)):out.append((x,y,z0+h))
+    return spheres_bulk('pelvis',out,r) if out else []
 class Arm:
     def __init__(self,side,margin=.015,table=True):
         self.side=side;self.chain=arm_chain(side);self.hand=hand_opening(side)
@@ -179,8 +195,32 @@ class Arm:
         self.seeds.insert(0,np.clip([q.get(n,0.) for n in self.chain.names],self.chain.lower,self.chain.upper))
         self.home=self.seeds[0]
     def set_scene(self,plane,trays=()):
-        """Obstacles from the latest observation: measured table plane + tray walls (body unchanged)."""
-        self.col.environment=self.body+table_env(plane=plane)+(tray_env(trays,plane) if trays else [])
+        """Obstacles from the latest observation: measured table plane + tray walls (body unchanged).
+        Equivalent to  col.environment = body + table_env(plane=plane) + tray_env(trays, plane)  (same spheres, same order);
+        the assembled arrays and the Rust grid are memoised per scene (the torso-yaw search revisits the same rotated
+        scenes for every object of an observation)."""
+        tk=np.asarray(trays,float).tobytes() if trays else None
+        key=(np.asarray(plane[0],float).tobytes(),float(plane[1]),tk,id(self.body),len(self.body))
+        cache=self.__dict__.setdefault('_scenes',{})
+        e=cache.get(key)
+        if e is None:
+            parts=[self._body_entry(),_table_entry(plane=plane)]+([_tray_entry(trays,plane)] if trays else [])
+            t=tuple(x for p in parts for x in p[0])
+            if not t or any(s.link!=self.chain.base for s in t):raise ValueError("nonempty base-frame environment required")
+            C=np.concatenate([p[1] for p in parts]);R=np.concatenate([p[2] for p in parts]);C.setflags(write=False);R.setflags(write=False)
+            fe=None
+            if self.col._fast is not None and _accel.enabled2():
+                try:fe=_accel.fast_env(C,R)
+                except BaseException as ex:_accel.guard(ex);_accel.failed('FastEnv',ex)
+            if len(cache)>256:cache.clear()
+            e=cache[key]=(t,C,R,fe)
+        self.col.install_environment(*e)
+    def _body_entry(self):
+        b=self.__dict__.get('_body_arr')
+        if b is None or b[0] is not self.body or len(b[1])!=len(self.body):
+            C=np.array([s.center for s in self.body],dtype=float).reshape(-1,3);R=np.array([s.radius for s in self.body],dtype=float)
+            C.setflags(write=False);R.setflags(write=False);b=self._body_arr=(self.body,C,R)
+        return (tuple(b[0]),b[1],b[2])
     def tcp(self,q):
         return self.chain.fk(q)
     def lift(self,q,dz=.08):
@@ -206,16 +246,55 @@ class Arm:
         """TCP pose so that the hand's thumb->finger closing axis maps to close_axis and fingers point along approach.
         point='grip': midpoint of the OPEN finger tips; 'pinch': where thumb and index/middle meshes first touch when
         closing (mesh-derived, 1.8 cm deeper toward the palm) -- used for rim pinches."""
-        Rh=J[f"{'left' if self.side=='l' else 'right'}_hand_to_tcp"]['T'][:3,:3]   # hand frame in tcp frame
-        hm=hand_mesh(self.side)
-        gp=np.asarray(hm['pinch_point_hand'],float) if (point=='pinch' and hm) else self.hand['grip_center_hand']
-        c_t=Rh@self.hand['close_axis_hand'];z_t=Rh@np.array([0,0,1.]);g_t=Rh@gp
-        z_t=z_t-c_t*(z_t@c_t);z_t/=np.linalg.norm(z_t)
+        A,g_t=self._hand_frame(point)
         u=close_axis/np.linalg.norm(close_axis);a=approach-u*(approach@u);a/=np.linalg.norm(a)
-        A=np.c_[c_t,z_t,np.cross(c_t,z_t)];B=np.c_[u,a,np.cross(u,a)];R=B@A.T
+        B=np.c_[u,a,np.cross(u,a)];R=B@A.T
         T=np.eye(4);T[:3,:3]=R;T[:3,3]=center_xyz-R@g_t;return T
+    def _hand_frame(self,point):
+        """(A, g_t) of grasp_pose: hand closing/finger frame and grip point in the tcp frame. Pure function of the robot
+        data and hand_mesh: memoised per (point, hand_mesh version); same arithmetic as the former inline code."""
+        hm=hand_mesh(self.side);key=(point=='pinch' and bool(hm),next(iter(_HAND_MESH_CACHE),None))
+        c=self.__dict__.setdefault('_hand_frames',{})
+        v=c.get(key)
+        if v is None:
+            Rh=J[f"{'left' if self.side=='l' else 'right'}_hand_to_tcp"]['T'][:3,:3]   # hand frame in tcp frame
+            gp=np.asarray(hm['pinch_point_hand'],float) if (point=='pinch' and hm) else self.hand['grip_center_hand']
+            c_t=Rh@self.hand['close_axis_hand'];z_t=Rh@np.array([0,0,1.]);g_t=Rh@gp
+            z_t=z_t-c_t*(z_t@c_t);z_t/=np.linalg.norm(z_t)
+            A=np.c_[c_t,z_t,np.cross(c_t,z_t)];A.setflags(write=False);g_t.setflags(write=False)
+            v=c[key]=(A,g_t)
+        return v
     def solve(self,T,seed=None,w_null=NULL_WEIGHT):
         # 7-DOF redundancy: secondary pull toward the elbow-out home posture (away from the torso), see kinematics.ik
+        seeds=([seed] if seed is not None else [])+self.seeds
+        if self.col._fast is not None and self.chain._fast is not None and _accel.enabled2():
+            r=self._solve_fast(T,seeds,w_null)
+            if r is not NotImplemented:return r
+        return self.solve_py(T,seed,w_null)
+    def _solve_fast(self,T,seeds,w_null):
+        """One Rust call for the whole seed loop of solve_py: IK per seed in order, first converged + collision-free q.
+        Validation that solve_py repeats per seed but that does not depend on the seed (target rigid transform and
+        rotation, preferred posture, parameters) is done once: if it raises, every seed raises -> None. Per-seed
+        validation (finite, joint limits) happens in Rust, a rejected seed is skipped like the reference's ValueError."""
+        ch=self.chain;n=len(ch.active)
+        try:
+            S=np.array(seeds,dtype=float)
+            if S.shape!=(len(seeds),n):return NotImplemented
+        except (ValueError,TypeError):return NotImplemented
+        try:
+            target=check_transform(T);qp=None
+            if w_null>0:qp=ch.validate_q(np.clip(finite(self.home,(n,)),ch.lower,ch.upper))
+            if not np.isfinite(w_null) or w_null<0 or w_null>1:raise ValueError('null-space weight')
+            check_rotation(target[:3,:3])
+        except ValueError:return None
+        try:
+            r=self.col._fast.solve(np.ascontiguousarray(target,float),np.ascontiguousarray(S),150,.002,.015,.25,.15,
+                                   None if qp is None else np.ascontiguousarray(qp,float),float(w_null))
+        except BaseException as e:
+            _accel.guard(e);_accel.failed('solve',e);return NotImplemented
+        return None if r is None else r[1]
+    def solve_py(self,T,seed=None,w_null=NULL_WEIGHT):
+        """Reference seed loop (Chain.ik + CollisionModel.valid per seed)."""
         for s in ([seed] if seed is not None else [])+self.seeds:
             try:
                 q=self.chain.ik(T,s,max_iter=150,q_pref=self.home if w_null>0 else None,w_null=w_null)

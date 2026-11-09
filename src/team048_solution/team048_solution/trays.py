@@ -9,6 +9,7 @@ RGB ~(234,250,238), dominant-channel margin ~0.047; the table renders neutral ~(
 CHROMA_MIN=0.03 separates both. Red/blue trays were not in view in v5: TODO(verify) on a frame that shows them.
 """
 import numpy as np
+from . import _accel
 
 TRAY_SIZE = (.22, .32)      # x, y extent [m]; long axis along pelvis y
 TRAY_H = .07
@@ -39,6 +40,19 @@ def locate(P, rgb, valid, name, colour, plane=None, window=.15, min_px=150, max_
     (a partially visible tray would bias the centre); shifts > max_shift are rejected.
     """
     nx, ny = NOMINAL[name]
+    xy = None
+    if _accel.enabled2() and colour in CHANNEL and getattr(rgb, 'dtype', None) == np.uint8 and np.ndim(P) == 3 and np.shape(rgb) == np.shape(P) and np.shape(valid) == np.shape(P)[:2]:
+        try:
+            pl = None if plane is None else ([float(x) for x in np.asarray(plane[0], float)], float(plane[1]), -.01, TRAY_H+.02)
+            xy = _accel.tray_select(P, rgb, valid, nx, ny, TRAY_SIZE[0]/2+window, TRAY_SIZE[1]/2+window, pl, CHANNEL[colour], CHROMA_MIN)
+        except BaseException as e:
+            _accel.guard(e); _accel.failed('tray_select', e); xy = None
+    if xy is None:
+        xy = _select_py(P, rgb, valid, nx, ny, colour, plane, window)
+    return _centre(xy, nx, ny, min_px, max_shift, min_cover)
+
+
+def _select_py(P, rgb, valid, nx, ny, colour, plane, window):
     P = np.asarray(P, float); m = np.asarray(valid, bool) & np.isfinite(P).all(axis=-1)
     m &= (np.abs(P[..., 0]-nx) < TRAY_SIZE[0]/2+window) & (np.abs(P[..., 1]-ny) < TRAY_SIZE[1]/2+window)
     if plane is not None:
@@ -49,9 +63,12 @@ def locate(P, rgb, valid, name, colour, plane=None, window=.15, min_px=150, max_
     if len(idx[0]):
         sel = chroma_mask(np.asarray(rgb)[idx], colour)
         m = np.zeros_like(m); m[tuple(i[sel] for i in idx)] = True
-    if int(m.sum()) < min_px:
+    return P[m][:, :2]
+
+
+def _centre(xy, nx, ny, min_px, max_shift, min_cover):
+    if len(xy) < min_px:
         return np.array([nx, ny]), 'nominal'
-    xy = P[m][:, :2]
     lo, hi = np.quantile(xy, .03, axis=0), np.quantile(xy, .97, axis=0)
     c = np.array([nx, ny], float)
     for a in (0, 1):

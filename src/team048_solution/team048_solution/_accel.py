@@ -19,6 +19,10 @@ except Exception as e:      # ImportError, or an ABI mismatch surfacing as anoth
     _ext = None; AVAILABLE = False; REASON = '%s: %s' % (type(e).__name__, e)
 
 _disabled = False
+# API level of the installed extension: 1 = phase 1 (FK/IK/collision/inlier counts/flood fill), 2 = phase 2
+# (Arm.solve, cached environments, deprojection, RANSAC stream, tray selection, segment statistics, grasp kernels).
+# An older wheel keeps working: phase-2 callers then use their NumPy reference.
+API = int(getattr(_ext, 'API', 1)) if AVAILABLE else 0
 # rayon threads are opt-in: the simulator shares the evaluation machine's CPU, and on the 2-core-equivalent box
 # parallel sweeps measured slower (certify 3.3 vs 2.7 ms). TEAM048_ACCEL_PARALLEL=1 enables them.
 PARALLEL = os.environ.get('TEAM048_ACCEL_PARALLEL', '0') == '1'
@@ -26,6 +30,10 @@ PARALLEL = os.environ.get('TEAM048_ACCEL_PARALLEL', '0') == '1'
 
 def enabled():
     return AVAILABLE and not _disabled
+
+
+def enabled2():
+    return API >= 2 and not _disabled
 
 
 def failed(where, exc):
@@ -80,3 +88,55 @@ def plane_inlier_counts(points, planes, tol):
 
 def flood_fill(mask, points, max_jump):
     return _ext.flood_fill(np.ascontiguousarray(mask, bool), np.ascontiguousarray(points, float), float(max_jump))
+
+
+# ---------------- phase 2 ----------------
+_PCG = {}
+
+
+def pcg_state(seed):
+    """(state_hi, state_lo, inc_hi, inc_lo, has_uint32, uinteger) of np.random.default_rng(seed)'s PCG64, from NumPy."""
+    v = _PCG.get(seed)
+    if v is None:
+        st = np.random.PCG64(seed).state; M = (1 << 64)-1
+        s, i = int(st['state']['state']), int(st['state']['inc'])
+        v = _PCG[seed] = (s >> 64, s & M, i >> 64, i & M, bool(st['has_uint32']), int(st['uinteger']))
+    return v
+
+
+def ransac_plane(P, mask, seed, iterations, tol):
+    return _ext.ransac_plane(np.ascontiguousarray(P, float), np.ascontiguousarray(mask, bool), pcg_state(seed),
+                             int(iterations), float(tol), PARALLEL)
+
+
+def deproject(depth, fx, fy, cx, cy, T):
+    return _ext.deproject(np.ascontiguousarray(depth, float), float(fx), float(fy), float(cx), float(cy),
+                          np.ascontiguousarray(T, float), PARALLEL)
+
+
+def tray_select(P, rgb, valid, nx, ny, wx, wy, plane, channel, chroma_min):
+    return _ext.tray_select(np.ascontiguousarray(P, float), np.ascontiguousarray(rgb, np.uint8), np.ascontiguousarray(valid, bool),
+                            float(nx), float(ny), float(wx), float(wy), plane, int(channel), float(chroma_min))
+
+
+def segment_components(P, rgb, valid, n, d, min_h, max_h, low, high, max_jump, min_pixels):
+    return _ext.segment_components(np.ascontiguousarray(P, float), np.ascontiguousarray(rgb, np.uint8), np.ascontiguousarray(valid, bool),
+                                   [float(x) for x in n], float(d), float(min_h), float(max_h), [float(x) for x in low],
+                                   [float(x) for x in high], float(max_jump), int(min_pixels))
+
+
+def min_caliper(hull, dirs):
+    return _ext.min_caliper(np.ascontiguousarray(hull, float), np.ascontiguousarray(dirs, float))
+
+
+def min_dist_xy(tips, pts):
+    return _ext.min_dist_xy(np.ascontiguousarray(tips, float), np.ascontiguousarray(pts, float))
+
+
+def fast_env(centers, radii):
+    return _ext.FastEnv(np.ascontiguousarray(centers, float), np.ascontiguousarray(radii, float))
+
+
+def table_mask(P, valid, x_lo, x_hi, y_abs, rects):
+    return _ext.table_mask(np.ascontiguousarray(P, float), np.ascontiguousarray(valid, bool), float(x_lo), float(x_hi), float(y_abs),
+                           [tuple(float(v) for v in r) for r in rects])

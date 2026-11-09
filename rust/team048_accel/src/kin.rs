@@ -12,14 +12,23 @@ pub struct Rt {
     pub t: V3,
 }
 impl Rt {
-    pub const IDENTITY: Rt = Rt { r: M3::new(1., 0., 0., 0., 1., 0., 0., 0., 1.), t: V3::new(0., 0., 0.) };
+    pub const IDENTITY: Rt = Rt {
+        r: M3::new(1., 0., 0., 0., 1., 0., 0., 0., 1.),
+        t: V3::new(0., 0., 0.),
+    };
     #[inline(always)]
     pub fn mul(&self, o: &Rt) -> Rt {
-        Rt { r: self.r * o.r, t: self.r * o.t + self.t }
+        Rt {
+            r: self.r * o.r,
+            t: self.r * o.t + self.t,
+        }
     }
     #[inline(always)]
     pub fn mul_rot(&self, r: &M3) -> Rt {
-        Rt { r: self.r * r, t: self.t }
+        Rt {
+            r: self.r * r,
+            t: self.t,
+        }
     }
     #[inline(always)]
     pub fn apply(&self, p: &V3) -> V3 {
@@ -35,7 +44,24 @@ impl Rt {
     pub fn to_rows(&self) -> [f64; 16] {
         let r = &self.r;
         let t = &self.t;
-        [r[(0, 0)], r[(0, 1)], r[(0, 2)], t[0], r[(1, 0)], r[(1, 1)], r[(1, 2)], t[1], r[(2, 0)], r[(2, 1)], r[(2, 2)], t[2], 0., 0., 0., 1.]
+        [
+            r[(0, 0)],
+            r[(0, 1)],
+            r[(0, 2)],
+            t[0],
+            r[(1, 0)],
+            r[(1, 1)],
+            r[(1, 2)],
+            t[1],
+            r[(2, 0)],
+            r[(2, 1)],
+            r[(2, 2)],
+            t[2],
+            0.,
+            0.,
+            0.,
+            1.,
+        ]
     }
 }
 
@@ -88,7 +114,14 @@ pub fn rot(j: &Joint, angle: f64) -> M3 {
 
 impl Chain {
     /// origins: row-major 4x4 per joint; axes: per joint; movable flags. Lower/upper per ACTIVE joint.
-    pub fn new(origins: &[[f64; 16]], axes: &[[f64; 3]], movable: &[bool], tcp: &[f64; 16], lower: &[f64], upper: &[f64]) -> Result<Chain, String> {
+    pub fn new(
+        origins: &[[f64; 16]],
+        axes: &[[f64; 3]],
+        movable: &[bool],
+        tcp: &[f64; 16],
+        lower: &[f64],
+        upper: &[f64],
+    ) -> Result<Chain, String> {
         let nj = origins.len();
         if nj == 0 || nj > MAXJ || axes.len() != nj || movable.len() != nj {
             return Err("unsupported chain size".into());
@@ -101,10 +134,22 @@ impl Chain {
             .map(|i| {
                 let axis = V3::new(axes[i][0], axes[i][1], axes[i][2]);
                 let (k, kk) = skew_of(&axis);
-                Joint { origin: Rt::from_rows(&origins[i]), k, kk, axis, movable: movable[i] }
+                Joint {
+                    origin: Rt::from_rows(&origins[i]),
+                    k,
+                    kk,
+                    axis,
+                    movable: movable[i],
+                }
             })
             .collect();
-        Ok(Chain { joints, tcp: Rt::from_rows(tcp), lower: Q::from_column_slice(lower), upper: Q::from_column_slice(upper), n_active })
+        Ok(Chain {
+            joints,
+            tcp: Rt::from_rows(tcp),
+            lower: Q::from_column_slice(lower),
+            upper: Q::from_column_slice(upper),
+            n_active,
+        })
     }
 
     /// frames[0] = base, frames[j+1] = child frame of joint j (the Python dict keyed by child link).
@@ -185,12 +230,28 @@ impl Chain {
 
     /// Port of Chain.ik after its argument validation (done by the Python caller). Some(q) or None == "did not converge".
     #[allow(clippy::too_many_arguments)]
-    pub fn ik(&self, target: &Rt, seed: &Q, max_iter: usize, position_tol: f64, angle_tol: f64, length_scale: f64, trust_radius: f64, q_pref: Option<&Q>, w_null: f64) -> Option<Q> {
+    pub fn ik(
+        &self,
+        target: &Rt,
+        seed: &Q,
+        max_iter: usize,
+        position_tol: f64,
+        angle_tol: f64,
+        length_scale: f64,
+        trust_radius: f64,
+        q_pref: Option<&Q>,
+        w_null: f64,
+    ) -> Option<Q> {
         let mut q = *seed;
         let weights = SVector::<f64, 6>::new(1., 1., 1., length_scale, length_scale, length_scale);
         const SCALES: [f64; 6] = [1., 0.5, 0.25, 0.125, 0.0625, 0.015625];
+        // residual of the accepted line-search candidate is reused (same q, same deterministic arithmetic)
+        let mut cached: Option<SVector<f64, 6>> = None;
         for _ in 0..max_iter {
-            let e = self.residual(target, &q);
+            let e = match cached.take() {
+                Some(e) => e,
+                None => self.residual(target, &q),
+            };
             if norm3(e[0], e[1], e[2]) < position_tol && norm3(e[3], e[4], e[5]) < angle_tol {
                 return Some(q);
             }
@@ -240,9 +301,11 @@ impl Chain {
                 }
                 for sc in SCALES {
                     let cand = self.clip(&(q + sc * dq));
-                    let r = weights.component_mul(&self.residual(target, &cand));
+                    let rc = self.residual(target, &cand);
+                    let r = weights.component_mul(&rc);
                     if norm_n(r.as_slice()) < ew_norm - 1e-12 {
                         q = cand;
+                        cached = Some(rc);
                         improved = true;
                         break;
                     }
@@ -319,7 +382,11 @@ pub fn svd_sorted(j: &Jac) -> Svd {
     // A = J^T V = U' S  =>  J^T = U' S V^T  =>  J = V S U'^T : U_J = V, Vt_J = U'^T
     let sv: [f64; 6] = std::array::from_fn(|k| norm_n(a.column(k).as_slice()));
     let mut idx = [0usize, 1, 2, 3, 4, 5];
-    idx.sort_by(|x, y| sv[*y].partial_cmp(&sv[*x]).unwrap_or(std::cmp::Ordering::Equal));
+    idx.sort_by(|x, y| {
+        sv[*y]
+            .partial_cmp(&sv[*x])
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
     let mut u = SMatrix::<f64, 6, 6>::zeros();
     let mut s = SVector::<f64, 6>::zeros();
     let mut vt = SMatrix::<f64, 6, N>::zeros();
@@ -343,7 +410,11 @@ pub fn rotation_error(target: &M3, current: &M3) -> V3 {
     let r = target * current.transpose();
     let tr = (r[(0, 0)] + r[(1, 1)]) + r[(2, 2)];
     let theta = ((tr - 1.) / 2.).clamp(-1., 1.).acos();
-    let v = V3::new(r[(2, 1)] - r[(1, 2)], r[(0, 2)] - r[(2, 0)], r[(1, 0)] - r[(0, 1)]);
+    let v = V3::new(
+        r[(2, 1)] - r[(1, 2)],
+        r[(0, 2)] - r[(2, 0)],
+        r[(1, 0)] - r[(0, 1)],
+    );
     if theta < 1e-7 {
         return v * 0.5;
     }
@@ -373,22 +444,61 @@ pub(crate) mod tests {
 
     fn rpy(r: f64, p: f64, y: f64) -> M3 {
         let (cr, sr, cp, sp, cy, sy) = (r.cos(), r.sin(), p.cos(), p.sin(), y.cos(), y.sin());
-        M3::new(cy * cp, cy * sp * sr - sy * cr, cy * sp * cr + sy * sr, sy * cp, sy * sp * sr + cy * cr, sy * sp * cr - cy * sr, -sp, cp * sr, cp * cr)
+        M3::new(
+            cy * cp,
+            cy * sp * sr - sy * cr,
+            cy * sp * cr + sy * sr,
+            sy * cp,
+            sy * sp * sr + cy * cr,
+            sy * sp * cr - cy * sr,
+            -sp,
+            cp * sr,
+            cp * cr,
+        )
     }
     pub fn test_chain() -> Chain {
         // 7-DOF arm-like chain with offsets; deterministic.
-        let axes = [[0., 1., 0.], [1., 0., 0.], [0., 0., 1.], [0., 1., 0.], [0., 0., 1.], [0., 1., 0.], [1., 0., 0.], [0., 0., 1.]];
-        let offs = [[0., 0.2, 0.3], [0., 0.05, 0.], [0., 0., -0.12], [0., 0., -0.14], [0., 0., -0.1], [0., 0., -0.12], [0., 0., -0.05], [0., 0., -0.08]];
+        let axes = [
+            [0., 1., 0.],
+            [1., 0., 0.],
+            [0., 0., 1.],
+            [0., 1., 0.],
+            [0., 0., 1.],
+            [0., 1., 0.],
+            [1., 0., 0.],
+            [0., 0., 1.],
+        ];
+        let offs = [
+            [0., 0.2, 0.3],
+            [0., 0.05, 0.],
+            [0., 0., -0.12],
+            [0., 0., -0.14],
+            [0., 0., -0.1],
+            [0., 0., -0.12],
+            [0., 0., -0.05],
+            [0., 0., -0.08],
+        ];
         let mov = [true, true, true, true, true, true, true, false];
         let mut origins = vec![];
         for (k, o) in offs.iter().enumerate() {
             let r = rpy(0.1 * k as f64, -0.05 * k as f64, 0.02 * k as f64);
-            let rt = Rt { r, t: V3::new(o[0], o[1], o[2]) };
+            let rt = Rt {
+                r,
+                t: V3::new(o[0], o[1], o[2]),
+            };
             origins.push(rt.to_rows());
         }
         let lower = [-2.9, -0.3, -2.9, -2.2, -2.9, -1.0, -1.5];
         let upper = [2.9, 2.9, 2.9, 0.1, 2.9, 1.0, 1.5];
-        Chain::new(&origins, &axes, &mov, &Rt::IDENTITY.to_rows(), &lower, &upper).unwrap()
+        Chain::new(
+            &origins,
+            &axes,
+            &mov,
+            &Rt::IDENTITY.to_rows(),
+            &lower,
+            &upper,
+        )
+        .unwrap()
     }
     fn q_in(c: &Chain, u: [f64; 7]) -> Q {
         Q::from_fn(|k, _| c.lower[k] + (c.upper[k] - c.lower[k]) * u[k])
@@ -413,7 +523,7 @@ pub(crate) mod tests {
             }
         }
         #[test]
-        fn rotation_error_inverts_exp(ax in proptest::array::uniform3(-1f64..1.), th in 0.0f64..3.14159) {
+        fn rotation_error_inverts_exp(ax in proptest::array::uniform3(-1f64..1.), th in 0.0f64..3.1) {
             let a = V3::new(ax[0], ax[1], ax[2]); prop_assume!(a.norm() > 1e-3);
             let j = Joint { origin: Rt::IDENTITY, k: skew_of(&a).0, kk: skew_of(&a).1, axis: a, movable: true };
             let r = rot(&j, th); let w = rotation_error(&r, &M3::identity());

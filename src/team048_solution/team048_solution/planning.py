@@ -22,6 +22,17 @@ class Sphere:
             raise ValueError('invalid radius')
 
 
+def spheres_bulk(link, centers, radii):
+    """Spheres for many centres at once: same objects as [Sphere(link,c,r) ...] (frozen, read-only float centre),
+    validated in bulk (finite centres, finite positive radii) instead of per instance."""
+    C=np.array(centers,dtype=float).reshape(-1,3); R=np.broadcast_to(np.asarray(radii,dtype=float),(len(C),))
+    if not np.isfinite(C).all() or not np.isfinite(R).all() or np.any(R<=0): raise ValueError('invalid sphere batch')
+    C.setflags(write=False); out=[]; new=object.__new__; put=object.__setattr__
+    for c,r in zip(C,R.tolist()):
+        s=new(Sphere); put(s,'link',link); put(s,'center',c); put(s,'radius',r); out.append(s)
+    return out
+
+
 class CollisionModel:
     def __init__(self, chain, spheres, environment, ignored_pairs=(), *, audited_complete=False, margin=.015):
         if not audited_complete or not spheres or not environment:
@@ -83,6 +94,17 @@ class CollisionModel:
         self._env_centers.setflags(write=False); self._env_radii.setflags(write=False)
         if getattr(self,'_fast',None) is not None:
             try: self._fast.set_env(np.ascontiguousarray(self._env_centers),[float(r) for r in self._env_radii])
+            except BaseException as e: self._fallback('set_env',e)
+
+    def install_environment(self, values, centers, radii, fast_env=None):
+        """Install a pre-validated environment: `values` a tuple of base-frame Spheres, `centers`/`radii` the read-only
+        arrays the `environment` setter would build from them (same rows, same order), `fast_env` an optional cached
+        Rust grid of exactly those arrays. Equivalent to `self.environment = values` without re-validation/rebuild."""
+        self._environment=values; self._env_centers=centers; self._env_radii=radii
+        if getattr(self,'_fast',None) is not None:
+            try:
+                if fast_env is not None: self._fast.use_env(fast_env)
+                else: self._fast.set_env(np.ascontiguousarray(centers),[float(r) for r in radii])
             except BaseException as e: self._fallback('set_env',e)
 
     def valid(self, q, inflation=0):

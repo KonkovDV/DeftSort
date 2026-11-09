@@ -106,5 +106,8 @@ class Equivalence(unittest.TestCase):
             roi=(np.array([.18,-.62,-1.]),np.array([.62,.62,1.]))
             A=perception.segment(P,z['rgb'],tb,b,roi,min_pixels=40);B=perception.segment_py(P,z['rgb'],tb,b,roi,min_pixels=40)
             s.assertEqual(len(A),len(B))
-            for x,y in zip(A,B):s.assertTrue(np.array_equal(x.pixels,y.pixels) and np.array_equal(x.features,y.features))
+            for x,y in zip(A,B):
+                s.assertTrue(np.array_equal(x.pixels,y.pixels) and np.array_equal(x.centroid,y.centroid) and np.array_equal(x.lower,y.lower) and np.array_equal(x.upper,y.upper))
+                # height quantile: Rust sums the dot product left to right, NumPy's BLAS gemv may use FMA (CPU-dependent): <= 1 ulp
+                s.assertTrue(np.allclose(x.features,y.features,rtol=0,atol=1e-12) and np.array_equal(np.delete(x.features,2),np.delete(y.features,2)))
 if __name__=='__main__':unittest.main()

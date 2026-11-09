@@ -25,9 +25,17 @@ def pose(xyz=(0, 0, 0), rpy=(0, 0, 0)):
     return T
 
 
+_E4 = np.array([0., 0., 0., 1.]); _I3 = np.eye(3)
+
+
+def _close(a, b, atol=1e-8, rtol=1e-5):
+    # == np.allclose(a, b, rtol, atol) for FINITE inputs (np.isclose: |a-b| <= atol + rtol*|b|), without its overhead
+    return bool(np.all(np.abs(a-b) <= atol+rtol*np.abs(b)))
+
+
 def check_transform(T):
     T = finite(T, (4, 4))
-    if not np.allclose(T[3], [0, 0, 0, 1]) or not np.allclose(T[:3, :3].T@T[:3, :3], np.eye(3), atol=1e-6) or np.linalg.det(T[:3, :3]) < 0.999:
+    if not _close(T[3], _E4) or not _close(T[:3, :3].T@T[:3, :3], _I3, atol=1e-6) or np.linalg.det(T[:3, :3]) < 0.999:
         raise ValueError('not rigid transform')
     return T
 
@@ -67,7 +75,7 @@ def project(depth_mm, K, T, now, stamp, max_age=0.3):
 
 def check_rotation(matrix):
     matrix=finite(matrix,(3,3))
-    if not np.allclose(matrix.T@matrix,np.eye(3),atol=1e-6) or abs(np.linalg.det(matrix)-1)>1e-6: raise ValueError("invalid rotation matrix")
+    if not _close(matrix.T@matrix,_I3,atol=1e-6) or abs(np.linalg.det(matrix)-1)>1e-6: raise ValueError("invalid rotation matrix")
     return matrix
 
 

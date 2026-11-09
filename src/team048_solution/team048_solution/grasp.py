@@ -14,6 +14,7 @@ Offline evidence (fixes/kaggle-tpu/study, 100 layouts, body_yaw place, Rust acce
 """
 import numpy as np
 from scipy.spatial import ConvexHull
+from . import _accel
 # Rim pinch: grip centre BELOW the rim top so the finger pads overlap the wall instead of touching its edge.
 # v6 (Kaggle, old code z=rim top): 0/3 rim picks ended in a tray. Value = geometric choice (pad overlap), UNVERIFIED:
 # the next run logs wrist force and finger positions at every grasp to confirm or recalibrate it.
@@ -24,12 +25,23 @@ RIM_ANGLE_DEG=(0,30,-30,60,-60,90,-90)
 # Top-down depth below the object top (m). Study topdown_shallow (.01) ≈ topdown (.03) for ok-rate; keep .03.
 TOP_DEPTH=.03
 
-def footprint(cloud,plane):
-    n,d=plane;h=cloud@n+d;xy=cloud[:,:2]
-    hull=xy[ConvexHull(xy).vertices];best=(9.,0.)
-    for a in np.linspace(0,np.pi,180,endpoint=False):
+_ANG=np.linspace(0,np.pi,180,endpoint=False)
+_DIRS=np.array([[np.cos(a),np.sin(a)] for a in _ANG])   # exactly the reference's per-angle u (scalar ufunc calls)
+
+def _caliper_py(hull):
+    best=(9.,0.)
+    for a in _ANG:
         u=np.array([np.cos(a),np.sin(a)]);p=hull@u;w=p.max()-p.min()
         if w<best[0]:best=(w,a)
+    return best
+
+def footprint(cloud,plane):
+    n,d=plane;h=cloud@n+d;xy=cloud[:,:2]
+    hull=xy[ConvexHull(xy).vertices];best=None
+    if _accel.enabled2():
+        try:w,k=_accel.min_caliper(hull,_DIRS);best=(w,_ANG[k]) if w<9. else (9.,0.)
+        except BaseException as e:_accel.guard(e);_accel.failed('min_caliper',e)
+    if best is None:best=_caliper_py(hull)
     w,a=best;u=np.array([np.cos(a),np.sin(a)]);v=np.array([-u[1],u[0]]);L=(hull@v).max()-(hull@v).min()
     c=np.array([(hull@u).max()+(hull@u).min(),(hull@v).max()+(hull@v).min()])/2;center=c[0]*u+c[1]*v
     return dict(width=float(w),length=float(L),axis=u,center=center,height=float(np.quantile(h,.98)),hull=hull)
@@ -71,12 +83,24 @@ def candidates(cloud,plane,category,others=(),W_MAX=.09,finger=.02,depth=.04,mar
             # close along the radius (toward the bowl centre), approach straight down
             out.append(dict(kind='rim',center=p,close_axis=rad,approach=np.array([0.,0.,-1.]),width=.025,z=z,
                             score=1.0-.02*i))   # prefer the near-robot rim point
+    allpts=None
+    if _accel.enabled2() and out:
+        try:
+            oo=[np.asarray(o,float) for o in others if len(o)]
+            allpts=np.concatenate([o[:,:2] for o in oo]) if oo else np.zeros((0,2))
+            if not np.isfinite(allpts).all():allpts=None   # NaN semantics differ (np.min -> nan): reference loop
+        except BaseException as e:_accel.guard(e);allpts=None   # malformed others: reference loop decides
     for g in out:   # clearance of finger corridors against other segments' points (sensor data)
         c=g['center'];ax=np.asarray(g['close_axis'],float)[:2];half=g['width']/2+margin
         tips=[c+ax*half,c-ax*half] if g['kind'] in ('side','top') else [np.asarray(g['center'],float)]
-        clr=9.
-        for o in others:
-            for t in tips:clr=min(clr,float(np.min(np.linalg.norm(o[:,:2]-t,axis=1))) if len(o) else 9.)
+        clr=None
+        if allpts is not None and _accel.enabled2():
+            try:clr=min(9.,float(np.min(_accel.min_dist_xy(np.array(tips,float),allpts))))   # == reference min over others x tips
+            except BaseException as e:_accel.guard(e);_accel.failed('min_dist_xy',e);clr=None
+        if clr is None:
+            clr=9.
+            for o in others:
+                for t in tips:clr=min(clr,float(np.min(np.linalg.norm(o[:,:2]-t,axis=1))) if len(o) else 9.)
         g['clearance']=clr;g['feasible']=clr>finger
         g['score']+=min(clr,.05)*10
     return f,sorted(out,key=lambda g:-g['score'])

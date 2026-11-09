@@ -21,7 +21,7 @@ from scipy.optimize import linear_sum_assignment
 from . import arm as ARMMOD
 from . import budget as BUD, grip as GRIP, trays as TR
 from .sensing import PairBuffer
-from .perception import table_plane,segment
+from .perception import table_plane,segment,deproject,table_region
 from .grasp import candidates
 D=os.path.join(os.path.dirname(os.path.abspath(__file__)),'data')
 PRI=json.load(open(os.path.join(D,'priors.json')))
@@ -193,16 +193,13 @@ class Sol(Node):
         rgb=np.frombuffer(bytes(rgbm.data),np.uint8).reshape(rgbm.height,rgbm.width,3)
         dmm=np.frombuffer(bytes(dm.data),np.uint16).reshape(dm.height,dm.width).astype(float)
         K=np.array(info.k).reshape(3,3);T=s.tf('pelvis',dm.header.frame_id or 'camera_head_link',dm.header.stamp)
-        v,u=np.mgrid[0:dm.height,0:dm.width];Z=dmm/1000.
-        X=(u-K[0,2])*Z/K[0,0];Y=(v-K[1,2])*Z/K[1,1]
-        P=(np.stack([X,Y,Z],-1).reshape(-1,3)@T[:3,:3].T+T[:3,3]).reshape(dm.height,dm.width,3)
+        P=deproject(dmm,K,T)   # X=(u-cx)Z/fx, Y=(v-cy)Z/fy, Z=mm/1000, pelvis = R@[X,Y,Z]+t (Rust kernel or NumPy reference)
         valid=dmm>0
-        tb0=valid&(P[...,0]>.15)&(P[...,0]<.75)&(np.abs(P[...,1])<.7)
+        tb0=table_region(P,valid)   # valid & .15<x<.75 & |y|<.7
         plane=table_plane(P,tb0)
         s.locate_trays(P,rgb,valid,plane)
-        for (tx,ty) in s.trays.values():   # trays are not objects
-            valid=valid&~((np.abs(P[...,0]-tx)<TRAY_HALF[0]+.02)&(np.abs(P[...,1]-ty)<TRAY_HALF[1]+.02))
-        tb=valid&(P[...,0]>.15)&(P[...,0]<.75)&(np.abs(P[...,1])<.7)
+        # trays are not objects: same region minus |x-tx|<TRAY_HALF[0]+.02 & |y-ty|<TRAY_HALF[1]+.02 per tray
+        tb=table_region(P,valid,[(tx,ty,TRAY_HALF[0]+.02,TRAY_HALF[1]+.02) for (tx,ty) in s.trays.values()])
         roi=(np.array([.18,-.62,-1.]),np.array([.62,.62,1.]))
         dets=segment(P,rgb,tb,plane,roi,min_pixels=40)
         return P,rgb,plane,dets
@@ -225,9 +222,10 @@ class Sol(Node):
             feats.append((h,e[0],e[1]))
         N=[n for n in names if n in PRI]
         C=np.full((len(dets),len(N)+len(dets)),3.)   # dummy columns: unassigned (cost 3)
-        for i,(h,w,l) in enumerate(feats):
-            for j,n in enumerate(N):
-                p=PRI[n];C[i,j]=abs(h-p['height'])/.012+max(0,w-p['w_min']-.01)/.012+max(0,p['w_min']-w-.02)/.02+max(0,l-p['w_max']-.015)/.015
+        if N:   # element-wise identical to the scalar double loop (same operation order; max(0,x) == np.maximum(0,x) here)
+            F=np.array(feats,float).reshape(-1,3);h,w,l=F[:,:1],F[:,1:2],F[:,2:3]
+            ph=np.array([PRI[n]['height'] for n in N],float);pw=np.array([PRI[n]['w_min'] for n in N],float);pl=np.array([PRI[n]['w_max'] for n in N],float)
+            C[:,:len(N)]=np.abs(h-ph)/.012+np.maximum(0,w-pw-.01)/.012+np.maximum(0,pw-w-.02)/.02+np.maximum(0,l-pl-.015)/.015
         r,c=linear_sum_assignment(C);out=[]
         for i,j in zip(r,c):
             if j>=len(N):continue

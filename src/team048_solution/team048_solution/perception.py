@@ -25,6 +25,13 @@ def table_plane(points, valid, iterations=120, tolerance=.006, min_inliers=100, 
     """RANSAC horizontal plane. Same RNG stream and candidate arithmetic as table_plane_py; only the inlier COUNTING
     of all candidates is batched (Rust kernel, else one chunked BLAS product); the winner is the first candidate with
     the maximal count (== the reference's strict '>' scan) and its inlier set is recomputed exactly as before."""
+    if _accel.enabled2() and np.ndim(points) == 3 and np.shape(valid) == np.shape(points)[:2] and type(seed) is int and seed >= 0:
+        try:
+            r = _accel.ransac_plane(points, valid, seed, iterations, tolerance)
+        except BaseException as e:
+            _accel.guard(e); _accel.failed('ransac_plane', e); r = None
+        if r is not None:
+            return _plane_from_best(*r, tolerance, min_inliers)
     p = np.asarray(points)[np.asarray(valid, dtype=bool)]
     p = p[np.isfinite(p).all(axis=1)]
     if len(p) < min_inliers:
@@ -58,6 +65,49 @@ def table_plane(points, valid, iterations=120, tolerance=.006, min_inliers=100, 
             normal, offset = cands[k]; inliers = abs(p@normal+offset) < tolerance
             score = int(inliers.sum()); best = (normal, offset, inliers)
     return _refine_plane(p, best, score, min_inliers)
+
+
+def _plane_from_best(p, planes, k, count, tolerance, min_inliers):
+    """Rust path of table_plane: p = compacted cloud (same rows/order as NumPy), planes = candidates of the same RNG
+    stream (normal, offset), k = first candidate with the maximal inlier count (-1: all counts 0; exact pruned scan).
+    Inlier set and refinement exactly as in table_plane."""
+    if len(p) < min_inliers:
+        raise ValueError('insufficient plane support')
+    best = None; score = 0
+    if k >= 0:
+        normal, offset = planes[k, :3].copy(), planes[k, 3]; inliers = abs(p@normal+offset) < tolerance
+        score = int(inliers.sum()); best = (normal, offset, inliers)
+    return _refine_plane(p, best, score, min_inliers)
+
+
+def table_region(P, valid, rects=(), x=(.15, .75), y_abs=.7):
+    """node.observe table mask: valid & x0 < X < x1 & |Y| < y_abs, minus every rectangle (cx, cy, hx, hy)
+    (|X-cx| < hx & |Y-cy| < hy, the tray exclusion). Rust kernel when available (element-wise identical)."""
+    if _accel.enabled2() and np.ndim(P) == 3 and np.shape(valid) == np.shape(P)[:2]:
+        try: return _accel.table_mask(P, valid, x[0], x[1], y_abs, rects)
+        except BaseException as e: _accel.guard(e); _accel.failed('table_mask', e)
+    m = valid & (P[..., 0] > x[0]) & (P[..., 0] < x[1]) & (np.abs(P[..., 1]) < y_abs)
+    for cx, cy, hx, hy in rects:
+        m = m & ~((np.abs(P[..., 0]-cx) < hx) & (np.abs(P[..., 1]-cy) < hy))
+    return m
+
+
+def deproject(depth_mm, K, T):
+    """Organized pelvis-frame cloud (h,w,3) from a depth image in mm (float) -- node.observe arithmetic:
+    X = (u-cx)*Z/fx, Y = (v-cy)*Z/fy, Z = depth/1000, P = [X,Y,Z] @ R.T + t. Rust kernel when available
+    (fixed evaluation order; NumPy's BLAS product may differ by <= 2 ulp depending on the CPU's OpenBLAS kernel)."""
+    K = np.asarray(K, float); T = np.asarray(T, float); dmm = np.asarray(depth_mm, float)
+    if _accel.enabled2() and dmm.ndim == 2 and K.shape == (3, 3) and T.shape == (4, 4):
+        try: return _accel.deproject(dmm, K[0, 0], K[1, 1], K[0, 2], K[1, 2], T)
+        except BaseException as e: _accel.guard(e); _accel.failed('deproject', e)
+    return deproject_py(dmm, K, T)
+
+
+def deproject_py(dmm, K, T):
+    h, w = dmm.shape
+    v, u = np.mgrid[0:h, 0:w]; Z = dmm/1000.
+    X = (u-K[0, 2])*Z/K[0, 0]; Y = (v-K[1, 2])*Z/K[1, 1]
+    return (np.stack([X, Y, Z], -1).reshape(-1, 3)@T[:3, :3].T+T[:3, 3]).reshape(h, w, 3)
 
 
 def _refine_plane(p, best, score, min_inliers):
@@ -118,6 +168,14 @@ def segment(points, rgb, valid, plane, roi, min_pixels=25, max_jump=.025, min_he
     if np.any(high <= low):
         raise ValueError('ROI invalid')
     n, d = plane
+    if _accel.enabled2() and p.ndim == 3 and np.shape(valid) == p.shape[:2]:
+        try:
+            pix, off, keep, rows = _accel.segment_components(p, rgb, np.asarray(valid, bool), finite(n, (3,)), float(d), min_height,
+                                                             max_height, low, high, max_jump, min_pixels)
+            # row: centroid(3) lower(3) upper(3) sorted xy extent(2) height q98 median rgb/255 (3)  -- perc.rs
+            return [Detection(r[0:3].copy(), r[3:6].copy(), r[6:9].copy(), pix[off[c]:off[c+1]], r[9:15].copy())
+                    for c, r in zip(keep, rows)]
+        except BaseException as e: _accel.guard(e); _accel.failed('segment_components', e)
     height = p@finite(n, (3,))+float(d)
     mask = valid & (height > min_height) & (height < max_height) & np.all((p >= low) & (p <= high), axis=2)
     comps = None
