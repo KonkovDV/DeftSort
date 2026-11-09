@@ -322,7 +322,7 @@ class Sol(Node):
                 yp=plan_place_yaw(A,p['q_lift'],tx,ty+dy,plane,list(s.trays.values()),fallback=(tx,ty) if dy else None)
                 if yp is None:continue
                 yaw,place=yp
-                if not s.budget.can_start(s.now(),p['duration']):
+                if not s.budget.can_start(s.now(),p['duration']+(2*abs(yaw)/.8+1. if yaw else 0.)):   # waist out and back at 0.8 rad/s
                     s.log('skip',name,'remaining',round(s.budget.remaining(s.now()),1),'s');return None
                 s.log('pick',name,cat,'->',tray,'slot',k,'arm',side,g['kind'],'w',round(g['width'],3),'z',round(g['z'],3))
                 Tg=A.tcp(p['q_grasp']);s.trace('start',side,name,kind=g['kind'],center=[round(float(x),3) for x in c3])
@@ -384,13 +384,14 @@ def plan_place(A,q_from,tx,ty,top,fallback=None):
     return None
 def rotz(a):
     c,s_=np.cos(a),np.sin(a);return np.array([[c,-s_,0],[s_,c,0],[0,0,1.]])
-YAW_MAX=1.6           # rad, |body_yaw| used for placing (INTERFACES.md: body_yaw_joint motor 31, [-2.97, 3.14], plus = left)
+YAW_MAX=2.5           # rad, |body_yaw| used for placing (INTERFACES.md: body_yaw_joint motor 31, [-2.97, 3.14], plus = left)
 def yaw_candidates(side,tx,ty):
     """Torso yaw angles that bring the tray in front of this arm's shoulder (rotation about pelvis z, joint at origin).
     Offline (2026-11-09, reach-p3 30 layouts): with body_yaw locked no object reached both trays with one arm."""
     phi=np.arctan2(ty,tx);out=[]
     sg=1. if side=='l' else -1.
-    for aim in (.5,.25,0.,.75,-.25):          # tray direction in the torso frame, this arm's side first
+    for aim in (1.11,.9,1.3,.7,.5):    # tray direction in the torso frame; 1.11 = atan2(.69,.34), the own-side tray the arm reaches unyawed
+        # (yaw keeps the pelvis-axis distance, 0.77 m, so the tray must sit beside this arm's shoulder, not in front)
         th=float(phi-sg*aim)
         if abs(th)<=YAW_MAX and abs(th)>.15 and all(abs(th-o)>.1 for o in out):out.append(th)
     return out
