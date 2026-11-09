@@ -119,13 +119,19 @@ class Chain:
         return np.array([np.r_[np.cross(axis,point-origin),axis] for axis,origin in zip(axes,origins)]).T
 
     def ik(self, target, seed, max_iter=200, position_tol=.002, angle_tol=.015,
-           length_scale=.25, trust_radius=.15):
+           length_scale=.25, trust_radius=.15, q_pref=None, w_null=0.):
         """Local, bounded scaled DLS; no global reachability/completeness claim.
 
         The orientation error and angular Jacobian both use world coordinates.
         Backtracking checks the actual SO(3) residual, not a linearized success.
         """
         target=check_transform(target); q=self.validate_q(seed).copy()
+        # Secondary objective (redundant 7-DOF arm): pull toward a preferred posture inside the task null space.
+        # It cannot change the TCP residual to first order, so convergence/accuracy of the primary task is kept.
+        if q_pref is not None:
+            q_pref=self.validate_q(np.clip(finite(q_pref,(len(self.active),)),self.lower,self.upper))
+        if not np.isfinite(w_null) or w_null<0 or w_null>1:
+            raise ValueError('null-space weight must be in [0,1]')
         if type(max_iter) is not int or max_iter<=0 or not np.isfinite([position_tol,angle_tol,length_scale,trust_radius]).all() or min(position_tol,angle_tol,length_scale,trust_radius)<=0:
             raise ValueError('invalid IK parameters')
         weights=np.r_[np.ones(3),np.full(3,length_scale)]
@@ -139,13 +145,20 @@ class Chain:
             J=weights[:,None]*self.jacobian(q); ew=weights*e
             U,s,Vt=np.linalg.svd(J,full_matrices=False)
             damping=.002+.05*max(0.,1.-float(s[-1])/.04)**2
-            dq=Vt.T@((s/(s*s+damping*damping))*(U.T@ew))
-            norm=np.linalg.norm(dq)
-            if norm>trust_radius: dq*=trust_radius/norm
+            dq_task=Vt.T@((s/(s*s+damping*damping))*(U.T@ew))
+            steps=[dq_task]
+            if q_pref is not None and w_null>0:
+                rank=int(np.sum(s>1e-6*s[0]))
+                N=np.eye(len(q))-Vt[:rank].T@Vt[:rank]        # projector onto the null space of the weighted Jacobian
+                steps.insert(0,dq_task+w_null*(N@(q_pref-q)))  # try task+posture first, pure task step as fallback
             improved=False
-            for scale in (1.,.5,.25,.125,.0625,.015625):
-                candidate=np.clip(q+scale*dq,self.lower,self.upper)
-                if np.linalg.norm(weights*residual(candidate))<np.linalg.norm(ew)-1e-12:
-                    q=candidate; improved=True; break
+            for dq in steps:
+                norm=np.linalg.norm(dq)
+                if norm>trust_radius: dq=dq*(trust_radius/norm)
+                for scale in (1.,.5,.25,.125,.0625,.015625):
+                    candidate=np.clip(q+scale*dq,self.lower,self.upper)
+                    if np.linalg.norm(weights*residual(candidate))<np.linalg.norm(ew)-1e-12:
+                        q=candidate; improved=True; break
+                if improved: break
             if not improved: break
         raise ValueError('IK did not converge within limits; no command permitted')

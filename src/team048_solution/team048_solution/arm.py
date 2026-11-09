@@ -63,7 +63,27 @@ def hand_opening(side='l',n=9):
 def arm_chain(side):
     tip=SIDE[side]['tip'];c=Chain.from_urdf(XML,'pelvis',tip,np.eye(4))
     return c.lock_joints({'body_yaw_joint':0.})
+NULL_WEIGHT=.1   # IK null-space pull toward home; 0 disables (tested: accuracy unchanged, see tests/test_ideas.py)
+# I3: mesh-fitted collision spheres (tools/fit_spheres.py on the UBTECH tiangong2pro_urdf STL meshes, Apache-2.0).
+# TODO(calibrate): keep USE_MESH_SPHERES=False until the mesh frames are verified against the simulator /tf
+# (FK vs TF for all arm links) and the JSON carries "validated": true. Inertia-derived spheres are used meanwhile.
+USE_MESH_SPHERES=False
+MESH_SPHERES=os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','spheres_mesh.json')
+def mesh_spheres(path=MESH_SPHERES,require_validated=True):
+    """[{link,center,radius}] from JSON, or None when missing/unvalidated/malformed (never partially applied)."""
+    import json
+    try:d=json.load(open(path))
+    except (OSError,ValueError):return None
+    if require_validated and d.get('validated') is not True:return None
+    try:return [Sphere(e['link'],np.asarray(e['center'],float),float(e['radius'])) for e in d['spheres']]
+    except (KeyError,TypeError,ValueError):return None
 def arm_spheres(side,chain):
+    if USE_MESH_SPHERES:
+        M=mesh_spheres()
+        links=set(chain.frames(np.clip(np.zeros(len(chain.active)),chain.lower,chain.upper)))
+        if M:
+            M=[x for x in M if x.link in links]
+            if M:return M
     S=[];s=side
     for n in ARM:
         child=J[f'{n}_{s}_joint']['child'];r=link_radius(child)
@@ -109,6 +129,27 @@ class Arm:
         q=dict(zip([f'{n}_{side}_joint' for n in ARM],[-.6,.25*s,0.,-1.2,0.,0.,0.]))
         self.seeds.insert(0,np.clip([q.get(n,0.) for n in self.chain.names],self.chain.lower,self.chain.upper))
         self.home=self.seeds[0]
+    def tcp(self,q):
+        return self.chain.fk(q)
+    def lift(self,q,dz=.08):
+        """Straight-up retreat target from q (same orientation, +dz in pelvis z), certified swept path, or None."""
+        T=self.chain.fk(q).copy();T[2,3]+=dz
+        try:qu=self.chain.ik(T,q,max_iter=150)
+        except ValueError:return None
+        return qu if self.col.valid(qu) and self.col.certify(q,qu) else None
+    def correct(self,q_measured,q_goal,max_step=.05):
+        """One position-only Jacobian correction of the commanded joints so the MEASURED TCP reaches the goal TCP
+        (compensates PD undershoot under load). Returns a certified command or None."""
+        e=self.chain.fk(q_goal)[:3,3]-self.chain.fk(q_measured)[:3,3]
+        Jp=self.chain.jacobian(q_measured)[:3]
+        dq=Jp.T@np.linalg.solve(Jp@Jp.T+1e-4*np.eye(3),e)
+        n=np.abs(dq).max()
+        if n>max_step:dq*=max_step/n
+        qc=np.clip(np.asarray(q_goal,float)+dq,self.chain.lower,self.chain.upper)
+        return qc if self.col.valid(qc) and self.col.certify(q_measured,qc) else None
+    def position_error(self,q_measured,T_goal):
+        """Distance between the TCP at the measured joints and the goal TCP (m)."""
+        return float(np.linalg.norm(self.chain.fk(q_measured)[:3,3]-T_goal[:3,3]))
     def grasp_pose(self,center_xyz,close_axis,approach):
         """TCP pose so that the hand's thumb->finger closing axis maps to close_axis and fingers point along approach."""
         Rh=J[f"{'left' if self.side=='l' else 'right'}_hand_to_tcp"]['T'][:3,:3]   # hand frame in tcp frame
@@ -117,10 +158,11 @@ class Arm:
         u=close_axis/np.linalg.norm(close_axis);a=approach-u*(approach@u);a/=np.linalg.norm(a)
         A=np.c_[c_t,z_t,np.cross(c_t,z_t)];B=np.c_[u,a,np.cross(u,a)];R=B@A.T
         T=np.eye(4);T[:3,:3]=R;T[:3,3]=center_xyz-R@g_t;return T
-    def solve(self,T,seed=None):
+    def solve(self,T,seed=None,w_null=NULL_WEIGHT):
+        # 7-DOF redundancy: secondary pull toward the elbow-out home posture (away from the torso), see kinematics.ik
         for s in ([seed] if seed is not None else [])+self.seeds:
             try:
-                q=self.chain.ik(T,s,max_iter=150)
+                q=self.chain.ik(T,s,max_iter=150,q_pref=self.home if w_null>0 else None,w_null=w_null)
                 if self.col.valid(q):return q
             except ValueError:pass
         return None
