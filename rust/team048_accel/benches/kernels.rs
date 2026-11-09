@@ -167,8 +167,10 @@ fn bench(c: &mut Criterion) {
         std::fs::read_to_string(format!("{dir}frame.json")),
     ) {
         let pts: Vec<f64> = pb
-            .chunks_exact(8)
-            .map(|x| f64::from_le_bytes(x.try_into().unwrap()))
+            .as_chunks::<8>()
+            .0
+            .iter()
+            .map(|x| f64::from_le_bytes(*x))
             .collect();
         let planes: Vec<[f64; 4]> = (0..60)
             .map(|k| {
@@ -180,8 +182,10 @@ fn bench(c: &mut Criterion) {
             b.iter(|| black_box(perc::plane_inlier_counts(&pts, &planes, 0.006, false)))
         });
         let p: Vec<f64> = fb
-            .chunks_exact(8)
-            .map(|x| f64::from_le_bytes(x.try_into().unwrap()))
+            .as_chunks::<8>()
+            .0
+            .iter()
+            .map(|x| f64::from_le_bytes(*x))
             .collect();
         let m: Vec<bool> = mb.iter().map(|v| *v != 0).collect();
         let meta: serde_json::Value = serde_json::from_str(&meta).unwrap();

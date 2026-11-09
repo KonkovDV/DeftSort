@@ -5,10 +5,24 @@ Skipped when the extension (API >= 2) is not installed."""
 import contextlib,glob,json,os,sys,unittest,numpy as np
 HERE=os.path.dirname(os.path.abspath(__file__));sys.path.insert(0,os.path.join(HERE,'..'));sys.path.insert(0,HERE)
 import test_node_stub  # noqa: ROS stubs for node.py
+import scene_fixture as SF
 from team048_solution import _accel, arm, perception, trays as TR, grasp, planning, node as NODE
 FRAMES=sorted(glob.glob('/workspace/fixes/kaggle-sim/out_v7/trace/*/*.npz'))[:int(os.environ.get('T48_EQ_FRAMES',31))]
 FIX=os.path.join(HERE,'fixtures','v5_head_frame.npz')
 K=np.array([[343.16,0,320.],[0,343.16,180.],[0,0,1]])
+# Target environment (ROS 2 Humble: Python 3.10, NumPy < 2): bit-identical. NumPy 2.x evaluates 2-vector products
+# (xy@u) with a different kernel (FMA): there the reference itself moves by <= 1 ulp, so floats are compared to
+# 1e-12 and every discrete result (None, flags, counts, kinds, chosen axis) must still match exactly.
+EXACT=np.lib.NumpyVersion(np.__version__)<'2.0.0'
+def same(a,b):
+    if isinstance(a,dict) and isinstance(b,dict):return a.keys()==b.keys() and all(same(a[k],b[k]) for k in a)
+    if isinstance(a,(list,tuple)) and isinstance(b,(list,tuple)) and len(a)==len(b) and not all(isinstance(x,(int,float,np.number)) for x in a):
+        return all(same(x,y) for x,y in zip(a,b))
+    if a is None or b is None or isinstance(a,(str,bool,np.bool_)) or isinstance(b,(str,bool,np.bool_)):return a==b
+    A,B=np.asarray(a),np.asarray(b)
+    if A.shape!=B.shape:return False
+    if EXACT or A.dtype.kind not in 'fc':return np.array_equal(A,B)
+    return bool(np.allclose(A,B,rtol=0,atol=1e-12))
 
 @contextlib.contextmanager
 def reference():
@@ -31,7 +45,7 @@ class Phase2(unittest.TestCase):
         c.F=frames()
         c.arms={k:arm.Arm(k) for k in 'lr'}
         n=np.array([-.0699,0,.9976]);c.plane=(n/np.linalg.norm(n),.1788/np.linalg.norm(n))
-        for A in c.arms.values():A.set_scene(c.plane,list(TR.NOMINAL.values()))
+        for A in c.arms.values():A.set_scene(c.plane,list(SF.TRAYS.values()))
     def setUp(s):
         if not s.F:s.skipTest('v7 frames not on this machine')
     # ---------------- perception ----------------
@@ -56,24 +70,42 @@ class Phase2(unittest.TestCase):
         for fn,dd,T,rgb in s.F:
             P=perception.deproject(dd,K,T);R=perception.deproject_py(dd,K,T);dmax=max(dmax,np.abs(P-R).max())
             valid=dd>0
-            with reference():tb_ref=perception.table_region(R,valid);tr_ref=perception.table_region(R,valid,[(x,y,.13,.18) for x,y in TR.NOMINAL.values()])
+            with reference():tb_ref=perception.table_region(R,valid);tr_ref=perception.table_region(R,valid,[(x,y,.13,.18) for x,y in SF.TRAYS.values()])
             s.assertTrue(np.array_equal(perception.table_region(R,valid),tb_ref))
-            s.assertTrue(np.array_equal(perception.table_region(R,valid,[(x,y,.13,.18) for x,y in TR.NOMINAL.values()]),tr_ref))
+            s.assertTrue(np.array_equal(perception.table_region(R,valid,[(x,y,.13,.18) for x,y in SF.TRAYS.values()]),tr_ref))
             for seed in (0,1,7):
                 a=perception.table_plane(R,tb_ref,seed=seed);b=perception.table_plane_py(R,tb_ref,seed=seed)
                 s.assertTrue(np.array_equal(a[0],b[0]) and a[1]==b[1],(fn,seed))
         print(f'\ndeproject max |diff| {dmax:.1e} over {len(s.F)} frames');s.assertLessEqual(dmax,1e-12)
-    def test_tray_locate_exact(s):
-        n=0
+    def test_tray_detect_exact(s):
+        n=found=0
         for fn,dd,T,rgb in s.F:
             P=perception.deproject_py(dd,K,T);valid=dd>0;pl=perception.table_plane_py(P,perception.table_region(P,valid))
-            for name in TR.NOMINAL:
+            for name in TR.SEARCH:
                 for col in TR.CHANNEL:
-                    for plane in (pl,None):
-                        a=TR.locate(P,rgb,valid,name,col,plane)
-                        with reference():b=TR.locate(P,rgb,valid,name,col,plane)
-                        s.assertTrue(np.array_equal(a[0],b[0]) and a[1]==b[1],(fn,name,col));n+=1
-        print(f'\ntrays.locate: {n} calls identical')
+                    a=TR.detect(P,rgb,valid,name,col,pl)
+                    with reference():b=TR.detect(P,rgb,valid,name,col,pl)
+                    s.assertTrue(same(a,b),(fn,name,col,a,b));n+=1;found+=a is not None
+        print(f'\ntrays.detect: {n} calls identical ({found} detections)')
+    def test_min_area_rect_and_rect_mask(s):
+        rng=np.random.default_rng(0);bad=0
+        for k in range(150):
+            n=int(rng.integers(1,3000));A=rng.normal(size=(n,3))*rng.uniform(.01,.3)+rng.uniform(-1,1,3)
+            for xy in (A[:,:2],np.ascontiguousarray(A[:,:2]),A[:,:2].round(3)):
+                a=TR.min_area_rect(xy);b=TR.min_area_rect_py(xy);bad+=not all(same(x,y) for x,y in zip(a,b))
+        s.assertEqual(bad,0)
+        fn,dd,T,rgb=s.F[0];P=perception.deproject_py(dd,K,T).copy();P[::7,::5]=np.nan
+        for th in np.linspace(0,3,7):
+            u=np.array([np.cos(th),np.sin(th)]);v=np.array([-u[1],u[0]])
+            R=[(.34,.6,u,v,.14,.19),(.5,-.1,v,u,.1,.3)]
+            s.assertTrue(np.array_equal(perception.rect_mask(P,R),perception.rect_mask_py(P,[(x,y,a[0],a[1],b[0],b[1],c,d) for x,y,a,b,c,d in R])))
+        class S:pass
+        o=S();o.trays={'tray_left':dict(center=(.34,.69),size=(.22,.32),axis=(.1,.995),height=.068),'tray_center':(.53,0.)}
+        m=NODE.Sol.tray_mask(o,P);ref=np.zeros(P.shape[:2],bool)
+        for t in o.trays.values():   # the former inline expression
+            x,y,ax,ay,a,b,_=arm.tray_geom(t);v=np.array([ax,ay]);u=np.array([v[1],-v[0]]);dx=P[...,0]-x;dy=P[...,1]-y
+            ref|=(np.abs(dx*u[0]+dy*u[1])<a/2+NODE.TRAY_MASK_MARGIN)&(np.abs(dx*v[0]+dy*v[1])<b/2+NODE.TRAY_MASK_MARGIN)
+        s.assertTrue(np.array_equal(m,ref) and m.any())
     def test_segment_statistics(s):
         nd=0;roi=(np.array([.18,-.62,-1.]),np.array([.62,.62,1.]))
         for fn,dd,T,rgb in s.F:
@@ -100,12 +132,11 @@ class Phase2(unittest.TestCase):
             others=[cloud('box',rng.uniform(.3,.5),rng.uniform(-.4,.4),0.) for _ in range(k%4)]+([np.zeros((0,3))] if k%5==0 else [])
             fa,Ca=grasp.candidates(cl,pl,cat,others,W_MAX=.1)
             with reference():fb,Cb=grasp.candidates(cl,pl,cat,others,W_MAX=.1)
-            for key in ('width','length','height'):s.assertEqual(fa[key],fb[key])
-            s.assertTrue(np.array_equal(fa['axis'],fb['axis']) and np.array_equal(fa['center'],fb['center']))
+            for key in ('width','length','height','axis','center'):s.assertTrue(same(fa[key],fb[key]),(cat,key))
             s.assertEqual(len(Ca),len(Cb))
             for g,h in zip(Ca,Cb):
                 s.assertEqual(sorted(g),sorted(h))
-                for key in g:s.assertTrue(np.array_equal(np.asarray(g[key]),np.asarray(h[key])),(cat,key));nc+=1
+                for key in g:s.assertTrue(same(g[key],h[key]),(cat,key));nc+=1
         print(f'\ngrasp.candidates: 60 objects, {nc} candidate fields identical')
     # ---------------- planning ----------------
     def test_solve_matches_seed_loop(s):
@@ -124,22 +155,39 @@ class Phase2(unittest.TestCase):
         print(f'\nArm.solve: {same} targets identical ({found} solved)')
     def test_scene_cache_equivalent(s):
         A=arm.Arm('l');rng=np.random.default_rng(4)
+        dets=[dict(center=(.34,.69),size=(.22,.32),axis=(.1,.995),height=.068),(.53,0.),(.34,-.69,0.,1.,.21,.31,.07)]
         for th in (0.,.7,-1.3):
-            R=NODE.rotz(-th);pl=(R@s.plane[0],s.plane[1]);tr=[tuple((R@np.r_[x,y,0.])[:2]) for x,y in TR.NOMINAL.values()]
-            for trays in (tr,[]):
-                A.set_scene(pl,trays);env=A.col.environment;C,Rr=A.col._env_centers.copy(),A.col._env_radii.copy()
+            R=NODE.rotz(-th);pl=(R@s.plane[0],s.plane[1]);tr=arm.rotate_trays(dets,R)
+            for trays,tx in ((tr,None),([],None),(tr,(.25,1.)),(tr[:1],(.05,.9))):
+                A.set_scene(pl,trays,table_x=tx);env=A.col.environment;C,Rr=A.col._env_centers.copy(),A.col._env_radii.copy()
                 qs=[rng.uniform(A.chain.lower,A.chain.upper) for _ in range(80)];va=[A.col.valid(q) for q in qs]
-                A.col.environment=A.body+arm.table_env(plane=pl)+(arm.tray_env(trays,pl) if trays else [])
+                A.col.environment=A.body+arm.table_env(pl,getattr(A,'table_x',None))+(arm.tray_env(trays,pl) if trays else [])
                 s.assertEqual(repr(env),repr(A.col.environment));s.assertTrue(np.array_equal(C,A.col._env_centers) and np.array_equal(Rr,A.col._env_radii))
                 s.assertEqual(va,[A.col.valid(q) for q in qs])
+        A.set_other(np.zeros(7));A.set_scene(s.plane,tr);e1=repr(A.col.environment)
+        A.col.environment=A.body+arm.table_env(s.plane,A.table_x)+arm.tray_env(tr,s.plane);s.assertEqual(e1,repr(A.col.environment))
     def test_table_env_vectorised_exact(s):
-        for pl in (s.plane,(np.array([.03,-.02,.99]),.2)):
+        for pl,x,y in ((s.plane,(.12,1.),(-1.,1.)),((np.array([.03,-.02,.99]),.2),(.3,.85),(-.95,.95))):
             n,d=np.asarray(pl[0],float),float(pl[1]);nn=np.linalg.norm(n);n=n/nn;d=d/nn;ref=[]
-            for a in np.arange(.32,.85+1e-9,.03):
-                for b in np.arange(-.95,.95+1e-9,.03):
+            for a in np.arange(x[0],x[1]+1e-9,.03):
+                for b in np.arange(y[0],y[1]+1e-9,.03):
                     z=-(d+n[0]*a+n[1]*b)/n[2];ref.append(planning.Sphere('pelvis',np.array([a,b,z])-.1*n,.1))
-            got=arm.table_env_build(plane=pl);s.assertEqual(len(got),len(ref))
+            got=arm.table_env_build(pl,x,y);s.assertEqual(len(got),len(ref))
             for g,r in zip(got,ref):s.assertTrue(g.link==r.link and np.array_equal(g.center,r.center) and g.radius==r.radius and not g.center.flags.writeable)
+    def test_tray_env_bulk_exact(s):
+        dets=[dict(center=(.34,.69),size=(.22,.32),axis=(.1,.995),height=.068),(.53,0.)]
+        for pl in (s.plane,(np.array([.03,-.02,.99]),.2)):
+            got=arm.tray_env_build(dets,pl);n,d=np.asarray(pl[0],float),float(pl[1]);ref=[];h0=.07
+            for t in dets:
+                tx,ty,ax,ay,sa,sb,h0=arm.tray_geom(t,(.22,.32),h0)   # same carry-over of the height default as tray_env_build
+                v=np.array([ax,ay])/max(1e-9,np.hypot(ax,ay));u=np.array([v[1],-v[0]]);hx,hy=sa/2,sb/2;loc=[]
+                for a in np.arange(-hx,hx+1e-9,.03):loc+=[(a,-hy),(a,hy)]
+                for b in np.arange(-hy,hy+1e-9,.03):loc+=[(-hx,b),(hx,b)]
+                for x,y in [(tx+a*u[0]+b*v[0],ty+a*u[1]+b*v[1]) for a,b in loc]:
+                    z0=-(d+n[0]*x+n[1]*y)/n[2]
+                    for hh in (h0-.02,max(.02,h0-.06)):ref.append(planning.Sphere('pelvis',np.array([x,y,z0+hh]),.02))
+            s.assertEqual(repr(got),repr(ref))
+            s.assertTrue(all(np.array_equal(g.center,r.center) for g,r in zip(got,ref)))
     def test_certify_skip_and_levers_bound(s):
         rng=np.random.default_rng(8);n=agree=nn=0;viol=0.
         for A in s.arms.values():
@@ -186,9 +234,9 @@ class Phase2(unittest.TestCase):
     def test_phase2_failures_fall_back(s):
         fn,dd,T,rgb=s.F[0];P=perception.deproject_py(dd,K,T);valid=dd>0
         with reference():
-            tb=perception.table_region(P,valid);pl=perception.table_plane(P,tb);loc=TR.locate(P,rgb,valid,'tray_center','green',pl)
+            tb=perception.table_region(P,valid);pl=perception.table_plane(P,tb);loc=TR.detect(P,rgb,valid,'tray_center','green',pl)
             seg=perception.segment(P,rgb,tb,pl,(np.array([.18,-.62,-1.]),np.array([.62,.62,1.])),min_pixels=40)
-        names=('ransac_plane','deproject','tray_select','segment_components','min_caliper','min_dist_xy','table_mask')
+        names=('ransac_plane','deproject','tray_window_mask','min_area_rect_scan','rot_rect_mask','segment_components','min_caliper','min_dist_xy','table_mask')
         saved={k:getattr(_accel._ext,k) for k in names}
         class Boom:
             def __getattr__(self,k):
@@ -201,7 +249,7 @@ class Phase2(unittest.TestCase):
             s.assertTrue(np.array_equal(perception.deproject(dd,K,T),P))
             s.assertTrue(np.array_equal(perception.table_region(P,valid),tb));s.assertFalse(_accel.enabled2())
             _accel._disabled=False;a=perception.table_plane(P,tb);s.assertTrue(np.array_equal(a[0],pl[0]) and a[1]==pl[1])
-            _accel._disabled=False;b=TR.locate(P,rgb,valid,'tray_center','green',pl);s.assertTrue(np.array_equal(b[0],loc[0]) and b[1]==loc[1])
+            _accel._disabled=False;s.assertEqual(TR.detect(P,rgb,valid,'tray_center','green',pl),loc)
             _accel._disabled=False;g=perception.segment(P,rgb,tb,pl,(np.array([.18,-.62,-1.]),np.array([.62,.62,1.])),min_pixels=40)
             s.assertEqual([x.pixels.tolist() for x in g],[x.pixels.tolist() for x in seg])
         finally:

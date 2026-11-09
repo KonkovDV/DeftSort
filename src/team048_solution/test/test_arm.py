@@ -1,6 +1,7 @@
 """Existing IK/collision acceptance tests (ported from fixes/ik/test_arm.py to the package import)."""
 import os,sys,unittest,numpy as np
 sys.path.insert(0,os.path.join(os.path.dirname(__file__),'..'))
+sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)));import scene_fixture as SF
 from team048_solution import arm
 def why(A,q):
     fr=A.chain.frames(q);W=[(s,fr[s.link][:3,:3]@s.center+fr[s.link][:3,3]) for s in A.col.spheres];out=[]
@@ -16,7 +17,7 @@ def why(A,q):
     return out
 class T(unittest.TestCase):
     @classmethod
-    def setUpClass(c):c.A=arm.Arm('l')
+    def setUpClass(c):c.A=arm.Arm('l');c.A.set_scene(SF.plane())
     def test_limits_from_urdf(s):
         ch=s.A.chain
         s.assertEqual(len(ch.names),7);s.assertTrue(np.all(ch.velocity<=.8))
@@ -42,8 +43,12 @@ class T(unittest.TestCase):
         T=s.A.grasp_pose(np.array([.4,.2,-.15]),np.array([0,1.,0]),np.array([1.,0,0]))
         g=(T@np.r_[arm.J['left_hand_to_tcp']['T'][:3,:3]@s.A.hand['grip_center_hand'],1])[:3];s.assertLess(np.linalg.norm(g-[.4,.2,-.15]),1e-6)
     def test_speed_cap(s):
-        p=s.A.plan_pick(np.array([.36,.25,arm.TABLE_TOP+.05]),np.array([0,1.,0]),np.array([1.,0,0]),.05)
-        if p:s.assertLessEqual(p['max_speed'],.8+1e-6)
+        p=s.A.plan_pick(np.array([.36,.25,SF.TABLE_TOP+.05]),np.array([0,1.,0]),np.array([1.,0,0]),.05)
+        s.assertIsNotNone(p);s.assertLessEqual(p['max_speed'],.8+1e-6)
+    def test_no_plan_before_measured_scene(s):
+        A=arm.Arm('l');s.assertFalse(A.scene_ready)        # #645: no stored table -> no planning
+        s.assertIsNone(A.plan_pick(np.array([.36,.25,SF.TABLE_TOP+.05]),np.array([0,1.,0]),np.array([1.,0,0]),.05))
+        with s.assertRaises(ValueError):arm.table_env(None)
     def test_too_wide_rejected(s):
         s.assertIsNone(s.A.plan_pick(np.array([.36,.25,-.13]),np.array([0,1.,0]),np.array([1.,0,0]),.2))
 if __name__=='__main__':unittest.main()

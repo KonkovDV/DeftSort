@@ -114,9 +114,14 @@ def deproject(depth, fx, fy, cx, cy, T):
                           np.ascontiguousarray(T, float), PARALLEL)
 
 
-def tray_select(P, rgb, valid, nx, ny, wx, wy, plane, channel, chroma_min):
-    return _ext.tray_select(np.ascontiguousarray(P, float), np.ascontiguousarray(rgb, np.uint8), np.ascontiguousarray(valid, bool),
-                            float(nx), float(ny), float(wx), float(wy), plane, int(channel), float(chroma_min))
+def tray_window_mask(P, rgb, valid, h, window, band, channel, chroma_min):
+    return _ext.tray_window_mask(np.ascontiguousarray(P, float), np.ascontiguousarray(rgb, np.uint8), np.ascontiguousarray(valid, bool),
+                                 np.ascontiguousarray(h, float), tuple(float(x) for x in window), (float(band[0]), float(band[1])),
+                                 int(channel), float(chroma_min))
+
+
+def rot_rect_mask(P, rects):
+    return _ext.rot_rect_mask(np.ascontiguousarray(P, float), [tuple(float(x) for x in r) for r in rects])
 
 
 def segment_components(P, rgb, valid, n, d, min_h, max_h, low, high, max_jump, min_pixels):
@@ -127,6 +132,10 @@ def segment_components(P, rgb, valid, n, d, min_h, max_h, low, high, max_jump, m
 
 def min_caliper(hull, dirs):
     return _ext.min_caliper(np.ascontiguousarray(hull, float), np.ascontiguousarray(dirs, float))
+
+
+def min_area_rect_scan(xy, dirs, q):
+    return _ext.min_area_rect_scan(np.ascontiguousarray(xy, float), np.ascontiguousarray(dirs, float), float(q))
 
 
 def min_dist_xy(tips, pts):

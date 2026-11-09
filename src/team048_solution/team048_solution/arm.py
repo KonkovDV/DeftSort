@@ -11,9 +11,37 @@ from .geometry import pose,rotation,check_transform,check_rotation,finite
 URDF=os.environ.get('HACK_URDF',os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','tiangong_pro_with_hands.urdf'))
 import re
 XML=re.sub(r'<axis\s+xyz="0 0 0"\s*/>','',open(URDF).read());ROOT=ET.fromstring(XML)
-STANDING_PELVIS=.88;TABLE_TOP=.70-STANDING_PELVIS   # hackathon/config/scene.yaml (table.height, standing_pelvis_height)
+# #645 (2026-11-05): table, trays and racks are found by the cameras; no pre-measured scene coordinates here.
+# Only APPROXIMATE SEARCH BOUNDS (allowed): the table plane must lie in this pelvis-z band (a wide "the table is roughly
+# at this height" window, 40 cm), and the table obstacle extends from the MEASURED near edge to these far bounds
+# (conservative: an obstacle where there may be no table only removes plans, never adds collisions).
+TABLE_Z_BAND=(-.45,-.05)    # m, pelvis frame: accepted table-top height at x=0.4 (search window, not a measurement)
+TABLE_X_FAR=1.0             # m, far bound of the table obstacle (search bound)
+TABLE_Y_HALF=1.0            # m, half width of the table obstacle (search bound)
+TABLE_X_NEAR_MIN=.12        # m, the table obstacle never starts closer than this (robot body region, robot geometry)
 SIDE={'l':dict(tip='left_tcp_link',hand='L_base_link',pre='left'),'r':dict(tip='right_tcp_link',hand='R_base_link',pre='right')}
 ARM=['shoulder_pitch','shoulder_roll','shoulder_yaw','elbow_pitch','elbow_yaw','wrist_pitch','wrist_roll']
+REQUIRED_LINKS=('pelvis','left_tcp_link','right_tcp_link','L_base_link','R_base_link','head_yaw_link','camera_head_link',
+                'waist_yaw_link','shoulder_pitch_l_link','shoulder_pitch_r_link','hip_pitch_l_link','hip_pitch_r_link')
+def load_urdf(xml_text):
+    """Switch the kinematic model to `xml_text` (e.g. /robot_description) if it has every required link and the arm
+    joints; returns (ok, reason). Must be called before Arm() objects are built."""
+    global XML,ROOT,J,BYCHILD
+    x=re.sub(r'<axis\s+xyz="0 0 0"\s*/>','',xml_text);r=ET.fromstring(x)
+    links={l.get('name') for l in r.findall('link')}
+    miss=[l for l in REQUIRED_LINKS if l not in links]
+    if miss:return False,f'missing links {miss[:3]}'
+    old=(XML,ROOT,J,BYCHILD)
+    XML,ROOT=x,r
+    try:
+        J=joints();BYCHILD={v['child']:k for k,v in J.items()}
+        need=[f'{n}_{s}_joint' for n in ARM for s in 'lr']+['left_hand_to_tcp','right_hand_to_tcp']
+        if any(n not in J for n in need):raise KeyError('arm joints')
+        for l in ('L_base_link','R_base_link'):inertial(l)
+        hand_opening('l');hand_opening('r')     # finger links present (fingertip model)
+    except Exception as e:
+        XML,ROOT,J,BYCHILD=old;_ENV_CACHE.clear();return False,f'incomplete ({type(e).__name__})'
+    _ENV_CACHE.clear();return True,'ok'
 def joints():
     out={}
     for j in ROOT.findall('joint'):
@@ -92,8 +120,8 @@ def hand_mesh(side):
             _HAND_MESH_CACHE.clear();_HAND_MESH_CACHE[key]=d
         return d[side]
     except Exception:return None
-def arm_spheres(side,chain):
-    if USE_MESH_SPHERES:
+def arm_spheres(side,chain,mesh=True):
+    if mesh and USE_MESH_SPHERES and chain is not None:
         M=mesh_spheres()
         links=set(chain.frames(np.clip(np.zeros(len(chain.active)),chain.lower,chain.upper)))
         if M:
@@ -126,9 +154,10 @@ def body_env(side,other_q=None):
         for x in (-.03,.04):E.append(Sphere('pelvis',np.array([x,0.,z]),r))
     hp=P('head_pitch_link');E.append(Sphere('pelvis',hp+np.array([.02,0,.08]),.12))
     o='r' if side=='l' else 'l';q=other_q or {}
-    for n in ARM:
-        child=J[f'{n}_{o}_joint']['child'];E.append(Sphere('pelvis',P(child,q=q),link_radius(child)))
-    E.append(Sphere('pelvis',P(SIDE[o]['tip'],q=q),.06))
+    # #625: the OTHER arm at its (measured) posture with the same segment + hand envelope as the moving arm
+    # (arm_spheres), mapped to pelvis by FK -- not one sphere per joint origin.
+    for sp in arm_spheres(o,None,mesh=False):
+        E.append(Sphere('pelvis',(fk_link(sp.link,q)@np.r_[sp.center,1])[:3],sp.radius))
     # legs/hips below the table are fixed: one sphere per hip
     for hs in ('l','r'):E.append(Sphere('pelvis',P(f'hip_pitch_{hs}_link'),.07))
     return E
@@ -146,43 +175,80 @@ def _cached(key,build):
     return list(_cached_entry(key,build)[0])
 def _key(*a):
     return tuple(np.asarray(x,float).tobytes() if isinstance(x,(np.ndarray,list,tuple)) else x for x in a)
-def _table_entry(x=(.32,.85),y=(-.95,.95),R=.1,step=.03,top=TABLE_TOP,plane=None):
-    pk=None if plane is None else (np.asarray(plane[0],float).tobytes(),float(plane[1]))
-    return _cached_entry(('table',_key(x,y,R,step,top),pk),lambda:table_env_build(x,y,R,step,top,plane))
-def table_env(x=(.32,.85),y=(-.95,.95),R=.1,step=.03,top=TABLE_TOP,plane=None):
-    return list(_table_entry(x,y,R,step,top,plane)[0])
-def table_env_build(x=(.32,.85),y=(-.95,.95),R=.1,step=.03,top=TABLE_TOP,plane=None):   # near edge x=.22 (table.front_gap)
-    """Table as spheres tangent to the top surface. plane=(n,d) (pelvis frame, n.p+d=0, from the head camera) replaces
-    the flat scene.yaml height: v7 Kaggle frames show the table tilted 4.0 deg in the pelvis frame (n_x=-0.070 in all
-    31 frames), i.e. 1.2-3.8 cm higher than the flat model over x=0.3-0.55."""
-    if plane is None:
-        return [Sphere('pelvis',np.array([a,b,top-R]),R) for a in np.arange(x[0],x[1]+1e-9,step) for b in np.arange(y[0],y[1]+1e-9,step)]
+def plane_height(plane,x,y):
+    """Table-top z (pelvis) at (x,y) for plane=(n,d), n.p+d=0."""
+    n,d=np.asarray(plane[0],float),float(plane[1]);return float(-(d+n[0]*x+n[1]*y)/n[2])
+def plane_plausible(plane,x=.4):
+    """True if the measured plane is horizontal enough and inside the table height search band (#645 bounds)."""
+    n=np.asarray(plane[0],float);n=n/np.linalg.norm(n)
+    return bool(n[2]>.96 and TABLE_Z_BAND[0]<=plane_height(plane,x,0.)<=TABLE_Z_BAND[1])
+def _table_args(plane,x,y):
+    if plane is None:raise ValueError('table obstacle needs a measured plane (#645: no stored table height)')
+    x=(TABLE_X_NEAR_MIN,TABLE_X_FAR) if x is None else (max(TABLE_X_NEAR_MIN,float(x[0])),float(x[1]))
+    y=(-TABLE_Y_HALF,TABLE_Y_HALF) if y is None else y
+    return x,y
+def _table_entry(plane,x=None,y=None,R=.1,step=.03):
+    x,y=_table_args(plane,x,y);pk=(np.asarray(plane[0],float).tobytes(),float(plane[1]))
+    return _cached_entry(('table',_key(x,y,R,step),pk),lambda:table_env_build(plane,x,y,R,step))
+def table_env(plane,x=None,y=None,R=.1,step=.03):
+    """plane is REQUIRED (measured by the head camera); x=(near,far): near = measured near edge."""
+    return list(_table_entry(plane,x,y,R,step)[0])
+def table_env_build(plane,x,y,R=.1,step=.03):
+    """Table as spheres tangent to the MEASURED top surface plane=(n,d) (pelvis frame, n.p+d=0, head camera).
+    v7 Kaggle frames show the table tilted 4.0 deg in the pelvis frame (n_x=-0.070 in all 31 frames)."""
     n,d=np.asarray(plane[0],float),float(plane[1]);nn=np.linalg.norm(n);n=n/nn;d=d/nn
     # vectorised, element-wise identical to the scalar loop  z=-(d+n0*a+n1*b)/n2; centre=[a,b,z]-R*n  (a outer, b inner)
     A,B=np.meshgrid(np.arange(x[0],x[1]+1e-9,step),np.arange(y[0],y[1]+1e-9,step),indexing='ij');A=A.ravel();B=B.ravel()
     Z=-(d+n[0]*A+n[1]*B)/n[2]
-    return spheres_bulk('pelvis',np.stack([A,B,Z],axis=1)-R*n,R)
+    return spheres_bulk('pelvis',np.stack([A,B,Z],axis=1).reshape(-1,3)-R*n,R)
+def tray_geom(t,size=(.22,.32),height=.07):
+    """Normalise a tray to (x, y, ax, ay, short, long, height): a 2-tuple (x,y) (synthetic tests) or the dict of
+    trays.detect() / a 7-tuple with the MEASURED long axis, size and wall height."""
+    if isinstance(t,dict):
+        return (float(t['center'][0]),float(t['center'][1]),float(t['axis'][0]),float(t['axis'][1]),
+                float(t['size'][0]),float(t['size'][1]),float(t.get('height',height)))
+    t=tuple(float(v) for v in t)
+    return t if len(t)==7 else (t[0],t[1],0.,1.,float(size[0]),float(size[1]),float(height))
+def rotate_trays(trays,R):
+    """Trays expressed in a frame rotated by R (3x3 about z): centre and long axis rotate."""
+    out=[]
+    for t in trays:
+        x,y,ax,ay,a,b,h=tray_geom(t);c=R@np.r_[x,y,0.];u=R@np.r_[ax,ay,0.];out.append((c[0],c[1],u[0],u[1],a,b,h))
+    return out
 def _tray_entry(trays,plane,size=(.22,.32),height=.07,r=.02,step=.03):
-    key=('tray',np.asarray(trays,float).tobytes(),np.asarray(plane[0],float).tobytes(),float(plane[1]),_key(size,height,r,step))
-    return _cached_entry(key,lambda:tray_env_build(trays,plane,size,height,r,step))
+    G=tuple(tray_geom(t,size,height) for t in trays)
+    key=('tray',np.asarray(G,float).tobytes(),np.asarray(plane[0],float).tobytes(),float(plane[1]),_key(r,step))
+    return _cached_entry(key,lambda:tray_env_build(G,plane,size,height,r,step))
 def tray_env(trays,plane,size=(.22,.32),height=.07,r=.02,step=.03):
     return list(_tray_entry(trays,plane,size,height,r,step)[0])
 def tray_env_build(trays,plane,size=(.22,.32),height=.07,r=.02,step=.03):
-    """Tray walls as spheres (centres r below the rim): v7 Kaggle s103 the hand was carried into the tray_right wall
-    (82 N, TCP 14 cm below plan) because trays were not obstacles."""
+    """Tray walls as spheres (centres r below the rim) from the MEASURED centre, long axis, size and wall height:
+    v7 Kaggle s103 the hand was carried into the tray_right wall (82 N, TCP 14 cm below plan) when trays were not
+    obstacles."""
     n,d=np.asarray(plane[0],float),float(plane[1]);out=[]
-    for tx,ty in trays:
-        hx,hy=size[0]/2,size[1]/2;pts=[]
-        for a in np.arange(-hx,hx+1e-9,step):pts+=[(tx+a,ty-hy),(tx+a,ty+hy)]
-        for b in np.arange(-hy,hy+1e-9,step):pts+=[(tx-hx,ty+b),(tx+hx,ty+b)]
+    for t in trays:
+        tx,ty,ax,ay,sa,sb,height=tray_geom(t,size,height)
+        v=np.array([ax,ay])/max(1e-9,np.hypot(ax,ay));u=np.array([v[1],-v[0]])   # u: short axis, v: long axis
+        hx,hy=sa/2,sb/2;loc=[]
+        for a in np.arange(-hx,hx+1e-9,step):loc+=[(a,-hy),(a,hy)]
+        for b in np.arange(-hy,hy+1e-9,step):loc+=[(-hx,b),(hx,b)]
+        pts=[(tx+a*u[0]+b*v[0],ty+a*u[1]+b*v[1]) for a,b in loc]
         for x,y in pts:
             z0=-(d+n[0]*x+n[1]*y)/n[2]
             for h in (height-r,max(r,height-3*r)):out.append((x,y,z0+h))
     return spheres_bulk('pelvis',out,r) if out else []
+HOME_Q=(-.6,.25,0.,-1.2,0.,0.,0.)   # forward-reaching elbow-bent home posture (robot posture; y-sign mirrored per side)
+def home_dict(side):
+    s=1 if side=='l' else -1;v=list(HOME_Q);v[1]*=s
+    return dict(zip([f'{n}_{side}_joint' for n in ARM],v))
+def other_home(side):
+    """The other arm at ITS home posture (the default while this arm plans; updated from /joint_states by set_other)."""
+    return home_dict('r' if side=='l' else 'l')
 class Arm:
     def __init__(self,side,margin=.015,table=True):
         self.side=side;self.chain=arm_chain(side);self.hand=hand_opening(side)
-        self.body=body_env(side);env=self.body+(table_env() if table else [])
+        # No table until the head camera measured it (#645): planning refuses to run before set_scene().
+        self.body=body_env(side,other_home(side));env=list(self.body);self.scene_ready=False
         # ignore adjacent arm links and the shoulder link vs torso handled by env; within-chain adjacency:
         links=[J[f'{n}_{side}_joint']['child'] for n in ARM]+[SIDE[side]['tip']]
         ign=[(a,b) for i,a in enumerate(links) for b in links[i+1:i+3]]
@@ -190,21 +256,25 @@ class Arm:
         self.seeds=[np.clip(np.zeros(len(self.chain.active)),self.chain.lower,self.chain.upper)]
         rng=np.random.default_rng(0)
         for _ in range(6):self.seeds.append(rng.uniform(self.chain.lower,self.chain.upper)*.5)
-        e=[0.]*7;s=1 if side=='l' else -1   # a forward-reaching elbow-bent seed
-        q=dict(zip([f'{n}_{side}_joint' for n in ARM],[-.6,.25*s,0.,-1.2,0.,0.,0.]))
+        q=home_dict(side)   # a forward-reaching elbow-bent seed
         self.seeds.insert(0,np.clip([q.get(n,0.) for n in self.chain.names],self.chain.lower,self.chain.upper))
         self.home=self.seeds[0]
-    def set_scene(self,plane,trays=()):
-        """Obstacles from the latest observation: measured table plane + tray walls (body unchanged).
-        Equivalent to  col.environment = body + table_env(plane=plane) + tray_env(trays, plane)  (same spheres, same order);
-        the assembled arrays and the Rust grid are memoised per scene (the torso-yaw search revisits the same rotated
-        scenes for every object of an observation)."""
-        tk=np.asarray(trays,float).tobytes() if trays else None
-        key=(np.asarray(plane[0],float).tobytes(),float(plane[1]),tk,id(self.body),len(self.body))
+    def set_scene(self,plane,trays=(),table_x=None):
+        """Obstacles from the latest observation: measured table plane (+ measured near edge table_x=(near,far)) and
+        the detected tray walls (body unchanged).
+        Equivalent to  col.environment = body + table_env(plane, table_x) + tray_env(trays, plane)  (same spheres, same
+        order); the assembled arrays and the Rust grid are memoised per scene (the torso-yaw search revisits the same
+        rotated scenes for every object of an observation)."""
+        if table_x is not None:self.table_x=table_x
+        self._scene=(plane,list(trays))
+        tx=getattr(self,'table_x',None)
+        bt,bC,bR=self._body_entry()
+        G=np.asarray([tray_geom(t) for t in trays],float).tobytes() if trays else None
+        key=(np.asarray(plane[0],float).tobytes(),float(plane[1]),G,_key(*_table_args(plane,tx,None)),bC.tobytes(),bR.tobytes())
         cache=self.__dict__.setdefault('_scenes',{})
         e=cache.get(key)
         if e is None:
-            parts=[self._body_entry(),_table_entry(plane=plane)]+([_tray_entry(trays,plane)] if trays else [])
+            parts=[(bt,bC,bR),_table_entry(plane,tx)]+([_tray_entry(trays,plane)] if trays else [])
             t=tuple(x for p in parts for x in p[0])
             if not t or any(s.link!=self.chain.base for s in t):raise ValueError("nonempty base-frame environment required")
             C=np.concatenate([p[1] for p in parts]);R=np.concatenate([p[2] for p in parts]);C.setflags(write=False);R.setflags(write=False)
@@ -215,12 +285,32 @@ class Arm:
             if len(cache)>256:cache.clear()
             e=cache[key]=(t,C,R,fe)
         self.col.install_environment(*e)
+        self.scene_ready=True
     def _body_entry(self):
         b=self.__dict__.get('_body_arr')
         if b is None or b[0] is not self.body or len(b[1])!=len(self.body):
             C=np.array([s.center for s in self.body],dtype=float).reshape(-1,3);R=np.array([s.radius for s in self.body],dtype=float)
             C.setflags(write=False);R.setflags(write=False);b=self._body_arr=(self.body,C,R)
         return (tuple(b[0]),b[1],b[2])
+    def set_other(self,q_other):
+        """#625 arm-to-arm: the other arm's envelope at its MEASURED joints (7-vector in ARM order or dict)."""
+        o='r' if self.side=='l' else 'l'
+        if not isinstance(q_other,dict):q_other=dict(zip([f'{n}_{o}_joint' for n in ARM],[float(x) for x in q_other]))
+        key=tuple(round(q_other.get(f'{n}_{o}_joint',0.),3) for n in ARM)
+        if key==getattr(self,'_other_key',None):return
+        self._other_key=key
+        self.body=_cached(('body',self.side,key),lambda:body_env(self.side,dict(zip([f'{n}_{o}_joint' for n in ARM],key))))
+        if getattr(self,'_scene',None) is not None:self.set_scene(*self._scene)
+        else:self.col.environment=list(self.body)
+    def path_home(self,q):
+        """Certified way home from q: [home] if the straight joint path is collision-free, else [lift(q), home] when
+        that is, else None (#625: never an uncertified move when a certified one exists)."""
+        q=np.clip(np.asarray(q,float),self.chain.lower,self.chain.upper)
+        if self.col.certify(q,self.home):return [self.home]
+        for dz in (.08,.15):
+            qu=self.lift(q,dz)
+            if qu is not None and self.col.certify(qu,self.home):return [qu,self.home]
+        return None
     def tcp(self,q):
         return self.chain.fk(q)
     def lift(self,q,dz=.08):
@@ -304,6 +394,7 @@ class Arm:
     def plan_pick(self,center,close_axis,approach,width,pre=.08,lift=.08,tilts=(0,.35,.6),point='grip'):
         """Returns dict(q_pre,q_grasp,q_lift,traj) or None. Speed capped at 0.8 rad/s by joint_path/Chain.velocity."""
         if width>self.hand['opposed_open']-.01:return None
+        if not self.scene_ready:return None   # no measured table yet: never plan against an assumed scene (#645)
         import itertools
         for t,sg in itertools.product(tilts,(1.,-1.)):
             a=np.asarray(approach,float);u=sg*np.asarray(close_axis,float)   # a 2-finger-opposed grasp is symmetric in the closing axis

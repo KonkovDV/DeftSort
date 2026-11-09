@@ -92,6 +92,24 @@ def table_region(P, valid, rects=(), x=(.15, .75), y_abs=.7):
     return m
 
 
+def rect_mask(P, rects):
+    """Pixels inside any rotated rectangle (x, y, u, v, ha, hb): |(X-x)u0+(Y-y)u1| < ha & |(X-x)v0+(Y-y)v1| < hb
+    (u, v unit 2-vectors). Rust kernel when available (element-wise identical)."""
+    rects = [(float(x), float(y), float(u[0]), float(u[1]), float(v[0]), float(v[1]), float(ha), float(hb)) for x, y, u, v, ha, hb in rects]
+    if rects and _accel.enabled2() and np.ndim(P) == 3 and np.shape(P)[2] == 3:
+        try: return _accel.rot_rect_mask(P, rects)
+        except BaseException as e: _accel.guard(e); _accel.failed('rot_rect_mask', e)
+    return rect_mask_py(P, rects)
+
+
+def rect_mask_py(P, rects):
+    m = np.zeros(np.shape(P)[:2], bool)
+    for x, y, u0, u1, v0, v1, ha, hb in rects:
+        dx = P[..., 0]-x; dy = P[..., 1]-y
+        m |= (np.abs(dx*u0+dy*u1) < ha) & (np.abs(dx*v0+dy*v1) < hb)
+    return m
+
+
 def deproject(depth_mm, K, T):
     """Organized pelvis-frame cloud (h,w,3) from a depth image in mm (float) -- node.observe arithmetic:
     X = (u-cx)*Z/fx, Y = (v-cy)*Z/fy, Z = depth/1000, P = [X,Y,Z] @ R.T + t. Rust kernel when available
@@ -156,6 +174,38 @@ def table_plane_py(points, valid, iterations=120, tolerance=.006, min_inliers=10
     if normal[2] < .96:
         raise ValueError('bad refined plane')
     return normal, -normal@center
+
+
+def plane_inliers(points, valid, plane, tolerance=.008):
+    """Boolean image: valid points within `tolerance` of the plane (n.p+d=0)."""
+    P = np.asarray(points, float); n, d = np.asarray(plane[0], float), float(plane[1])
+    return np.asarray(valid, bool) & np.isfinite(P).all(axis=-1) & (np.abs(P@n+d) < tolerance)
+
+
+def near_edge(points, valid, plane, y_half=.5, drop=.05, q=.1, min_cols=40, min_below=5):
+    """Near (robot-side) table edge x from one view, or None if this view does not SEE the edge.
+    Column-wise in the image: the lowest table-plane inlier pixel of a column is an edge pixel only if the pixels
+    below it in that column (closer to the camera along the image) include >= min_below valid points at least `drop`
+    under the plane (the view passes the edge and drops to the floor/crates). Otherwise the inlier boundary is just the
+    image border and the true edge may be closer -> None (caller uses a conservative bound).
+    Kaggle v7 torso frames: edge pixels at x 0.21-0.25 m (pelvis), head frames: edge not visible (None)."""
+    P = np.asarray(points, float)
+    ok = np.asarray(valid, bool) & np.isfinite(P).all(axis=-1)
+    n, d = np.asarray(plane[0], float), float(plane[1])
+    h = np.where(ok, P@n+d, np.nan)
+    inl = ok & (np.abs(h) < .008) & (np.abs(P[..., 1]) < y_half)
+    H = inl.shape[0]
+    xs = []
+    for c in np.nonzero(inl.any(axis=0))[0]:
+        r = int(np.nonzero(inl[:, c])[0].max())
+        if r >= H-1:
+            continue
+        below = h[r+1:, c]
+        if int(np.sum(below < -drop)) >= min_below:
+            xs.append(P[r, c, 0])
+    if len(xs) < min_cols:
+        return None
+    return float(np.quantile(xs, q))
 
 
 def segment(points, rgb, valid, plane, roi, min_pixels=25, max_jump=.025, min_height=.012, max_height=.35):

@@ -3,6 +3,7 @@ import os,sys,json,struct,tempfile,types,unittest
 import numpy as np
 HERE=os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0,os.path.join(HERE,'..'));sys.path.insert(0,os.path.join(HERE,'..','..','..','tools'))
+sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)));import scene_fixture as SF
 from team048_solution import arm,budget,grip,trays,sensing
 from team048_solution.geometry import quaternion_transform
 V5=os.path.join(HERE,'fixtures','v5_head_frame.npz')
@@ -34,7 +35,8 @@ class Grip(unittest.TestCase):            # I1 plumbing + I4
     def test_force_not_used_finger_calibrated(s):
         s.assertIsNone(grip.GRASP_DF_MIN_N)          # F/T offsets 0.05-5.5 N empty (v7): not a decision signal
         s.assertEqual(grip.FINGER_DEV_HELD,.35);s.assertEqual(grip.FINGER_EFF_HELD,.67)
-        s.assertEqual(grip.HAND_FORCE_RATIO,1.0);s.assertEqual(grip.HAND_SPEED_RATIO,1.0)
+        s.assertTrue(.3<=grip.HAND_FORCE_RATIO<=.5)       # organiser #648: 0.3-0.5 instead of 1.0
+        s.assertLess(grip.HAND_SPEED_RATIO,1.0)
     def test_finger_verdict_on_v7_frames(s):
         rim=[1,1,.1,.1,.2,0.];side=[0,0,0,0,0,0.]
         # real v7 'lifted' frames (position, effort)
@@ -87,25 +89,36 @@ class Trays(unittest.TestCase):           # I5 + I6
         s.assertLess(trays.chroma_mask(table,'green').mean(),.02)        # neutral table
         s.assertLess(trays.chroma_mask(tray,'red').mean(),.02)
         s.assertLess(trays.chroma_mask(tray,'blue').mean(),.02)
-    def test_locate_synthetic(s):
-        H,W=60,80;yy,xx=np.mgrid[0:H,0:W]
-        P=np.zeros((H,W,3));P[...,0]=.2+xx/W*.5;P[...,1]=.4+yy/H*.6;P[...,2]=-.18
+    def _scene(s,true=(.36,.70),yaw=0.,H=120,W=160,x=(.05,.75),y=(.30,1.20)):
+        yy,xx=np.mgrid[0:H,0:W]
+        P=np.zeros((H,W,3));P[...,0]=x[0]+xx/W*(x[1]-x[0]);P[...,1]=y[0]+yy/H*(y[1]-y[0]);P[...,2]=-.18
         rgb=np.full((H,W,3),224,np.uint8)
-        true=(.36,.70);m=(np.abs(P[...,0]-true[0])<.11)&(np.abs(P[...,1]-true[1])<.16)
-        rgb[m]=(250,234,236)                  # red-dominant, desaturated like the v5 render
-        plane=(np.array([0,0,1.]),.18)
-        c,src=trays.locate(P,rgb,np.ones((H,W),bool),'tray_left','red',plane)
-        s.assertEqual(src,'camera');s.assertLess(np.linalg.norm(c-true),.015)
-        c2,src2=trays.locate(P,rgb,np.ones((H,W),bool),'tray_left','blue',plane)
-        s.assertEqual(src2,'nominal');s.assertTrue(np.allclose(c2,trays.NOMINAL['tray_left']))
-    def test_locate_rejects_partial_and_far(s):
-        H,W=60,80;yy,xx=np.mgrid[0:H,0:W]
-        P=np.zeros((H,W,3));P[...,0]=.2+xx/W*.5;P[...,1]=.4+yy/H*.6;P[...,2]=-.18
-        rgb=np.full((H,W,3),224,np.uint8)
-        m=(np.abs(P[...,0]-.34)<.11)&(P[...,1]>.80)&(P[...,1]<.85)   # thin strip only: y extent < 60 % of tray
-        rgb[m]=(250,234,236)
-        c,src=trays.locate(P,rgb,np.ones((H,W),bool),'tray_left','red',None,min_px=10)
-        s.assertAlmostEqual(c[1],.69)      # y not refined from a partial view
+        c,sn=np.cos(yaw),np.sin(yaw);dx=P[...,0]-true[0];dy=P[...,1]-true[1]
+        u=dx*c+dy*sn;v=-dx*sn+dy*c
+        m=(np.abs(u)<.11)&(np.abs(v)<.16)
+        rgb[m]=(250,234,236)                  # red-dominant, desaturated like the v5/v7 renders
+        P[m,2]+=.0                            # tray floor at table height
+        return P,rgb,(np.array([0,0,1.]),.18)
+    def test_detect_synthetic_full_tray(s):
+        P,rgb,plane=s._scene()
+        d=trays.detect(P,rgb,np.ones(P.shape[:2],bool),'tray_left','red',plane)
+        s.assertIsNotNone(d);s.assertFalse(d['partial'])
+        s.assertLess(np.linalg.norm(np.array(d['center'])-[.36,.70]),.012)
+        s.assertAlmostEqual(d['size'][0],.22,delta=.015);s.assertAlmostEqual(d['size'][1],.32,delta=.015)
+        s.assertGreater(abs(d['axis'][1]),.99)          # long axis along y
+        s.assertIsNone(trays.detect(P,rgb,np.ones(P.shape[:2],bool),'tray_left','blue',plane))   # wrong colour
+    def test_detect_measures_rotation_and_position_anywhere(s):
+        P,rgb,plane=s._scene(true=(.42,.62),yaw=.3)      # not the simulator layout: found where it is
+        d=trays.detect(P,rgb,np.ones(P.shape[:2],bool),'tray_left','red',plane)
+        s.assertFalse(d['partial']);s.assertLess(np.linalg.norm(np.array(d['center'])-[.42,.62]),.015)
+        ang=np.arctan2(d['axis'][1],d['axis'][0]);s.assertAlmostEqual(abs(ang),np.pi/2+.3,delta=.04)
+    def test_detect_partial_when_cut_by_border(s):
+        P,rgb,plane=s._scene(true=(.36,1.15))           # extends past the image border (y up to 1.20)
+        d=trays.detect(P,rgb,np.ones(P.shape[:2],bool),'tray_left','red',plane)
+        s.assertIsNotNone(d);s.assertTrue(d['partial'])  # centre unreliable -> caller re-aims, never uses it
+    def test_no_nominal_positions_in_package(s):
+        s.assertFalse(hasattr(trays,'NOMINAL'));s.assertFalse(hasattr(trays,'locate'))
+        s.assertFalse(hasattr(arm,'TABLE_TOP'))
     def test_unknown_colour(s):
         with s.assertRaises(ValueError):trays.chroma_mask(np.zeros((2,2,3),np.uint8),'purple')
 
@@ -202,17 +215,17 @@ class V7Fixes(unittest.TestCase):
         self.assertAlmostEqual(budget.start_time(10.,3.,0.),7.)
     def test_table_env_follows_measured_plane(self):
         n=np.array([-.0699,0,.9976]);d=.1788          # v7 Kaggle plane (pelvis frame)
-        T=arm.table_env(plane=(n,d))
+        T=arm.table_env((n,d))
         for sp in T[::50]:
             top=sp.center+sp.radius*n/np.linalg.norm(n)
             self.assertAlmostEqual(float(top@n/np.linalg.norm(n)+d/np.linalg.norm(n)),0.,6)
         z=lambda x:-(d+n[0]*x)/n[2]
-        self.assertGreater(z(.5)-arm.TABLE_TOP,.03)    # 3.5 cm above the flat model at x=0.5
+        self.assertGreater(z(.5)-SF.TABLE_TOP,.03)    # 3.5 cm above the flat model at x=0.5
     def test_tray_walls_are_obstacles(self):
-        n=np.array([0,0,1.]);d=-arm.TABLE_TOP
+        n=np.array([0,0,1.]);d=-SF.TABLE_TOP
         W=arm.tray_env([(.34,-.69)],(n,d))
         self.assertTrue(W);top=max(s.center[2]+s.radius for s in W)
-        self.assertAlmostEqual(top,arm.TABLE_TOP+.07,6)
+        self.assertAlmostEqual(top,SF.TABLE_TOP+.07,6)
     def test_thumb_in_collision_envelope(self):
         A=arm.Arm('l');hm=arm.hand_mesh('l');self.assertIsNotNone(hm)
         tip=[s for s in A.col.spheres if s.link==arm.SIDE['l']['tip']]

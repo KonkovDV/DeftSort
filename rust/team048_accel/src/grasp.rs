@@ -61,3 +61,54 @@ mod tests {
         }
     }
 }
+
+/// trays.min_area_rect scan: for every direction u (v = [-u1, u0]) the linear-interpolated q / (1-q) quantiles of
+/// xy.u and xy.v (NumPy `quantile`, method 'linear'); returns the first direction with the strictly smallest
+/// area (hu-lu)*(hv-lv) and its (lu, hu, lv, hv). Projections are x*u0 + y*u1 (two products, one sum: the same
+/// value NumPy's matmul gives for a 2-vector). None if xy or dirs is empty.
+pub fn min_area_rect_scan(xy: &[[f64; 2]], dirs: &[[f64; 2]], q: f64) -> Option<(usize, [f64; 4])> {
+    if xy.is_empty() || dirs.is_empty() {
+        return None;
+    }
+    let (q0, q1) = (q, 1. - q);
+    let mut pu = vec![0.; xy.len()];
+    let mut pv = vec![0.; xy.len()];
+    let mut best: Option<(f64, usize, [f64; 4])> = None;
+    for (k, u) in dirs.iter().enumerate() {
+        let v = [-u[1], u[0]];
+        for ((a, b), p) in pu.iter_mut().zip(pv.iter_mut()).zip(xy) {
+            *a = p[0] * u[0] + p[1] * u[1];
+            *b = p[0] * v[0] + p[1] * v[1];
+        }
+        let lu = crate::perc::quantile_linear(&mut pu, q0);
+        let hu = crate::perc::quantile_linear(&mut pu, q1);
+        let lv = crate::perc::quantile_linear(&mut pv, q0);
+        let hv = crate::perc::quantile_linear(&mut pv, q1);
+        let area = (hu - lu) * (hv - lv);
+        if best.is_none_or(|b| area < b.0) {
+            best = Some((area, k, [lu, hu, lv, hv]));
+        }
+    }
+    best.map(|(_, k, e)| (k, e))
+}
+
+#[cfg(test)]
+mod rect_tests {
+    use super::*;
+    use proptest::prelude::*;
+    proptest! {
+        #[test]
+        fn rect_scan_covers_points(pts in proptest::collection::vec((-1.0f64..1.0, -1.0f64..1.0), 5..300)) {
+            let xy: Vec<[f64; 2]> = pts.iter().map(|&(x, y)| [x, y]).collect();
+            let dirs: Vec<[f64; 2]> = (0..91).map(|i| { let a = std::f64::consts::FRAC_PI_2 * i as f64 / 90.; [a.cos(), a.sin()] }).collect();
+            let (k, [lu, hu, lv, hv]) = min_area_rect_scan(&xy, &dirs, 0.).unwrap();
+            // q = 0: the extent along the chosen axes contains every point
+            let u = dirs[k];
+            for p in &xy {
+                let a = p[0] * u[0] + p[1] * u[1];
+                let b = -p[0] * u[1] + p[1] * u[0];
+                prop_assert!(a >= lu - 1e-12 && a <= hu + 1e-12 && b >= lv - 1e-12 && b <= hv + 1e-12);
+            }
+        }
+    }
+}

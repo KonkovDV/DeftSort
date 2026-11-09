@@ -44,6 +44,7 @@ def install_stubs():
     mod('bodyctrl_msgs.srv',SetForce=SetForce,SetSpeed=SetSpeed)
     mod('tf2_ros',Buffer=lambda:None,TransformListener=lambda b,n:None)
 install_stubs()
+sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)));import scene_fixture as SF
 from team048_solution import node as N, arm as ARM, trays as TR
 
 def stamp(t):return types.SimpleNamespace(sec=int(t),nanosec=int(round((t-int(t))*1e9)))
@@ -51,14 +52,17 @@ class NodeWiring(unittest.TestCase):
     @classmethod
     def setUpClass(c):
         c.s=N.Sol();c.s.arms={k:ARM.Arm(k) for k in 'lr'}
+        for A in c.s.arms.values():A.set_scene(SF.plane(),list(SF.TRAYS.values()))   # synthetic test scene
     def test_speed_cap_in_command(s):
         s.s.cmd('arm',[11,12],[0.,0.],[5.,0.])
         sent=s.s.pub['arm'].sent[-1].cmds
         s.assertTrue(all(0<c.spd<=.8 for c in sent))      # 0 would mean "max speed" in the sim: never sent
     def test_hand_settings_calls_services(s):
         s.s.hand_settings()
-        r=s.s.cli_force['l'].calls[-1];s.assertEqual(r.force0_ratio,1.0);s.assertEqual(r.force5_ratio,1.0)
-        r=s.s.cli_speed['r'].calls[-1];s.assertEqual(r.speed3_ratio,1.0)
+        from team048_solution import grip as G
+        r=s.s.cli_force['l'].calls[-1];s.assertEqual(r.force0_ratio,G.HAND_FORCE_RATIO);s.assertTrue(.3<=r.force3_ratio<=.5)
+        s.assertEqual(r.force5_ratio,G.HAND_FORCE_THUMB_ROT)          # thumb rotation: positioning, not squeezing
+        r=s.s.cli_speed['r'].calls[-1];s.assertEqual(r.speed3_ratio,G.HAND_SPEED_RATIO);s.assertLess(r.speed3_ratio,1.)
     def test_subscribed_topics(s):
         subs=set(s.s.subs)
         for t in ('/arm_6dof_left','/arm_6dof_right','/inspire_hand/state/left_hand','/inspire_hand/state/right_hand',
@@ -66,7 +70,7 @@ class NodeWiring(unittest.TestCase):
             s.assertIn(t,subs)
         s.assertFalse(any('/sim/objects' in t or '/sim/task/check' in t for t in list(subs)+list(s.s.pubs)))
     def test_plan_place_slots_and_retreat(s):
-        A=s.s.arms['l'];top=ARM.TABLE_TOP;tx,ty=TR.NOMINAL['tray_left']
+        A=s.s.arms['l'];top=SF.TABLE_TOP;tx,ty=SF.TRAYS['tray_left']
         res=[N.plan_place(A,A.home,tx,ty+dy,top) for dy in (0.,.08,-.08)]
         ok=[r for r in res if r is not None];s.assertTrue(ok,'no feasible place pose for the left tray')
         for q,qu,_ in ok:
@@ -80,22 +84,27 @@ class NodeWiring(unittest.TestCase):
         sol.frames.add_depth(Msg(header=Msg(stamp=stamp(st),frame_id='camera_head_link'),height=360,width=640,data=dep.astype(np.uint16).tobytes()))
         sol.info=Msg(k=list(f['K']))
         T=N.quat_to_T(list(f['tf_t']),list(f['tf_q']));sol.tf=lambda a,b,stamp=None:T
+        sol.trays={}
         P,rgb2,plane,dets=sol.observe()
-        s.assertEqual(P.shape,(360,640,3));s.assertGreater(plane[0][2],.96)
-        for name,(x,y) in sol.trays.items():
-            s.assertLessEqual(np.hypot(x-TR.NOMINAL[name][0],y-TR.NOMINAL[name][1]),.10+1e-9)
+        s.assertEqual(P.shape,(360,640,3));s.assertGreater(plane[0][2],.96);s.assertTrue(ARM.plane_plausible(plane))
+        s.assertEqual(sol.trays,{})       # observe() never invents trays; the survey adds only FULL detections
+        valid=np.isfinite(P).all(-1)&(f['depth']>0)
+        out=sol.locate_trays(P,rgb2,valid,plane)
+        d=out.get('tray_center')          # v5 frame: the green tray is cut by the bottom image border
+        s.assertIsNotNone(d);s.assertTrue(d['partial']);s.assertNotIn('tray_center',sol.trays)
+        hy=ARM.fk_link('head_yaw_link')[:3,3];s.assertLess(abs(np.arctan2(d['centroid'][1]-hy[1],d['centroid'][0]-hy[0])),.2)
     def test_budget_skip_returns_none(s):
         sol=s.s;from team048_solution import budget as B
         sol.budget=B.TimeBudget(270,t0=Clock.t-265)     # 5 s left
         rng=np.random.default_rng(0);cloud=np.c_[rng.uniform(.33,.39,400),rng.uniform(.17,.23,400),rng.uniform(-.18,-.10,400)]
-        plane=(np.array([0,0,1.]),-ARM.TABLE_TOP)
+        plane=(np.array([0,0,1.]),-SF.TABLE_TOP);sol.trays=dict(SF.TRAYS)
         n0=len(sol.pub['arm'].sent);n1=len(sol.hand['left'].sent)+len(sol.hand['right'].sent)
         r=sol.pick_place('004_sugar_box','box',cloud,plane,[],'tray_left')
         s.assertIsNone(r)                               # a plan exists but does not fit: never started
         s.assertEqual(len(sol.pub['arm'].sent),n0);s.assertEqual(len(sol.hand['left'].sent)+len(sol.hand['right'].sent),n1)
     def test_plan_place_right_tray_reachable(s):
         # v6 root cause: no release pose for tray_right (closing axis tried with one sign only) -> boxes never picked
-        A=s.s.arms['r'];top=ARM.TABLE_TOP;tx,ty=TR.NOMINAL['tray_right']
+        A=s.s.arms['r'];top=SF.TABLE_TOP;tx,ty=SF.TRAYS['tray_right']
         s.assertIsNotNone(N.plan_place(A,A.home,tx,ty,top))
         s.assertIsNotNone(N.plan_place(A,A.home,tx,ty-.08,top,fallback=(tx,ty)))
     def test_look_waits_for_head(s):
@@ -141,8 +150,9 @@ class NodeWiring(unittest.TestCase):
         sol.look=lambda *a,**k:(calls.append('look'),Clock.t)[1]
         sol.observe=lambda nb=None:(calls.append('obs'),(None,None,None,[]))[1]
         sol.identify=lambda *a:[]
-        sol.retreat=lambda k:None;sol.js={'x':0.}
+        sol.retreat=lambda k:None;sol.go_home=lambda k:calls.append('home');sol.js={'x':0.}
+        sol.survey=lambda *a,**k:(calls.append('survey'),Clock.t)[1];sol.robot_description='<robot/>'
         sol.run()
-        s.assertEqual(calls[0],'look');s.assertEqual(calls.count('obs'),N.EMPTY_OBS_MAX)
+        s.assertEqual(calls[:3],['home','home','survey']);s.assertEqual(calls.count('obs'),N.EMPTY_OBS_MAX)
         s.assertTrue(sol.pubs['/sim/task/done'].sent)
 if __name__=='__main__':unittest.main()

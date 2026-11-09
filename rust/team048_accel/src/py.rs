@@ -554,51 +554,63 @@ fn ransac_plane<'py>(
     }))
 }
 
-/// trays.locate selection -> (m,2) xy. plane = (n(3), d, h_low, h_high) or None.
+/// node.tray_mask: union of rotated rectangles (x, y, u0, u1, v0, v1, ha, hb) over an organised cloud.
+#[pyfunction]
+fn rot_rect_mask<'py>(
+    py: Python<'py>,
+    points: PyReadonlyArray3<f64>,
+    rects: Vec<[f64; 8]>,
+) -> PyResult<Bound<'py, PyArray2<bool>>> {
+    let sh = points.shape();
+    if sh[2] != 3 {
+        return Err(PyValueError::new_err("points (h,w,3)"));
+    }
+    let (h, w) = (sh[0], sh[1]);
+    let p = slice(&points, "points")?;
+    let mut out = vec![false; h * w];
+    py.detach(|| perc::rot_rect_mask(p, &rects, &mut out));
+    Ok(Array2::from_shape_vec((h, w), out)
+        .map_err(|e| PyValueError::new_err(e.to_string()))?
+        .into_pyarray(py))
+}
+
+/// trays.detect selection -> (count in window and height band, mask after chroma).
 #[pyfunction]
 #[allow(clippy::too_many_arguments)]
-fn tray_select<'py>(
+fn tray_window_mask<'py>(
     py: Python<'py>,
     points: PyReadonlyArray3<f64>,
     rgb: PyReadonlyArray3<u8>,
     valid: PyReadonlyArray2<bool>,
-    nx: f64,
-    ny: f64,
-    wx: f64,
-    wy: f64,
-    plane: Option<(Vec<f64>, f64, f64, f64)>,
+    height: PyReadonlyArray2<f64>,
+    window: (f64, f64, f64, f64),
+    band: (f64, f64),
     channel: usize,
     chroma_min: f64,
-) -> PyResult<Bound<'py, PyArray2<f64>>> {
+) -> PyResult<(usize, Bound<'py, PyArray2<bool>>)> {
     let (h, w) = (valid.shape()[0], valid.shape()[1]);
-    if points.shape() != [h, w, 3] || rgb.shape() != [h, w, 3] || channel > 2 {
-        return Err(PyValueError::new_err("points/rgb (h,w,3), channel 0..2"));
+    if points.shape() != [h, w, 3]
+        || rgb.shape() != [h, w, 3]
+        || height.shape() != [h, w]
+        || channel > 2
+    {
+        return Err(PyValueError::new_err(
+            "points/rgb (h,w,3), height (h,w), channel 0..2",
+        ));
     }
-    let (p, c, v) = (
+    let (p, c, v, hh) = (
         slice(&points, "points")?,
         slice(&rgb, "rgb")?,
         slice(&valid, "valid")?,
+        slice(&height, "height")?,
     );
-    let pl = match plane {
-        Some((n, d, lo, hi)) => Some((v3(n, "plane normal")?, d, lo, hi)),
-        None => None,
-    };
-    let xy = py.detach(|| {
-        perc::tray_select(
-            p,
-            c,
-            v,
-            nx,
-            ny,
-            wx,
-            wy,
-            pl.as_ref().map(|(n, d, lo, hi)| (n, *d, *lo, *hi)),
-            channel,
-            chroma_min,
-        )
-    });
-    let m = xy.len() / 2;
-    Ok(Array2::from_shape_vec((m, 2), xy).unwrap().into_pyarray(py))
+    let mut out = vec![false; h * w];
+    let win = [window.0, window.1, window.2, window.3];
+    let n =
+        py.detach(|| perc::tray_window_mask(p, c, v, hh, win, band, channel, chroma_min, &mut out));
+    let arr = numpy::ndarray::Array2::from_shape_vec((h, w), out)
+        .map_err(|e| PyValueError::new_err(e.to_string()))?;
+    Ok((n, arr.into_pyarray(py)))
 }
 
 /// perception.segment core: mask, flood fill and the statistics of every component with >= min_pixels pixels.
@@ -700,6 +712,31 @@ fn min_caliper(
     Ok(py.detach(|| crate::grasp::min_caliper(&hs, &ds)))
 }
 
+/// trays.min_area_rect direction scan -> (index, lu, hu, lv, hv) or None.
+#[pyfunction]
+#[allow(clippy::type_complexity)]
+fn min_area_rect_scan(
+    py: Python<'_>,
+    xy: PyReadonlyArray2<f64>,
+    dirs: PyReadonlyArray2<f64>,
+    q: f64,
+) -> PyResult<Option<(usize, f64, f64, f64, f64)>> {
+    if xy.shape()[1] != 2 || dirs.shape()[1] != 2 {
+        return Err(PyValueError::new_err("xy (n,2), dirs (a,2)"));
+    }
+    let xv = xy.as_array();
+    let dv = dirs.as_array();
+    let ps: Vec<[f64; 2]> = (0..xv.shape()[0])
+        .map(|i| [xv[[i, 0]], xv[[i, 1]]])
+        .collect();
+    let ds: Vec<[f64; 2]> = (0..dv.shape()[0])
+        .map(|i| [dv[[i, 0]], dv[[i, 1]]])
+        .collect();
+    Ok(py
+        .detach(|| crate::grasp::min_area_rect_scan(&ps, &ds, q))
+        .map(|(k, e)| (k, e[0], e[1], e[2], e[3])))
+}
+
 /// Finger-corridor clearance: per tip min xy distance to the points (inf when no points). pts (m, >=2).
 #[pyfunction]
 fn min_dist_xy<'py>(
@@ -730,9 +767,11 @@ fn team048_accel(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<FastEnv>()?;
     m.add_function(wrap_pyfunction!(deproject, m)?)?;
     m.add_function(wrap_pyfunction!(ransac_plane, m)?)?;
-    m.add_function(wrap_pyfunction!(tray_select, m)?)?;
+    m.add_function(wrap_pyfunction!(tray_window_mask, m)?)?;
+    m.add_function(wrap_pyfunction!(rot_rect_mask, m)?)?;
     m.add_function(wrap_pyfunction!(segment_components, m)?)?;
     m.add_function(wrap_pyfunction!(min_caliper, m)?)?;
+    m.add_function(wrap_pyfunction!(min_area_rect_scan, m)?)?;
     m.add_function(wrap_pyfunction!(table_mask, m)?)?;
     m.add_function(wrap_pyfunction!(min_dist_xy, m)?)?;
     m.add("API", 2)?;

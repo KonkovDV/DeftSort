@@ -51,3 +51,35 @@ def start_time(sim_now_at_first_clock, wall_at_first_clock, wall_at_import, rtf_
     """
     lag = max(0.0, wall_at_first_clock - wall_at_import)
     return sim_now_at_first_clock - rtf_max*lag
+
+
+def launch_age_s(marker='run.sh', max_up=6):
+    """Seconds since the launch of this solution: the start of the oldest ancestor process (up to max_up levels) whose
+    command line contains `marker` (run.sh), else of this process. Linux /proc only; None if unavailable.
+    SCORING.md "Уточнения" 4 Nov / #638: the limit counts from the moment run.sh is started; start-up is included."""
+    import os
+    try:
+        tck = os.sysconf('SC_CLK_TCK')
+        now = time_boot()
+        pid, best = os.getpid(), None
+        for _ in range(max_up+1):
+            with open(f'/proc/{pid}/stat') as f:
+                st = f.read()
+            rest = st[st.rindex(')')+2:].split()
+            start = int(rest[19])/tck            # field 22 (starttime), seconds since boot
+            with open(f'/proc/{pid}/cmdline', 'rb') as f:
+                cmd = f.read().replace(b'\0', b' ').decode(errors='ignore')
+            if best is None or marker in cmd:
+                best = start
+            ppid = int(rest[1])
+            if ppid <= 1:
+                break
+            pid = ppid
+        return max(0.0, now-best) if best is not None else None
+    except Exception:
+        return None
+
+
+def time_boot():
+    import time
+    return time.clock_gettime(time.CLOCK_BOOTTIME)

@@ -341,56 +341,49 @@ pub fn deproject(
     out
 }
 
-/// trays.locate pixel selection: valid & finite & inside the xy window & (optional) plane height band & tray chroma.
-/// Returns the selected (x, y) in row-major order (== P[m][:, :2]).
+/// trays.detect pixel selection: valid & finite(P) & x0 < X < x1 & y0 < Y < y1 & lo < h < hi (h = the caller's
+/// NumPy height image, so the band test sees exactly the reference values) -> (count, mask & dominant-channel
+/// chroma >= chroma_min). Chroma: rgb/255 per channel, c[k] - max(others) (same arithmetic as trays.chroma_mask).
 #[allow(clippy::too_many_arguments)]
-pub fn tray_select(
+pub fn tray_window_mask(
     p: &[f64],
     rgb: &[u8],
     valid: &[bool],
-    nx: f64,
-    ny: f64,
-    wx: f64,
-    wy: f64,
-    plane: Option<(&[f64; 3], f64, f64, f64)>,
+    h: &[f64],
+    win: [f64; 4],
+    band: (f64, f64),
     k: usize,
     chroma_min: f64,
-) -> Vec<f64> {
-    let mut out = Vec::new();
+    out: &mut [bool],
+) -> usize {
     let (o1, o2) = match k {
         0 => (1, 2),
         1 => (0, 2),
         _ => (0, 1),
     };
+    let [x0, x1, y0, y1] = win;
+    let mut count = 0;
     for i in 0..valid.len() {
+        out[i] = false;
         if !valid[i] {
             continue;
         }
         let q = &p[3 * i..3 * i + 3];
-        if !(q[0].is_finite() && q[1].is_finite() && q[2].is_finite())
-            || (q[0] - nx).abs() >= wx
-            || (q[1] - ny).abs() >= wy
-        {
-            // coordinates finite here: same as !(.. < ..)
+        if !(q[0].is_finite() && q[1].is_finite() && q[2].is_finite()) {
             continue;
         }
-        if let Some((n, d, lo, hi)) = plane {
-            let hh = height(q, n, d);
-            if hh.partial_cmp(&lo) != Some(std::cmp::Ordering::Greater)
-                || hh.partial_cmp(&hi) != Some(std::cmp::Ordering::Less)
-            {
-                continue;
-            }
+        let hh = h[i];
+        // finite operands: !(a > b) == (a <= b); h may be NaN only if the plane is not finite -> excluded below
+        if !(q[0] > x0 && q[0] < x1 && q[1] > y0 && q[1] < y1 && hh > band.0 && hh < band.1) {
+            continue;
         }
+        count += 1;
         let c = &rgb[3 * i..3 * i + 3];
         let ck = c[k] as f64 / 255.;
         let m = (c[o1] as f64 / 255.).max(c[o2] as f64 / 255.);
-        if ck - m >= chroma_min {
-            out.push(q[0]);
-            out.push(q[1]);
-        }
+        out[i] = ck - m >= chroma_min;
     }
-    out
+    count
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -508,6 +501,18 @@ pub fn component_features(
         rows.push(r);
     }
     (keep, rows)
+}
+
+/// Union of rotated rectangles: |(X-x)u0 + (Y-y)u1| < ha & |(X-x)v0 + (Y-y)v1| < hb for any rect
+/// (x, y, u0, u1, v0, v1, ha, hb); element-wise identical to the NumPy expression (NaN -> false).
+pub fn rot_rect_mask(p: &[f64], rects: &[[f64; 8]], out: &mut [bool]) {
+    for (o, q) in out.iter_mut().zip(p.as_chunks::<3>().0) {
+        *o = rects.iter().any(|r| {
+            let dx = q[0] - r[0];
+            let dy = q[1] - r[1];
+            (dx * r[2] + dy * r[3]).abs() < r[6] && (dx * r[4] + dy * r[5]).abs() < r[7]
+        });
+    }
 }
 
 #[cfg(test)]
