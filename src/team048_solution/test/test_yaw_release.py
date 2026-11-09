@@ -47,4 +47,11 @@ class FarTray(unittest.TestCase):
             N.plan_place_yaw(A,A.home,*TR.NOMINAL['tray_right'],pl,list(TR.NOMINAL.values()))
         finally:N.plan_place=orig
         self.assertTrue(calls);self.assertNotIn(-.69,calls)    # every attempt is in a yawed (rotated) frame
+class InfeasibleCache(unittest.TestCase):
+    def test_replan_only_after_scene_change(self):
+        nof={}
+        self.assertTrue(N.replan_infeasible(nof,'a',set()))
+        nof['a']=0;self.assertFalse(N.replan_infeasible(nof,'a',set()))
+        self.assertTrue(N.replan_infeasible(nof,'a',{'b'}))       # an object was removed: obstacles changed
+        self.assertTrue(N.replan_infeasible(nof,'c',set()))
 if __name__=='__main__':unittest.main()

@@ -252,7 +252,7 @@ class Sol(Node):
         while not s.js:time.sleep(.05)
         for k in 'lr':s.hand_open(k)
         t_head=s.look()
-        handled=set();fails={};empty=0
+        handled=set();fails={};empty=0;nofeas={}   # nofeas[name]=len(handled) when no pick+place plan existed
         while s.budget.can_start(s.now()):
             try:P,rgb,plane,dets=s.observe(t_head)
             except Exception as e:s.log('observe failed',e);break
@@ -267,11 +267,13 @@ class Sol(Node):
             did=False;stop=False
             for det,name,cat,conf,cloud,cost in ids:
                 if fails.get(name,0)>=2:continue
+                if not replan_infeasible(nofeas,name,handled):continue   # same scene: the deterministic planner fails again
                 cat=objs.get(name,cat)        # category from /sim/task is authoritative
                 tray=cats.get(cat)
                 if tray not in s.trays:continue
                 others=[P[d.pixels[:,0],d.pixels[:,1]] for d in dets if d is not det]   # every segment is an obstacle
-                t=s.now();ok=s.pick_place(name,cat,cloud,plane,others,tray)
+                t=s.now();s.last_infeasible=False;ok=s.pick_place(name,cat,cloud,plane,others,tray)
+                if ok is False and s.last_infeasible:nofeas[name]=len(handled)
                 if ok is None:stop=True;break           # budget: no time to finish another object
                 if ok:handled.add(name);did=True;s.budget.record_cycle(s.now()-t);break
                 fails[name]=fails.get(name,0)+1
@@ -361,7 +363,14 @@ class Sol(Node):
                 s.trace('home',side,name)
                 s.placed[tray]=k+1
                 return True
+        s.last_infeasible=True   # nothing executed: no candidate had a collision-free pick + place plan
         return False
+def replan_infeasible(nofeas,name,handled):
+    """False when the last planning for `name` found no pick+place plan and no object has been removed since
+    (obstacles unchanged -> the deterministic planner would fail again and only burn sim time; v7: observe->start
+    planning 12.0 s sim mean). Offline episode MC (fixes/budget/episode_mc.py, pool 3 sort3, 100 layouts): +0.4..0.9 pts
+    when planning costs 2x sim time."""
+    return nofeas.get(name) is None or nofeas[name]!=len(handled)
 PLACE_AXES=(np.array([1.,0,0]),np.array([0,1.,0]),np.array([-1.,0,0]),np.array([0,-1.,0]))
 def plan_place(A,q_from,tx,ty,top,fallback=None):
     """Release pose over (tx,ty) at the lowest feasible height -> (q_place, q_up, q_carry) or None.
