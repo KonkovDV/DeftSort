@@ -82,15 +82,100 @@ def thumb_rotated(pos, target_rot=0., tol=THUMB_ROT_TOL):
     return bool(abs(float(pos[5])-target_rot) <= tol)
 
 
-def contact_target(contact_pos, closed_target, past=None):
-    """Phase-2 command: for every commanded-closing finger (closed_target < .5, DOF 1-5) target = max(closed_target,
-    p_contact - past); other DOFs unchanged. 'Slightly past' the measured contact, never beyond the closed target."""
+JAM_TOL = .02                # a finger reading above 1 + JAM_TOL is bent BACK past fully open by a contact ("jammed").
+                             # v7+v8 'closed' frames: 8 of 15 attempts had such fingers (up to 1.81); none are pinching.
+TARGET_MAX = 1.0             # hand command range [0, 1] (1 = open, INTERFACES.md)
+
+
+def jammed(pos, closed_target=None, tol=JAM_TOL):
+    """DOF numbers (1..5) of fingers bent back past fully open (position > 1 + tol). With closed_target given, only
+    the commanded-closing fingers (target < .5) are reported."""
+    if pos is None:
+        return []
+    p = np.asarray(pos, float)
+    t = None if closed_target is None else np.asarray(closed_target, float)
+    return [k+1 for k in range(min(5, len(p))) if p[k] > 1.+tol and (t is None or t[k] < .5)]
+
+
+def contact_target(contact_pos, closed_target, past=None, tol=JAM_TOL):
+    """Phase-2 command: for every commanded-closing finger (closed_target < .5, DOF 1-5) target = min(1, max(closed_target,
+    p_contact - past)); other DOFs unchanged. 'Slightly past' the measured contact, never beyond the closed target and
+    never above 1.0 (v8 fix 3: 7 of 15 v7+v8 attempts produced targets up to 1.66 = 'open further' for jammed fingers).
+    Jammed fingers (contact position > 1 + tol, bent back by a contact, not pinching) are NOT re-targeted: they keep
+    the closed target."""
     past = CLOSE_PAST if past is None else past
     p = np.asarray(contact_pos, float); t = np.asarray(closed_target, float).copy()
     for k in range(min(5, len(t), len(p))):
-        if t[k] < .5:
-            t[k] = max(t[k], p[k]-past)
-    return [float(x) for x in t]
+        if t[k] < .5 and p[k] <= 1.+tol:
+            t[k] = min(TARGET_MAX, max(t[k], p[k]-past))
+    return [float(min(TARGET_MAX, x)) for x in t]
+
+
+# ---- Held rule (v8 fix 2, evidence: fixes/V8_ANALYSIS_RU.md section 5, fixtures test/fixtures/v7v8_grasp_traces.json)
+# Held iff at least one commanded-closing finger (DOF 1-5) deviates >= HELD_DEV from its CURRENT command and its
+# effort is >= HELD_EFF. 15/15 correct on the v7+v8 closed/lifted pairs (4 held, 11 empty, force 1.0), where
+# past_verdict misses 2 of 4 held (v8 Perricone: the fingers travelled 0.46-0.76 past contact, only the jammed thumb
+# held) and finger_verdict answers None for Perricone. Blocked fingers saturate the normalised effort (1.0 at any
+# force ratio, sim robot_io finger_effort); unloaded fingers in v7/v8 read <= 0.334 at ratio 1.0.
+HELD_DEV = .10
+HELD_EFF = .9
+
+
+def held_rule(pos, eff, command, closed_target, dev_min=HELD_DEV, eff_min=HELD_EFF):
+    """True held / False empty / None (missing data). command = the hand vector currently commanded (phase-2 target
+    or closed target); closed_target selects the closing fingers (< .5)."""
+    if pos is None or eff is None or command is None or closed_target is None:
+        return None
+    p = np.asarray(pos, float); e = np.asarray(eff, float)
+    c = np.asarray(command, float); t0 = np.asarray(closed_target, float)
+    if min(len(p), len(e), len(c), len(t0)) < 5:
+        return None
+    k = [i for i in range(5) if t0[i] < .5]
+    if not k:
+        return None
+    return bool(any(abs(p[i]-c[i]) >= dev_min and abs(e[i]) >= eff_min for i in k))
+
+
+# ---- Guarded approach (v8 fix 4): v8 attempts 1-4 had fingers bent by contact BEFORE the close command
+# (Utana middle/index -0.06/-0.10, Threshold index 0.16 with 16 N, Crunch 1.06-1.46 with 14.6 N, mustard little 1.60).
+# Only the fingers that will CLOSE for this grasp kind are guarded (closed_target < .5): in both held v7 Ecoforms rim
+# grasps the (non-closing) ring finger read 1.14/1.17 at the grasp pose, so guarding every finger would have aborted
+# the only v7 success. With the closing set: 0 of 4 held v7+v8 grasps trip, 11 of 12 empty ones trip before closing
+# (test/fixtures/v7v8_grasp_traces.json).
+GUARD_DEV = .10
+
+
+def approach_deviation(pos, command, closed_target=None, dofs=5):
+    """(max |position - command| over the guarded DOFs, list of guarded DOF numbers above GUARD_DEV) or (None, []).
+    Guarded DOFs: 1..dofs, restricted to the closing fingers (closed_target < .5) when closed_target is given."""
+    if pos is None or command is None:
+        return None, []
+    p = np.asarray(pos, float)[:dofs]; c = np.asarray(command, float)[:dofs]
+    if len(p) < dofs or len(c) < dofs:
+        return None, []
+    k = list(range(dofs)) if closed_target is None else [i for i in range(dofs) if float(closed_target[i]) < .5]
+    if not k:
+        return None, []
+    d = np.abs(p-c)
+    return float(max(d[i] for i in k)), [i+1 for i in k if d[i] > GUARD_DEV]
+
+
+# ---- Finger stall by POSITION (v8 fix 5): the velocity criterion fired in 3 of 16 v7+v8 closes.
+STALL_TOL = .005             # max |delta position| of every finger over the window
+STALL_WINDOW = .15           # s sim
+
+
+def fingers_stalled(hist, now, since=None, tol=STALL_TOL, window=STALL_WINDOW, dofs=6):
+    """hist: list of (t, positions) (newest last, sim time). True when the samples of the last `window` seconds (all
+    newer than `since`, the command time) span >= 80 % of the window, number >= 2, and every finger moved < tol."""
+    if not hist:
+        return False
+    lo = now-window
+    w = [(t, np.asarray(p, float)[:dofs]) for t, p in hist if t >= lo and (since is None or t >= since)]
+    if len(w) < 2 or w[-1][0]-w[0][0] < .8*window:
+        return False
+    P = np.stack([p for _, p in w])
+    return bool(np.all(P.max(0)-P.min(0) < tol))
 
 
 def contact_empty(contact_pos, closed_target, empty_max=EMPTY_CONTACT_MAX):
@@ -103,7 +188,7 @@ def contact_empty(contact_pos, closed_target, empty_max=EMPTY_CONTACT_MAX):
 
 
 def past_verdict(pos, target2, closed_target, past=None):
-    """Held check after phase 2 (target2 = contact - past). Held: the fingers are still blocked short of target2 by
+    """LOG-ONLY since v8 fix 2 (misses 2 of 4 v7+v8 held grasps). Held check after phase 2 (target2 = contact - past). Held: the fingers are still blocked short of target2 by
     at least half of `past` (the object holds them); empty: they reached target2 (object gone) or ran to the closed
     target. Threshold past/2 = 0.075 for past 0.15, vs 0.02 position noise of an unloaded finger in v7."""
     past = CLOSE_PAST if past is None else past
