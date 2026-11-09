@@ -1,0 +1,584 @@
+{
+ "validated": false,
+ "source": "tools/fit_spheres.py on tiangong2pro_urdf STL meshes (Apache-2.0, UBTECH)",
+ "r_max": 0.03,
+ "pad": 0.005,
+ "spheres": [
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.00215,
+    0.0001,
+    0.55672
+   ],
+   "radius": 0.03628
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.00348,
+    0.03809,
+    0.04567
+   ],
+   "radius": 0.06332
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.01469,
+    0.12539,
+    0.4272
+   ],
+   "radius": 0.07578
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.04073,
+    -0.12417,
+    0.40912
+   ],
+   "radius": 0.07279
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.00983,
+    -0.13056,
+    0.34008
+   ],
+   "radius": 0.05645
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.11846,
+    -0.01733,
+    0.14747
+   ],
+   "radius": 0.0721
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.00185,
+    0.1475,
+    0.24153
+   ],
+   "radius": 0.06084
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.09817,
+    -0.06429,
+    0.3847
+   ],
+   "radius": 0.07245
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.0615,
+    0.10921,
+    0.10848
+   ],
+   "radius": 0.06742
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.07277,
+    0.06372,
+    0.45358
+   ],
+   "radius": 0.06348
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.05752,
+    -0.1116,
+    0.13554
+   ],
+   "radius": 0.07405
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.00684,
+    -0.10514,
+    0.06594
+   ],
+   "radius": 0.06777
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.03346,
+    0.12596,
+    0.41239
+   ],
+   "radius": 0.0616
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.00043,
+    -0.03925,
+    0.04249
+   ],
+   "radius": 0.07445
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.11794,
+    -0.03188,
+    0.35021
+   ],
+   "radius": 0.07527
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.04242,
+    0.12765,
+    0.37518
+   ],
+   "radius": 0.05806
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.00098,
+    -0.0783,
+    0.37175
+   ],
+   "radius": 0.05033
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.02108,
+    -0.00177,
+    0.06789
+   ],
+   "radius": 0.06452
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.12328,
+    0.07044,
+    0.29218
+   ],
+   "radius": 0.06744
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.06009,
+    0.12842,
+    0.29516
+   ],
+   "radius": 0.06633
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.11819,
+    -0.03616,
+    0.09217
+   ],
+   "radius": 0.0748
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.01108,
+    -0.14452,
+    0.24194
+   ],
+   "radius": 0.07187
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.07102,
+    0.11419,
+    0.20108
+   ],
+   "radius": 0.07175
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.05023,
+    -0.11706,
+    0.19136
+   ],
+   "radius": 0.0743
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.04123,
+    -0.12497,
+    0.38874
+   ],
+   "radius": 0.06986
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.00276,
+    -0.0039,
+    0.5185
+   ],
+   "radius": 0.06603
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.1284,
+    -0.03744,
+    0.28483
+   ],
+   "radius": 0.07474
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.01796,
+    0.11045,
+    0.07138
+   ],
+   "radius": 0.06111
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.09145,
+    -0.00111,
+    0.45025
+   ],
+   "radius": 0.06508
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.11996,
+    -0.07924,
+    0.18614
+   ],
+   "radius": 0.07268
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.09492,
+    -0.06289,
+    0.07787
+   ],
+   "radius": 0.06963
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -1e-05,
+    0.07823,
+    0.37094
+   ],
+   "radius": 0.05156
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.00265,
+    0.12725,
+    0.16491
+   ],
+   "radius": 0.06598
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.00709,
+    -0.1277,
+    0.42854
+   ],
+   "radius": 0.05807
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.09501,
+    0.07387,
+    0.38593
+   ],
+   "radius": 0.06879
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.00316,
+    0.05022,
+    0.49823
+   ],
+   "radius": 0.07392
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.06923,
+    -0.1244,
+    0.30438
+   ],
+   "radius": 0.07198
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.07385,
+    -0.06674,
+    0.45051
+   ],
+   "radius": 0.06787
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.11847,
+    0.03988,
+    0.17749
+   ],
+   "radius": 0.06298
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.11813,
+    0.02847,
+    0.3507
+   ],
+   "radius": 0.07292
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.11959,
+    -0.02277,
+    0.21314
+   ],
+   "radius": 0.06885
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.06112,
+    -0.10352,
+    0.09906
+   ],
+   "radius": 0.07749
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.0037,
+    -0.07242,
+    0.47215
+   ],
+   "radius": 0.07342
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.13013,
+    0.03445,
+    0.18154
+   ],
+   "radius": 0.07125
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.12624,
+    0.00894,
+    0.3492
+   ],
+   "radius": 0.05684
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.08541,
+    0.10349,
+    0.11567
+   ],
+   "radius": 0.06397
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.08675,
+    0.01159,
+    0.40845
+   ],
+   "radius": 0.07507
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.10956,
+    0.06055,
+    0.25356
+   ],
+   "radius": 0.07485
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.04562,
+    -0.00126,
+    0.01938
+   ],
+   "radius": 0.0644
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.11477,
+    0.06297,
+    0.09016
+   ],
+   "radius": 0.06803
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.04067,
+    -0.13325,
+    0.25647
+   ],
+   "radius": 0.06985
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.09438,
+    -0.09188,
+    0.25384
+   ],
+   "radius": 0.07538
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.02449,
+    0.00149,
+    0.0638
+   ],
+   "radius": 0.05161
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.03869,
+    -0.12938,
+    0.3537
+   ],
+   "radius": 0.07516
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.07486,
+    0.11384,
+    0.23172
+   ],
+   "radius": 0.06546
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.09138,
+    0.05258,
+    0.06551
+   ],
+   "radius": 0.06833
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.01183,
+    -0.00192,
+    0.48001
+   ],
+   "radius": 0.07321
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.01396,
+    0.00168,
+    0.01055
+   ],
+   "radius": 0.05671
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.06904,
+    -0.00201,
+    0.01722
+   ],
+   "radius": 0.07724
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.00201,
+    0.12997,
+    0.33716
+   ],
+   "radius": 0.06382
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.03913,
+    0.12997,
+    0.36101
+   ],
+   "radius": 0.07716
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    0.02985,
+    0.09796,
+    0.05051
+   ],
+   "radius": 0.06478
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.05658,
+    0.13501,
+    0.28633
+   ],
+   "radius": 0.07743
+  },
+  {
+   "link": "waist_yaw_link",
+   "center": [
+    -0.08352,
+    0.09866,
+    0.41232
+   ],
+   "radius": 0.06964
+  }
+ ]
+}

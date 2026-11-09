@@ -54,6 +54,7 @@ def main(argv=None):
     ap.add_argument('--urdf', required=True); ap.add_argument('--meshes', required=True)
     ap.add_argument('--links', nargs='+', required=True); ap.add_argument('--out', required=True)
     ap.add_argument('--r-max', type=float, default=.05); ap.add_argument('--pad', type=float, default=.005)
+    ap.add_argument("--max-spheres", type=int, default=24)
     a = ap.parse_args(argv)
     root = ET.parse(a.urdf).getroot(); out = []
     for link in a.links:
@@ -68,7 +69,7 @@ def main(argv=None):
         scale = [float(x) for x in (m.get('scale') or '1 1 1').split()]
         V = read_stl(os.path.join(a.meshes, fn))*np.array(scale)
         V = V@rpy_matrix(*rpy).T+np.array(xyz)
-        for c, r in cover(V, a.r_max, a.pad):
+        for c, r in cover(V, a.r_max, a.pad, a.max_spheres):
             out.append(dict(link=link, center=[round(float(x), 5) for x in c], radius=round(r, 5)))
     json.dump(dict(validated=False, source='tools/fit_spheres.py on tiangong2pro_urdf STL meshes (Apache-2.0, UBTECH)',
                    r_max=a.r_max, pad=a.pad, spheres=out), open(a.out, 'w'), indent=1)

@@ -143,6 +143,29 @@ def arm_spheres(side,chain,mesh=True):
     if hm:
         for c in hm['thumb_env_hand']:S.append(Sphere(tip,R@np.asarray(c,float),max(.012,hm['thumb_env_radius'])))
     return S
+# v9fix: torso envelope fitted to the waist_yaw_link (torso) STL mesh (tools/fit_spheres.py --links waist_yaw_link
+# --r-max .03 --pad .005 --max-spheres 64; UBTECH tiangong2pro_urdf, Apache-2.0). Robot geometry, not scene (#645).
+# Mesh frames: the UBTECH URDF has the SAME 62 joints with identical origins/axes as the organiser URDF (only 4 sensor
+# links renamed), checked by fixes/diag/v9a_mesh_contacts.py. v9a Kaggle (HACK_SELF_COLLISION=1): at the Ecoforms
+# pre-grasp the forearm/hand were 1-8 mm from the torso mesh and the wrist F/T read 581 N, while the old column model
+# (two spheres r<=0.08 at x=-0.03/0.04) accepted the posture.
+TORSO_SPHERES=os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','torso_spheres.json')
+SHOULDER_LOCAL=.06   # m: arm spheres whose centre stays within this of the shoulder joint are mounted ON the torso
+def torso_spheres(side):
+    """Torso mesh spheres (pelvis frame, body_yaw 0) minus those the arm's own shoulder-mounted spheres overlap at
+    some shoulder posture (mounting region; those pairs are excluded by design, like the adjacent-link pairs)."""
+    import json
+    if os.environ.get('TEAM048_TORSO_MESH','1')=='0':return []    # offline A/B studies only
+    try:d=json.load(open(TORSO_SPHERES))
+    except (OSError,ValueError):return []
+    T=fk_link('waist_yaw_link');S=[(T[:3,:3]@np.asarray(e['center'],float)+T[:3,3],float(e['radius'])) for e in d['spheres']]
+    sh=fk_link(J[f'shoulder_pitch_{side}_joint']['child'])[:3,3]
+    loc=[sp for sp in arm_spheres(side,None,mesh=False) if sp.link in (J[f'shoulder_pitch_{side}_joint']['child'],
+         J[f'shoulder_roll_{side}_joint']['child'],J[f'shoulder_yaw_{side}_joint']['child']) and np.linalg.norm(sp.center)<SHOULDER_LOCAL]
+    rl=max([sp.radius for sp in loc],default=0.)
+    # swept bound: a shoulder-local sphere stays inside the ball |p-sh| <= SHOULDER_LOCAL + its radius
+    keep=[(c,r) for c,r in S if np.linalg.norm(c-sh)>SHOULDER_LOCAL+rl+r+.015]
+    return [Sphere('pelvis',c,r) for c,r in keep]
 def body_env(side,other_q=None):
     """Torso, head and the other arm (at its posture) as pelvis-frame spheres. Table added separately."""
     E=[];P=lambda link,p=np.zeros(3),q=None:(fk_link(link,q)@np.r_[p,1])[:3]
@@ -152,6 +175,7 @@ def body_env(side,other_q=None):
     r=min(.08,abs(shL[1])-.07)
     for z in np.arange(0.,shL[2]-.05,.06):
         for x in (-.03,.04):E.append(Sphere('pelvis',np.array([x,0.,z]),r))
+    E+=torso_spheres(side)
     hp=P('head_pitch_link');E.append(Sphere('pelvis',hp+np.array([.02,0,.08]),.12))
     o='r' if side=='l' else 'l';q=other_q or {}
     # #625: the OTHER arm at its (measured) posture with the same segment + hand envelope as the moving arm
@@ -193,14 +217,28 @@ def _table_entry(plane,x=None,y=None,R=.1,step=.03):
 def table_env(plane,x=None,y=None,R=.1,step=.03):
     """plane is REQUIRED (measured by the head camera); x=(near,far): near = measured near edge."""
     return list(_table_entry(plane,x,y,R,step)[0])
+TABLE_EDGE_R=.025      # m, small spheres along the measured near edge (top lip + front face)
+TABLE_FRONT_DEPTH=.35  # m below the measured top: the table front is solid at least this deep. v9a Kaggle: the
+                       # straight start->home sweep jammed both hands against the table front 2-22 cm BELOW the top
+                       # (wrist |F| 258 N / 938 N, TCP x 0.20 / z -0.20 / -0.16 m pelvis; fixes/V9_ANALYSIS_RU.md)
 def table_env_build(plane,x,y,R=.1,step=.03):
     """Table as spheres tangent to the MEASURED top surface plane=(n,d) (pelvis frame, n.p+d=0, head camera).
-    v7 Kaggle frames show the table tilted 4.0 deg in the pelvis frame (n_x=-0.070 in all 31 frames)."""
+    v7 Kaggle frames show the table tilted 4.0 deg in the pelvis frame (n_x=-0.070 in all 31 frames).
+    v9fix: the big spheres start R behind the MEASURED near edge x[0] (they used to start AT the edge and bulged R=10 cm
+    toward the robot below the top, so no certified path existed from the start posture); the band between the edge
+    and the first big sphere is covered by small TABLE_EDGE_R spheres tangent to the top, and the front face by a
+    column of small spheres from the top down to TABLE_FRONT_DEPTH. Nothing of the model is closer than x[0]."""
     n,d=np.asarray(plane[0],float),float(plane[1]);nn=np.linalg.norm(n);n=n/nn;d=d/nn
-    # vectorised, element-wise identical to the scalar loop  z=-(d+n0*a+n1*b)/n2; centre=[a,b,z]-R*n  (a outer, b inner)
-    A,B=np.meshgrid(np.arange(x[0],x[1]+1e-9,step),np.arange(y[0],y[1]+1e-9,step),indexing='ij');A=A.ravel();B=B.ravel()
-    Z=-(d+n[0]*A+n[1]*B)/n[2]
-    return spheres_bulk('pelvis',np.stack([A,B,Z],axis=1).reshape(-1,3)-R*n,R)
+    r=TABLE_EDGE_R;ys=np.arange(y[0],y[1]+1e-9,step)
+    zt=lambda A,B:-(d+n[0]*A+n[1]*B)/n[2]
+    A,B=np.meshgrid(np.arange(x[0]+R,x[1]+1e-9,step),ys,indexing='ij');A=A.ravel();B=B.ravel()
+    big=np.stack([A,B,zt(A,B)],axis=1).reshape(-1,3)-R*n
+    a,b=np.meshgrid(np.arange(x[0]+r,x[0]+R+1e-9,step),ys,indexing='ij');a=a.ravel();b=b.ravel()
+    lip=np.stack([a,b,zt(a,b)],axis=1).reshape(-1,3)-r*n
+    dz=np.arange(r,TABLE_FRONT_DEPTH+1e-9,step)
+    fy,fz=np.meshgrid(ys,dz,indexing='ij');fy=fy.ravel();fz=fz.ravel();fx=np.full_like(fy,x[0]+r)
+    front=np.stack([fx,fy,zt(fx,fy)-fz],axis=1)
+    return spheres_bulk('pelvis',big,R)+spheres_bulk('pelvis',np.vstack([lip,front]),r)
 def tray_geom(t,size=(.22,.32),height=.07):
     """Normalise a tray to (x, y, ax, ay, short, long, height): a 2-tuple (x,y) (synthetic tests) or the dict of
     trays.detect() / a 7-tuple with the MEASURED long axis, size and wall height."""
@@ -303,14 +341,64 @@ class Arm:
         if getattr(self,'_scene',None) is not None:self.set_scene(*self._scene)
         else:self.col.environment=list(self.body)
     def path_home(self,q):
-        """Certified way home from q: [home] if the straight joint path is collision-free, else [lift(q), home] when
-        that is, else None (#625: never an uncertified move when a certified one exists)."""
+        """Certified way home from q (#625: never an uncertified move when a certified one exists):
+        [home] if the straight joint path is collision-free, else [lift(q), home], else the shortest path through the
+        posture roadmap (home_roadmap). The first segment may start inside the safety margin (start posture, v9a:
+        forearm 3 mm from the hip mesh) and is then accepted only if it separates monotonically (certify_escape).
+        None if nothing is certified."""
         q=np.clip(np.asarray(q,float),self.chain.lower,self.chain.upper)
-        if self.col.certify(q,self.home):return [self.home]
-        for dz in (.08,.15):
-            qu=self.lift(q,dz)
-            if qu is not None and self.col.certify(qu,self.home):return [qu,self.home]
-        return None
+        start_ok=self.col.valid(q)
+        if self.col.certify_escape(q,self.home):return [self.home]
+        if start_ok:
+            for dz in (.08,.15):
+                qu=self.lift(q,dz)
+                if qu is not None and self.col.certify(qu,self.home):return [qu,self.home]
+        return self.roadmap_path(q)
+    # Posture roadmap for getting home from low / jammed postures (v9a: the straight start->home joint path swept both
+    # hands through the table front, 38k mesh vertices inside the table volume, arms jammed for ~90 s sim).
+    # Nodes are ROBOT postures only (shoulder pitch/roll and elbow on a grid between the start posture q=0 and the
+    # elbow-folded range; the other joints at their home values) -- no scene coordinates (#645). Edges are certified
+    # against the CURRENT measured scene; the start edge uses certify_escape.
+    ROADMAP_SP=(.6,.3,0.,-.3,-.6)
+    ROADMAP_SR=(0.,.25,.6,1.)
+    ROADMAP_EL=(-1.2,-1.6,-2.0,-2.4)
+    def roadmap_nodes(self,q=None):
+        sg=1. if self.side=='l' else -1.;N=[]
+        for sp in self.ROADMAP_SP:
+            for sr in self.ROADMAP_SR:
+                for el in self.ROADMAP_EL:
+                    w=np.array(self.home,float).copy();w[0]=sp;w[1]=sg*sr;w[3]=el
+                    N.append(np.clip(w,self.chain.lower,self.chain.upper))
+        if q is not None:       # from wherever the arm is (start / jammed posture): abduct, pitch back or fold first
+            for sr in self.ROADMAP_SR[1:]:
+                w=np.array(q,float).copy();w[1]=sg*sr;N.append(np.clip(w,self.chain.lower,self.chain.upper))
+            for sp in self.ROADMAP_SP[:2]:
+                w=np.array(q,float).copy();w[0]=sp;N.append(np.clip(w,self.chain.lower,self.chain.upper))
+            for el in self.ROADMAP_EL:
+                w=np.array(q,float).copy();w[3]=el;N.append(np.clip(w,self.chain.lower,self.chain.upper))
+        return [w for w in N if self.col.valid(w)]
+    def roadmap_path(self,q,goal=None):
+        """Dijkstra over {q} + roadmap nodes + goal, edge cost = max |dq| (time at the joint-speed cap), edges certified
+        lazily (start edge with certify_escape). Returns the waypoint list ending at goal, or None."""
+        import heapq
+        goal=self.home if goal is None else np.asarray(goal,float)
+        V=[np.asarray(q,float)]+self.roadmap_nodes(q)+[goal];n=len(V);G=n-1
+        dist=[np.inf]*n;prev=[-1]*n;dist[0]=0.;h=[(0.,0)];done=set()
+        while h:
+            d,i=heapq.heappop(h)
+            if i in done:continue
+            done.add(i)
+            if i==G:break
+            for j in range(1,n):
+                if j in done or j==i:continue
+                c=float(np.max(np.abs(V[j]-V[i])))
+                if d+c>=dist[j]:continue
+                ok=self.col.certify_escape(V[i],V[j]) if i==0 else self.col.certify(V[i],V[j])
+                if ok:dist[j]=d+c;prev[j]=i;heapq.heappush(h,(d+c,j))
+        if not np.isfinite(dist[G]):return None
+        path=[];k=G
+        while k>0:path.append(V[k]);k=prev[k]
+        return path[::-1]
     def tcp(self,q):
         return self.chain.fk(q)
     def lift(self,q,dz=.08):

@@ -33,6 +33,7 @@ def spheres_bulk(link, centers, radii):
     return out
 
 
+ESCAPE_TOL=.001   # m, see CollisionModel.certify_escape
 class CollisionModel:
     def __init__(self, chain, spheres, environment, ignored_pairs=(), *, audited_complete=False, margin=.015):
         if not audited_complete or not spheres or not environment:
@@ -160,6 +161,71 @@ class CollisionModel:
         # Every intermediate center is within bound of a sampled center.
         inflation = self.levers@abs(b-a)/steps
         return all(self.valid_vec(a+(b-a)*(i/steps), inflation) for i in range(steps+1))
+
+    def gaps(self, q):
+        """Signed clearances at q (NumPy, same expressions as valid_vec with zero inflation): (env (n_spheres, n_env),
+        self (n_pairs,)); a pair is in collision (within the margin) when its gap <= 0."""
+        frames=self.chain.frames_py(self.chain.validate_q(q))
+        R=np.array([frames[l][:3,:3] for l in self._sph_links]); t=np.array([frames[l][:3,3] for l in self._sph_links])
+        W=np.einsum('kij,kj->ki',R,self._sph_centers)+t
+        D=np.sqrt(((self._env_centers[None,:,:]-W[:,None,:])**2).sum(axis=2))
+        ge=D-((self._sph_radii[:,None]+self._env_radii[None,:])+self.margin)
+        if len(self._pi):
+            d=np.sqrt(((W[self._pi]-W[self._pk])**2).sum(axis=1))
+            gs=d-((self._sph_radii[self._pi]+self._sph_radii[self._pk])+self.margin)
+        else: gs=np.zeros(0)
+        return ge,gs
+
+    def certify_escape(self, a, b, max_step=.003):
+        """Start-state-collision handling (the MoveIt 'FixStartStateCollision' situation): the start `a` may lie
+        within the safety margin of some pairs (v9a: the organiser start posture has the forearm 3 mm from the hip
+        mesh, inside the 1.5 cm margin). The segment a->b is accepted iff
+          * every pair that is clear at `a` stays clear along the whole swept segment (same inflation bound as certify),
+          * every pair that is NOT clear at `a` never gets more than ESCAPE_TOL closer than it was AT THE START
+            (no deeper penetration than the start posture itself; 1 mm < the 2.9 mm real mesh clearance of the
+            start posture, fixes/diag/v9a_mesh_contacts.py), and
+          * `b` is fully valid.
+        If `a` is valid this is exactly certify(a, b). Implementation: environment spheres touched at `a` are removed
+        for a normal (Rust/NumPy) certify of the rest, and checked separately on the same samples."""
+        a=self.chain.validate_q(a); b=self.chain.validate_q(b)
+        if self.valid(a): return self.certify(a,b,max_step)
+        if not self.valid(b): return False
+        ge0,gs0=self.gaps(a)
+        if len(gs0) and np.any(gs0<=0): return self._certify_escape_full(a,b,max_step,ge0,gs0)
+        steps=max(1,int(np.ceil(np.max(abs(b-a))/max_step))); inf=self.levers@abs(b-a)/steps
+        # start set: environment spheres within the sweep bound of the start (in contact, or so close that the
+        # swept-sphere test of certify cannot pass its first sample) -> held to the no-deeper rule instead
+        J=np.unique(np.nonzero(ge0<=inf[:,None])[1]); keep=np.ones(len(self._environment),bool); keep[J]=False
+        saved=(self._environment,self._env_centers,self._env_radii)
+        try:
+            if keep.any():
+                self.environment=[e for e,k in zip(self._environment,keep) if k]
+                if not self.certify(a,b,max_step): return False
+        finally:
+            self.install_environment(*saved)
+        Cj=self._env_centers[J]; Rj=self._env_radii[J]; g0=ge0[:,J]; bad=g0<=inf[:,None]
+        for i in range(1,steps+1):
+            frames=self.chain.frames_py(a+(b-a)*(i/steps))
+            R=np.array([frames[l][:3,:3] for l in self._sph_links]); t=np.array([frames[l][:3,3] for l in self._sph_links])
+            W=np.einsum('kij,kj->ki',R,self._sph_centers)+t
+            g=np.sqrt(((Cj[None,:,:]-W[:,None,:])**2).sum(axis=2))-((self._sph_radii[:,None]+Rj[None,:])+self.margin)
+            if np.any((g<=inf[:,None])&~bad) or np.any(g[bad]<g0[bad]-ESCAPE_TOL): return False
+            bad=bad&(g<=inf[:,None])
+        return True
+
+    def _certify_escape_full(self, a, b, max_step, ge0, gs0):
+        """certify_escape reference for starts with self-pair contacts too (all pairs in NumPy)."""
+        steps=max(1,int(np.ceil(np.max(abs(b-a))/max_step)))
+        inf=self.levers@abs(b-a)/steps
+        be=ge0<=0; bs=gs0<=0
+        pe,ps=ge0-ESCAPE_TOL,gs0-ESCAPE_TOL
+        ie=inf[:,None]; is_=(inf[self._pi]+inf[self._pk]) if len(self._pi) else np.zeros(0)
+        for i in range(1,steps+1):
+            ge,gs=self.gaps(a+(b-a)*(i/steps))
+            if np.any((ge<=ie)&~be) or (len(gs) and np.any((gs<=is_)&~bs)): return False
+            if np.any(ge[be]<pe[be]) or (len(gs) and np.any(gs[bs]<ps[bs])): return False
+            be=be&(ge<=ie); bs=bs&(gs<=is_) if len(gs) else bs
+        return True
 
     def certify_py(self, a, b, max_step=.003):
         """Reference implementation (original loop over valid_py)."""
