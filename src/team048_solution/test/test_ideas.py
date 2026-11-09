@@ -225,3 +225,36 @@ class V7Fixes(unittest.TestCase):
         self.assertLess(p[2],g[2]-.01)
     def test_slot_inner_first(self):
         self.assertLess(trays.slot_offset(1,.03,ty=.69),0);self.assertGreater(trays.slot_offset(1,.03,ty=-.69),0)
+
+class GraspStudy(unittest.TestCase):
+    """Offline study evidence (fixes/kaggle-tpu/study local-g3dx/g3bx/g6x, 2026-11-09)."""
+    def test_dish_has_multi_angle_rim(self):
+        from team048_solution.grasp import candidates,RIM_ANGLE_DEG
+        rng=np.random.default_rng(1);t=rng.uniform(0,2*np.pi,2500);h=.07
+        cl=np.c_[.4+.066*np.cos(t),.2+.066*np.sin(t),rng.uniform(-.18,-.18+h,2500)]
+        f,C=candidates(cl,(np.array([0.,0.,1.]),.18),'dish',W_MAX=.095)
+        rims=[c for c in C if c['kind']=='rim']
+        self.assertEqual(len(rims),len(RIM_ANGLE_DEG))
+        self.assertGreater(rims[0]['score'],rims[-1]['score'])   # near-robot preferred
+    def test_box_topdown_when_side_too_wide(self):
+        """Gelatin-like footprint: min caliper ~8.9 cm fails side (needs w+2cm <= W_MAX) but top fits W_MAX."""
+        from team048_solution.grasp import candidates
+        rng=np.random.default_rng(2);N=3000
+        # axis-aligned box 8.9 x 6.0 x 3 cm on table z=-0.18
+        u=rng.uniform(-.5,.5,(N,3))*[0.089,0.060,0];u[:,2]=rng.uniform(0,.03,N)
+        face=rng.integers(0,5,N);u[face==0,2]=.03;u[face==1,0]=.0445;u[face==2,0]=-.0445
+        cl=u+[0.40,0.10,-0.18]
+        f,C=candidates(cl,(np.array([0.,0.,1.]),.18),'box',W_MAX=.095)
+        kinds={c['kind'] for c in C}
+        self.assertIn('top',kinds)
+        # side may or may not exist on the short axis (6 cm + 2 cm margin = 8 cm <= 9.5)
+        tops=[c for c in C if c['kind']=='top']
+        self.assertTrue(any(c['width']<=.095 for c in tops))
+    def test_razer_wide_still_no_candidate(self):
+        """Razer min width 10 cm > W_MAX≈0.095: neither side nor top (study union ok=0)."""
+        from team048_solution.grasp import candidates
+        rng=np.random.default_rng(3);N=3000
+        u=rng.uniform(-.5,.5,(N,3))*[0.100,0.120,0];u[:,2]=rng.uniform(0,.04,N)  # min caliper 10 cm (study)
+        cl=u+[0.40,0.0,-0.18]
+        f,C=candidates(cl,(np.array([0.,0.,1.]),.18),'electronics',W_MAX=.095)
+        self.assertEqual(C,[])   # nothing fits the hand opening gate

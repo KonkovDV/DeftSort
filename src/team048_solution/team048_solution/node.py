@@ -312,13 +312,19 @@ class Sol(Node):
             for g in C:
                 if not g['feasible']:continue
                 top=-(plane[1]+plane[0][:2]@g['center'])/plane[0][2]
-                ap=np.r_[g['approach'],0.] if g['kind']=='side' else np.array([0,0,-1.])
-                ca=np.r_[g['close_axis'],0.]
+                if g['kind']=='side':
+                    ap=np.r_[g['approach'],0.];ca=np.r_[g['close_axis'],0.];pt='grip'
+                elif g['kind']=='top':
+                    ap=np.asarray(g.get('approach3',[0.,0.,-1.]),float)
+                    ca=np.asarray(g['close_axis'],float);ca=np.r_[ca,0.] if ca.size==2 else ca;pt='pinch'
+                else:  # rim
+                    ap=np.asarray(g.get('approach3',[0.,0.,-1.]),float)
+                    ca=np.asarray(g['close_axis'],float);ca=np.r_[ca,0.] if ca.size==2 else ca;pt='pinch'
                 p=None
                 for dz in (SIDE_DZ if g['kind']=='side' else (0.,)):
                     if g['kind']=='side' and dz>0 and g['z']+dz>f['height']-.015:break
                     c3=np.array([g['center'][0],g['center'][1],top+g['z']+dz])
-                    p=A.plan_pick(c3,ca,ap,g['width'],point='pinch' if g['kind']=='rim' else 'grip')
+                    p=A.plan_pick(c3,ca,ap,g['width'],point=pt)
                     if p is not None:break
                 if p is None:continue
                 yp=plan_place_yaw(A,p['q_lift'],tx,ty+dy,plane,list(s.trays.values()),fallback=(tx,ty) if dy else None)
