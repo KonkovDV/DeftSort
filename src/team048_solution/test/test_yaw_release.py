@@ -32,4 +32,19 @@ class Yaw(unittest.TestCase):
         A.set_scene(pl,list(TR.NOMINAL.values()));e0=repr(A.col.environment)
         N.plan_place_yaw(A,A.home,*TR.NOMINAL['tray_right'],pl,list(TR.NOMINAL.values()))
         self.assertEqual(e0,repr(A.col.environment))
+class FarTray(unittest.TestCase):
+    def test_far_tray_sides(self):
+        L,R,C=TR.NOMINAL['tray_left'][1],TR.NOMINAL['tray_right'][1],TR.NOMINAL['tray_center'][1]
+        self.assertTrue(N.far_tray('l',R));self.assertTrue(N.far_tray('r',L))
+        self.assertFalse(N.far_tray('l',L));self.assertFalse(N.far_tray('r',R))
+        self.assertFalse(N.far_tray('l',C));self.assertFalse(N.far_tray('r',C))
+    def test_far_tray_skips_unyawed_search(self):
+        calls=[];orig=N.plan_place
+        def spy(A,q,tx,ty,top,fallback=None):calls.append(round(float(ty),3));return None
+        N.plan_place=spy
+        try:
+            A=ARM.Arm('l');n=np.array([-.0699,0,.9976]);pl=(n/np.linalg.norm(n),.1788/np.linalg.norm(n))
+            N.plan_place_yaw(A,A.home,*TR.NOMINAL['tray_right'],pl,list(TR.NOMINAL.values()))
+        finally:N.plan_place=orig
+        self.assertTrue(calls);self.assertNotIn(-.69,calls)    # every attempt is in a yawed (rotated) frame
 if __name__=='__main__':unittest.main()

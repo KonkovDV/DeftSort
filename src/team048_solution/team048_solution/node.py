@@ -395,14 +395,21 @@ def yaw_candidates(side,tx,ty):
         th=float(phi-sg*aim)
         if abs(th)<=YAW_MAX and abs(th)>.15 and all(abs(th-o)>.1 for o in out):out.append(th)
     return out
+FAR_TRAY_Y=.3
+def far_tray(side,ty):
+    """Tray on the OTHER arm's side (tray_left for the right arm, tray_right for the left arm).
+    Offline evidence (2026-11-09): reach-p3/p6 Kaggle, 30 layouts x 2 pools, 0 of 450 picked objects were placeable in the
+    far tray with body_yaw=0; study r3s3 (new planner, organiser layout generator) 103/103 far-tray placements used yaw."""
+    return (side=='l' and ty<-FAR_TRAY_Y) or (side=='r' and ty>FAR_TRAY_Y)
 def plan_place_yaw(A,q_from,tx,ty,plane,trays,fallback=None):
     """(theta, (q_place,q_up,q_carry)) or None. theta=0 first; otherwise the torso is yawed by theta while the arm holds
     q_carry (or q_from); the scene (table plane, trays) is expressed in the rotated torso frame. The hold posture is
     checked against the rotated scene at 5 intermediate angles (sampled, not swept)."""
     n,d=np.asarray(plane[0],float),float(plane[1])
     zt=lambda x,y,n=n:-(d+n[0]*x+n[1]*y)/n[2]
-    r=plan_place(A,q_from,tx,ty,zt(tx,ty),fallback)
-    if r is not None:return 0.,r
+    if not far_tray(A.side,ty):    # the unyawed search for the far tray always fails: skip it (planning costs sim time)
+        r=plan_place(A,q_from,tx,ty,zt(tx,ty),fallback)
+        if r is not None:return 0.,r
     try:
         for th in yaw_candidates(A.side,tx,ty):
             R=rotz(-th);n2=R@n
