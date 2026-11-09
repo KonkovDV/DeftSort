@@ -142,7 +142,12 @@ def held_rule(pos, eff, command, closed_target, dev_min=HELD_DEV, eff_min=HELD_E
 # grasps the (non-closing) ring finger read 1.14/1.17 at the grasp pose, so guarding every finger would have aborted
 # the only v7 success. With the closing set: 0 of 4 held v7+v8 grasps trip, 11 of 12 empty ones trip before closing
 # (test/fixtures/v7v8_grasp_traces.json).
-GUARD_DEV = .10
+# v9fix: 0.10 had no margin. v9a free motion (no contact: wrist |F| 3.2-3.5 N, TCP 1.4 cm from plan) read thumb 1.094
+# at pre-grasp and 1.103 at the trip; v7 free motion up to 0.085. Contacts before failed v7/v8 grasps: 0.225 (v8 Crunch)
+# and above, except v7 Hyaluronic 0.109. GUARD_DEV = midpoint of the largest free-motion deviation (0.103) and the
+# smallest separated contact (0.225) = 0.164 -> 0.16: 0 of 4 held grasps and 0 of 2 v9a free-motion samples trip,
+# 10 of 12 failed grasps still trip (lost: v7 Hyaluronic 0.109; v7 Crayola 0.007 never tripped).
+GUARD_DEV = .16
 
 
 def approach_deviation(pos, command, closed_target=None, dofs=5):

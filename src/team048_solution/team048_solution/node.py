@@ -59,6 +59,8 @@ PLACE_TOL=.04         # m, release TCP error: one correction before opening (v7 
 SIDE_DZ=(0.,.02,.04)  # m, raise a side grasp when the low one is not collision-free against the measured table
 EMPTY_OBS_MAX=2       # consecutive observations with nothing to pick before giving up (an observation whose
                       # attempt touched the scene and was re-observed does not count as 'nothing to pick')
+FAILS_MAX=2           # failed attempts per object before it is skipped (per round)
+RETRY_ROUNDS=1        # extra round with reset failure counters when time is left (v9a: stop at 124 s of 405 s)
 HAND_LOG_DT=.1        # s sim: hand-state log period during the guarded approach and the closing (10 Hz, v8 fix 4)
 def quat_to_T(t,q):
     x,y,z,w=q;T=np.eye(4)
@@ -417,13 +419,21 @@ class Sol(Node):
         s.hand_settings()
         while not s.js:time.sleep(.05)
         for k in 'lr':s.hand_open(k)
-        for k in 'lr':s.go_home(k)     # from the start posture along a certified path (planning assumes home)
+        # v9fix: survey FIRST with the arms in the start posture (v7 s102 start frames: table plane, near edge and
+        # trays are measured with the arms hanging), then go home along a path certified against the MEASURED
+        # table. v9a: going home before the table was known commanded the straight start->home joint path, which
+        # sweeps the hands through the table front -> both arms jammed (|F| 258 N / 938 N) and 4 of 7 picks were lost.
         t_head=s.survey()
+        if s.plane is not None:
+            for A in s.arms.values():A.set_scene(s.plane,list(s.trays.values()),getattr(s,'table_x',None))
+        for k in 'lr':s.go_home(k)     # from the start posture along a certified path (planning assumes home)
+        t_head=max(t_head,s.now())
         handled=set();fails={};empty=0;nofeas={};resurveys=0   # nofeas[name]=len(handled) when no pick+place plan existed
+        retries=0;why='time budget'
         s.last_contact=False
         while s.budget.can_start(s.now()):
             try:P,rgb,plane,dets=s.observe(t_head)
-            except Exception as e:s.log('observe failed',e);break
+            except Exception as e:s.log('observe failed',e);why='observe failed';break
             t_head=s.now()                   # later observations: frames newer than the end of the last motion
             if plane is not None:
                 for A in s.arms.values():A.set_scene(plane,list(s.trays.values()),s.table_x)   # measured table + near edge + tray walls
@@ -434,7 +444,7 @@ class Sol(Node):
             ids.sort(key=lambda x:-x[3])     # most confident first
             did=False;stop=False;touched=False
             for det,name,cat,conf,cloud,cost in ids:
-                if fails.get(name,0)>=2:continue
+                if fails.get(name,0)>=FAILS_MAX:continue
                 if not replan_infeasible(nofeas,name,handled):   # same scene: the deterministic planner fails again
                     s.log('no plan:',name,json.dumps({'reason':'unchanged scene since the last failed planning'}));continue
                 cat=objs.get(name,cat)        # category from /sim/task is authoritative
@@ -449,14 +459,22 @@ class Sol(Node):
                 fails[name]=fails.get(name,0)+1
                 if s.last_contact:           # v8 fix 6: the hand touched the scene -> the other clouds are stale
                     s.log('re-observe after contact',name);touched=True;break
-            if stop:break
+            if stop:why='time budget (next object would not finish)';break
             if not did and resurveys<TRAY_RESURVEY_MAX and any(cats.get(objs.get(x[1],x[2])) not in s.trays for x in ids):
                 resurveys+=1;s.log('needed tray missing: re-survey');t_head=s.survey();continue
             empty=0 if (did or touched) else empty+1
-            if empty>=EMPTY_OBS_MAX:break
+            if empty>=EMPTY_OBS_MAX:
+                # v9a: the run ended at 124 s of 405 s because every remaining object had 2 failures (mostly the
+                # jammed-arm aborts) or was not identified. One more round with fresh counters while a whole cycle
+                # still fits (the -10 end-of-run rule is enforced per object by can_start / place_time anyway).
+                left=[n for n in objs if n not in handled and fails.get(n,0)>=FAILS_MAX]
+                if retries<RETRY_ROUNDS and left and s.budget.can_start(s.now()):
+                    retries+=1;s.log('retry round',retries,'objects',[n[:24] for n in left]);fails={};nofeas={};empty=0;continue
+                why='nothing pickable in %d observations'%empty;break
         for k in 'lr':s.retreat(k)
         if abs(s.js.get('body_yaw_joint',0.))>.05:s.waist(0.)
-        s.done.publish(Empty());s.log('done at',round(s.budget.elapsed(s.now()),1),'handled',sorted(handled))
+        s.done.publish(Empty());s.log('done at',round(s.budget.elapsed(s.now()),1),'handled',sorted(handled),'reason:',why,
+                                      'fails',json.dumps({k[:24]:v for k,v in fails.items()}))
         s.log('accel at end',*accel_status())
     def use_robot_description(s,wait=1.):
         """#595.4: prefer the URDF the simulator publishes on /robot_description (TRANSIENT_LOCAL, latched). It is
@@ -485,8 +503,9 @@ class Sol(Node):
         a low pose) and the event is logged for the trajectory review."""
         A=s.arms[side];o='r' if side=='l' else 'l'
         if o in s.arms:A.set_other(s.q_now(o))
-        path=A.path_home(s.q_now(side))
-        if path is None:s.log('WARNING uncertified path home',side);path=[A.home]
+        q=s.q_now(side);path=A.path_home(q)
+        if path is None:s.log('WARNING uncertified path home',side,'from',[round(float(x),3) for x in q]);path=[A.home]
+        elif len(path)>1:s.log('path home',side,'via',len(path)-1,'waypoint(s)')
         for q in path[:-1]:s.move_arm(side,q,tol=.03)
         s.move_arm(side,path[-1],tol=.05)
     def retreat(s,side):
