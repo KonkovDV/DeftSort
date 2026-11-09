@@ -7,6 +7,7 @@
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): архитектура и жизненный цикл.
 - [docs/COMPLIANCE.md](docs/COMPLIANCE.md): соответствие правилам и ответам организаторов, аудит констант сцены.
 - [docs/PARAMETERS.md](docs/PARAMETERS.md): параметры и их происхождение.
+- [docs/ORG_ANSWERS.md](docs/ORG_ANSWERS.md): матрица трассируемости ответов организаторов.
 - [docs/PREPUSH_CHECKLIST.md](docs/PREPUSH_CHECKLIST.md): чек-лист перед сдачей.
 
 ## Как запустить
