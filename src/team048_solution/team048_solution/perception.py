@@ -108,6 +108,38 @@ def table_plane_py(points, valid, iterations=120, tolerance=.006, min_inliers=10
     return normal, -normal@center
 
 
+def plane_inliers(points, valid, plane, tolerance=.008):
+    """Boolean image: valid points within `tolerance` of the plane (n.p+d=0)."""
+    P = np.asarray(points, float); n, d = np.asarray(plane[0], float), float(plane[1])
+    return np.asarray(valid, bool) & np.isfinite(P).all(axis=-1) & (np.abs(P@n+d) < tolerance)
+
+
+def near_edge(points, valid, plane, y_half=.5, drop=.05, q=.1, min_cols=40, min_below=5):
+    """Near (robot-side) table edge x from one view, or None if this view does not SEE the edge.
+    Column-wise in the image: the lowest table-plane inlier pixel of a column is an edge pixel only if the pixels
+    below it in that column (closer to the camera along the image) include >= min_below valid points at least `drop`
+    under the plane (the view passes the edge and drops to the floor/crates). Otherwise the inlier boundary is just the
+    image border and the true edge may be closer -> None (caller uses a conservative bound).
+    Kaggle v7 torso frames: edge pixels at x 0.21-0.25 m (pelvis), head frames: edge not visible (None)."""
+    P = np.asarray(points, float)
+    ok = np.asarray(valid, bool) & np.isfinite(P).all(axis=-1)
+    n, d = np.asarray(plane[0], float), float(plane[1])
+    h = np.where(ok, P@n+d, np.nan)
+    inl = ok & (np.abs(h) < .008) & (np.abs(P[..., 1]) < y_half)
+    H = inl.shape[0]
+    xs = []
+    for c in np.nonzero(inl.any(axis=0))[0]:
+        r = int(np.nonzero(inl[:, c])[0].max())
+        if r >= H-1:
+            continue
+        below = h[r+1:, c]
+        if int(np.sum(below < -drop)) >= min_below:
+            xs.append(P[r, c, 0])
+    if len(xs) < min_cols:
+        return None
+    return float(np.quantile(xs, q))
+
+
 def segment(points, rgb, valid, plane, roi, min_pixels=25, max_jump=.025, min_height=.012, max_height=.35):
     """Depth-continuity components above the plane. The flood fill (seed order, stack order, neighbour order and
     jump test identical to segment_py) runs in Rust when available; features are computed exactly as before."""
