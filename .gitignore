@@ -3,3 +3,6 @@ __pycache__/
 build/
 install/
 log/
+rust/team048_accel/target/
+__pycache__/
+*.pyc

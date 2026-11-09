@@ -6,6 +6,7 @@ A partial chain model alone is not a whole-robot collision model.
 from dataclasses import dataclass
 import numpy as np
 from .geometry import finite
+from . import _accel
 
 
 @dataclass(frozen=True)
@@ -27,8 +28,9 @@ class CollisionModel:
             raise ValueError('complete audited robot/hand/payload and environment envelopes mandatory')
         if not np.isfinite(margin) or margin <= 0:
             raise ValueError('positive safety margin required')
+        self._fast = None
         self.chain = chain; self.spheres = tuple(Sphere(s.link,s.center,s.radius) for s in spheres); self.environment = list(environment)
-        self.ignored = {frozenset(pair) for pair in ignored_pairs}; self.margin = margin
+        self.ignored = {frozenset(pair) for pair in ignored_pairs}; self._margin = margin
         links = set(chain.frames(np.clip(np.zeros(len(chain.active)), chain.lower, chain.upper)))
         if any(s.link not in links for s in spheres):
             raise ValueError('unknown collision link')
@@ -44,6 +46,27 @@ class CollisionModel:
                         self.levers[row,active_index]=sum(np.linalg.norm(j.origin[:3,3]) for j in chain.joints[index+1:stop+1])+np.linalg.norm(sphere.center)
                     active_index+=1
         self.reach=float(np.max(self.levers))
+        # NumPy fast-path tables for valid_py (same per-pair expressions as the reference loop)
+        self._sph_links=[s.link for s in self.spheres]
+        self._sph_centers=np.array([s.center for s in self.spheres],dtype=float).reshape(-1,3)
+        self._sph_radii=np.array([s.radius for s in self.spheres],dtype=float)
+        S=self.spheres
+        P=[(i,k) for i in range(len(S)) for k in range(i+1,len(S)) if S[i].link!=S[k].link and frozenset((S[i].link,S[k].link)) not in self.ignored]
+        self._pi=np.array([p[0] for p in P],dtype=int); self._pk=np.array([p[1] for p in P],dtype=int)
+        self._fast=_accel.fast_collision(self)   # Rust kernels (None -> NumPy reference)
+
+    @property
+    def margin(self):
+        return self._margin
+
+    @margin.setter
+    def margin(self,value):
+        if not np.isfinite(value) or value<=0: raise ValueError('positive safety margin required')
+        self._margin=value
+        if self._fast is not None: self._fast.margin=float(value)
+
+    def _fallback(self,where,exc):
+        _accel.guard(exc); _accel.failed(where,exc); self._fast=None
 
     @property
     def environment(self):
@@ -57,11 +80,38 @@ class CollisionModel:
         self._env_centers=np.array([s.center for s in values],dtype=float).reshape(-1,3)
         self._env_radii=np.array([s.radius for s in values],dtype=float)
         self._env_centers.setflags(write=False); self._env_radii.setflags(write=False)
+        if getattr(self,'_fast',None) is not None:
+            try: self._fast.set_env(np.ascontiguousarray(self._env_centers),[float(r) for r in self._env_radii])
+            except BaseException as e: self._fallback('set_env',e)
 
     def valid(self, q, inflation=0):
         inflation=np.broadcast_to(finite(inflation),(len(self.spheres),))
         if np.any(inflation<0): raise ValueError('invalid collision inflation')
-        frames = self.chain.frames(q); world = []
+        if self._fast is not None:
+            q=self.chain.validate_q(q)
+            try: return self._fast.valid(np.ascontiguousarray(q,float),np.ascontiguousarray(inflation,float))
+            except BaseException as e: self._fallback('valid',e)
+        return self.valid_vec(q,inflation)
+
+    def valid_vec(self, q, inflation=0):
+        """Vectorised NumPy fallback: same per-pair expressions as valid_py, evaluated as arrays."""
+        inflation=np.broadcast_to(finite(inflation),(len(self.spheres),))
+        if np.any(inflation<0): raise ValueError('invalid collision inflation')
+        frames=self.chain.frames_py(q)
+        R=np.array([frames[l][:3,:3] for l in self._sph_links]); t=np.array([frames[l][:3,3] for l in self._sph_links])
+        W=np.einsum('kij,kj->ki',R,self._sph_centers)+t
+        D=np.sqrt(((self._env_centers[None,:,:]-W[:,None,:])**2).sum(axis=2))
+        if np.any(D<=((self._sph_radii[:,None]+self._env_radii[None,:])+self.margin)+inflation[:,None]): return False
+        if len(self._pi):
+            d=np.sqrt(((W[self._pi]-W[self._pk])**2).sum(axis=1))
+            if np.any(d<=(((self._sph_radii[self._pi]+self._sph_radii[self._pk])+self.margin)+inflation[self._pi])+inflation[self._pk]): return False
+        return True
+
+    def valid_py(self, q, inflation=0):
+        """Reference implementation (original loop)."""
+        inflation=np.broadcast_to(finite(inflation),(len(self.spheres),))
+        if np.any(inflation<0): raise ValueError('invalid collision inflation')
+        frames = self.chain.frames_py(q); world = []
         for s in self.spheres:
             T = frames[s.link]; world.append((s, T[:3, :3]@s.center+T[:3, 3]))
         for k,(s, p) in enumerate(world):
@@ -80,10 +130,20 @@ class CollisionModel:
         if not np.isfinite(max_step) or max_step <= 0:
             raise ValueError('positive finite collision resolution required')
         a = self.chain.validate_q(a); b = self.chain.validate_q(b)
+        if self._fast is not None:
+            try: return self._fast.certify(np.ascontiguousarray(a,float),np.ascontiguousarray(b,float),float(max_step))
+            except BaseException as e: self._fallback('certify',e)
         steps = max(1, int(np.ceil(np.max(abs(b-a))/max_step)))
         # Every intermediate center is within bound of a sampled center.
         inflation = self.levers@abs(b-a)/steps
-        return all(self.valid(a+(b-a)*(i/steps), inflation) for i in range(steps+1))
+        return all(self.valid_vec(a+(b-a)*(i/steps), inflation) for i in range(steps+1))
+
+    def certify_py(self, a, b, max_step=.003):
+        """Reference implementation (original loop over valid_py)."""
+        a = self.chain.validate_q(a); b = self.chain.validate_q(b)
+        steps = max(1, int(np.ceil(np.max(abs(b-a))/max_step)))
+        inflation = self.levers@abs(b-a)/steps
+        return all(self.valid_py(a+(b-a)*(i/steps), inflation) for i in range(steps+1))
 
     def certify_box(self, a, b, padding=0.):
         """Conditional sphere-envelope bound for ANY joint ordering in box.

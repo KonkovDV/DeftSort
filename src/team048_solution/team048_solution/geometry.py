@@ -65,11 +65,15 @@ def project(depth_mm, K, T, now, stamp, max_age=0.3):
     return p, valid
 
 
+def check_rotation(matrix):
+    matrix=finite(matrix,(3,3))
+    if not np.allclose(matrix.T@matrix,np.eye(3),atol=1e-6) or abs(np.linalg.det(matrix)-1)>1e-6: raise ValueError("invalid rotation matrix")
+    return matrix
+
+
 def rotation_error(target, current):
     """SO(3) logarithm, including pi rotations (not a sine-only residual)."""
-    target=finite(target,(3,3)); current=finite(current,(3,3))
-    for matrix in (target,current):
-        if not np.allclose(matrix.T@matrix,np.eye(3),atol=1e-6) or abs(np.linalg.det(matrix)-1)>1e-6: raise ValueError("invalid rotation matrix")
+    target=check_rotation(target); current=check_rotation(current)
     R = target @ current.T
     theta = np.arccos(np.clip((np.trace(R)-1)/2, -1, 1))
     v = np.array([R[2, 1]-R[1, 2], R[0, 2]-R[2, 0], R[1, 0]-R[0, 1]])

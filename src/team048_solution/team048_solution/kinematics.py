@@ -2,7 +2,8 @@
 from dataclasses import dataclass,replace
 import xml.etree.ElementTree as ET
 import numpy as np
-from .geometry import finite, pose, rotation, check_transform, rotation_error
+from .geometry import finite, pose, rotation, check_transform, rotation_error, check_rotation
+from . import _accel
 
 
 @dataclass
@@ -31,6 +32,12 @@ class Chain:
         self.names = [j.name for j in self.active]
         self.lower = np.array([j.lower for j in self.active]); self.upper = np.array([j.upper for j in self.active])
         self.velocity = np.array([min(.8, j.velocity) for j in self.active])
+        # NumPy fast path: per-joint skew matrices, bit-identical to geometry.rotation (same normalisation/formula)
+        self._K = []
+        for j in self.joints:
+            a = finite(j.axis, (3,)); x, y, z = a/np.linalg.norm(a)
+            K = np.array([[0, -z, y], [z, 0, -x], [-y, x, 0]]); self._K.append((K, K@K))
+        self._fast = _accel.fast_chain(self)   # Rust kernels (None -> NumPy reference)
 
     @classmethod
     def from_urdf(cls, xml, base, tip, tcp):
@@ -95,26 +102,58 @@ class Chain:
             raise ValueError('joint limit violation')
         return q
 
+    def _rot(self, k, angle):
+        # == geometry.rotation(joint.axis, angle) bit for bit, without per-call validation (q already validated)
+        K, KK = self._K[k]
+        return np.eye(3) + np.sin(angle)*K + (1-np.cos(angle))*KK
+
+    def _fallback(self, where, exc):
+        _accel.guard(exc); _accel.failed(where, exc); self._fast = None
+
     def frames(self, q):
+        q = self.validate_q(q)
+        if self._fast is not None:
+            try:
+                F = self._fast.frames(np.ascontiguousarray(q, float)); out = {self.base: F[0]}
+                for i, j in enumerate(self.joints): out[j.child] = F[i+1]
+                return out
+            except BaseException as e: self._fallback('frames', e)
+        return self.frames_py(q)
+
+    def frames_py(self, q):
         q = self.validate_q(q); frames = {self.base: np.eye(4)}; T = np.eye(4); i = 0
-        for j in self.joints:
+        for k, j in enumerate(self.joints):
             T = T@j.origin
             if j.movable:
-                M = np.eye(4); M[:3, :3] = rotation(j.axis, q[i]); T = T@M; i += 1
+                M = np.eye(4); M[:3, :3] = self._rot(k, q[i]); T = T@M; i += 1
             frames[j.child] = T.copy()
         return frames
 
     def fk(self, q):
-        return self.frames(q)[self.tip]@self.tcp
+        if self._fast is not None:
+            q = self.validate_q(q)
+            try: return self._fast.fk(np.ascontiguousarray(q, float))
+            except BaseException as e: self._fallback('fk', e)
+        return self.fk_py(q)
+
+    def fk_py(self, q):
+        return self.frames_py(q)[self.tip]@self.tcp
 
     def jacobian(self, q):
         """World-frame geometric Jacobian [TCP linear m/rad; angular rad/rad]."""
+        if self._fast is not None:
+            q = self.validate_q(q)
+            try: return self._fast.jacobian(np.ascontiguousarray(q, float))
+            except BaseException as e: self._fallback('jacobian', e)
+        return self.jacobian_py(q)
+
+    def jacobian_py(self, q):
         q=self.validate_q(q); T=np.eye(4); origins=[]; axes=[]; i=0
-        for joint in self.joints:
+        for k,joint in enumerate(self.joints):
             T=T@joint.origin
             if joint.movable:
                 origins.append(T[:3,3].copy()); axes.append(T[:3,:3]@joint.axis)
-                M=np.eye(4); M[:3,:3]=rotation(joint.axis,q[i]); T=T@M; i+=1
+                M=np.eye(4); M[:3,:3]=self._rot(k,q[i]); T=T@M; i+=1
         point=(T@self.tcp)[:3,3]
         return np.array([np.r_[np.cross(axis,point-origin),axis] for axis,origin in zip(axes,origins)]).T
 
@@ -134,15 +173,41 @@ class Chain:
             raise ValueError('null-space weight must be in [0,1]')
         if type(max_iter) is not int or max_iter<=0 or not np.isfinite([position_tol,angle_tol,length_scale,trust_radius]).all() or min(position_tol,angle_tol,length_scale,trust_radius)<=0:
             raise ValueError('invalid IK parameters')
+        check_rotation(target[:3,:3])   # the reference raises this on its first residual (rotation_error)
+        if self._fast is not None:
+            try:
+                r=self._fast.ik(np.ascontiguousarray(target,float),np.ascontiguousarray(q,float),max_iter,float(position_tol),
+                                float(angle_tol),float(length_scale),float(trust_radius),
+                                None if q_pref is None else np.ascontiguousarray(q_pref,float),float(w_null))
+            except BaseException as e:
+                self._fallback('ik',e); r=False
+            if r is None: raise ValueError('IK did not converge within limits; no command permitted')
+            if r is not False: return r
+        return self._ik_loop(target,q,max_iter,position_tol,angle_tol,length_scale,trust_radius,q_pref,w_null)
+
+    def ik_py(self, target, seed, max_iter=200, position_tol=.002, angle_tol=.015,
+              length_scale=.25, trust_radius=.15, q_pref=None, w_null=0.):
+        """NumPy reference of ik (same validation, no Rust)."""
+        target=check_transform(target); q=self.validate_q(seed).copy()
+        if q_pref is not None:
+            q_pref=self.validate_q(np.clip(finite(q_pref,(len(self.active),)),self.lower,self.upper))
+        if not np.isfinite(w_null) or w_null<0 or w_null>1:
+            raise ValueError('null-space weight must be in [0,1]')
+        if type(max_iter) is not int or max_iter<=0 or not np.isfinite([position_tol,angle_tol,length_scale,trust_radius]).all() or min(position_tol,angle_tol,length_scale,trust_radius)<=0:
+            raise ValueError('invalid IK parameters')
+        check_rotation(target[:3,:3])
+        return self._ik_loop(target,q,max_iter,position_tol,angle_tol,length_scale,trust_radius,q_pref,w_null)
+
+    def _ik_loop(self,target,q,max_iter,position_tol,angle_tol,length_scale,trust_radius,q_pref,w_null):
         weights=np.r_[np.ones(3),np.full(3,length_scale)]
         def residual(v):
-            T=self.fk(v)
+            T=self.fk_py(v)
             return np.r_[target[:3,3]-T[:3,3],rotation_error(target[:3,:3],T[:3,:3])]
         for _ in range(max_iter):
             e=residual(q)
             if np.linalg.norm(e[:3])<position_tol and np.linalg.norm(e[3:])<angle_tol:
                 return q
-            J=weights[:,None]*self.jacobian(q); ew=weights*e
+            J=weights[:,None]*self.jacobian_py(q); ew=weights*e
             U,s,Vt=np.linalg.svd(J,full_matrices=False)
             damping=.002+.05*max(0.,1.-float(s[-1])/.04)**2
             dq_task=Vt.T@((s/(s*s+damping*damping))*(U.T@ew))
