@@ -183,16 +183,16 @@ impl Chain {
         SVector::<f64, 6>::new(dp[0], dp[1], dp[2], w[0], w[1], w[2])
     }
 
-    /// Port of Chain.ik after its argument validation (done by the Python caller). Ok(q) or Err(()) == "did not converge".
+    /// Port of Chain.ik after its argument validation (done by the Python caller). Some(q) or None == "did not converge".
     #[allow(clippy::too_many_arguments)]
-    pub fn ik(&self, target: &Rt, seed: &Q, max_iter: usize, position_tol: f64, angle_tol: f64, length_scale: f64, trust_radius: f64, q_pref: Option<&Q>, w_null: f64) -> Result<Q, ()> {
+    pub fn ik(&self, target: &Rt, seed: &Q, max_iter: usize, position_tol: f64, angle_tol: f64, length_scale: f64, trust_radius: f64, q_pref: Option<&Q>, w_null: f64) -> Option<Q> {
         let mut q = *seed;
         let weights = SVector::<f64, 6>::new(1., 1., 1., length_scale, length_scale, length_scale);
         const SCALES: [f64; 6] = [1., 0.5, 0.25, 0.125, 0.0625, 0.015625];
         for _ in 0..max_iter {
             let e = self.residual(target, &q);
             if norm3(e[0], e[1], e[2]) < position_tol && norm3(e[3], e[4], e[5]) < angle_tol {
-                return Ok(q);
+                return Some(q);
             }
             let mut jw = self.jacobian(&q);
             for r in 0..6 {
@@ -255,7 +255,7 @@ impl Chain {
                 break;
             }
         }
-        Err(())
+        None
     }
 }
 
@@ -276,7 +276,8 @@ pub fn norm_n(x: &[f64]) -> f64 {
 /// One-sided Jacobi (Hestenes) on the 7x6 matrix A = J^T: column rotations until every column pair is orthogonal to
 /// machine precision; high relative accuracy, fixed size, no allocation (nalgebra's bidiagonal SVD reconstructed
 /// this matrix only to ~2.5e-10). The IK update only uses sign-invariant products, so sign conventions do not matter.
-pub fn svd_sorted(j: &Jac) -> (SMatrix<f64, 6, 6>, SVector<f64, 6>, SMatrix<f64, 6, N>) {
+pub type Svd = (SMatrix<f64, 6, 6>, SVector<f64, 6>, SMatrix<f64, 6, N>);
+pub fn svd_sorted(j: &Jac) -> Svd {
     let mut a: SMatrix<f64, N, 6> = j.transpose();
     let mut v = SMatrix::<f64, 6, 6>::identity();
     for _sweep in 0..60 {
@@ -316,10 +317,7 @@ pub fn svd_sorted(j: &Jac) -> (SMatrix<f64, 6, 6>, SVector<f64, 6>, SMatrix<f64,
         }
     }
     // A = J^T V = U' S  =>  J^T = U' S V^T  =>  J = V S U'^T : U_J = V, Vt_J = U'^T
-    let mut sv = [0.; 6];
-    for k in 0..6 {
-        sv[k] = norm_n(a.column(k).as_slice());
-    }
+    let sv: [f64; 6] = std::array::from_fn(|k| norm_n(a.column(k).as_slice()));
     let mut idx = [0usize, 1, 2, 3, 4, 5];
     idx.sort_by(|x, y| sv[*y].partial_cmp(&sv[*x]).unwrap_or(std::cmp::Ordering::Equal));
     let mut u = SMatrix::<f64, 6, 6>::zeros();
@@ -426,7 +424,7 @@ pub(crate) mod tests {
             let c = test_chain(); let q = q_in(&c, u); let target = c.fk(&q);
             let mut s = q; for k in 0..N { s[k] += du[k]; }
             let r = c.ik(&target, &s, 200, 0.002, 0.015, 0.25, 0.15, None, 0.);
-            prop_assert!(r.is_ok());
+            prop_assert!(r.is_some());
             let t = c.fk(&r.unwrap());
             prop_assert!((t.t - target.t).norm() < 0.002);
         }

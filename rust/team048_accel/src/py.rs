@@ -93,7 +93,7 @@ impl FastChain {
             None => None,
         };
         let r = py.detach(|| self.c.ik(&t, &s, max_iter, position_tol, angle_tol, length_scale, trust_radius, qp.as_ref(), w_null));
-        Ok(r.ok().map(|q| q.as_slice().to_vec().into_pyarray(py)))
+        Ok(r.map(|q| q.as_slice().to_vec().into_pyarray(py)))
     }
 }
 
