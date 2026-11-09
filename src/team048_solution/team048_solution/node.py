@@ -32,6 +32,14 @@ APPROACH_VMAX=.3      # rad/s on the last pre-grasp -> grasp segment (do not kno
 TCP_TOL=.01           # m, measured TCP vs planned before closing; one correction if exceeded
 RETREAT_DZ=.08        # m, straight-up lift after release / before going home from low poses
 LOW_TCP=ARMMOD.TABLE_TOP+.10
+HEAD_PITCH=.4         # rad, look-down posture for the table (head_pitch_joint)
+HEAD_TOL=.01          # rad, head considered on target
+HEAD_TMAX=6.          # s sim, give up waiting for the head (logged)
+ID_CONF_MIN=.7        # identify(): category margin; render-set study 2026-11-09 (pool 3, 625 segments): 0.7 -> 599 accepted / 7 wrong vs 1.0 -> 498 / 3
+ID_COST_MAX=2.5
+TRACE_DIR=os.environ.get('TEAM048_TRACE_DIR')   # offline test harness only: per-object JSON trace + RGB-D frames
+SHADOW_DF_N=.5*.08*9.81   # NOT used for decisions: logged 'would-be' verdict, 1/2 weight of the lightest pool-3 object (sim cfg 0.08 kg)
+EMPTY_OBS_MAX=2       # consecutive observations with nothing to pick before giving up
 def quat_to_T(t,q):
     x,y,z,w=q;T=np.eye(4)
     T[:3,:3]=[[1-2*(y*y+z*z),2*(x*y-z*w),2*(x*z+y*w)],[2*(x*y+z*w),1-2*(x*x+z*z),2*(y*z-x*w)],[2*(x*z-y*w),2*(y*z+x*w),1-2*(x*x+y*y)]]
@@ -116,21 +124,63 @@ class Sol(Node):
     def hand_verdict(s,side):
         h=s.hstate.get(side)
         return s.monitor.verdict(s.wrench.get(side),None if h is None else list(h.position),None if h is None else list(h.effort))
+    def look(s,pitch=HEAD_PITCH,tol=HEAD_TOL,tmax=HEAD_TMAX):
+        """Command the head pitch and WAIT until /joint_states shows it there and still (v6: the first observation
+        was taken while the head was still rising from 0 -> objects outside the view / TF mismatch -> nothing picked).
+        Returns the sim time at which the head was settled (frames must be newer)."""
+        s.cmd('head',[2],[pitch],[.8]);t=s.now();prev=None
+        while s.now()-t<tmax:
+            with s.lock:q=s.js.get('head_pitch_joint')
+            if q is not None and abs(q-pitch)<tol and prev is not None and abs(q-prev)<.002:
+                s.log('head settled',round(q,3),'after',round(s.now()-t,2),'s');return s.now()
+            prev=q;s.sleep(.1)
+        with s.lock:q=s.js.get('head_pitch_joint')
+        s.log('head NOT settled',q,'target',pitch);return s.now()
+    def trace(s,phase,side,name,T_plan=None,**extra):
+        """One JSON line per phase: sim time, wrist force (hand weight already subtracted by the sim),
+        finger position/effort, measured vs planned TCP. Saved frames only when TRACE_DIR is set (offline tests)."""
+        A=s.arms[side];qm=np.clip(s.q_now(side),A.chain.lower,A.chain.upper);tcp=A.tcp(qm)[:3,3]
+        F=s.wrench.get(side);h=s.hstate.get(side)
+        rec=dict(t=round(s.budget.elapsed(s.now()),2),phase=phase,side=side,obj=name,
+                 F=None if F is None else [round(float(x),3) for x in F],
+                 dF=None if F is None or s.monitor.f0 is None else round(float(np.linalg.norm(F-s.monitor.f0)),3),
+                 fing=None if h is None else [round(float(x),3) for x in h.position],
+                 eff=None if h is None else [round(float(x),3) for x in h.effort],
+                 tcp=[round(float(x),4) for x in tcp])
+        if T_plan is not None:rec['tcp_plan']=[round(float(x),4) for x in T_plan[:3,3]];rec['tcp_err']=round(float(np.linalg.norm(tcp-T_plan[:3,3])),4)
+        rec.update(extra);s.log('TRACE',json.dumps(rec))
+        if TRACE_DIR and phase in ('closed','lifted','released'):
+            try:
+                pair=s.frames.pair(-1e18)
+                if pair is not None:
+                    r,d=pair;os.makedirs(TRACE_DIR,exist_ok=True)
+                    np.savez_compressed(os.path.join(TRACE_DIR,f"{rec['t']:07.2f}_{phase}_{side}_{name[:20]}.npz"),
+                        rgb=np.frombuffer(bytes(r.data),np.uint8).reshape(r.height,r.width,3),
+                        depth=np.frombuffer(bytes(d.data),np.uint16).reshape(d.height,d.width),
+                        head_pitch=s.js.get('head_pitch_joint',np.nan),q=qm,rec=json.dumps(rec))
+            except Exception as e:s.log('trace save failed',e)
     # ---------------- perception ----------------
-    def tf(s,target,source):
-        tr=s.tfb.lookup_transform(target,source,rclpy.time.Time(),timeout=rclpy.duration.Duration(seconds=1.))
+    def tf(s,target,source,stamp=None):
+        """Transform at the image stamp (head may move); latest available if that time is not buffered."""
+        to=rclpy.duration.Duration(seconds=1.)
+        tr=None
+        if stamp is not None:
+            try:tr=s.tfb.lookup_transform(target,source,rclpy.time.Time(seconds=stamp.sec,nanoseconds=stamp.nanosec),timeout=to)
+            except Exception as e:s.log('tf at stamp failed, using latest:',type(e).__name__)
+        if tr is None:tr=s.tfb.lookup_transform(target,source,rclpy.time.Time(),timeout=to)
         t=tr.transform.translation;r=tr.transform.rotation
         return quat_to_T([t.x,t.y,t.z],[r.x,r.y,r.z,r.w])
-    def observe(s):
-        t_req=s.now();t=time.monotonic();pair=None
+    def observe(s,not_before=None):
+        t_req=s.now() if not_before is None else not_before;t=time.monotonic();pair=None
         while time.monotonic()-t<5 and (pair is None or s.info is None):
             pair=s.frames.pair(t_req);time.sleep(.02)
-        if pair is None:pair=s.frames.pair(-1e18)     # no fresh pair: newest synchronised pair (logged)
+        if pair is None:
+            pair=s.frames.pair(-1e18);s.log('observe: no fresh pair, using newest')
         if pair is None or s.info is None:raise RuntimeError('no synchronised RGB-D pair / camera_info')
         rgbm,dm=pair;info=s.info
         rgb=np.frombuffer(bytes(rgbm.data),np.uint8).reshape(rgbm.height,rgbm.width,3)
         dmm=np.frombuffer(bytes(dm.data),np.uint16).reshape(dm.height,dm.width).astype(float)
-        K=np.array(info.k).reshape(3,3);T=s.tf('pelvis',dm.header.frame_id or 'camera_head_link')
+        K=np.array(info.k).reshape(3,3);T=s.tf('pelvis',dm.header.frame_id or 'camera_head_link',dm.header.stamp)
         v,u=np.mgrid[0:dm.height,0:dm.width];Z=dmm/1000.
         X=(u-K[0,2])*Z/K[0,0];Y=(v-K[1,2])*Z/K[1,1]
         P=(np.stack([X,Y,Z],-1).reshape(-1,3)@T[:3,:3].T+T[:3,3]).reshape(dm.height,dm.width,3)
@@ -185,28 +235,33 @@ class Sol(Node):
         s.arms={k:ARMMOD.Arm(k) for k in 'lr'}
         s.log('startup',round(s.budget.elapsed(s.now()),1),'s of',s.budget.limit)
         s.hand_settings()
-        s.cmd('head',[2],[.4],[.8])
         while not s.js:time.sleep(.05)
         for k in 'lr':s.hand_open(k)
-        handled=set();fails={}
+        t_head=s.look()
+        handled=set();fails={};empty=0
         while s.budget.can_start(s.now()):
-            try:P,rgb,plane,dets=s.observe()
+            try:P,rgb,plane,dets=s.observe(t_head)
             except Exception as e:s.log('observe failed',e);break
-            ids=[x for x in s.identify(dets,P,plane,[n for n in objs if n not in handled]) if x[3]>1.0 and x[5]<2.5]
-            if not ids:break
+            t_head=s.now()                   # later observations: frames newer than the end of the last motion
+            allid=s.identify(dets,P,plane,[n for n in objs if n not in handled])
+            s.log('observe t',round(s.budget.elapsed(s.now()),1),'dets',len(dets),'assigned',
+                  [(x[1][:18],round(x[3],2),round(x[5],2)) for x in allid])
+            ids=[x for x in allid if x[3]>ID_CONF_MIN and x[5]<ID_COST_MAX]
             ids.sort(key=lambda x:-x[3])     # most confident first
-            did=False
+            did=False;stop=False
             for det,name,cat,conf,cloud,cost in ids:
                 if fails.get(name,0)>=2:continue
                 cat=objs.get(name,cat)        # category from /sim/task is authoritative
                 tray=cats.get(cat)
                 if tray not in s.trays:continue
-                others=[x[4] for x in ids if x[1]!=name]
+                others=[P[d.pixels[:,0],d.pixels[:,1]] for d in dets if d is not det]   # every segment is an obstacle
                 t=s.now();ok=s.pick_place(name,cat,cloud,plane,others,tray)
-                if ok is None:break           # budget: no time to finish another object
+                if ok is None:stop=True;break           # budget: no time to finish another object
                 if ok:handled.add(name);did=True;s.budget.record_cycle(s.now()-t);break
                 fails[name]=fails.get(name,0)+1
-            if not did:break
+            if stop:break
+            empty=0 if did else empty+1
+            if empty>=EMPTY_OBS_MAX:break
         for k in 'lr':s.retreat(k)
         s.done.publish(Empty());s.log('done at',round(s.budget.elapsed(s.now()),1),'handled',sorted(handled))
     def go_home(s,side):
@@ -235,41 +290,51 @@ class Sol(Node):
                 ca=np.r_[g['close_axis'],0.]
                 p=A.plan_pick(c3,ca,ap,g['width'])
                 if p is None:continue
-                place=plan_place(A,p['q_lift'],tx,ty+dy,top)
+                place=plan_place(A,p['q_lift'],tx,ty+dy,top,fallback=(tx,ty) if dy else None)
                 if place is None:continue
                 if not s.budget.can_start(s.now(),p['duration']):
                     s.log('skip',name,'remaining',round(s.budget.remaining(s.now()),1),'s');return None
-                s.log('pick',name,cat,'->',tray,'slot',k,'arm',side,g['kind'],'w',round(g['width'],3))
-                s.hand_open(side);s.move_arm(side,p['q_pre'])
+                s.log('pick',name,cat,'->',tray,'slot',k,'arm',side,g['kind'],'w',round(g['width'],3),'z',round(g['z'],3))
+                Tg=A.tcp(p['q_grasp']);s.trace('start',side,name,kind=g['kind'],center=[round(float(x),3) for x in c3])
+                s.hand_open(side);s.move_arm(side,p['q_pre']);s.trace('pre',side,name,A.tcp(p['q_pre']))
                 s.move_arm(side,p['q_grasp'],tol=.015,vmax=APPROACH_VMAX)
-                qm=s.q_now(side)
-                if A.position_error(np.clip(qm,A.chain.lower,A.chain.upper),A.tcp(p['q_grasp']))>TCP_TOL:
+                qm=s.q_now(side);s.trace('at_grasp',side,name,Tg)
+                if A.position_error(np.clip(qm,A.chain.lower,A.chain.upper),Tg)>TCP_TOL:
                     qc=A.correct(np.clip(qm,A.chain.lower,A.chain.upper),p['q_grasp'])
-                    if qc is not None:s.move_arm(side,qc,tol=.01,vmax=APPROACH_VMAX,refine=0)
+                    if qc is not None:s.move_arm(side,qc,tol=.01,vmax=APPROACH_VMAX,refine=0);s.trace('corrected',side,name,Tg)
                 s.monitor.baseline(s.wrench.get(side))
-                s.hand_close(side,g['kind']);s.wait_fingers(side)
-                s.move_arm(side,p['q_lift'])
+                s.hand_close(side,g['kind']);settled=s.wait_fingers(side);s.trace('closed',side,name,Tg,settled=settled)
+                s.move_arm(side,p['q_lift']);s.sleep(.3)
                 held=s.hand_verdict(side)
+                F=s.wrench.get(side);f0=s.monitor.f0
+                shadow=None if F is None or f0 is None else bool(np.linalg.norm(F-f0)>=SHADOW_DF_N)
+                s.trace('lifted',side,name,A.tcp(p['q_lift']),verdict=held,shadow=shadow)
                 if held is False:      # nothing in the hand: open, retreat, re-observe (object untouched => 0, not -10)
                     s.log('grasp check: empty',name);s.hand_open(side);s.retreat(side);return False
                 q_place,q_up=place
-                s.move_arm(side,q_place,tol=.03)
-                s.hand_open(side);s.wait_fingers(side,tmin=.4,tmax=1.0)
+                s.move_arm(side,q_place,tol=.03);s.trace('over_tray',side,name,A.tcp(q_place),tray=tray,tray_xy=[round(tx,3),round(ty+dy,3)])
+                s.hand_open(side);s.wait_fingers(side,tmin=.4,tmax=1.0);s.trace('released',side,name,A.tcp(q_place))
                 if q_up is not None:s.move_arm(side,q_up,tol=.03)
-                s.go_home(side)
+                s.go_home(side);s.trace('home',side,name)
                 s.placed[tray]=k+1
                 return True
         return False
-def plan_place(A,q_from,tx,ty,top):
-    """Release pose over (tx,ty) at the lowest feasible height, plus a straight-up retreat pose (or None)."""
-    for dz in (.20,.25,.30):            # unchanged heights; lowering needs payload-vs-tray-wall data (TODO)
-        c=np.array([tx,ty,top+TRAY_H+dz-.1])
-        for ca in (np.array([1.,0,0]),np.array([0,1.,0])):
-            T=A.grasp_pose(c,ca,np.array([0,0,-1.]))
-            q=A.solve(T,q_from)
-            if q is None:continue
-            if A.col.certify(q_from,q) and A.col.certify(q,A.home):
-                return q,A.lift(q,RETREAT_DZ)
+PLACE_AXES=(np.array([1.,0,0]),np.array([0,1.,0]),np.array([-1.,0,0]),np.array([0,-1.,0]))
+def plan_place(A,q_from,tx,ty,top,fallback=None):
+    """Release pose over (tx,ty) at the lowest feasible height, plus a straight-up retreat pose (or None).
+    Closing axis tried with BOTH signs: the Inspire hand is not symmetric (thumb vs fingers), the right arm reaches
+    tray_right only with the mirrored axis (offline 2026-11-09: +x/+y -> IK fails for every height, -y -> ok).
+    v6 root cause: no box was ever picked because tray_right had no release pose. fallback=(x,y) (tray centre)
+    is tried when the slot position is out of reach."""
+    for (x,y) in [(tx,ty)]+([fallback] if fallback is not None else []):
+        for dz in (.20,.25,.30):            # unchanged heights; lowering needs payload-vs-tray-wall data (TODO)
+            c=np.array([x,y,top+TRAY_H+dz-.1])
+            for ca in PLACE_AXES:
+                T=A.grasp_pose(c,ca,np.array([0,0,-1.]))
+                q=A.solve(T,q_from)
+                if q is None:continue
+                if A.col.certify(q_from,q) and A.col.certify(q,A.home):
+                    return q,A.lift(q,RETREAT_DZ)
     return None
 def self_w(s):return min(s.arms['l'].hand['opposed_open']-.01,.11)
 def main():

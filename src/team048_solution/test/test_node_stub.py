@@ -32,7 +32,7 @@ def install_stubs():
     mod('rclpy.qos',QoSProfile=lambda **k:None,DurabilityPolicy=types.SimpleNamespace(TRANSIENT_LOCAL=1),
         ReliabilityPolicy=types.SimpleNamespace(RELIABLE=1),qos_profile_sensor_data=None)
     mod('rclpy.executors',MultiThreadedExecutor=object)
-    rclpy.time=types.SimpleNamespace(Time=lambda:None);rclpy.duration=types.SimpleNamespace(Duration=lambda **k:None)
+    rclpy.time=types.SimpleNamespace(Time=lambda **k:None);rclpy.duration=types.SimpleNamespace(Duration=lambda **k:None)
     mod('std_msgs');mod('std_msgs.msg',String=mk('String'),Empty=mk('Empty'))
     mod('sensor_msgs');mod('sensor_msgs.msg',JointState=mk('JointState'),Image=mk('Image'),CameraInfo=mk('CameraInfo'))
     mod('geometry_msgs');mod('geometry_msgs.msg',WrenchStamped=mk('WrenchStamped'))
@@ -79,7 +79,7 @@ class NodeWiring(unittest.TestCase):
         sol.frames.add_rgb(Msg(header=Msg(stamp=stamp(st),frame_id='camera_head_link'),height=360,width=640,data=rgb.tobytes()))
         sol.frames.add_depth(Msg(header=Msg(stamp=stamp(st),frame_id='camera_head_link'),height=360,width=640,data=dep.astype(np.uint16).tobytes()))
         sol.info=Msg(k=list(f['K']))
-        T=N.quat_to_T(list(f['tf_t']),list(f['tf_q']));sol.tf=lambda a,b:T
+        T=N.quat_to_T(list(f['tf_t']),list(f['tf_q']));sol.tf=lambda a,b,stamp=None:T
         P,rgb2,plane,dets=sol.observe()
         s.assertEqual(P.shape,(360,640,3));s.assertGreater(plane[0][2],.96)
         for name,(x,y) in sol.trays.items():
@@ -93,4 +93,56 @@ class NodeWiring(unittest.TestCase):
         r=sol.pick_place('004_sugar_box','box',cloud,plane,[],'tray_left')
         s.assertIsNone(r)                               # a plan exists but does not fit: never started
         s.assertEqual(len(sol.pub['arm'].sent),n0);s.assertEqual(len(sol.hand['left'].sent)+len(sol.hand['right'].sent),n1)
+    def test_plan_place_right_tray_reachable(s):
+        # v6 root cause: no release pose for tray_right (closing axis tried with one sign only) -> boxes never picked
+        A=s.s.arms['r'];top=ARM.TABLE_TOP;tx,ty=TR.NOMINAL['tray_right']
+        s.assertIsNotNone(N.plan_place(A,A.home,tx,ty,top))
+        s.assertIsNotNone(N.plan_place(A,A.home,tx,ty-.08,top,fallback=(tx,ty)))
+    def test_look_waits_for_head(s):
+        sol=s.s;sol.js={'head_pitch_joint':0.};seq=iter([0.,.1,.25,.39,.398,.399,.399,.399]+[.399]*50)
+        def fake_sleep(dt):
+            Clock.t+=dt;sol.js['head_pitch_joint']=next(seq)
+        sol.sleep=fake_sleep;t0=Clock.t
+        t=sol.look(.4)
+        s.assertGreaterEqual(t-t0,.5)                       # returned only after the head reached 0.4 and stopped
+        s.assertAlmostEqual(sol.js['head_pitch_joint'],.399,3)
+        s.assertEqual(sol.pub['head'].sent[-1].cmds[0].pos,.4)
+        del sol.sleep
+    def test_look_times_out_when_no_joint_state(s):
+        sol=s.s;sol.js={}
+        def fake_sleep(dt):Clock.t+=dt
+        sol.sleep=fake_sleep;t0=Clock.t;t=sol.look(.4,tmax=1.)
+        s.assertGreaterEqual(t-t0,1.);del sol.sleep
+    def test_tf_uses_image_stamp(s):
+        sol=s.s;seen=[]
+        class Tr:pass
+        def lk(target,source,time,timeout=None):
+            seen.append(time);tr=Tr();tr.transform=Msg(translation=Msg(x=0,y=0,z=0),rotation=Msg(x=0,y=0,z=0,w=1));return tr
+        import rclpy
+        old=rclpy.time.Time;rclpy.time.Time=lambda **k:k
+        sol.tfb=types.SimpleNamespace(lookup_transform=lk)
+        try:N.Sol.tf(sol,'pelvis','camera_head_link',stamp(12.5))
+        finally:rclpy.time.Time=old
+        s.assertEqual(seen[0],{'seconds':12,'nanoseconds':500000000})
+    def test_trace_line_is_json(s):
+        sol=s.s;from team048_solution import budget as B;import json
+        sol.budget=B.TimeBudget(270,t0=Clock.t);logs=[]
+        sol.get_logger=lambda:types.SimpleNamespace(info=logs.append)
+        A=sol.arms['l'];sol.js=dict(zip(A.chain.names,A.home));sol.wrench['l']=np.array([0.,0.,1.5]);sol.monitor.baseline(np.zeros(3))
+        sol.trace('lifted','l','x',sol.arms['l'].tcp(sol.arms['l'].home),verdict=None)
+        r=json.loads(logs[-1].split('TRACE ',1)[1]);s.assertEqual(r['phase'],'lifted');s.assertAlmostEqual(r['dF'],1.5)
+        s.assertAlmostEqual(r['tcp_err'],0.,3)
+        del sol.get_logger
+    def test_run_retries_empty_observation_then_done(s):
+        # v6 seed 101: first observation empty -> loop ended at once. Now: look() first, re-observe up to EMPTY_OBS_MAX.
+        sol=N.Sol();sol.arms=s.s.arms
+        sol.task={'task':'sort2','categories':{'box':'tray_left'},'objects':{'a':'box'},'trays':{}}
+        calls=[];Clock.t=50.
+        sol.look=lambda *a,**k:(calls.append('look'),Clock.t)[1]
+        sol.observe=lambda nb=None:(calls.append('obs'),(None,None,None,[]))[1]
+        sol.identify=lambda *a:[]
+        sol.retreat=lambda k:None;sol.js={'x':0.}
+        sol.run()
+        s.assertEqual(calls[0],'look');s.assertEqual(calls.count('obs'),N.EMPTY_OBS_MAX)
+        s.assertTrue(sol.pubs['/sim/task/done'].sent)
 if __name__=='__main__':unittest.main()

@@ -6,6 +6,10 @@ Hand opening W_MAX and finger geometry are PARAMETERS: the Inspire hand limits m
 assets/SDK (not guessed here)."""
 import numpy as np
 from scipy.spatial import ConvexHull
+# Rim pinch: grip centre BELOW the rim top so the finger pads overlap the wall instead of touching its edge.
+# v6 (Kaggle, old code z=rim top): 0/3 rim picks ended in a tray. Value = geometric choice (pad overlap), UNVERIFIED:
+# the next run logs wrist force and finger positions at every grasp to confirm or recalibrate it.
+RIM_DEPTH=.015
 def footprint(cloud,plane):
     n,d=plane;h=cloud@n+d;xy=cloud[:,:2]
     hull=xy[ConvexHull(xy).vertices];best=(9.,0.)
@@ -35,7 +39,7 @@ def candidates(cloud,plane,category,others=(),W_MAX=.09,finger=.02,depth=.04,mar
                             score=(W_MAX-w)/W_MAX-.5*float(appr@toward)))
     if category=='dish':
         r=f['hull'];k=np.argmax(r@toward);p=r[k]   # nearest rim point toward the robot
-        out.append(dict(kind='rim',center=p,close_axis=toward,approach=np.array([0,0,-1.]),width=.025,z=f['height'],score=1.))
+        out.append(dict(kind='rim',center=p,close_axis=toward,approach=np.array([0,0,-1.]),width=.025,z=f['height']-min(RIM_DEPTH,.3*f['height']),score=1.))
     for g in out:   # clearance of finger corridors against other segments' points (sensor data)
         c=g['center'];ax=g['close_axis'];half=g['width']/2+margin
         tips=[c+ax*half,c-ax*half] if g['kind']=='side' else [g['center']]

@@ -171,3 +171,12 @@ class Rules(unittest.TestCase):           # constraints: no debug topics, 0.8 ca
             s.assertNotIn(t,lits,msg='debug topic used')
         s.assertIn('min(.8,',src)
 if __name__=='__main__':unittest.main()
+
+class V6Fixes(unittest.TestCase):
+    def test_rim_grip_below_rim_top(self):
+        from team048_solution.grasp import candidates,RIM_DEPTH
+        rng=np.random.default_rng(0);t=rng.uniform(0,2*np.pi,2000);h=.053
+        cl=np.c_[.4+.055*np.cos(t),.2+.055*np.sin(t),rng.uniform(-.18,-.18+h,2000)]
+        f,C=candidates(cl,(np.array([0,0,1.]),.18),'dish')
+        g=[c for c in C if c['kind']=='rim'][0]
+        self.assertAlmostEqual(g['z'],f['height']-min(RIM_DEPTH,.3*f['height']),6);self.assertLess(g['z'],f['height'])
