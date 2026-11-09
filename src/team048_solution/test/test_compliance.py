@@ -175,3 +175,12 @@ class EndOfRun595(unittest.TestCase):
         self.assertIsNone(r)                                    # stopped for lack of time
         self.assertTrue(any(isinstance(m,str) and m=='retreat' for m in moves))
         self.assertEqual(hand[-1][:5],[1,1,1,1,1])             # opened at the object
+
+class TimeLimit595(unittest.TestCase):
+    def test_launch_age_counts_process_start(self):
+        from team048_solution import budget as B
+        a=B.launch_age_s();self.assertIsNotNone(a);self.assertGreaterEqual(a,0.)
+        self.assertLessEqual(N.WALL_LAUNCH,N.WALL_IMPORT)            # start-up before import is charged, never less
+        self.assertAlmostEqual(B.start_time(50.,10.,4.),44.)          # 6 s wall of start-up at RTF<=1 -> 6 s sim
+    def test_run_sh_uses_sim_time(self):
+        self.assertIn('use_sim_time:=true',open(os.path.join(HERE,'..','..','..','run.sh')).read())

@@ -9,6 +9,9 @@ Scene (#645): table plane + near edge and the trays are MEASURED by the cameras 
 yaw scan, torso camera for the near edge); only approximate search bounds and robot geometry are constants."""
 import json,os,time,threading,math
 WALL_IMPORT=time.monotonic()
+from . import budget as _B0
+_AGE=_B0.launch_age_s()                       # run.sh -> ros2 run -> python start-up before this import (sim limit
+WALL_LAUNCH=WALL_IMPORT-(_AGE if _AGE is not None and _AGE<120 else 0.)   # counts it: SCORING 4 Nov, #595.3/#638)
 import numpy as np,rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile,DurabilityPolicy,ReliabilityPolicy,qos_profile_sensor_data
@@ -370,7 +373,7 @@ class Sol(Node):
         while s.task is None or s.now()<=0:time.sleep(.05)
         # v7 s101: 'startup 206.9 s' -- the wait for the (not yet running) sim clock was counted as sim time.
         # Only process start-up before the node could receive /clock is charged (pessimistically, RTF<=1).
-        t0=BUD.start_time(s.now(),getattr(s,'wall_ready',time.monotonic()),WALL_IMPORT)
+        t0=BUD.start_time(s.now(),getattr(s,'wall_ready',time.monotonic()),WALL_LAUNCH)
         task=s.task;s.log('task',task.get('task'),task.get('objects_from'))
         if task.get('task') not in BUD.LIMITS:
             s.done.publish(Empty());return
