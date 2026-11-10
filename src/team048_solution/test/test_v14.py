@@ -131,3 +131,16 @@ class TrayAxisSign(unittest.TestCase):
             with mock.patch.object(TRY,'min_area_rect',lambda xy,q=.02,f=forced:(np.array([.35,.61]),np.array([.21,.29]),f)):
                 d=TRY.detect(P,rgb,valid,'tray_left','red',plane)
             s.assertIsNotNone(d);s.assertGreater(d['axis'][0],0)
+
+
+from team048_solution import perception as PER, _accel as ACC
+class FfiEdges(unittest.TestCase):
+    """research/diag/v14/ffi_edges.py: of 43 edge inputs only an empty depth image made a Rust kernel panic."""
+    @unittest.skipUnless(ACC.enabled2(), 'needs the Rust module (API 2)')
+    def test_empty_depth_image_keeps_rust_enabled(s):
+        K=np.array([[343.16,0,320],[0,343.16,240],[0,0,1.]]);T=np.eye(4)
+        try:
+            P=PER.deproject(np.zeros((0,0)),K,T)
+            s.assertEqual(P.shape,(0,0,3))
+            s.assertTrue(ACC.enabled2(),'an empty image disabled the Rust module for the whole process')
+        finally:ACC._disabled=False
