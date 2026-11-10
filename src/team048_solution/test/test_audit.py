@@ -4,7 +4,7 @@ import os,sys,json,types,unittest,time
 from unittest import mock
 import numpy as np
 HERE=os.path.dirname(os.path.abspath(__file__));sys.path.insert(0,os.path.join(HERE,'..'));sys.path.insert(0,HERE)
-import test_node_stub as TS
+import test_node_stub as TS  # noqa: F401  (installs the ROS stubs)
 from test_node_stub import N,Clock
 from team048_solution import arm as ARM, grip as G
 P8={x['phase']:x for x in json.load(open(os.path.join(HERE,'fixtures','v8_perricone_place.json')))['phases']}

@@ -4,7 +4,7 @@ CPU-dependent there: OpenBLAS uses FMA on AVX2/AVX-512): <= 1e-12 absolute, with
 Skipped when the extension (API >= 2) is not installed."""
 import contextlib,glob,json,os,sys,unittest,numpy as np
 HERE=os.path.dirname(os.path.abspath(__file__));sys.path.insert(0,os.path.join(HERE,'..'));sys.path.insert(0,HERE)
-import test_node_stub  # noqa: ROS stubs for node.py
+import test_node_stub  # noqa: F401  (installs the ROS stubs for node.py)
 import scene_fixture as SF
 from team048_solution import _accel, arm, perception, trays as TR, grasp, planning, node as NODE
 V7_TRACE=os.environ.get('TEAM048_V7_TRACE',os.path.join(HERE,'..','..','..','research','kaggle-sim','out_v7','trace'))   # Kaggle v7 trace frames (research/, not in the submission: tests skip)
@@ -249,7 +249,6 @@ class Phase2(unittest.TestCase):
             tb=perception.table_region(P,valid);pl=perception.table_plane(P,tb);loc=TR.detect(P,rgb,valid,'tray_center','green',pl)
             seg=perception.segment(P,rgb,tb,pl,(np.array([.18,-.62,-1.]),np.array([.62,.62,1.])),min_pixels=40)
         names=('ransac_plane','deproject','tray_window_mask','min_area_rect_scan','rot_rect_mask','segment_components','min_caliper','min_dist_xy','table_mask')
-        saved={k:getattr(_accel._ext,k) for k in names}
         class Boom:
             def __getattr__(self,k):
                 if k in names:

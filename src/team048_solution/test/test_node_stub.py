@@ -1,5 +1,5 @@
 """node.py wiring without ROS: rclpy/msg/tf2 replaced by minimal stubs, real v5 head frame (Kaggle) as input."""
-import os,sys,types,unittest,time
+import os,sys,types,unittest
 import numpy as np
 HERE=os.path.dirname(os.path.abspath(__file__));sys.path.insert(0,os.path.join(HERE,'..'))
 V5=os.path.join(HERE,'fixtures','v5_head_frame.npz')
@@ -50,7 +50,7 @@ def install_stubs():
     mod('tf2_ros',Buffer=lambda:None,TransformListener=lambda b,n:None)
 install_stubs()
 sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)));import scene_fixture as SF
-from team048_solution import node as N, arm as ARM, trays as TR
+from team048_solution import node as N, arm as ARM
 
 def stamp(t):return types.SimpleNamespace(sec=int(t),nanosec=int(round((t-int(t))*1e9)))
 class NodeWiring(unittest.TestCase):

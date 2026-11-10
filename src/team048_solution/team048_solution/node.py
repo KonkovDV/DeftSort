@@ -9,7 +9,7 @@ Tubes: not solved -> immediate /sim/task/done (0 points, allowed by SCORING).
 Debug topics (/sim/task/check, /sim/objects/*) are never used.
 Scene (#645): table plane + near edge and the trays are MEASURED by the cameras at run time (head survey with head
 yaw scan, torso camera for the near edge); only approximate search bounds and robot geometry are constants."""
-import json,os,time,threading,math
+import json,os,time,threading
 WALL_IMPORT=time.monotonic()
 from . import budget as _B0
 _AGE=_B0.launch_age_s()                       # run.sh -> ros2 run -> python start-up before this import (sim limit

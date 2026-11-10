@@ -1,6 +1,6 @@
 """Organiser answers #595/#613/#625/#636/#638/#645/#648 (see COMPLIANCE.md): scene measured by cameras, hand force/speed/
 thumb/close-past, end-of-run policy, /robot_description, debug topics."""
-import os,sys,types,unittest,re,glob
+import os,sys,types,unittest,glob
 import numpy as np
 HERE=os.path.dirname(os.path.abspath(__file__));sys.path.insert(0,HERE)
 import test_node_stub as TS                      # installs the ROS stubs
@@ -126,7 +126,6 @@ class Grasp648(unittest.TestCase):
         s=N.Sol();s.hstate={'l':types.SimpleNamespace(position=[1,1,1,1,1,0.01])}
         self.assertTrue(s.wait_thumb('l',tmax=.1))
         s.hstate['l']=types.SimpleNamespace(position=[1,1,1,1,1,.6]);s.sleep=lambda dt:None
-        t=TS.Clock.t
         import time as _t
         orig=_t.sleep
         try:
@@ -144,7 +143,6 @@ class EndOfRun595(unittest.TestCase):
         """A lifted object outside a tray at the limit is -10, untouched 0: with time for the grasp but not for the
         transport, the hand opens at the object and the arm retreats WITHOUT lifting."""
         from team048_solution import budget as B
-        sol=TS.NodeWiring.s if hasattr(TS.NodeWiring,'s') else None
         s=N.Sol();s.arms={k:ARM.Arm(k) for k in 'lr'};s.hand_settings_step()
         for A in s.arms.values():A.set_scene(SF.plane(),list(SF.TRAYS.values()))
         s.trays=dict(SF.TRAYS);moves=[];hand=[]

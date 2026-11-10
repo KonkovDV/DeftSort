@@ -4,7 +4,7 @@ trace 0098.15: Utana before the attempt that slipped during the carry, at_grasp 
 import os,sys,json,unittest
 import numpy as np
 HERE=os.path.dirname(os.path.abspath(__file__));sys.path.insert(0,os.path.join(HERE,'..'));sys.path.insert(0,HERE)
-import test_node_stub as TS   # noqa: ROS stubs
+import test_node_stub as TS  # noqa: F401  (installs the ROS stubs)
 from team048_solution import arm as ARM, grasp as GR, node as N, trays as TR
 import scene_fixture as SF
 FX=os.path.join(HERE,'fixtures');Z=np.load(os.path.join(FX,'v12_rim_dishes.npz'));META=json.load(open(os.path.join(FX,'v12_rim_dishes.json')))

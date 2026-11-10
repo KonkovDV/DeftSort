@@ -7,7 +7,7 @@ import numpy as np
 HERE=os.path.dirname(os.path.abspath(__file__));sys.path.insert(0,HERE)
 import test_node_stub as TS                      # installs the ROS stubs
 import test_v13 as V13
-from team048_solution import node as N, grip as G, arm as ARM
+from team048_solution import node as N, grip as G
 PKG=os.path.join(HERE,'..','team048_solution')
 
 class ForceRange(unittest.TestCase):

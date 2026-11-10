@@ -4,7 +4,7 @@ mustard / Crayola / Crunch / Perricone touched the object before closing (fixtur
 import os,sys,json,unittest
 import numpy as np
 HERE=os.path.dirname(os.path.abspath(__file__));sys.path.insert(0,os.path.join(HERE,'..'));sys.path.insert(0,HERE)
-import test_node_stub as TS   # noqa: ROS stubs
+import test_node_stub as TS  # noqa: F401  (installs the ROS stubs)
 from team048_solution import arm as ARM, grasp as GR
 import scene_fixture as SF
 PRI=json.load(open(os.path.join(HERE,'..','team048_solution','data','priors.json')))

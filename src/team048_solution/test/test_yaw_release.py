@@ -1,9 +1,9 @@
 """v7 evidence (sort3 s103, Hyaluronic_Acid): fingers fully closed (0.003, effort 0.004) after lift = empty hand; after
 release 0.97, home 0.99 = open (INTERFACES.md: 1.0 open, 0.0 closed). Torso yaw (body_yaw_joint, motor 31) for placing."""
 import sys,os,types,unittest,numpy as np
-sys.path.insert(0,os.path.dirname(__file__));import test_node_stub
+sys.path.insert(0,os.path.dirname(__file__));import test_node_stub  # noqa: F401  (installs the ROS stubs)
 sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)));import scene_fixture as SF
-from team048_solution import node as N, grip as G, trays as TR, arm as ARM
+from team048_solution import node as N, grip as G, arm as ARM
 SIDE=[0,0,0,0,0,0.]
 class Release(unittest.TestCase):
     def test_v7_s103_hyaluronic_lifted_is_empty(self):

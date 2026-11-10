@@ -4,7 +4,7 @@ Nothing here changes a plan; every constant below names its source."""
 import os,sys,math,unittest
 import numpy as np
 sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
-import test_node_stub as TS                      # installs the ROS stubs
+import test_node_stub as TS  # noqa: F401  (installs the ROS stubs)
 from team048_solution import node as N, arm as ARM, geometry as GEO, perception as PE, trays as TR, grasp as GR
 
 # camera_info of /camera/head and /camera/body_front (Kaggle v5 logs, frames.json): 640x360, D = 0

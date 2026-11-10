@@ -2,7 +2,7 @@
 Frames: pelvis, z up, x forward. Uses the v4 Chain (bounded DLS IK) and CollisionModel (swept sphere certification).
 Limitations: the URDF STL meshes are absent, so link envelopes are spheres sized from the URDF inertial tensors
 (equivalent-cylinder radius, inflated) -- an approximation, not mesh collision."""
-import sys,os,numpy as np,xml.etree.ElementTree as ET
+import os,numpy as np,xml.etree.ElementTree as ET
 
 from .kinematics import Chain
 from .planning import Sphere,CollisionModel,joint_path,spheres_bulk
@@ -241,7 +241,7 @@ def torso_spheres(side):
 def body_env(side,other_q=None):
     """Torso, head and the other arm (at its posture) as pelvis-frame spheres. Table added separately."""
     E=[];P=lambda link,p=np.zeros(3),q=None:(fk_link(link,q)@np.r_[p,1])[:3]
-    w=fk_link('waist_yaw_link');shL=P('shoulder_pitch_l_link');shR=P('shoulder_pitch_r_link')
+    shL=P('shoulder_pitch_l_link')
     # torso column: from pelvis up to shoulder height, width = shoulder separation minus arm clearance
     # trunk core kept inside the shoulder joints (|y| + r <= shoulder_y - 0.07); arm links mount on it
     r=min(.08,abs(shL[1])-.07)

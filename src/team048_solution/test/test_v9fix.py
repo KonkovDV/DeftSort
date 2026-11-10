@@ -3,7 +3,7 @@ measured jammed both hands in the table front; torso envelope missing; guard thr
 import os,sys,json,types,unittest
 import numpy as np
 HERE=os.path.dirname(os.path.abspath(__file__));sys.path.insert(0,os.path.join(HERE,'..'));sys.path.insert(0,HERE)
-import test_node_stub as TS
+import test_node_stub as TS  # noqa: F401  (installs the ROS stubs)
 from test_node_stub import N,Clock
 from team048_solution import arm as ARM, grip as G, perception as PE
 from test_compliance import cloud,V7

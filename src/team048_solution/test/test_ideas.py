@@ -83,7 +83,7 @@ class Trays(unittest.TestCase):           # I5 + I6
                 s.assertLessEqual(abs(trays.slot_offset(k,h))+h,trays.TRAY_SIZE[1]/2-trays.TRAY_WALL+1e-9)
     @unittest.skipUnless(os.path.exists(V5),'v5 fixture missing')
     def test_chroma_on_real_v5_frame(s):
-        f=np.load(V5);rgb=f['rgb'];r0=0
+        f=np.load(V5);rgb=f['rgb']
         tray=rgb[340:358,300:350];table=rgb[260:300,450:600];s.assertGreater(table.size,0)
         s.assertGreater(trays.chroma_mask(tray,'green').mean(),.8)       # green tray (desaturated render)
         s.assertLess(trays.chroma_mask(table,'green').mean(),.02)        # neutral table
