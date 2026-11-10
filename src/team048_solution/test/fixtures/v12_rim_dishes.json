@@ -1,0 +1,50 @@
+{
+ "utana_v7s102": {
+  "obj": "Utana_5_Porcelain_Ramekin_Large",
+  "frame": "v7 sort3 s102 start head frame (test/fixtures/v7_s102_start_frames.npz), segment by colour/size",
+  "r0": 0.06525197755306954,
+  "c0": [
+   0.3930428676493963,
+   0.3803542876305405
+  ]
+ },
+ "ecoforms_v7s102": {
+  "obj": "Ecoforms_Plant_Container_B4_Har",
+  "frame": "v7 sort3 s102 start head frame (test/fixtures/v7_s102_start_frames.npz), segment by colour/size",
+  "r0": 0.049986172270762866,
+  "c0": [
+   0.3394703876654379,
+   0.10671830236165422
+  ]
+ },
+ "threshold_v7s102": {
+  "obj": "Threshold_Ramekin_White_Porcelain",
+  "frame": "v7 sort3 s102 start head frame (test/fixtures/v7_s102_start_frames.npz), segment by colour/size",
+  "r0": 0.05536971370827811,
+  "c0": [
+   0.35623643985988046,
+   -0.2832846975594309
+  ]
+ },
+ "utana_v11b": {
+  "obj": "Utana_5_Porcelain_Ramekin_Large",
+  "frame": "v11b sort2 s101 trace 0098.15 (last head frame before the Utana attempt at log :1236)",
+  "start_line": "Kaggle v11b run_sort2_101.log:1236, at_grasp :1276",
+  "r0": 0.06253884564505369,
+  "c0": [
+   0.40160313285368043,
+   0.4050766861212036
+  ],
+  "at_grasp_q": [
+   0.062,
+   0.042,
+   0.111,
+   -1.785,
+   -1.635,
+   0.597,
+   -1.104
+  ],
+  "side": "l",
+  "t": 114.81
+ }
+}

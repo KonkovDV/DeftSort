@@ -615,13 +615,14 @@ class Sol(Node):
         s.last_contact=True;s.retreat(side);return False
     def pick_place(s,name,cat,cloud,plane,others,tray):
         """True placed / False failed (safe, nothing lifted left outside) / None not started for lack of time."""
-        f,C=candidates(cloud,plane,cat,others,W_MAX=self_w(s),robot_xy=(0.,0.))
+        f,C=candidates(cloud,plane,cat,others,W_MAX=self_w(s),robot_xy=(0.,0.),mass=PRI.get(name,{}).get('mass'))
         tx,ty,ax,ay,ts,tl,th=ARMMOD.tray_geom(s.trays[tray])
         order='lr' if ty>.1 else ('rl' if ty<-.1 else ('lr' if f['center'][1]>=0 else 'rl'))
         k=s.placed.get(tray,0);dl=TR.slot_offset(k,.5*f['length'],size=(ts,tl),ty=ty)   # along the MEASURED long axis
         sx,sy=tx+dl*ax,ty+dl*ay
         why={'candidates':len(C),'feasible':int(sum(1 for g in C if g['feasible'])),'pick_ik':{},'place':{},'hand_clear':{}}   # v8 fix 7
         if 'rim_closed' in f:why['rim_closed']=f['rim_closed']
+        if f.get('rim_torque') is not None:why['rim_torque']=round(f['rim_torque'],3)
         for side in order:
             if not s.hand_force_applied(side):   # #648: never grasp at the default force 1.0
                 why.setdefault('hand_force_not_applied',[]).append(side);continue
@@ -646,7 +647,8 @@ class Sol(Node):
                     if p is not None:break
                 if p is None:
                     why['pick_ik'][side]=why['pick_ik'].get(side,0)+1;continue
-                yp=plan_place_yaw(A,p['q_lift'],sx,sy,plane,list(s.trays.values()),fallback=(tx,ty) if dl else None,tray_h=th)
+                yp=plan_place_yaw(A,p['q_lift'],sx,sy,plane,list(s.trays.values()),fallback=(tx,ty) if dl else None,tray_h=th,
+                                  obj_off=held_offset(A,p['q_grasp'],g,c3))
                 if yp is None:
                     why['place'][side]=why['place'].get(side,0)+1;continue
                 yaw,place=yp
@@ -723,7 +725,8 @@ class Sol(Node):
         if len(why.get('hand_force_not_applied',[]))==len(order):   # not a planning failure: retry once a hand is ready
             why['reason']='hand force not applied on any arm';s.log('no plan:',name,json.dumps(why));return False
         s.last_infeasible=True   # nothing executed: no candidate had a collision-free pick + place plan
-        why['reason']=('dish without an open rim (closed top measured)' if f.get('rim_closed') and not C else 'no grasp candidate' if not C else 'no feasible grasp candidate' if not why['feasible'] else
+        why['reason']=('dish without an open rim (closed top measured)' if f.get('rim_closed') and not C else
+                       'dish too heavy for a rim pinch (m*g*r above GRASP.RIM_TORQUE_MAX)' if f.get('rim_heavy') and not C else 'no grasp candidate' if not C else 'no feasible grasp candidate' if not why['feasible'] else
                        'no collision-free pick IK' if not why['place'] else 'no place plan (tray reach / collisions)')
         s.log('no plan:',name,json.dumps(why))
         return False
@@ -742,18 +745,32 @@ def replan_infeasible(nofeas,name,handled):
     when planning costs 2x sim time."""
     return nofeas.get(name) is None or nofeas[name]!=len(handled)
 PLACE_AXES=(np.array([1.,0,0]),np.array([0,1.,0]),np.array([-1.,0,0]),np.array([0,-1.,0]))
-def plan_place(A,q_from,tx,ty,top,fallback=None,tray_h=TRAY_H):
+def held_offset(A,q_grasp,g,c3):
+    """Centre of the held object in the TCP frame for grasps whose grip point is NOT over the object centre (rim pinch:
+    the pinch is on the rim, the dish centre r0 away), else None. Check on Kaggle data: FK of the measured at_grasp
+    joints (v8, v9b, v11b, 5 rim attempts), pinch point + r0 * closing axis lies 10.4-12.9 mm from the dish centre
+    measured in the head frame (TCP_TOL 1 cm plus the circle fit). Height = the pinch height (plan_place uses only the
+    horizontal part)."""
+    oc=g.get('obj_center')
+    if oc is None:return None
+    T=A.tcp(q_grasp);p=np.array([oc[0],oc[1],c3[2]],float)
+    return T[:3,:3].T@(p-T[:3,3])
+def plan_place(A,q_from,tx,ty,top,fallback=None,tray_h=TRAY_H,obj_off=None):
     """Release pose over (tx,ty) at the lowest feasible height -> (q_place, q_up, q_carry) or None.
     q_carry: straight-up lift from q_from to the release height (carry high over the tray walls), None if not needed
     or not feasible (then q_from->q_place must be certified directly). q_up: straight-up retreat after release.
     Closing axis tried with BOTH signs (v6: tray_right reachable only with the mirrored axis); fallback=(x,y) (tray
-    centre) is tried when the slot is out of reach."""
+    centre) is tried when the slot is out of reach. obj_off (held_offset): the pose is shifted horizontally so that
+    the OBJECT centre, not the hand's grip point, is over (x,y); without it a rim-held dish hangs r0 (5-6.6 cm) off the
+    slot, toward or over the tray wall."""
     z_from=A.tcp(q_from)[2,3]
     for (x,y) in [(tx,ty)]+([fallback] if fallback is not None else []):
         for dz in (.20,.25,.30):            # unchanged heights; lowering needs payload-vs-tray-wall data (TODO)
             c=np.array([x,y,top+tray_h+dz-.1])
             for ca in PLACE_AXES:
                 T=A.grasp_pose(c,ca,np.array([0,0,-1.]))
+                if obj_off is not None:
+                    sh=T[:3,:3]@obj_off+T[:3,3]-c;sh[2]=0.;T=A.grasp_pose(c-sh,ca,np.array([0,0,-1.]))
                 q=A.solve(T,q_from)
                 if q is None:continue
                 if not A.col.certify(q,A.home):continue
@@ -783,21 +800,22 @@ def far_tray(side,ty):
     Offline evidence (2026-11-09): reach-p3/p6 Kaggle, 30 layouts x 2 pools, 0 of 450 picked objects were placeable in the
     far tray with body_yaw=0; study r3s3 (new planner, organiser layout generator) 103/103 far-tray placements used yaw."""
     return (side=='l' and ty<-FAR_TRAY_Y) or (side=='r' and ty>FAR_TRAY_Y)
-def plan_place_yaw(A,q_from,tx,ty,plane,trays,fallback=None,tray_h=TRAY_H):
+def plan_place_yaw(A,q_from,tx,ty,plane,trays,fallback=None,tray_h=TRAY_H,obj_off=None):
     """(theta, (q_place,q_up,q_carry)) or None. theta=0 first; otherwise the torso is yawed by theta while the arm holds
     q_carry (or q_from); the scene (table plane, trays) is expressed in the rotated torso frame. The hold posture is
     checked against the rotated scene at 5 intermediate angles (sampled, not swept)."""
     n,d=np.asarray(plane[0],float),float(plane[1])
     zt=lambda x,y,n=n:-(d+n[0]*x+n[1]*y)/n[2]
+    kw={} if obj_off is None else {'obj_off':obj_off}    # side/top grasps: same call as before v12
     if not far_tray(A.side,ty):    # the unyawed search for the far tray always fails: skip it (planning costs sim time)
-        r=plan_place(A,q_from,tx,ty,zt(tx,ty),fallback,tray_h)
+        r=plan_place(A,q_from,tx,ty,zt(tx,ty),fallback,tray_h,**kw)
         if r is not None:return 0.,r
     try:
         for th in yaw_candidates(A.side,tx,ty):
             R=rotz(-th);n2=R@n
             A.set_scene((n2,d),ARMMOD.rotate_trays(trays,R))
             t2=(R@np.r_[tx,ty,0.])[:2];fb=None if fallback is None else tuple((R@np.r_[fallback[0],fallback[1],0.])[:2])
-            r=plan_place(A,q_from,t2[0],t2[1],zt(t2[0],t2[1],n2),fb,tray_h)
+            r=plan_place(A,q_from,t2[0],t2[1],zt(t2[0],t2[1],n2),fb,tray_h,**kw)
             if r is None:continue
             hold=r[2] if r[2] is not None else q_from
             ok=True
