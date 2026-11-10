@@ -20,7 +20,7 @@
 
 The task: ROS Humanoid Hack, manipulation track. A TienKung 2.0 Pro humanoid with Inspire hands stands at a table in Isaac Sim 5.0 / Isaac Lab 2.2. Objects of three categories lie on the table next to coloured trays. Each object goes into its category's tray: `sort2` (2 categories, 270 s) and `sort3` (3 categories, 405 s) on pool 3 (dish / box / jar), with `sort2` on pool 6 as a bonus. Time is simulation time and start-up counts. An object in its tray scores +10; one lifted and left outside its tray, or still in the hand at the end, scores −10; an untouched one scores 0 (#595). Simulator object poses are off limits, scene coordinates may not be hard-coded (#645), and self-collision is checked (#625).
 
-DeftSort is a single Python ROS 2 node that, for each layout, finds the table and trays with the robot's own cameras, segments and identifies the objects, plans each grasp and placement with a collision certificate over the whole path (arm, torso, other arm, table, tray walls), and decides whether the object can still reach its tray before the limit. No neural networks: geometry, RANSAC, the Hungarian algorithm, DLS IK and a sphere model of the robot. The numeric kernels are mirrored in the Rust module `team048_accel`, bit-exact against the NumPy reference.
+DeftSort is a single Python ROS 2 node that, for each layout, finds the table and trays with the robot's own cameras, segments and identifies the objects, plans each grasp and placement with a collision certificate over the whole path (arm, torso, other arm, table, tray walls), and decides whether the object can still reach its tray before the limit. No neural networks: geometry, RANSAC, the Hungarian algorithm, DLS IK and a sphere model of the robot. The numeric kernels are mirrored in the Rust module `team048_accel`. On all 62 recorded frames in the target environment (Python 3.10, NumPy 1.26) deprojection, table plane, trays and segments are bit-identical to the NumPy reference; segment features, candidates and plans differ by at most 2.3e-14, with no discrete differences.
 
 | Stage | Question | DeftSort |
 |---|---|---|
@@ -113,7 +113,7 @@ flowchart LR
 | Perception, ms per frame | 146.7 | 47.9 | 3.1× |
 | Planning 10 objects, s | 0.672 | 0.374 | 1.8× |
 
-Bit-exact equivalence is tested in `test_accel_equivalence.py` and `test_accel_phase2.py` (one segment-height quantile differs by ≤ 1e-12 due to FMA in NumPy's BLAS). Any import failure or error falls back to NumPy for the rest of the process. `vendor/` ships a SHA256-checked manylinux2014 abi3 wheel; `setup.sh` builds from source otherwise and never fails.
+Equivalence is tested in `test_accel_equivalence.py` and `test_accel_phase2.py`: bit-exact except one segment-height quantile (≤ 1e-12, FMA in NumPy's BLAS) deprojection (≤ 1e-12, depends on the CPU's OpenBLAS kernel) and IK solutions (≥ 99.5 % of random targets agree to 1e-9; otherwise both branches must reach the target). Any import failure or error falls back to NumPy for the rest of the process. `vendor/` ships a SHA256-checked manylinux2014 abi3 wheel; `setup.sh` builds from source otherwise and never fails.
 
 ## Install, run, test
 
