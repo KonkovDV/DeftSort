@@ -14,6 +14,7 @@ M=[('MATH_PHYSICS','node.py:',PKG+'node.py',r'def tf\(','tf'),('MATH_PHYSICS','n
  ('MATH_PHYSICS','perception.py:',PKG+'perception.py',r'^def deproject_py','deproj_py'),('MATH_PHYSICS','perception.py:',PKG+'perception.py',r'^def table_plane\(','plane'),
  ('MATH_PHYSICS','perception.py:',PKG+'perception.py',r'^def _refine_plane','refine'),('MATH_PHYSICS','arm.py:',PKG+'arm.py',r'^def plane_plausible','plaus'),
  ('MATH_PHYSICS','arm.py:',PKG+'arm.py',r'^def plane_height','ph'),('MATH_PHYSICS','perception.py:',PKG+'perception.py',r'^def near_edge','edge'),
+ ('MATH_PHYSICS','trays.py:',PKG+'trays.py',r'^def canonical_axis','canon'),
  ('MATH_PHYSICS','perception.py:',PKG+'perception.py',r'^def segment\(','seg'),('MATH_PHYSICS','node.py:',PKG+'node.py',r'C\[:,:len\(N\)\]=np.abs\(h-ph\)','cost'),
  ('MATH_PHYSICS','grasp.py:',PKG+'grasp.py',r'^def candidates','cand'),('MATH_PHYSICS','grasp.py:',PKG+'grasp.py',r'^def footprint','fp'),
  ('MATH_PHYSICS','grasp.py:',PKG+'grasp.py',r'^def circle_fit','circ'),('MATH_PHYSICS','grasp.py:',PKG+'grasp.py',r'^def rim_closed','rimc'),
@@ -30,7 +31,7 @@ M=[('MATH_PHYSICS','node.py:',PKG+'node.py',r'def tf\(','tf'),('MATH_PHYSICS','n
  ('MATH_PHYSICS','node.py:',PKG+'node.py',r'def recover','rec'),('MATH_PHYSICS','sensing.py:',PKG+'sensing.py',r'def snapshot','snap')]
 # MATH_PHYSICS: references in document order (one per occurrence); the table above lists them in that order except
 # where the doc names two on one line -- resolved below by matching the order of appearance.
-ORDER_MP=['tf','quat','rotate','deproj','deproj_py','plane','refine','plaus','ph','edge','seg','cost','cand','fp','circ','rimc','torque',
+ORDER_MP=['tf','quat','rotate','deproj','deproj_py','plane','refine','plaus','ph','edge','canon','seg','cost','cand','fp','circ','rimc','torque',
  'gpose','clear','held_off','force','ct','held','guard','ik','corr','sph','valid','cert','spd','st','cs','lift','pt','hold','rec','end','snap']
 def ref(key):
     for e in M:
@@ -95,13 +96,13 @@ def org(text):
      '`pkg/node.py:108` (`min(.8, max(v, 1e-3))`) | — | `T/test_node_stub.py:56`':'`'+S('pkg/node.py','cmd')+'` (`min(.8, max(v, 1e-3))`) | — | `'+S('T/test_node_stub.py','t_spd')+'`',
      '`T/test_compliance.py:17` |\n':'`'+S('T/test_compliance.py','c17')+'` |\n',
      'Номера строк указаны на тот момент и с тех пор сдвинулись; в текущем коде место находится по имени функции или константы, указанному в скобках.':
-       'Номера строк сверены с кодом v14 скриптом `research/diag/v14/doc_refs.py` (каждая ссылка привязана к строке, которую она называет); имя функции или константы указано в скобках.'}
+       'Номера строк сверены с кодом v14 скриптом сверки рабочего репозитория (`research/diag/v14/doc_refs.py`, в сдачу не входит): каждая ссылка привязана к строке, которую она называет; имя функции или константы указано в скобках.'}
     return rows
 if __name__=='__main__':
     mpf=os.path.join(R,'docs','MATH_PHYSICS.md');s=open(mpf).read();n=mp(s)
     print('MATH_PHYSICS changed refs:',sum(a!=b for a,b in zip(re.findall(r'[a-z_]+\.py:\d+(?:-\d+)?',s),re.findall(r'[a-z_]+\.py:\d+(?:-\d+)?',n))),'of',len(re.findall(r'(?<![\w/])[a-z_]+\.py:\d+',s)))
     of=os.path.join(R,'docs','ORG_ANSWERS.md');t=open(of).read();rows=org(t);miss=[k for k in rows if k not in t]
-    print('ORG_ANSWERS anchors missing in doc:',miss)
+    print('ORG_ANSWERS old anchors still in doc:',[k for k in rows if k in t and k!=rows[k]]);print('ORG_ANSWERS current refs missing:',[v[:80] for v in rows.values() if v not in t])
     if '--fix' in sys.argv:
         open(mpf,'w').write(n)
         for k,v in rows.items():t=t.replace(k,v)
