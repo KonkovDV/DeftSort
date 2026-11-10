@@ -34,10 +34,10 @@ DeftSort runs one Python ROS 2 node per layout finds the table and trays with th
 
 ## Status
 
-Scores in the simulator are not yet stable. Offline tests pass; the v11 changes have not run on GPU yet.
+Scores in the simulator are not yet stable. Offline tests pass. The v12 changes are checked only by CPU replay of recorded frames and logs: no GPU quota is left before 14.11.
 
-- Tests: 173. With the Rust module and the v7 frames all 173 pass; without the v7 frames 157 pass and 16 are skipped; with `TEAM048_ACCEL=0` 150 pass and 23 are skipped (the Rust ↔ NumPy equivalence tests). Fixtures come from Kaggle runs: RGB-D frames, grasp TRACEs, simulator logs.
-- Last full run, v9b (`sort2`, seed 101, commit `f525ed9`): 10 points, 1 of 6 objects in its tray (Perricone), `done` at 242.2 s of 270 on the time budget.
+- Tests: 181. With the Rust module and the v7 frames all 181 pass; without the v7 frames 165 pass and 16 are skipped; with `TEAM048_ACCEL=0` 158 pass and 23 are skipped (the Rust ↔ NumPy equivalence tests). Fixtures come from Kaggle runs: RGB-D frames, grasp TRACEs, simulator logs.
+- Last run, v11b (`sort2`, seed 101, commit `497471e`): 0 of 6 in trays. The force limit reached both hands and Threshold was skipped, but Utana slipped during the carry and stayed on the table (from the frames, likely −10). The simulator did not answer `/sim/task/check`, so there is no exact score. The run before, v9b on `f525ed9`: 10 points (Perricone).
 - Objects of 0.22 kg and more were held 0 of 6 times in v7 and v8, so they go last.
 - Test tubes are not attempted: the node publishes `/sim/task/done` right away (0 points, allowed by the rules).
 
@@ -49,6 +49,7 @@ Scores in the simulator are not yet stable. Offline tests pass; the v11 changes 
 | v9a, sort3 seed 103, self-collision ON | compliance + Rust merge | 0 | Went home before measuring the table and swept through its edge (\|F\| up to 938 N); torso missing from the model |
 | v9a, sort3 seed 103 | `f525ed9` | did not start | Camera frames began 1115 s after the bridge started, but the harness never received `/sim/task` via `ros2 topic echo` within 1512 s |
 | v9b, sort2 seed 101 | `f525ed9` | 10 (Perricone) | The force limit reached the right hand only; Threshold is closed on top and all 4 rim pinches hit it with the thumb |
+| v11b, sort2 seed 101 | `497471e` | 0 in trays, likely −10 | Force 0.4 on both hands, Threshold skipped; Perricone slipped on the lift (same plan as v9b); Utana held on the lift and dropped during the carry |
 
 ## Architecture
 
@@ -96,6 +97,8 @@ flowchart LR
 
 - #648: force 0.4 and speed 0.5 on both hands, thumb first, phase 2 targets the measured contact minus `CLOSE_PAST` 0.15 of the stroke.
 - Rim pinches are planned only on open dishes (`grasp.rim_closed`): Threshold shows 622–677 points at rim height inside the rim circle in every v7, v8 and v9b frame, open dishes 0–6. In v9b all 4 Threshold approaches tripped the thumb guard 0.4–1.0 mm from the closed top.
+- Rim pinch only when the gravity torque m·g·r ≤ 0.17 N·m (`grasp.RIM_TORQUE_MAX`; m from `objects.yaml` for the identified object, r = measured rim radius). Runs: Ecoforms (0.05 N·m) held 2 of 2, Threshold (0.11) 1 of 3, Utana (0.21–0.22 in replay) 0 of 7. Dishes above it are skipped: 0 points instead of a −10 risk.
+- A rim-held dish is placed by its centre, not by the pinch point (`node.held_offset`). Before, the centre hung 5–6.6 cm off the slot; in the middle slot an Ecoforms-size dish crossed the tray wall by 1.5 cm (`test_v12.py`).
 - Empty grasps are detected before the lift (`contact_empty` 0.10); approach guard `GUARD_DEV` 0.16 keeps 4/4 holds and catches at least 10/12 failed approaches in v7 + v8; hold rule: deviation ≥ 0.10 and effort ≥ 0.9.
 - Physics: at force 0.4 the saturated finger drive gives at least 80 N per finger, so μ ≈ 0.03 suffices for the heaviest pool object (0.43 kg). Slips come from contact geometry, not friction.
 - Budget: `can_start` with `SAFETY_S` 8 s, `FIRST_CYCLE_S` 35 s, `PLACE_TAIL_S` 12 s; `place_time` includes the lift and `MOVE_SETTLE_S` 2.6 s per move (old model: 6.6 s vs 12.0 s measured on v8). If the carry would not fit, the hand opens in place.
@@ -126,10 +129,11 @@ Env: `TEAM048_HAND_FORCE` (0.4), `TEAM048_HAND_SPEED` (0.5), `TEAM048_CLOSE_PAST
 
 | Area | Now | Next |
 |---|---|---|
-| Simulator validation | v9b: 10 points; v11 not run on GPU | `sort2` seed 101: two `hand force limits` lines in the sim log, Threshold rim skipped |
+| Simulator validation | v11b confirmed force on both hands and the Threshold skip; v12 not run on GPU | `sort2` seed 101 after the quota reset: Utana skipped, Ecoforms placed by its centre |
 | Heavy objects | 0/6 holds from 0.22 kg | Three-finger or bottom-wall grasp |
-| Utana rim | 0/6 in v7 and v9b; in v9b the thumb closed 10.6–11.3 cm from the centre with the wall at 6.3 cm | Finger poses on the rim from the next run |
-| Neighbours | In v9b Ecoforms and Crunch left the assignment after the Ecoforms grasp (26 N at the wrist); Crayola fell during the approach | Wrist force is now logged at every grasp step |
+| Heavy dishes | Utana (0.21–0.22 N·m) is no longer attempted: 0 of 7 pinches, one likely −10 | Grasp at the base wall or with three fingers |
+| Neighbours | In v9b and v11b Ecoforms and Crunch toppled after the Ecoforms contact (up to 26 N at the wrist); in v11b the left arm pushed Utana off the tray edge onto the table. Objects in or on trays are not in the collision model | Envelope of placed objects |
+| Dropped object | An object dropped during the carry counts as placed and is not retried; the empty-hand signal over the tray is unreliable (v9b Perricone landed in the tray with an 'empty' verdict) | Needs drop data |
 | Torso model | −1 object per layout | Torso-only pad/margin after checking |
 | Pool 6 | Razer mouse (10.0 cm) and gelatin box (8.9 cm) wider than the 7.8 cm pinch opening | Separate grasp strategy |
 | Test tubes | Immediate `/sim/task/done` | After sorting is stable |
