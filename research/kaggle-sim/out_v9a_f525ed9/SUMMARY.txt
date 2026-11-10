@@ -1,0 +1,7 @@
+v9a COMPLETE 2026-11-10 ~09:54 UTC (last_run_time)
+solution: f525ed9c76
+task: sort3 seed 103 pool 3 HACK_SELF_COLLISION=1
+outcome: SIM NOT UP (sim boot up=0 after 1512s; camera bridge cam_head=0/cam_torso=0 throughout)
+results.jsonl: missing
+sort rc: 4
+accel: 0.2.0 ready; colcon build OK

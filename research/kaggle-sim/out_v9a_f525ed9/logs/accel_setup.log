@@ -1,0 +1,7 @@
++ cd /tmp/sol
++ '[' -f setup.sh ']'
++ TEAM048_PY=/tmp/w/mm/envs/ros/bin/python
++ TEAM048_NO_BUILD=1
++ bash setup.sh
+[setup.sh] team048_accel 0.2.0 ready
+accel import OK 0.2.0

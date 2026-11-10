@@ -1,0 +1,104 @@
+09:54:26 MSK +0s SESSION A {'TASK': 'sort3', 'SEEDS': '103', 'RUNTO': '2000', 'HACK_SELF_COLLISION': '1', 'HACK_POOL': '3', 'SEED0': '100', 'SIMBOOT_MAX': '1500'} solution f525ed9c76
+09:54:26 MSK +0s GPU GPU 0: Tesla T4 (UUID: GPU-30f6e702-2034-8139-551d-217be5358d02)
+GPU 1: Tesla T4 (UUID: GPU-8ee7b4a5-ca1d-4d99-c73a-00f3f821d4bc)
+09:54:26 MSK +0s START setup timeout 2400
+09:55:26 MSK +60s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=setup.log ::  for f in *.so.$DRV | + b=libvdpau_nvidia.so | + ln -sf libvdpau_nvidia.so.580.178.04 libvdpau_nvidia.so.1 | + ln -sf libvdpau_nvidia.so.580.178.04 libvdpau_nvidia.so.0 | + ln -sf libvdpau_nvidia.so.580.178.04 libvdpau_nvidia.so | + cd /tmp/w | + cat | + mkdir -p /tmp/w/egl | + cat | + timeout 300 apt-get update -qq | 
+09:56:26 MSK +120s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=setup.log ::  | + mkdir -p /tmp/nssr_sim | + cp -r /kaggle/input/datasets/dmitrijkv/team048-polygon-assets/polygon/. /tmp/nssr_sim/ | + P=/tmp/w/mm/envs/isaac/bin/python | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cu128 | 
+09:57:26 MSK +180s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=setup.log :: ut/datasets/dmitrijkv/team048-polygon-assets/polygon/. /tmp/nssr_sim/ | + P=/tmp/w/mm/envs/isaac/bin/python | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cu128 | + ln -sfn /tmp/nssr_sim /nssr_sim | + wait 700 | 
+09:58:26 MSK +240s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=setup.log :: olygon-assets/polygon/. /tmp/nssr_sim/ | + P=/tmp/w/mm/envs/isaac/bin/python | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cu128 | + ln -sfn /tmp/nssr_sim /nssr_sim | + wait 700 | + echo ros_env_rc=0 | + wait 701 | 
+09:59:26 MSK +300s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=setup.log :: /bin/python -m pip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com | 
+10:00:26 MSK +360s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: thon -m pip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  | 
+10:01:26 MSK +420s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: n -m pip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  | 
+10:02:26 MSK +480s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: m pip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  | 
+10:03:26 MSK +540s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: ip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  | 
+10:04:27 MSK +600s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  |  | 
+10:05:27 MSK +660s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=bodyctrl_build.log :: Starting >>> bodyctrl_msgs | 
+10:06:27 MSK +720s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: lation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  |  |  | 10:05:27 MSK +660s HB step=setup gpu=[0 %, 0 MiB | 0 %, 0 MiB] last=bodyctrl_build.log :: Starting >>> bodyctrl_msgs |  | 
+10:06:46 MSK +739s END setup rc 0
+10:06:46 MSK +739s SETUP_CHECK {'ros': True, 'isaac': True, 'bodyctrl': True, 'nssr': True}
+10:06:46 MSK +739s START sort timeout 5200
+10:07:27 MSK +780s HB step=sort gpu=[0 %, 226 MiB
+0 %, 65 MiB] last=bridge_sort3.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794294433.773852454] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794294438.773805749] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794294443.777788121] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+10:08:27 MSK +840s HB step=sort gpu=[0 %, 317 MiB
+0 %, 65 MiB] last=bridge_sort3.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794294493.775021656] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794294498.776204319] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794294503.775299167] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+10:09:27 MSK +900s HB step=sort gpu=[0 %, 333 MiB
+0 %, 65 MiB] last=bridge_sort3.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794294553.773832112] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794294558.775642465] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794294563.773726057] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+10:10:27 MSK +960s HB step=sort gpu=[4 %, 333 MiB
+0 %, 65 MiB] last=bridge_sort3.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794294613.773598442] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794294618.774580698] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794294623.773697379] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+10:11:27 MSK +1021s HB step=sort gpu=[4 %, 365 MiB
+0 %, 65 MiB] last=sort.log ::  8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | + sleep 5 | + '[' 270 -lt 1508 ']' | ++ left | +++ date +%s | ++ echo 4990 | + '[' 4990 -gt 1300 ']' | + rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | + sleep 5 | 
+10:12:27 MSK +1081s HB step=sort gpu=[4 %, 365 MiB
+0 %, 65 MiB] last=sort.log ::  8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | + sleep 5 | + '[' 328 -lt 1508 ']' | ++ left | +++ date +%s | ++ echo 4932 | + '[' 4932 -gt 1300 ']' | + rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | + sleep 5 | 
+10:13:27 MSK +1141s HB step=sort gpu=[4 %, 365 MiB
+0 %, 65 MiB] last=sort.log ::  8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | + sleep 5 | + '[' 388 -lt 1508 ']' | ++ left | +++ date +%s | ++ echo 4872 | + '[' 4872 -gt 1300 ']' | + rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | + sleep 5 | 
+10:14:27 MSK +1201s HB step=sort gpu=[4 %, 365 MiB
+0 %, 65 MiB] last=sim_task_sort3.txt :: olcon_ordered_commands | +++ unset _colcon_prefix_sh_source_script | +++ unset _colcon_prefix_bash_COLCON_CURRENT_PREFIX | ++ unset COLCON_CURRENT_PREFIX | ++ unset _colcon_prefix_chain_bash_source_script | + timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | 
+10:15:27 MSK +1261s HB step=sort gpu=[4 %, 365 MiB
+0 %, 65 MiB] last=bridge_sort3.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794294913.774166508] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794294918.774252105] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794294923.773615035] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+10:16:27 MSK +1321s HB step=sort gpu=[4 %, 876 MiB
+0 %, 65 MiB] last=sim_sort3.log :: m https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.0 | [hack] decor: 0 Isaac props, 0 lamp lights, from https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.0, units by metrics assembler | [hack] objects (pool 3, seed 100): dish: 3, box: 3, jar: 3 | 
+10:17:27 MSK +1381s HB step=sort gpu=[4 %, 886 MiB
+0 %, 65 MiB] last=sort.log ::  8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | + sleep 5 | + '[' 631 -lt 1508 ']' | ++ left | +++ date +%s | ++ echo 4629 | + '[' 4629 -gt 1300 ']' | + rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | + sleep 5 | 
+10:18:27 MSK +1441s HB step=sort gpu=[0 %, 886 MiB
+0 %, 65 MiB] last=bridge_sort3.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794295093.773846272] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794295098.774621645] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794295103.773627322] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+10:19:27 MSK +1501s HB step=sort gpu=[4 %, 905 MiB
+0 %, 65 MiB] last=sim_task_sort3.txt :: olcon_ordered_commands | +++ unset _colcon_prefix_sh_source_script | +++ unset _colcon_prefix_bash_COLCON_CURRENT_PREFIX | ++ unset COLCON_CURRENT_PREFIX | ++ unset _colcon_prefix_chain_bash_source_script | + timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | 
+10:20:28 MSK +1561s HB step=sort gpu=[4 %, 905 MiB
+0 %, 65 MiB] last=bridge_sort3.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794295213.773825578] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794295218.774537137] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794295223.773580423] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+10:21:28 MSK +1621s HB step=sort gpu=[4 %, 906 MiB
+0 %, 65 MiB] last=bridge_sort3.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794295273.773577696] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794295278.773610010] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794295283.773693792] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+10:22:28 MSK +1681s HB step=sort gpu=[4 %, 906 MiB
+0 %, 65 MiB] last=sort.log ::  8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | + sleep 5 | + '[' 929 -lt 1508 ']' | ++ left | +++ date +%s | ++ echo 4331 | + '[' 4331 -gt 1300 ']' | + rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | + sleep 5 | 
+10:23:28 MSK +1741s HB step=sort gpu=[0 %, 1344 MiB
+0 %, 65 MiB] last=sim_task_sort3.txt :: p.bash ']' | + source /tmp/sol/install/setup.bash | ++ COLCON_CURRENT_PREFIX=/tmp/w/mm/envs/ros | ++ _colcon_prefix_chain_bash_source_script /tmp/w/mm/envs/ros/local_setup.bash | ++ '[' -f /tmp/w/mm/envs/ros/local_setup.bash ']' | ++ '[' -n '' ']' | ++ . /tmp/w/mm/envs/ros/local_setup.bash | +++ AMENT_SHELL=bash | 
+10:24:28 MSK +1801s HB step=sort gpu=[0 %, 1344 MiB
+0 %, 65 MiB] last=sim_task_sort3.txt :: olcon_ordered_commands | +++ unset _colcon_prefix_sh_source_script | +++ unset _colcon_prefix_bash_COLCON_CURRENT_PREFIX | ++ unset COLCON_CURRENT_PREFIX | ++ unset _colcon_prefix_chain_bash_source_script | + timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | 
+10:25:28 MSK +1861s HB step=sort gpu=[4 %, 2494 MiB
+0 %, 65 MiB] last=sim_sort3.log ::  8, 13, 18, 22, 26, 28, 4, 9, 14, 19, 23, 27, 29, 30, 31, 32, 33, 34, 40, 41, 42, 43, 44, 50, 52, 35, 36, 37, 38, 39, 45, 46, 47, 48, 49, 51, 53, 5, 10, 15, 0, 1, 6, 11, 16, 20, 24, 2, 7, 12, 17, 21, 25] | [PERF] Hz: 0.26 | Advance: 3309.79ms | Preprocess: 0.02ms | EnvStep: 11.97ms | Total: 3321.78ms | 
+10:26:28 MSK +1921s HB step=sort gpu=[23 %, 3278 MiB
+0 %, 65 MiB] last=sim_sort3.log :: 0ms | Total: 45.10ms | [PERF] Hz: 22.63 | Advance: 17.70ms | Preprocess: 0.01ms | EnvStep: 25.89ms | Total: 43.61ms | [PERF] Hz: 23.89 | Advance: 16.73ms | Preprocess: 0.01ms | EnvStep: 24.41ms | Total: 41.16ms | [PERF] Hz: 23.54 | Advance: 16.47ms | Preprocess: 0.01ms | EnvStep: 25.42ms | Total: 41.91ms | 
+10:27:28 MSK +1981s HB step=sort gpu=[32 %, 3278 MiB
+0 %, 65 MiB] last=sort.log :: 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | + sleep 5 | + '[' 1232 -lt 1508 ']' | ++ left | +++ date +%s | ++ echo 4028 | + '[' 4028 -gt 1300 ']' | + rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | + sleep 5 | 
+10:28:28 MSK +2041s HB step=sort gpu=[37 %, 3278 MiB
+0 %, 65 MiB] last=sim_task_sort3.txt :: a_wrap activate ros | + local cmd=activate | + case "${cmd}" in | + for arg in "${@}" | + case "${arg}" in | + for arg in "${@}" | + case "${arg}" in | + __mamba_xctivate activate ros | + local ask_mamba | ++ PS1= | ++ __mamba_exe shell activate ros --shell bash | ++ /tmp/w/bin/micromamba shell activate ros --shell bash | 
+10:29:28 MSK +2102s HB step=sort gpu=[25 %, 3278 MiB
+0 %, 65 MiB] last=sim_sort3.log :: 4ms | Total: 41.98ms | [PERF] Hz: 23.64 | Advance: 16.36ms | Preprocess: 0.02ms | EnvStep: 25.38ms | Total: 41.75ms | [PERF] Hz: 21.92 | Advance: 19.74ms | Preprocess: 0.02ms | EnvStep: 25.24ms | Total: 44.99ms | [PERF] Hz: 22.86 | Advance: 17.49ms | Preprocess: 0.01ms | EnvStep: 25.58ms | Total: 43.08ms | 
+10:30:28 MSK +2162s HB step=sort gpu=[39 %, 3278 MiB
+0 %, 65 MiB] last=sim_sort3.log :: 6ms | Total: 42.74ms | [PERF] Hz: 22.94 | Advance: 18.14ms | Preprocess: 0.01ms | EnvStep: 24.83ms | Total: 42.98ms | [PERF] Hz: 23.22 | Advance: 17.26ms | Preprocess: 0.01ms | EnvStep: 25.13ms | Total: 42.40ms | [PERF] Hz: 24.00 | Advance: 16.30ms | Preprocess: 0.01ms | EnvStep: 24.63ms | Total: 40.94ms | 
+10:31:28 MSK +2222s HB step=sort gpu=[40 %, 3278 MiB
+0 %, 65 MiB] last=sim_sort3.log :: 5ms | Total: 41.97ms | [PERF] Hz: 23.57 | Advance: 16.61ms | Preprocess: 0.01ms | EnvStep: 25.22ms | Total: 41.85ms | [PERF] Hz: 23.74 | Advance: 16.33ms | Preprocess: 0.01ms | EnvStep: 25.22ms | Total: 41.56ms | [PERF] Hz: 23.43 | Advance: 16.64ms | Preprocess: 0.01ms | EnvStep: 25.34ms | Total: 41.99ms | 
+10:31:58 MSK +2252s END sort rc 4
+10:31:58 MSK +2252s ACCEL_SETUP + cd /tmp/sol
++ '[' -f setup.sh ']'
++ TEAM048_PY=/tmp/w/mm/envs/ros/bin/python
++ TEAM048_NO_BUILD=1
++ bash setup.sh
+[setup.sh] team048_accel 0.2.0 ready
+accel import OK 0.2.0
+
+10:31:58 MSK +2252s BUILD t _colcon_prefix_bash_COLCON_CURRENT_PREFIX
+++ unset COLCON_CURRENT_PREFIX
+++ unset _colcon_prefix_chain_bash_source_script
++ '[' -f /tmp/sol/install/setup.bash ']'
++ colcon build
+Starting >>> team048_solution
+Finished <<< team048_solution [1.03s]
+
+Summary: 1 package finished [1.15s]
+sol_build_rc=0
+
+10:31:58 MSK +2252s RESULTS missing [Errno 2] No such file or directory: '/kaggle/working/results.jsonl'
+10:31:58 MSK +2252s KEYLINES run_sort_trace.log 
+10:31:58 MSK +2252s DONE
