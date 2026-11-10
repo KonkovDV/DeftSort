@@ -1,4 +1,4 @@
-"""node.py wiring without ROS: rclpy/msg/tf2 replaced by minimal stubs, real v5 head frame (Kaggle) as input."""
+"""node.py wiring without ROS: rclpy/msg/tf2 replaced by minimal stubs, real run-v5 head frame as input."""
 import os,sys,types,unittest
 import numpy as np
 HERE=os.path.dirname(os.path.abspath(__file__));sys.path.insert(0,os.path.join(HERE,'..'))
@@ -127,7 +127,7 @@ class NodeWiring(unittest.TestCase):
         sol=s.s;sol.js={}
         def fake_sleep(dt):Clock.t+=dt
         sol.sleep=fake_sleep;t0=Clock.t;t=sol.look(.4,tmax=1.)
-        s.assertGreaterEqual(t-t0,1.);del sol.sleep
+        s.assertGreaterEqual(t-t0,1.-1e-6);del sol.sleep   # float sum of sleeps (order-independent)
     def test_tf_uses_image_stamp(s):
         sol=s.s;seen=[]
         class Tr:pass
