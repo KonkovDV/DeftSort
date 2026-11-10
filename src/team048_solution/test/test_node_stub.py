@@ -157,7 +157,10 @@ class NodeWiring(unittest.TestCase):
         sol.identify=lambda *a:[]
         sol.retreat=lambda k:None;sol.go_home=lambda k:calls.append('home');sol.js={'x':0.}
         sol.survey=lambda *a,**k:(calls.append('survey'),Clock.t)[1];sol.robot_description='<robot/>'
-        sol.run()
+        from unittest import mock
+        # start-up = wall time between import and node creation: in a long or loaded suite run it exceeded the 270 s limit
+        # (no observation at all). Pin it to zero so the test does not depend on how long the suite has been running.
+        with mock.patch.object(N,'WALL_LAUNCH',sol.wall_ready):sol.run()
         # v9fix: survey first (arms in the start posture), then home along a path certified against the measured table
         s.assertEqual(calls[:3],['survey','home','home']);s.assertEqual(calls.count('obs'),N.EMPTY_OBS_MAX)
         s.assertTrue(sol.pubs['/sim/task/done'].sent)

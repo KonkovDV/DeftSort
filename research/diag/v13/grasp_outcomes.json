@@ -1,0 +1,927 @@
+{
+ "rows": [
+  {
+   "run": "v7",
+   "log": "run_sort3_101.log",
+   "line": 1009,
+   "obj": "Threshold_Ramekin_White_",
+   "cat": "dish",
+   "side": "l",
+   "kind": "rim",
+   "phases": [
+    "start",
+    "pre",
+    "at_grasp",
+    "closed",
+    "lifted",
+    "over_tray",
+    "released",
+    "home"
+   ],
+   "verdicts": {
+    "lifted": null,
+    "over_tray": null
+   },
+   "empty": null,
+   "outcome": "released_over_tray"
+  },
+  {
+   "run": "v7",
+   "log": "run_sort3_101.log",
+   "line": 1021,
+   "obj": "Ecoforms_Plant_Container",
+   "cat": "dish",
+   "side": "l",
+   "kind": "rim",
+   "phases": [
+    "start",
+    "pre",
+    "at_grasp",
+    "closed",
+    "lifted",
+    "over_tray",
+    "released",
+    "home"
+   ],
+   "verdicts": {
+    "lifted": null,
+    "over_tray": null
+   },
+   "empty": null,
+   "outcome": "released_over_tray"
+  },
+  {
+   "run": "v7",
+   "log": "run_sort3_101.log",
+   "line": 1033,
+   "obj": "006_mustard_bottle",
+   "cat": "jar",
+   "side": "r",
+   "kind": "side",
+   "phases": [
+    "start",
+    "pre",
+    "at_grasp",
+    "corrected",
+    "closed",
+    "lifted",
+    "over_tray",
+    "released",
+    "home"
+   ],
+   "verdicts": {
+    "lifted": null,
+    "over_tray": null
+   },
+   "empty": null,
+   "outcome": "released_over_tray"
+  },
+  {
+   "run": "v7",
+   "log": "run_sort3_101.log",
+   "line": 1046,
+   "obj": "Hyaluronic_Acid",
+   "cat": "jar",
+   "side": "l",
+   "kind": "side",
+   "phases": [
+    "start",
+    "pre",
+    "at_grasp",
+    "closed"
+   ],
+   "verdicts": {},
+   "empty": null,
+   "outcome": "closed_other"
+  },
+  {
+   "run": "v7",
+   "log": "run_sort3_102.log",
+   "line": 1009,
+   "obj": "Utana_5_Porcelain_Rameki",
+   "cat": "dish",
+   "side": "l",
+   "kind": "rim",
+   "phases": [
+    "start",
+    "pre",
+    "at_grasp",
+    "closed",
+    "lifted",
+    "over_tray",
+    "released",
+    "home"
+   ],
+   "verdicts": {
+    "lifted": null,
+    "over_tray": null
+   },
+   "empty": null,
+   "outcome": "released_over_tray"
+  },
+  {
+   "run": "v7",
+   "log": "run_sort3_102.log",
+   "line": 1021,
+   "obj": "Crayola_Bonus_64_Crayons",
+   "cat": "box",
+   "side": "r",
+   "kind": "side",
+   "phases": [
+    "start",
+    "pre",
+    "at_grasp",
+    "corrected",
+    "closed",
+    "lifted",
+    "over_tray",
+    "released",
+    "home"
+   ],
+   "verdicts": {
+    "lifted": null,
+    "over_tray": null
+   },
+   "empty": null,
+   "outcome": "released_over_tray"
+  },
+  {
+   "run": "v7",
+   "log": "run_sort3_102.log",
+   "line": 1035,
+   "obj": "Threshold_Ramekin_White_",
+   "cat": "dish",
+   "side": "l",
+   "kind": "rim",
+   "phases": [
+    "start",
+    "pre",
+    "at_grasp",
+    "closed",
+    "lifted",
+    "over_tray",
+    "released",
+    "home"
+   ],
+   "verdicts": {
+    "lifted": null,
+    "over_tray": null
+   },
+   "empty": null,
+   "outcome": "released_over_tray"
+  },
+  {
+   "run": "v7",
+   "log": "run_sort3_102.log",
+   "line": 1047,
+   "obj": "Hyaluronic_Acid",
+   "cat": "jar",
+   "side": "l",
+   "kind": "side",
+   "phases": [
+    "start",
+    "pre",
+    "at_grasp",
+    "corrected",
+    "closed",
+    "lifted",
+    "over_tray",
+    "released",
+    "home"
+   ],
+   "verdicts": {
+    "lifted": null,
+    "over_tray": null
+   },
+   "empty": null,
+   "outcome": "released_over_tray"
+  },
+  {
+   "run": "v7",
+   "log": "run_sort3_103.log",
+   "line": 1009,
+   "obj": "Ecoforms_Plant_Container",
+   "cat": "dish",
+   "side": "l",
+   "kind": "rim",
+   "phases": [
+    "start",
+    "pre",
+    "at_grasp",
+    "closed",
+    "lifted",
+    "over_tray",
+    "released",
+    "home"
+   ],
+   "verdicts": {
+    "lifted": null,
+    "over_tray": null
+   },
+   "empty": null,
+   "outcome": "released_over_tray"
+  },
+  {
+   "run": "v7",
+   "log": "run_sort3_103.log",
+   "line": 1021,
+   "obj": "Perricone_MD_AcylGlutath",
+   "cat": "box",
+   "side": "r",
+   "kind": "side",
+   "phases": [
+    "start",
+    "pre",
+    "at_grasp",
+    "closed",
+    "lifted",
+    "over_tray",
+    "released",
+    "home"
+   ],
+   "verdicts": {
+    "lifted": null,
+    "over_tray": null
+   },
+   "empty": null,
+   "outcome": "released_over_tray"
+  },
+  {
+   "run": "v7",
+   "log": "run_sort3_103.log",
+   "line": 1034,
+   "obj": "Hyaluronic_Acid",
+   "cat": "jar",
+   "side": "l",
+   "kind": "side",
+   "phases": [
+    "start",
+    "pre",
+    "at_grasp",
+    "corrected",
+    "closed",
+    "lifted",
+    "over_tray",
+    "released",
+    "home"
+   ],
+   "verdicts": {
+    "lifted": null,
+    "over_tray": null
+   },
+   "empty": null,
+   "outcome": "released_over_tray"
+  },
+  {
+   "run": "v8",
+   "log": "run_sort3_103.log",
+   "line": 1009,
+   "obj": "Utana_5_Porcelain_Rameki",
+   "cat": "dish",
+   "side": "r",
+   "kind": "rim",
+   "phases": [
+    "start",
+    "pre",
+    "at_grasp",
+    "closed",
+    "lifted"
+   ],
+   "verdicts": {
+    "lifted": false
+   },
+   "empty": null,
+   "notes": [
+    "1015: grasp check: empty Utana_5_Porcelain_Ramekin_Large"
+   ],
+   "outcome": "lifted_empty"
+  },
+  {
+   "run": "v8",
+   "log": "run_sort3_103.log",
+   "line": 1016,
+   "obj": "Threshold_Ramekin_White_",
+   "cat": "dish",
+   "side": "l",
+   "kind": "rim",
+   "phases": [
+    "start",
+    "pre",
+    "at_grasp",
+    "closed",
+    "lifted"
+   ],
+   "verdicts": {
+    "lifted": false
+   },
+   "empty": null,
+   "notes": [
+    "1022: grasp check: empty Threshold_Ramekin_White_Porcelain"
+   ],
+   "outcome": "lifted_empty"
+  },
+  {
+   "run": "v8",
+   "log": "run_sort3_103.log",
+   "line": 1023,
+   "obj": "Crunch_Girl_Scouts_Candy",
+   "cat": "box",
+   "side": "l",
+   "kind": "side",
+   "phases": [
+    "start",
+    "pre",
+    "at_grasp",
+    "closed",
+    "lifted"
+   ],
+   "verdicts": {
+    "lifted": false
+   },
+   "empty": null,
+   "notes": [
+    "1029: grasp check: empty Crunch_Girl_Scouts_Candy_Bars_Peanut_Butter_Creme_78_oz_box"
+   ],
+   "outcome": "lifted_empty"
+  },
+  {
+   "run": "v8",
+   "log": "run_sort3_103.log",
+   "line": 1030,
+   "obj": "006_mustard_bottle",
+   "cat": "jar",
+   "side": "r",
+   "kind": "side",
+   "phases": [
+    "start",
+    "pre",
+    "at_grasp",
+    "closed",
+    "lifted"
+   ],
+   "verdicts": {
+    "lifted": false
+   },
+   "empty": null,
+   "notes": [
+    "1036: grasp check: empty 006_mustard_bottle"
+   ],
+   "outcome": "lifted_empty"
+  },
+  {
+   "run": "v8",
+   "log": "run_sort3_103.log",
+   "line": 1037,
+   "obj": "Perricone_MD_AcylGlutath",
+   "cat": "box",
+   "side": "r",
+   "kind": "side",
+   "phases": [
+    "start",
+    "pre",
+    "at_grasp",
+    "closed",
+    "lifted",
+    "carry",
+    "over_tray",
+    "released"
+   ],
+   "verdicts": {
+    "lifted": null,
+    "over_tray": null
+   },
+   "empty": null,
+   "outcome": "released_over_tray"
+  },
+  {
+   "run": "v9a",
+   "log": "run_sort3_103.log",
+   "line": 1019,
+   "obj": "Utana_5_Porcelain_Rameki",
+   "cat": "dish",
+   "side": "l",
+   "kind": "rim",
+   "phases": [
+    "start",
+    "pre"
+   ],
+   "verdicts": {},
+   "notes": [
+    "1022: pre-grasp not reached, abort Utana_5_Porcelain_Ramekin_Large"
+   ],
+   "outcome": "not_closed"
+  },
+  {
+   "run": "v9a",
+   "log": "run_sort3_103.log",
+   "line": 1024,
+   "obj": "Threshold_Ramekin_White_",
+   "cat": "dish",
+   "side": "l",
+   "kind": "rim",
+   "phases": [
+    "start",
+    "pre"
+   ],
+   "verdicts": {},
+   "notes": [
+    "1027: pre-grasp not reached, abort Threshold_Ramekin_White_Porcelain"
+   ],
+   "outcome": "not_closed"
+  },
+  {
+   "run": "v9a",
+   "log": "run_sort3_103.log",
+   "line": 1028,
+   "obj": "Ecoforms_Plant_Container",
+   "cat": "dish",
+   "side": "l",
+   "kind": "rim",
+   "phases": [
+    "start",
+    "pre",
+    "guard"
+   ],
+   "verdicts": {},
+   "notes": [
+    "1049: guard: finger contact during approach Ecoforms_Plant_Container_B4_Har {\"dev\": 0.103, \"fing"
+   ],
+   "outcome": "guard_abort"
+  },
+  {
+   "run": "v9a",
+   "log": "run_sort3_103.log",
+   "line": 1053,
+   "obj": "Utana_5_Porcelain_Rameki",
+   "cat": "dish",
+   "side": "l",
+   "kind": "rim",
+   "phases": [
+    "start",
+    "pre",
+    "guard"
+   ],
+   "verdicts": {},
+   "notes": [
+    "1059: guard: finger contact during approach Utana_5_Porcelain_Ramekin_Large {\"dev\": 0.103, \"fing"
+   ],
+   "outcome": "guard_abort"
+  },
+  {
+   "run": "v9a",
+   "log": "run_sort3_103.log",
+   "line": 1062,
+   "obj": "Threshold_Ramekin_White_",
+   "cat": "dish",
+   "side": "l",
+   "kind": "rim",
+   "phases": [
+    "start",
+    "pre"
+   ],
+   "verdicts": {},
+   "notes": [
+    "1065: pre-grasp not reached, abort Threshold_Ramekin_White_Porcelain"
+   ],
+   "outcome": "not_closed"
+  },
+  {
+   "run": "v9a",
+   "log": "run_sort3_103.log",
+   "line": 1067,
+   "obj": "Crunch_Girl_Scouts_Candy",
+   "cat": "box",
+   "side": "r",
+   "kind": "top",
+   "phases": [
+    "start",
+    "pre"
+   ],
+   "verdicts": {},
+   "notes": [
+    "1070: pre-grasp not reached, abort Crunch_Girl_Scouts_Candy_Bars_Peanut_Butter_Creme_78_oz_box"
+   ],
+   "outcome": "not_closed"
+  },
+  {
+   "run": "v9a",
+   "log": "run_sort3_103.log",
+   "line": 1072,
+   "obj": "Saccharomyces_Boulardii_",
+   "cat": "jar",
+   "side": "r",
+   "kind": "side",
+   "phases": [
+    "start",
+    "pre",
+    "guard"
+   ],
+   "verdicts": {},
+   "notes": [
+    "1079: guard: finger contact during approach Saccharomyces_Boulardii_MOS_Value_Size {\"dev\": 0.105"
+   ],
+   "outcome": "guard_abort"
+  },
+  {
+   "run": "v9b",
+   "log": "run_sort2_101.log",
+   "line": 1018,
+   "obj": "Threshold_Ramekin_White_",
+   "cat": "dish",
+   "side": "r",
+   "kind": "rim",
+   "phases": [
+    "start",
+    "pre",
+    "guard"
+   ],
+   "verdicts": {},
+   "notes": [
+    "1033: guard: finger contact during approach Threshold_Ramekin_White_Porcelain {\"dev\": 0.217, \"fi"
+   ],
+   "outcome": "guard_abort"
+  },
+  {
+   "run": "v9b",
+   "log": "run_sort2_101.log",
+   "line": 1036,
+   "obj": "Threshold_Ramekin_White_",
+   "cat": "dish",
+   "side": "r",
+   "kind": "rim",
+   "phases": [
+    "start",
+    "pre",
+    "guard"
+   ],
+   "verdicts": {},
+   "notes": [
+    "1051: guard: finger contact during approach Threshold_Ramekin_White_Porcelain {\"dev\": 0.254, \"fi"
+   ],
+   "outcome": "guard_abort"
+  },
+  {
+   "run": "v9b",
+   "log": "run_sort2_101.log",
+   "line": 1054,
+   "obj": "Ecoforms_Plant_Container",
+   "cat": "dish",
+   "side": "l",
+   "kind": "rim",
+   "phases": [
+    "start",
+    "pre",
+    "guard"
+   ],
+   "verdicts": {},
+   "notes": [
+    "1066: guard: finger contact during approach Ecoforms_Plant_Container_B4_Har {\"dev\": 0.186, \"fing"
+   ],
+   "outcome": "guard_abort"
+  },
+  {
+   "run": "v9b",
+   "log": "run_sort2_101.log",
+   "line": 1069,
+   "obj": "Perricone_MD_AcylGlutath",
+   "cat": "box",
+   "side": "r",
+   "kind": "side",
+   "phases": [
+    "start",
+    "pre",
+    "at_grasp",
+    "closed",
+    "lifted",
+    "carry",
+    "over_tray",
+    "released",
+    "home"
+   ],
+   "verdicts": {
+    "lifted": true,
+    "over_tray": false
+   },
+   "empty": false,
+   "outcome": "released_verdict_empty"
+  },
+  {
+   "run": "v9b",
+   "log": "run_sort2_101.log",
+   "line": 1147,
+   "obj": "Utana_5_Porcelain_Rameki",
+   "cat": "dish",
+   "side": "l",
+   "kind": "rim",
+   "phases": [
+    "start",
+    "pre",
+    "at_grasp",
+    "corrected",
+    "closed",
+    "lifted"
+   ],
+   "verdicts": {
+    "lifted": false
+   },
+   "empty": false,
+   "notes": [
+    "1229: grasp check: empty Utana_5_Porcelain_Ramekin_Large"
+   ],
+   "outcome": "lifted_empty"
+  },
+  {
+   "run": "v9b",
+   "log": "run_sort2_101.log",
+   "line": 1232,
+   "obj": "Utana_5_Porcelain_Rameki",
+   "cat": "dish",
+   "side": "l",
+   "kind": "rim",
+   "phases": [
+    "start",
+    "pre",
+    "at_grasp",
+    "corrected",
+    "closed",
+    "lifted"
+   ],
+   "verdicts": {
+    "lifted": false
+   },
+   "empty": false,
+   "notes": [
+    "1333: grasp check: empty Utana_5_Porcelain_Ramekin_Large"
+   ],
+   "outcome": "lifted_empty"
+  },
+  {
+   "run": "v9b",
+   "log": "run_sort2_101.log",
+   "line": 1336,
+   "obj": "Crayola_Bonus_64_Crayons",
+   "cat": "box",
+   "side": "l",
+   "kind": "side",
+   "phases": [
+    "start",
+    "pre",
+    "at_grasp",
+    "closed"
+   ],
+   "verdicts": {},
+   "empty": true,
+   "notes": [
+    "1390: grasp check (contact): empty Crayola_Bonus_64_Crayons"
+   ],
+   "outcome": "closed_empty"
+  },
+  {
+   "run": "v9b",
+   "log": "run_sort2_101.log",
+   "line": 1394,
+   "obj": "Threshold_Ramekin_White_",
+   "cat": "dish",
+   "side": "r",
+   "kind": "rim",
+   "phases": [
+    "start",
+    "pre",
+    "guard"
+   ],
+   "verdicts": {},
+   "notes": [
+    "1410: guard: finger contact during approach Threshold_Ramekin_White_Porcelain {\"dev\": 0.201, \"fi"
+   ],
+   "outcome": "guard_abort"
+  },
+  {
+   "run": "v9b",
+   "log": "run_sort2_101.log",
+   "line": 1413,
+   "obj": "Threshold_Ramekin_White_",
+   "cat": "dish",
+   "side": "r",
+   "kind": "rim",
+   "phases": [
+    "start",
+    "pre",
+    "guard"
+   ],
+   "verdicts": {},
+   "notes": [
+    "1428: guard: finger contact during approach Threshold_Ramekin_White_Porcelain {\"dev\": 0.198, \"fi"
+   ],
+   "outcome": "guard_abort"
+  },
+  {
+   "run": "v9b",
+   "log": "run_sort2_101.log",
+   "line": 1431,
+   "obj": "Utana_5_Porcelain_Rameki",
+   "cat": "dish",
+   "side": "l",
+   "kind": "rim",
+   "phases": [
+    "start",
+    "pre",
+    "at_grasp",
+    "corrected",
+    "closed",
+    "lifted"
+   ],
+   "verdicts": {
+    "lifted": false
+   },
+   "empty": false,
+   "notes": [
+    "1526: grasp check: empty Utana_5_Porcelain_Ramekin_Large"
+   ],
+   "outcome": "lifted_empty"
+  },
+  {
+   "run": "v9b",
+   "log": "run_sort2_101.log",
+   "line": 1529,
+   "obj": "Utana_5_Porcelain_Rameki",
+   "cat": "dish",
+   "side": "l",
+   "kind": "rim",
+   "phases": [
+    "start",
+    "pre",
+    "at_grasp",
+    "corrected",
+    "closed",
+    "lifted"
+   ],
+   "verdicts": {
+    "lifted": false
+   },
+   "empty": false,
+   "notes": [
+    "1629: grasp check: empty Utana_5_Porcelain_Ramekin_Large"
+   ],
+   "outcome": "lifted_empty"
+  },
+  {
+   "run": "v11b",
+   "log": "run_sort2_101.log",
+   "line": 1027,
+   "obj": "Ecoforms_Plant_Container",
+   "cat": "dish",
+   "side": "l",
+   "kind": "rim",
+   "phases": [
+    "start",
+    "pre",
+    "guard"
+   ],
+   "verdicts": {},
+   "notes": [
+    "1040: guard: finger contact during approach Ecoforms_Plant_Container_B4_Har {\"dev\": 0.183, \"fing"
+   ],
+   "outcome": "guard_abort"
+  },
+  {
+   "run": "v11b",
+   "log": "run_sort2_101.log",
+   "line": 1043,
+   "obj": "Perricone_MD_AcylGlutath",
+   "cat": "box",
+   "side": "r",
+   "kind": "side",
+   "phases": [
+    "start",
+    "pre",
+    "at_grasp",
+    "closed",
+    "lifted"
+   ],
+   "verdicts": {
+    "lifted": false
+   },
+   "empty": false,
+   "notes": [
+    "1121: grasp check: empty Perricone_MD_AcylGlutathione_Eye_Lid_Serum"
+   ],
+   "outcome": "lifted_empty"
+  },
+  {
+   "run": "v11b",
+   "log": "run_sort2_101.log",
+   "line": 1124,
+   "obj": "Perricone_MD_AcylGlutath",
+   "cat": "box",
+   "side": "r",
+   "kind": "top",
+   "phases": [
+    "start",
+    "pre",
+    "at_grasp",
+    "closed",
+    "lifted"
+   ],
+   "verdicts": {
+    "lifted": false
+   },
+   "empty": false,
+   "notes": [
+    "1230: grasp check: empty Perricone_MD_AcylGlutathione_Eye_Lid_Serum"
+   ],
+   "outcome": "lifted_empty"
+  },
+  {
+   "run": "v11b",
+   "log": "run_sort2_101.log",
+   "line": 1235,
+   "obj": "Utana_5_Porcelain_Rameki",
+   "cat": "dish",
+   "side": "l",
+   "kind": "rim",
+   "phases": [
+    "start",
+    "pre",
+    "at_grasp",
+    "corrected",
+    "closed",
+    "lifted",
+    "carry",
+    "over_tray",
+    "released",
+    "home"
+   ],
+   "verdicts": {
+    "lifted": true,
+    "over_tray": false
+   },
+   "empty": false,
+   "outcome": "released_verdict_empty"
+  },
+  {
+   "run": "v11b",
+   "log": "run_sort2_101.log",
+   "line": 1324,
+   "obj": "Crayola_Bonus_64_Crayons",
+   "cat": "box",
+   "side": "l",
+   "kind": "side",
+   "phases": [
+    "start",
+    "pre",
+    "at_grasp",
+    "closed"
+   ],
+   "verdicts": {},
+   "empty": true,
+   "notes": [
+    "1379: grasp check (contact): empty Crayola_Bonus_64_Crayons"
+   ],
+   "outcome": "closed_empty"
+  },
+  {
+   "run": "v11b",
+   "log": "run_sort2_101.log",
+   "line": 1384,
+   "obj": "Ecoforms_Plant_Container",
+   "cat": "dish",
+   "side": "l",
+   "kind": "rim",
+   "phases": [
+    "start",
+    "pre",
+    "guard"
+   ],
+   "verdicts": {},
+   "notes": [
+    "1405: guard: finger contact during approach Ecoforms_Plant_Container_B4_Har {\"dev\": 0.17, \"finge"
+   ],
+   "outcome": "guard_abort"
+  }
+ ],
+ "table": {
+  "rim/dish": {
+   "released_over_tray": 5,
+   "lifted_empty": 6,
+   "not_closed": 3,
+   "guard_abort": 9,
+   "released_verdict_empty": 1
+  },
+  "side/jar": {
+   "released_over_tray": 3,
+   "closed_other": 1,
+   "lifted_empty": 1,
+   "guard_abort": 1
+  },
+  "side/box": {
+   "released_over_tray": 3,
+   "lifted_empty": 2,
+   "released_verdict_empty": 1,
+   "closed_empty": 2
+  },
+  "top/box": {
+   "not_closed": 1,
+   "lifted_empty": 1
+  }
+ }
+}

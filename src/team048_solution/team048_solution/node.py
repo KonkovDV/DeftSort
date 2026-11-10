@@ -501,61 +501,93 @@ class Sol(Node):
         # trays are measured with the arms hanging), then go home along a path certified against the MEASURED
         # table. v9a: going home before the table was known commanded the straight start->home joint path, which
         # sweeps the hands through the table front -> both arms jammed (|F| 258 N / 938 N) and 4 of 7 picks were lost.
-        t_head=s.survey()
-        if s.plane is not None:
-            for A in s.arms.values():A.set_scene(s.plane,list(s.trays.values()),getattr(s,'table_x',None))
-        for k in 'lr':s.go_home(k)     # from the start posture along a certified path (planning assumes home)
-        t_head=max(t_head,s.now())
-        handled=set();fails={};empty=0;nofeas={};resurveys=0   # nofeas[name]=len(handled) when no pick+place plan existed
-        retries=0;why='time budget'
-        s.last_contact=False
-        while s.budget.can_start(s.now()):
-            try:P,rgb,plane,dets=s.observe(t_head)
-            except Exception as e:s.log('observe failed',e);why='observe failed';break
-            t_head=s.now()                   # later observations: frames newer than the end of the last motion
-            if plane is not None:
-                for A in s.arms.values():A.set_scene(plane,list(s.trays.values()),s.table_x)   # measured table + near edge + tray walls
-            allid=s.identify(dets,P,plane,[n for n in objs if n not in handled])
-            s.log('observe t',round(s.budget.elapsed(s.now()),1),'dets',len(dets),'assigned',
-                  [(x[1][:18],round(x[3],2),round(x[5],2)) for x in allid])
-            ids=[x for x in allid if x[3]>ID_CONF_MIN and x[5]<ID_COST_MAX]
-            ids.sort(key=lambda x:(heavy(x[1]),-x[3]))     # light objects first (HEAVY_KG), then most confident
-            did=False;stop=False;touched=False
-            for det,name,cat,conf,cloud,cost in ids:
-                if fails.get(name,0)>=FAILS_MAX:continue
-                if not replan_infeasible(nofeas,name,handled):   # same scene: the deterministic planner fails again
-                    s.log('no plan:',name,json.dumps({'reason':'unchanged scene since the last failed planning'}));continue
-                cat=objs.get(name,cat)        # category from /sim/task is authoritative
-                tray=cats.get(cat)
-                if tray not in s.trays:
-                    s.log('no plan:',name,json.dumps({'reason':'tray not found by the cameras','tray':tray}));continue
-                others=[P[d.pixels[:,0],d.pixels[:,1]] for d in dets if d is not det]   # every segment is an obstacle
-                t=s.now();s.last_infeasible=False;s.last_contact=False;ok=s.pick_place(name,cat,cloud,plane,others,tray)
-                if ok is False and s.last_infeasible:nofeas[name]=len(handled)
-                if ok is None:stop=True;break           # budget: no time to finish another object
-                if ok:handled.add(name);did=True;s.budget.record_cycle(s.now()-t);break
-                fails[name]=fails.get(name,0)+1
-                if s.last_contact:           # v8 fix 6: the hand touched the scene -> the other clouds are stale
-                    s.log('re-observe after contact',name);touched=True;break
-            if stop:why='time budget (next object would not finish)';break
-            if not did and resurveys<TRAY_RESURVEY_MAX and any(cats.get(objs.get(x[1],x[2])) not in s.trays for x in ids):
-                resurveys+=1;s.log('needed tray missing: re-survey');t_head=s.survey();continue
-            empty=0 if (did or touched) else empty+1
-            if empty>=EMPTY_OBS_MAX:
-                # v9a: the run ended at 124 s of 405 s because every remaining object had 2 failures (mostly the
-                # jammed-arm aborts) or was not identified. One more round with fresh counters while a whole cycle
-                # still fits (the -10 end-of-run rule is enforced per object by can_start / place_time anyway).
-                left=[n for n in objs if n not in handled and fails.get(n,0)>=FAILS_MAX]
-                if retries<RETRY_ROUNDS and left and s.budget.can_start(s.now()):
-                    retries+=1;s.log('retry round',retries,'objects',[n[:24] for n in left]);fails={};nofeas={};empty=0;continue
-                why='nothing pickable in %d observations'%empty;break
-        for k in 'lr':s.retreat(k)
-        if abs(s.js.get('body_yaw_joint',0.))>.05:s.waist(0.)
+        handled=set();fails={};why='time budget'
+        try:
+            t_head=s.survey()
+            if s.plane is not None:
+                for A in s.arms.values():A.set_scene(s.plane,list(s.trays.values()),getattr(s,'table_x',None))
+            for k in 'lr':s.go_home(k)     # from the start posture along a certified path (planning assumes home)
+            t_head=max(t_head,s.now())
+            empty=0;nofeas={};resurveys=0   # nofeas[name]=len(handled) when no pick+place plan existed
+            retries=0
+            s.last_contact=False
+            while s.budget.can_start(s.now()):
+                try:P,rgb,plane,dets=s.observe_retry(t_head)
+                except Exception as e:s.log('observe failed',e);why='observe failed';break
+                t_head=s.now()                   # later observations: frames newer than the end of the last motion
+                if plane is not None:
+                    for A in s.arms.values():A.set_scene(plane,list(s.trays.values()),s.table_x)   # measured table + near edge + tray walls
+                allid=s.identify(dets,P,plane,[n for n in objs if n not in handled])
+                s.log('observe t',round(s.budget.elapsed(s.now()),1),'dets',len(dets),'assigned',
+                      [(x[1][:18],round(x[3],2),round(x[5],2)) for x in allid])
+                ids=[x for x in allid if x[3]>ID_CONF_MIN and x[5]<ID_COST_MAX]
+                ids.sort(key=lambda x:(heavy(x[1]),-x[3]))     # light objects first (HEAVY_KG), then most confident
+                did=False;stop=False;touched=False
+                for det,name,cat,conf,cloud,cost in ids:
+                    if fails.get(name,0)>=FAILS_MAX:continue
+                    if not replan_infeasible(nofeas,name,handled):   # same scene: the deterministic planner fails again
+                        s.log('no plan:',name,json.dumps({'reason':'unchanged scene since the last failed planning'}));continue
+                    cat=objs.get(name,cat)        # category from /sim/task is authoritative
+                    tray=cats.get(cat)
+                    if tray not in s.trays:
+                        s.log('no plan:',name,json.dumps({'reason':'tray not found by the cameras','tray':tray}));continue
+                    others=[P[d.pixels[:,0],d.pixels[:,1]] for d in dets if d is not det]   # every segment is an obstacle
+                    t=s.now();s.last_infeasible=False;s.last_contact=False
+                    try:ok=s.pick_place(name,cat,cloud,plane,others,tray)
+                    except Exception as e:      # v13: recover (hands open, arms home) and go on with a fresh observation
+                        s.log('pick failed with exception',name,type(e).__name__,e);s.recover();ok=False;s.last_contact=True
+                    if ok is False and s.last_infeasible:nofeas[name]=len(handled)
+                    if ok is None:stop=True;break           # budget: no time to finish another object
+                    if ok:handled.add(name);did=True;s.budget.record_cycle(s.now()-t);break
+                    fails[name]=fails.get(name,0)+1
+                    if s.last_contact:           # v8 fix 6: the hand touched the scene -> the other clouds are stale
+                        s.log('re-observe after contact',name);touched=True;break
+                if stop:why='time budget (next object would not finish)';break
+                if not did and resurveys<TRAY_RESURVEY_MAX and any(cats.get(objs.get(x[1],x[2])) not in s.trays for x in ids):
+                    resurveys+=1;s.log('needed tray missing: re-survey');t_head=s.survey();continue
+                empty=0 if (did or touched) else empty+1
+                if empty>=EMPTY_OBS_MAX:
+                    # v9a: the run ended at 124 s of 405 s because every remaining object had 2 failures (mostly the
+                    # jammed-arm aborts) or was not identified. One more round with fresh counters while a whole cycle
+                    # still fits (the -10 end-of-run rule is enforced per object by can_start / place_time anyway).
+                    left=[n for n in objs if n not in handled and fails.get(n,0)>=FAILS_MAX]
+                    if retries<RETRY_ROUNDS and left and s.budget.can_start(s.now()):
+                        retries+=1;s.log('retry round',retries,'objects',[n[:24] for n in left]);fails={};nofeas={};empty=0;continue
+                    why='nothing pickable in %d observations'%empty;break
+        except Exception as e:   # v13: an unexpected error must not skip the end-of-run release/retreat/done below
+            why=f'exception {type(e).__name__}: {e}';s.log('run loop failed:',why)
+        s.end_safe()
         if getattr(s,'hand_cfg_stop',None) is not None:s.hand_cfg_stop.set()
         s.done.publish(Empty());s.log('done at',round(s.budget.elapsed(s.now()),1),'handled',sorted(handled),'reason:',why,
                                       'fails',json.dumps({k[:24]:v for k,v in fails.items()}))
         s.log('accel at end',*accel_status())
         s.log('hand settings at end',json.dumps(s.hand_cfg_summary()))
+    def end_safe(s):
+        """End of run: both arms up and home, waist back to 0. Every step is guarded on its own, so a failing step
+        (planner, TF, a missing arm model) cannot keep /sim/task/done from being published."""
+        for k in 'lr':
+            try:s.retreat(k)
+            except Exception as e:s.log('end: retreat failed',k,type(e).__name__,e)
+        try:
+            if abs(s.js.get('body_yaw_joint',0.))>.05:s.waist(0.)
+        except Exception as e:s.log('end: waist failed',type(e).__name__,e)
+    def recover(s):
+        """After an exception inside pick_place: open both hands, arms up and home, waist back. The object state is
+        unknown; an object still in the hand at the end or lifted and left outside a tray scores -10 either way, an
+        object closed on but not lifted scores 0 only if the hand opens."""
+        for k in 'lr':
+            try:s.hand_open(k)
+            except Exception as e:s.log('recover: open failed',k,type(e).__name__,e)
+        for k in 'lr':
+            try:
+                if s.fingers_open(k) is False:s.wait_fingers(k,tmin=.4,tmax=RELEASE_WAIT)
+            except Exception as e:s.log('recover: wait failed',k,type(e).__name__,e)
+        s.end_safe()
+    def observe_retry(s,not_before):
+        """observe(), once more on a failure (a single failed capture or plane fit ended the whole run before v13)."""
+        try:return s.observe(not_before)
+        except Exception as e:s.log('observe failed, retrying once:',type(e).__name__,e)
+        return s.observe(s.now())
     def use_robot_description(s,wait=1.):
         """#595.4: prefer the URDF the simulator publishes on /robot_description (TRANSIENT_LOCAL, latched). It is
         used only if it contains every link the planner needs; otherwise the bundled copy of the same organiser URDF

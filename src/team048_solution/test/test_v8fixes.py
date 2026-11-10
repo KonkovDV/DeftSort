@@ -151,7 +151,9 @@ class RunLoopReobserve(unittest.TestCase):
             picks.append(name);sol.last_contact=True;return False      # every attempt touches and fails
         sol.pick_place=pp
         sol.retreat=lambda k:None;sol.go_home=lambda k:None;sol.js={'x':0.};sol.robot_description='<robot/>'
-        try:sol.run()
+        from unittest import mock
+        try:
+            with mock.patch.object(N,'WALL_LAUNCH',sol.wall_ready):sol.run()   # start-up pinned to 0 (see test_node_stub)
         finally:TS.Clock.t=100.
         # each failed contact attempt triggers a new observation; the object is retried at most twice per round,
         # v9fix: plus one retry round with reset counters while time is left (RETRY_ROUNDS=1)
