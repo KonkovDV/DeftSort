@@ -198,6 +198,7 @@ flowchart LR
 Нужны ROS 2 Humble, Python 3.10 и пакет сообщений `bodyctrl_msgs` из симулятора организаторов.
 
 ```bash
+pip install -r requirements.txt     # scipy (порядок установки формата: apt, pip, setup.sh, colcon build)
 bash setup.sh                       # один раз, с интернетом: Rust-модуль из vendor/ или из исходников
 colcon build                        # rust/ и vendor/ помечены COLCON_IGNORE
 source install/setup.bash
@@ -289,7 +290,7 @@ cd rust/team048_accel && cargo test --release                     # ядра Rus
 
 ## Лицензии и происхождение
 
-- Код команды: Apache-2.0 (`package.xml`, `Cargo.toml`).
+- Код команды: Apache-2.0, полный текст в `LICENSE` (указано также в `package.xml`, `Cargo.toml`).
 - `data/tiangong_pro_with_hands.urdf` взят из репозитория симулятора (Apache-2.0, UBTECH / N. Semenov) и используется только как кинематическая модель робота.
 - Сферы торса и большого пальца подогнаны офлайн (`tools/fit_spheres.py`, `tools/hand_from_meshes.py`) по STL-мешам UBTECH-Robot/tiangong2pro_tf (Apache-2.0).
 - Чужой код не копировался. Идеи из открытых проектов UBTECH реализованы заново.

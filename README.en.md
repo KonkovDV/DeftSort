@@ -118,7 +118,7 @@ Bit-exact equivalence is tested in `test_accel_equivalence.py` and `test_accel_p
 ## Install, run, test
 
 ```bash
-bash setup.sh && colcon build && source install/setup.bash
+pip install -r requirements.txt && bash setup.sh && colcon build && source install/setup.bash   # install order of the format: apt, pip, setup.sh, colcon
 bash run.sh
 python3 -m pytest -q                  # from the repo root (pytest.ini)
 TEAM048_ACCEL=0 python3 -m pytest -q
@@ -144,4 +144,4 @@ Details (Russian): [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/COMPLIANC
 
 ## Licences
 
-Team code: Apache-2.0 (`package.xml`, `Cargo.toml`). The URDF is from the simulator repository (Apache-2.0, UBTECH / N. Semenov); torso and thumb spheres are fitted offline to UBTECH tiangong2pro_tf STL meshes (Apache-2.0). No third-party code was copied.
+Team code: Apache-2.0, full text in `LICENSE` (also declared in `package.xml`, `Cargo.toml`). The URDF is from the simulator repository (Apache-2.0, UBTECH / N. Semenov); torso and thumb spheres are fitted offline to UBTECH tiangong2pro_tf STL meshes (Apache-2.0). No third-party code was copied.
