@@ -227,10 +227,6 @@ class GraspMonitor:
         self.effort_min = effort_held_threshold() if effort_min is None else effort_min
         self.f0 = None
 
-    @property
-    def calibrated(self):
-        return self.df_min is not None or (self.blocked_min is not None and self.effort_min is not None)
-
     def baseline(self, force):
         self.f0 = None if force is None else np.asarray(force, float)
 

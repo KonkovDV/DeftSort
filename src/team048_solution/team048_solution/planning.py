@@ -273,12 +273,3 @@ def joint_path(chain, collision, waypoints, speed=.35, acceleration=.4, dt=.05):
             u = i/count; points.append(a+(b-a)*(3*u*u-2*u*u*u)); times.append(start+duration*u)
     return Trajectory(np.array(points), np.array(times))
 
-
-def cartesian_waypoints(chain, targets, seed, collision):
-    qs = [chain.validate_q(seed)]
-    for target in targets:
-        q = chain.ik(target, qs[-1])
-        if not collision.certify(qs[-1], q):
-            raise ValueError('IK endpoint reachable but connecting path unsafe')
-        qs.append(q)
-    return qs

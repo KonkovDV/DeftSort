@@ -28,7 +28,7 @@ from scipy.optimize import linear_sum_assignment
 from . import arm as ARMMOD
 from . import budget as BUD, grip as GRIP, trays as TR
 from .sensing import PairBuffer
-from .perception import table_plane,segment,plane_inliers,near_edge,deproject,table_region,rect_mask
+from .perception import table_plane,segment,near_edge,deproject,table_region,rect_mask
 from .grasp import candidates
 D=os.path.join(os.path.dirname(os.path.abspath(__file__)),'data')
 PRI=json.load(open(os.path.join(D,'priors.json')))
@@ -208,8 +208,6 @@ class Sol(Node):
         """Phase-1 closing command per grasp kind (DOF 1..6; 1 open, 0 closed; DOF 6 thumb rotation stays 0 =
         opposition). side: whole hand; rim/top pinch: index+middle against the thumb."""
         return [0,0,0,0,0,0.] if kind=='side' else [1,1,.1,.1,.2,0.]
-    def hand_close(s,side,kind):
-        s.hand_set(side,s.closed_target(kind))
     def wait_thumb(s,side,tmax=None):
         """#648: the thumb is rotated into opposition FIRST (hand_open sets DOF 6), the other fingers close only
         after /inspire_hand/state shows DOF 6 there. Returns True/False (timeout) / None (no state)."""

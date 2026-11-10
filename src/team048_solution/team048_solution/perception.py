@@ -1,4 +1,4 @@
-"""Sensor-only plane removal and organized components. Classification abstains by default."""
+"""Sensor-only plane removal and organized components (object identity: node.identify, size priors)."""
 from dataclasses import dataclass
 import numpy as np
 from .geometry import finite
@@ -178,12 +178,6 @@ def table_plane_py(points, valid, iterations=120, tolerance=.006, min_inliers=10
     return normal, -normal@center
 
 
-def plane_inliers(points, valid, plane, tolerance=.008):
-    """Boolean image: valid points within `tolerance` of the plane (n.p+d=0)."""
-    P = np.asarray(points, float); n, d = np.asarray(plane[0], float), float(plane[1])
-    return np.asarray(valid, bool) & np.isfinite(P).all(axis=-1) & (np.abs(P@n+d) < tolerance)
-
-
 def near_edge(points, valid, plane, y_half=.5, drop=.05, q=.1, min_cols=40, min_below=5):
     """Near (robot-side) table edge x from one view, or None if this view does not SEE the edge.
     Column-wise in the image: the lowest table-plane inlier pixel of a column is an edge pixel only if the pixels
@@ -296,42 +290,3 @@ def segment_py(points, rgb, valid, plane, roi, min_pixels=25, max_jump=.025, min
         result.append(Detection(np.median(cloud, axis=0), lower, upper, pix, features))
     return result
 
-
-class RangeClassifier:
-    """User-supplied verified feature envelopes, not a pretrained model.
-
-    Overlap or out-of-distribution => unknown. Envelopes are heuristic evidence,
-    NOT calibrated probability and do not distinguish named instances.
-    """
-    def __init__(self, profiles=(), allowed=('dish', 'box', 'jar')):
-        self.profiles = []
-        for p in profiles:
-            if p.get('category') not in allowed or p.get('validated_on_sensors') is not True:
-                raise ValueError('profile not verified or wrong category')
-            lo = finite(p['min'], (6,)); hi = finite(p['max'], (6,))
-            if np.any(lo >= hi):
-                raise ValueError('invalid feature envelope')
-            self.profiles.append((p['category'], lo, hi))
-
-    def classify(self, detection):
-        f = finite(detection.features, (6,))
-        error=np.zeros(6) if detection.feature_error is None else finite(detection.feature_error,(6,))
-        if np.any(error<0): raise ValueError('negative feature uncertainty')
-        compatible={c for c,lo,hi in self.profiles if np.all((f+error>=lo)&(f-error<=hi))}
-        contained={c for c,lo,hi in self.profiles if np.all((f-error>=lo)&(f+error<=hi))}
-        matches=contained if len(compatible)==1 else set()
-        detection.category = next(iter(matches)) if len(matches) == 1 else None
-        detection.reason = 'unique interval-contained envelope; heuristic, not probability' if len(matches) == 1 else 'unknown or ambiguous'
-        return detection
-
-
-def tray_color(rgb):
-    """Coarse chroma vote only; not a cavity/placement detector."""
-    a = finite(rgb)
-    if a.size == 0 or a.shape[-1] != 3:
-        return None
-    c = np.median(a.reshape(-1, 3), axis=0)/255
-    order = np.argsort(c)
-    if c[order[-1]] < .25 or c[order[-1]]-c[order[-2]] < .18:
-        return None
-    return ('red', 'green', 'blue')[order[-1]]

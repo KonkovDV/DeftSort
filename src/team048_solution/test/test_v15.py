@@ -206,3 +206,18 @@ class MotionMethods(unittest.TestCase):
             v=[getattr(r,f'force{i}_ratio') for i in range(6)]
             s.assertTrue(all(G.HAND_FORCE_MIN<=x<=G.HAND_FORCE_MAX for x in v[:5]),v);s.assertEqual(v[5],G.HAND_FORCE_THUMB_ROT)
         s.assertEqual({k for (kind,k) in sol.hand_requests() if kind=='force'},{'l','r'})
+
+import ast,glob,re
+class NoDeadCode(unittest.TestCase):
+    # NumPy references of the Rust kernels and helpers the tests exercise directly
+    REFERENCE_ONLY={'ik_py','certify_py','certify_box','quaternion_transform','fingers_settled'}
+    def test_every_package_function_is_used(s):
+        pkg=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','team048_solution')
+        src={f:open(f).read() for f in glob.glob(os.path.join(pkg,'*.py'))}
+        code='\n'.join(re.sub(r'#.*','',t) for t in src.values())
+        dead=[]
+        for f,t in src.items():
+            for n in ast.walk(ast.parse(t)):
+                if isinstance(n,(ast.FunctionDef,ast.ClassDef)) and not n.name.startswith('__') and n.name not in s.REFERENCE_ONLY:
+                    if len(re.findall(r'\b'+re.escape(n.name)+r'\b',code))<2:dead.append(f'{os.path.basename(f)}:{n.lineno} {n.name}')
+        s.assertEqual(dead,[])

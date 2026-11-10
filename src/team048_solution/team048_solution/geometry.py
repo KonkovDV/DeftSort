@@ -52,27 +52,6 @@ def quaternion_transform(xyz, xyzw):
     return check_transform(T)
 
 
-def fresh(now, stamp, age=0.3):
-    if not np.isfinite([now, stamp, age]).all() or age <= 0 or not 0 <= now-stamp <= age:
-        raise ValueError('stale/future/unclocked data')
-
-
-def project(depth_mm, K, T, now, stamp, max_age=0.3):
-    fresh(now, stamp, max_age)
-    depth = np.asarray(depth_mm)
-    if depth.ndim != 2 or depth.dtype.kind != 'u' or depth.dtype.itemsize != 2:
-        raise ValueError('expected 16UC1 aligned depth in mm')
-    K = finite(K, (3, 3)); T = check_transform(T)
-    if K[0, 0] <= 0 or K[1, 1] <= 0 or not np.allclose(K[2], [0, 0, 1]) or abs(K[0, 1]) > 1e-8 or abs(K[1, 0]) > 1e-8:
-        raise ValueError('unsupported/invalid K')
-    v, u = np.indices(depth.shape); z = depth.astype(float)*0.001
-    valid = (z >= .15) & (z <= 6) & (depth != 0)
-    p = np.stack(((u-K[0, 2])*z/K[0, 0], (v-K[1, 2])*z/K[1, 1], z), axis=-1)
-    p = p @ T[:3, :3].T + T[:3, 3]
-    p[~valid] = np.nan
-    return p, valid
-
-
 def check_rotation(matrix):
     matrix=finite(matrix,(3,3))
     if not _close(matrix.T@matrix,_I3,atol=1e-6) or abs(np.linalg.det(matrix)-1)>1e-6: raise ValueError("invalid rotation matrix")
