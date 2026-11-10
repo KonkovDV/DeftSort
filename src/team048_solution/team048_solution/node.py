@@ -104,7 +104,7 @@ class Sol(Node):
         super().__init__('team048_solution')
         lat=QoSProfile(depth=1,durability=DurabilityPolicy.TRANSIENT_LOCAL,reliability=ReliabilityPolicy.RELIABLE)
         s.task=None;s.js={};s.info=None;s.lock=threading.Lock();s.frames=PairBuffer()
-        s.wrench={};s.hstate={};s.hvel={'l':[],'r':[]};s.hpos={'l':[],'r':[]};s.hand_log_t={}
+        s.wrench={};s.hstate={};s.hvel={'l':(),'r':()};s.hpos={'l':(),'r':()};s.hand_log_t={}
         s.create_subscription(String,'/sim/task',lambda m:setattr(s,'task',json.loads(m.data)),lat)
         s.create_subscription(JointState,'/joint_states',s.on_js,20)
         s.create_subscription(Image,'/cam_head/color/image_raw',s.frames.add_rgb,qos_profile_sensor_data)
@@ -132,10 +132,13 @@ class Sol(Node):
     def on_js(s,m):
         with s.lock:s.js.update(zip(m.name,m.position))
     def on_hand(s,k,m):
-        s.hstate[k]=m;h=s.hvel[k];h.append(list(m.velocity));del h[:-10]
+        # v15: the history is replaced by a NEW tuple (one atomic assignment) instead of append + del in place: a reader
+        # on the task thread (wait_fingers -> fingers_stalled) iterating the old list while this callback trimmed it
+        # could skip samples (test_v15.HandHistory).
+        s.hstate[k]=m;s.hvel[k]=(tuple(s.hvel[k])+(tuple(m.velocity),))[-10:]
         try:t=s.now()
         except Exception:t=None
-        if t is not None:hp=s.hpos[k];hp.append((t,list(m.position)));del hp[:-60]
+        if t is not None:s.hpos[k]=(tuple(s.hpos[k])+((t,tuple(m.position)),))[-60:]
     def hand_log(s,side,phase,force=False,**extra):
         """Hand state (position/velocity/effort + command) and the wrist force at <= 10 Hz (HAND_LOG_DT, sim time) during
         guarded phases. The force is logged only: v9b Ecoforms reached |F| 26 N before the finger guard tripped, and the
@@ -238,7 +241,7 @@ class Sol(Node):
         than the command. Default timeout = one full stroke at the configured finger speed + 0.5 s (speed 0.5 -> 2.1 s).
         log_phase: hand state logged at 10 Hz meanwhile."""
         tmax=GRIP.finger_stroke_time()+.5 if tmax is None else tmax
-        t=s.now();s.hvel[side].clear()
+        t=s.now();s.hvel[side]=()
         while s.now()-t<tmax:
             if log_phase:s.hand_log(side,log_phase)
             if s.now()-t>=tmin and GRIP.fingers_stalled(s.hpos[side],s.now(),since=t):return True

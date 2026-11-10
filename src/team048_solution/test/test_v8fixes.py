@@ -126,7 +126,7 @@ class PositionStall(unittest.TestCase):
     def test_wait_fingers_uses_position(self):
         s=N.Sol();orig=N.time.sleep
         def tick(dt):
-            TS.Clock.t+=.05;s.hpos['l'].append((TS.Clock.t,[.3,.3,.3,.3,.3,0.]))
+            TS.Clock.t+=.05;s.hpos['l']=tuple(s.hpos['l'])+((TS.Clock.t,[.3,.3,.3,.3,.3,0.]),)
         try:
             N.time.sleep=tick;s.hvel['l']=[[1.]*6]*10           # velocities never 'settled' (v8: 13/16)
             t=TS.Clock.t;self.assertTrue(s.wait_fingers('l',tmin=.3,tmax=2.))

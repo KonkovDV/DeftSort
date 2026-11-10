@@ -85,3 +85,20 @@ class FrameFreshness(unittest.TestCase):
         (P,rgb,valid),logs=s.cap(10.01,10.0);s.assertFalse(any('capture:' in l for l in logs))
     def test_period_constant_from_the_sim_log(s):
         s.assertEqual(N.CAMERA_PERIOD_S,.03);s.assertAlmostEqual(N.CAPTURE_MAX_AGE,.06)
+
+class HandHistory(unittest.TestCase):
+    def test_reader_sees_a_contiguous_history_while_the_callback_trims(s):
+        """The hand-state callback runs on an executor thread; wait_fingers iterates s.hpos on the task thread."""
+        sol=N.Sol();stop=[False];dt=.01;bad=0;reads=0
+        m=types.SimpleNamespace(velocity=[0.]*6,position=[.5]*6)
+        def feed():
+            while not stop[0]:TS.Clock.t=round(TS.Clock.t+dt,6);sol.on_hand('l',m)
+        old=sys.getswitchinterval();sys.setswitchinterval(1e-6);th=threading.Thread(target=feed,daemon=True);th.start()
+        try:
+            t0=time.time()
+            while time.time()-t0<2. and bad==0:
+                h=sol.hpos['l'];ts=[x[0] for x in h];reads+=1
+                if len(ts)>1 and np.max(np.diff(ts))>1.5*dt:bad+=1
+        finally:
+            stop[0]=True;th.join();sys.setswitchinterval(old);TS.Clock.t=100.
+        s.assertGreater(reads,100);s.assertEqual(bad,0,'a sample was skipped while the history was trimmed in place')
