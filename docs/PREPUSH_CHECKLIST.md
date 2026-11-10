@@ -1,34 +1,28 @@
-# Чек-лист перед отправкой в `main` (не выполнять без явного разрешения владельца)
+# Чек-лист перед сдачей
 
-Проверяется последний коммит в `main` на момент дедлайна, 11 ноября 2026 (#646, SCORING.md).
+Организаторы проверяют последний коммит в `main` командного репозитория на момент дедлайна, 11 ноября 2026 (#646, SCORING.md). Сдаётся одно дерево решения: этот репозиторий без истории разработки.
 
-1. [ ] Получено явное разрешение владельца на push в `nssr-hackathon/nssr-sol-team-048`, и только туда.
-2. [ ] Выбран коммит DeftSort, который сдаётся. В сдаваемое дерево не входят `research/` и `HANDOFF.md`.
-3. [ ] `python3 -m pytest -q` из корня проходит с модулем `team048_accel` и с `TEAM048_ACCEL=0`.
-4. [ ] `bash hackathon/tools/solution.sh <путь к решению>` в симуляторе: установка и запуск в чистом контейнере (SCORING.md).
-5. [ ] Прогоны `task.sh sort2 --pool 3` и `sort3 --pool 3`. В логе симулятора две строки `[hack] left hand force limits` и `[hack] right hand force limits`; в логе узла `hand settings at end` с обеими руками; в TRACE найдены все ящики и ближний край стола, нет `WARNING uncertified path`.
-6. [ ] Один прогон с `HACK_SELF_COLLISION=1` (#629): рука не проходит через корпус и другую руку.
-7. [ ] Отладочные топики не используются (тест `test_subscribed_topics` / `Survey.test_subscriptions`).
-8. [ ] В коде нет констант раскладки сцены (тест `NoSceneConstants`), `test/scene_fixture.py` не импортируется пакетом.
-9. [ ] `setup.sh` офлайн ставит wheel (SHA256), без сети падения нет. `run.sh` не требует интернета.
-10. [ ] В дереве нет секретов, токенов и личных путей (`git grep -nIiE 'ghp_|github_pat_|token|secret|password'`), нет ссылок на `research/` из `src/`, `run.sh`, `setup.sh`.
-11. [ ] README и `docs/` актуальны. Лицензии: URDF Apache-2.0, код команды свой, чужой код не копировался.
-12. [ ] После push проверить, что последний коммит в `main` на GitHub совпадает с локальным (`git ls-remote`).
+## Офлайн (выполняется на CPU, без симулятора)
 
-## Сборка сдаваемого коммита
+1. [ ] `python3 -m pytest -q` из корня проходит с модулем `team048_accel` и с `TEAM048_ACCEL=0`.
+2. [ ] `cd rust/team048_accel && cargo test --release` и `cargo clippy --all-targets --features python` без ошибок и предупреждений.
+3. [ ] Чистая сборка по командам README: `pip install -r requirements.txt`, `bash setup.sh`, `colcon build`. Без сети `setup.sh` ставит wheel из `vendor/` (SHA256) и не падает, `run.sh` интернета не требует.
+4. [ ] Отладочные топики не используются (`test_compliance.py`: `test_subscriptions`; `test_node_stub.py`: `test_subscribed_topics`; `test_v14.py`: `Rules`).
+5. [ ] В коде нет констант раскладки сцены (`test_compliance.py`), `test/scene_fixture.py` пакетом не импортируется.
+6. [ ] В дереве нет секретов, токенов, личных путей и ссылок на файлы вне дерева: `git grep -nIiE 'ghp_|github_pat_|token|secret|password'`, все относительные ссылки markdown ведут на существующие файлы и заголовки.
+7. [ ] README и `docs/` соответствуют коду. Лицензии: URDF Apache-2.0 (UBTECH), код команды Apache-2.0, чужой код не копировался.
 
-История DeftSort содержит `research/`, поэтому в командный репозиторий уходит отдельный коммит без родителей (orphan), а не коммит из этой истории:
+## В симуляторе (нужна GPU; для текущей версии не выполнялось)
 
-```bash
-SRC=<sha>                                    # выбранный коммит DeftSort
-git worktree add --detach /tmp/submit-048 "$SRC"
-cd /tmp/submit-048
-git checkout -q --orphan submit-048
-git rm -r -q --cached research HANDOFF.md
-rm -rf research HANDOFF.md
-git commit -q -m "Team 048 solution (DeftSort $SRC)"
-git ls-files | grep -E '^(research/|HANDOFF.md)' && echo "STOP: research in tree"
-python3 -m pytest -q && TEAM048_ACCEL=0 python3 -m pytest -q
-# только после явного разрешения владельца:
-# git push <team-repo> submit-048:refs/heads/main
-```
+8. [ ] `bash hackathon/tools/solution.sh <путь к решению>`: установка и запуск в чистом контейнере (SCORING.md).
+9. [ ] Прогоны `task.sh sort2 --pool 3` и `sort3 --pool 3`. Что должно быть в логах:
+   - в логе симулятора две строки, `[hack] left hand force limits` и `[hack] right hand force limits`;
+   - в логе узла строка `hand settings at end` с обеими руками;
+   - в TRACE найдены все ящики и ближний край стола;
+   - нет `WARNING uncertified path`.
+10. [ ] Один прогон с `HACK_SELF_COLLISION=1` (#629): рука не проходит через корпус и другую руку.
+
+## Отправка
+
+11. [ ] Push в командный репозиторий только с явного разрешения владельца.
+12. [ ] После push последний коммит `main` на GitHub совпадает с локальным (`git ls-remote`).

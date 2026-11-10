@@ -160,7 +160,7 @@ Details (Russian):
 
 ## Simulator runs
 
-Runs v6–v11b are our runs of the organisers' simulator on a cloud T4 GPU (RTF ≈ 0.21). Their logs and frames became test fixtures (`test/fixtures/`), and the constants in the code cite the run they come from.
+Runs v6–v11b are our runs of the organisers' simulator on a cloud T4 GPU (RTF ≈ 0.21). The earlier run v5 checked the interfaces; its frames and logs are used in the tests as well. Their logs and frames became test fixtures (`test/fixtures/`), and the constants in the code cite the run they come from.
 
 | Run | Result | What we learned and fixed |
 |---|---|---|
