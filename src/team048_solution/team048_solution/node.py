@@ -500,7 +500,12 @@ class Sol(Node):
             s.arms={k:ARMMOD.Arm(k) for k in 'lr'}
             s.log('startup',round(s.budget.elapsed(s.now()),1),'s of',s.budget.limit)
             s.log('accel',*accel_status())
-            while not s.js:time.sleep(.05)
+            # v15: /joint_states is required before any motion; the wait used to be unbounded (no /sim/task/done ever). It
+            # now ends as soon as no object cycle could be finished any more (the same can_start rule as the task loop),
+            # which goes to end_safe (no arm motion without joint states) and publishes done inside the budget.
+            while not s.js:
+                if not s.budget.can_start(s.now()):raise RuntimeError('no /joint_states while an object cycle still fit the budget')
+                time.sleep(.05)
             for k in 'lr':s.hand_open(k)
             # v9fix: survey FIRST with the arms in the start posture (v7 s102 start frames: table plane, near edge and
             # trays are measured with the arms hanging), then go home along a path certified against the MEASURED
