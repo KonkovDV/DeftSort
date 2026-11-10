@@ -3,6 +3,21 @@
 Ветка `fix/v14` (от `main` = `1cdd15e`). Все числа ниже получены скриптами из этого каталога на коде ветки; push и Kaggle не запускались.
 Скрипты: `audit_inventory.py` (перечень функций и покрытие), `ffi_edges.py` (шов Rust ↔ NumPy), `accel_bitwise.py` и `accel_tol.py` (62 кадра), `doc_refs.py` (ссылки файл:строка в документации).
 
+## Статус после v15 (ветка `fix/v15`, 10.11.2026)
+
+Закрыто на CPU, у каждой правки тест, который падает на старом коде (`test_v15.py`):
+- ожидание `/joint_states` ограничено бюджетом, `done` публикуется;
+- запасной путь `capture` берёт пару не старше `CAPTURE_MAX_AGE` = 2 периода камеры (0.06 с; период 0.03 с из лога симулятора v11b);
+- пропавший сустав в `/joint_states` — лог и `JointStateMissing` вместо нуля;
+- `hpos`/`hvel` заменяются атомарно кортежем;
+- `argsort(kind='stable')` в `trays`: на 62 кадрах Rust ↔ NumPy без различий;
+- методы движения (`go_home`, `retreat`, `waist`, `approach_guard`, `recover`, `end_safe`) покрыты тестами на поддельном роботе;
+- удалён мёртвый код из раздела 1 (`geometry.fresh`/`project`, `perception.plane_inliers` и импорт, `RangeClassifier`, `tray_color`, `planning.cartesian_waypoints`, `GraspMonitor.calibrated`) и неиспользуемый `Sol.hand_close`. AST-тест не даёт появиться функции без ссылок. `trays._components` оставлен: это запасной путь без scipy, теперь с тестом.
+
+Тесты: 237 (Rust 237 passed; `TEAM048_ACCEL=0` 213 passed, 24 skipped). Покрытие (Rust + NumPy, coverage.py 7.17, `--cov-branch`): строки 91.2 % (2377 исполняемых, 208 не исполнены), строки и ветви 88 %. На v14 было 87.5 % и 84 %.
+
+Планы на 62 кадрах против `a99b259`: 0 различий из 5358 (Python 3.13 / NumPy 2.5 и Python 3.10 / NumPy 1.26). Проверка формул: `research/diag/v15/MATH_REVIEW.md`. Строки «Потоки ROS», «Потеря сенсора», «Потеря `/joint_states`» и «Ничья по размеру компонент» в разделе 3 закрыты.
+
 ## 1. Перечень функций и покрытие
 
 - Функций и методов в `src/team048_solution/team048_solution` (обход AST, вложенные тоже): **249**.

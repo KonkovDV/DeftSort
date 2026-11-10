@@ -34,9 +34,9 @@ DeftSort is a single Python ROS 2 node that, for each layout, finds the table an
 
 ## Status
 
-Scores in the simulator are not yet stable. Offline tests pass. The v12 and v13 changes are checked only on CPU: replay of recorded frames and logs, stress and regression tests. No GPU quota is left before 14.11.
+Scores in the simulator are not yet stable. Offline tests pass. The v12–v15 changes are checked only on CPU: replay of recorded frames and logs, stress and regression tests. No GPU quota is left before 14.11.
 
-- Tests: 204. With the Rust module and the v7 frames all 204 pass; without the v7 frames 188 pass and 16 are skipped; with `TEAM048_ACCEL=0` 180 pass and 24 are skipped (the Rust ↔ NumPy equivalence tests). Fixtures come from Kaggle runs: RGB-D frames, grasp TRACEs, simulator logs.
+- Tests: 237. With the Rust module and the v7 frames all 237 pass; without the v7 frames 221 pass and 16 are skipped; with `TEAM048_ACCEL=0` 213 pass and 24 are skipped (the Rust ↔ NumPy equivalence tests). Fixtures come from Kaggle runs: RGB-D frames, grasp TRACEs, simulator logs.
 - Last run, v11b (`sort2`, seed 101, commit `497471e`): 0 of 6 in trays. The force limit reached both hands and Threshold was skipped, but Utana slipped during the carry and stayed on the table (from the frames, likely −10). The simulator did not answer `/sim/task/check`, so there is no exact score. The run before, v9b on `f525ed9`: 10 points (Perricone).
 - Objects of 0.22 kg and more were held 0 of 6 times in v7 and v8, so they go last.
 - Test tubes are not attempted: the node publishes `/sim/task/done` right away (0 points, allowed by the rules).
