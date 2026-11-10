@@ -34,9 +34,9 @@ DeftSort runs one Python ROS 2 node per layout finds the table and trays with th
 
 ## Status
 
-Scores in the simulator are not yet stable. Offline tests pass. The v12 changes are checked only by CPU replay of recorded frames and logs: no GPU quota is left before 14.11.
+Scores in the simulator are not yet stable. Offline tests pass. The v12 and v13 changes are checked only on CPU: replay of recorded frames and logs, stress and regression tests. No GPU quota is left before 14.11.
 
-- Tests: 181. With the Rust module and the v7 frames all 181 pass; without the v7 frames 165 pass and 16 are skipped; with `TEAM048_ACCEL=0` 158 pass and 23 are skipped (the Rust ↔ NumPy equivalence tests). Fixtures come from Kaggle runs: RGB-D frames, grasp TRACEs, simulator logs.
+- Tests: {T13EN}. Fixtures come from Kaggle runs: RGB-D frames, grasp TRACEs, simulator logs.
 - Last run, v11b (`sort2`, seed 101, commit `497471e`): 0 of 6 in trays. The force limit reached both hands and Threshold was skipped, but Utana slipped during the carry and stayed on the table (from the frames, likely −10). The simulator did not answer `/sim/task/check`, so there is no exact score. The run before, v9b on `f525ed9`: 10 points (Perricone).
 - Objects of 0.22 kg and more were held 0 of 6 times in v7 and v8, so they go last.
 - Test tubes are not attempted: the node publishes `/sim/task/done` right away (0 points, allowed by the rules).
@@ -98,6 +98,7 @@ flowchart LR
 - #648: force 0.4 and speed 0.5 on both hands, thumb first, phase 2 targets the measured contact minus `CLOSE_PAST` 0.15 of the stroke.
 - Rim pinches are planned only on open dishes (`grasp.rim_closed`): Threshold shows 622–677 points at rim height inside the rim circle in every v7, v8 and v9b frame, open dishes 0–6. In v9b all 4 Threshold approaches tripped the thumb guard 0.4–1.0 mm from the closed top.
 - Rim pinch only when the gravity torque m·g·r ≤ 0.17 N·m (`grasp.RIM_TORQUE_MAX`; m from `objects.yaml` for the identified object, r = measured rim radius). Runs: Ecoforms (0.05 N·m) held 2 of 2, Threshold (0.11) 1 of 3, Utana (0.21–0.22 in replay) 0 of 7. Dishes above it are skipped: 0 points instead of a −10 risk.
+- Every outcome ends the same way (v13): an exception inside `pick_place` opens both hands and sends the arms home, and the run goes on; at the end the lift, the way home and the waist reset run one by one, and `/sim/task/done` is always published. A failed observation is retried once instead of ending the run. The RGB-D pair buffer is locked against the camera callback threads.
 - A rim-held dish is placed by its centre, not by the pinch point (`node.held_offset`). Before, the centre hung 5–6.6 cm off the slot; in the middle slot an Ecoforms-size dish crossed the tray wall by 1.5 cm (`test_v12.py`).
 - Empty grasps are detected before the lift (`contact_empty` 0.10); approach guard `GUARD_DEV` 0.16 keeps 4/4 holds and catches at least 10/12 failed approaches in v7 + v8; hold rule: deviation ≥ 0.10 and effort ≥ 0.9.
 - Physics: at force 0.4 the saturated finger drive gives at least 80 N per finger, so μ ≈ 0.03 suffices for the heaviest pool object (0.43 kg). Slips come from contact geometry, not friction.
@@ -139,7 +140,7 @@ Env: `TEAM048_HAND_FORCE` (0.4), `TEAM048_HAND_SPEED` (0.5), `TEAM048_CLOSE_PAST
 | Test tubes | Immediate `/sim/task/done` | After sorting is stable |
 | Payload | Held object not in the collision model | Payload envelope during carry |
 
-Details (Russian): [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/COMPLIANCE.md](docs/COMPLIANCE.md), [docs/ORG_ANSWERS.md](docs/ORG_ANSWERS.md), [docs/PARAMETERS.md](docs/PARAMETERS.md).
+Details (Russian): [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/COMPLIANCE.md](docs/COMPLIANCE.md), [docs/ORG_ANSWERS.md](docs/ORG_ANSWERS.md), [docs/PARAMETERS.md](docs/PARAMETERS.md), [docs/MATH_PHYSICS.md](docs/MATH_PHYSICS.md) (frames, grasp model, torque gate, IK, collisions, time budget).
 
 ## Licences
 
