@@ -66,3 +66,22 @@ class MissingJoint(unittest.TestCase):
         sol,logs=sol_with_arms(js={})
         ok,e=bounded(sol.end_safe);s.assertTrue(ok);s.assertIsNone(e)
         s.assertEqual(sol.pub['arm'].sent,[]);s.assertEqual(sol.pub['waist'].sent,[])
+
+def frame(enc,data,t,h=2,w=2):
+    st=types.SimpleNamespace(sec=int(t),nanosec=int(round((t-int(t))*1e9)))
+    return types.SimpleNamespace(encoding=enc,height=h,width=w,data=bytes(data),header=types.SimpleNamespace(stamp=st,frame_id='camera_head_link'))
+class FrameFreshness(unittest.TestCase):
+    def cap(s,t_frame,t_req):
+        sol=N.Sol();logs=[];sol.log=lambda *a:logs.append(' '.join(str(x) for x in a))
+        sol.frames.add_rgb(frame('rgb8',np.zeros((2,2,3),np.uint8).tobytes(),t_frame))
+        sol.frames.add_depth(frame('16UC1',np.full((2,2),800,np.uint16).tobytes(),t_frame))
+        sol.info=types.SimpleNamespace(k=[100.,0,1,0,100.,1,0,0,1]);sol.tf=lambda *a:np.eye(4)
+        return sol.capture(not_before=t_req,wait=.05),logs
+    def test_frame_from_before_the_motion_is_refused(s):
+        with s.assertRaises(RuntimeError):s.cap(9.0,10.0)      # 1 s = 33 camera periods older than the request
+    def test_frame_within_two_periods_is_used(s):
+        (P,rgb,valid),logs=s.cap(10.0-1.5*N.CAMERA_PERIOD_S,10.0);s.assertEqual(P.shape,(2,2,3))
+    def test_fresh_frame_unchanged(s):
+        (P,rgb,valid),logs=s.cap(10.01,10.0);s.assertFalse(any('capture:' in l for l in logs))
+    def test_period_constant_from_the_sim_log(s):
+        s.assertEqual(N.CAMERA_PERIOD_S,.03);s.assertAlmostEqual(N.CAPTURE_MAX_AGE,.06)

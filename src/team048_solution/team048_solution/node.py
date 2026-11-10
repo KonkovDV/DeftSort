@@ -88,6 +88,11 @@ HAND_LOG_DT=.1        # s sim: hand-state log period during the guarded approach
 HAND_CFG_POLL_S=.2      # s wall between delivery passes
 HAND_CFG_REPLY_S=2.     # s wall to wait for a reply before the request is sent again
 HAND_CFG_SENDS_MAX=5    # sends per service; after that the request counts as delivered without a reply
+# Camera frame period in sim time: '[hack] camera period 0.0300 s sim, render_interval 3' (sim_sort2.log of the Kaggle
+# runs v9a, v9b, v11b; the bridge logged 37-41 frames per 5 s wall at RTF ~0.2). A frame up to two periods older than
+# the request (one frame in flight plus one dropped) is still accepted when no newer one arrives within `wait`.
+CAMERA_PERIOD_S=.03
+CAPTURE_MAX_AGE=2*CAMERA_PERIOD_S
 class JointStateMissing(RuntimeError):
     """An arm joint has never been reported on /joint_states (v15: no motion from an invented posture)."""
 def quat_to_T(t,q):
@@ -375,7 +380,12 @@ class Sol(Node):
         while time.monotonic()-t<wait and (pair is None or getattr(s,info_attr) is None):
             pair=buf.pair(t_req);time.sleep(.02)
         if pair is None:
-            pair=buf.pair(-1e18);s.log('capture: no fresh pair, using newest')
+            # v15: the fallback took the newest pair of ANY age (possibly from before the last head/arm motion). Now
+            # only a pair at most CAPTURE_MAX_AGE older than the request is accepted; otherwise the capture fails and
+            # observe_retry captures again.
+            pair=buf.pair(t_req-CAPTURE_MAX_AGE)
+            if pair is not None:s.log('capture: no pair newer than the request, using one <=',CAPTURE_MAX_AGE,'s older')
+            else:s.log('capture: no RGB-D pair within',CAPTURE_MAX_AGE,'s of the request (stale or no camera)')
         info=getattr(s,info_attr)
         if pair is None or info is None:raise RuntimeError('no synchronised RGB-D pair / camera_info')
         rgbm,dm=pair
