@@ -102,3 +102,16 @@ class HandHistory(unittest.TestCase):
         finally:
             stop[0]=True;th.join();sys.setswitchinterval(old);TS.Clock.t=100.
         s.assertGreater(reads,100);s.assertEqual(bad,0,'a sample was skipped while the history was trimmed in place')
+
+from team048_solution import trays as TRY
+class StableComponents(unittest.TestCase):
+    SIZES=[42,32,26,14,16,3,4,1,60,60,32,45,25,30,48,36,31]   # two largest tie (labels 9 and 10, raster order)
+    def mask(s):
+        m=np.zeros((2*len(s.SIZES),70),bool)
+        for r,n in enumerate(s.SIZES):m[2*r,:n]=True            # one component per even row, labelled top to bottom
+        return m
+    def test_tie_keeps_raster_order(s):
+        pix=TRY._largest_component(s.mask(),10)
+        s.assertEqual(len(pix),60);s.assertEqual(int(pix[0,0]),2*8,'tie broken toward the later component')
+    def test_components_order_stable(s):
+        c=TRY._components(s.mask());s.assertEqual([int(x[0,0])//2 for x in c[:2]],[8,9])

@@ -49,7 +49,7 @@ def _components(mask):
         if n == 0:
             return []
         sizes = np.bincount(lab.ravel())[1:]
-        return [np.argwhere(lab == i+1) for i in np.argsort(-sizes)]
+        return [np.argwhere(lab == i+1) for i in np.argsort(-sizes, kind='stable')]
     except ImportError:   # pragma: no cover - scipy is a declared dependency
         return [np.argwhere(mask)] if mask.any() else []
 
@@ -67,7 +67,9 @@ def _largest_component(mask, min_px):
     if n == 0:
         return None
     sizes = np.bincount(lab.ravel())[1:]
-    i = np.argsort(-sizes)[0]
+    # v15: kind='stable' -- equal sizes keep label (raster) order. The default introsort is not stable for >16
+    # components: with sizes [..., 60, 60, ...] (labels 9 and 10) it returned label 10 (NumPy 1.26 and 2.x).
+    i = np.argsort(-sizes, kind='stable')[0]
     return np.argwhere(lab == i+1) if sizes[i] >= min_px else None
 
 
