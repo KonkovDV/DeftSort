@@ -159,11 +159,22 @@ def detect(P, rgb, valid, name, colour, plane, min_px=150, border=2):
     if np.any(size > hi):
         return None           # larger than any tray: not a tray (or merged with something of the same colour)
     small = bool(np.any(size < lo))
-    if axis[1] < 0:
-        axis = -axis          # canonical sign
+    axis = canonical_axis(axis)
     return dict(center=(float(c[0]), float(c[1])), size=(float(size[0]), float(size[1])),
                 axis=(float(axis[0]), float(axis[1])), height=float(np.quantile(h[pix[:, 0], pix[:, 1]], .98)),
                 partial=touches or small, centroid=tuple(float(x) for x in cloud[:, :2].mean(0)), px=int(len(pix)))
+
+
+def canonical_axis(axis, eps=1e-9):
+    """Sign convention of a tray long axis: y component positive; for an axis along x (|y| <= eps) x positive.
+    v14: the old rule (flip if y < 0) left the two representations of the x axis that min_area_rect returns for an
+    exact 0 / 90 deg tie, u(0) = (1, 0) and v(90 deg) = (-1, 6e-17), with opposite signs. Which one wins the tie can
+    change with 1-ulp rounding (NumPy 2 vs the Rust scan: 7 of 62 recorded frames, tray_left), and the sign selects the
+    direction of the inner/outer slot (slot_offset * axis)."""
+    axis = np.asarray(axis, float)
+    if axis[1] < -eps or (abs(axis[1]) <= eps and axis[0] < 0):
+        return -axis
+    return axis
 
 
 def slot_offset(k, half_extent, step=SLOT_STEP, size=DOC_SIZE, wall=TRAY_WALL, clearance=.01, ty=0.):

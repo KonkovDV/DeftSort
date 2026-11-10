@@ -108,3 +108,26 @@ class ColourEncoding(unittest.TestCase):
     def test_bgr8_reordered(s):
         out=s.cap('bgr8');s.assertEqual(int(out[0,0,0]),10);s.assertEqual(int(out[0,0,2]),200)
 if __name__=='__main__':unittest.main()
+
+from team048_solution import trays as TRY
+class TrayAxisSign(unittest.TestCase):
+    def test_two_representations_of_x_axis_agree(s):
+        # min_area_rect tie at 0 / 90 deg: u(0)=(1,0) or v(90 deg)=(-cos..,..)=(-1,6e-17); before v14 they kept opposite signs
+        a=TRY.canonical_axis(np.array([1.,0.]));b=TRY.canonical_axis(np.array([-1.,6.123233995736766e-17]))
+        s.assertGreater(a[0],0);s.assertGreater(b[0],0);s.assertTrue(np.allclose(a,b,atol=1e-12))
+        s.assertTrue(np.allclose(TRY.canonical_axis(np.array([-1.,-1e-12])),[1.,1e-12]))
+    def test_general_axes_unchanged(s):
+        for ax in ([.927,.375],[-.3,.954],[0.,1.]):
+            s.assertEqual(TRY.canonical_axis(np.array(ax)).tolist(),ax)              # y > 0: kept as before
+        for ax in ([.927,-.375],[.3,-.954],[0.,-1.]):
+            s.assertEqual(TRY.canonical_axis(np.array(ax)).tolist(),[-ax[0],-ax[1]])   # y < 0: flipped as before
+    def test_detect_uses_canonical_sign(s):
+        # synthetic x-aligned tray: whichever tie winner min_area_rect returns, detect reports axis x > 0
+        P=np.zeros((60,80,3));P[...,0]=np.linspace(.2,.5,80)[None,:];P[...,1]=np.linspace(.5,.72,60)[:,None];P[...,2]=-.15
+        rgb=np.zeros((60,80,3),np.uint8);rgb[...,0]=200
+        valid=np.ones((60,80),bool);valid[0,:]=valid[-1,:]=valid[:,0]=valid[:,-1]=False
+        plane=(np.array([0,0,1.]),.18)
+        for forced in (np.array([1.,0.]),np.array([-1.,6.123233995736766e-17])):
+            with mock.patch.object(TRY,'min_area_rect',lambda xy,q=.02,f=forced:(np.array([.35,.61]),np.array([.21,.29]),f)):
+                d=TRY.detect(P,rgb,valid,'tray_left','red',plane)
+            s.assertIsNotNone(d);s.assertGreater(d['axis'][0],0)
