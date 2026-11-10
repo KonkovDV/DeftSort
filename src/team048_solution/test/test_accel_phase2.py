@@ -7,7 +7,7 @@ HERE=os.path.dirname(os.path.abspath(__file__));sys.path.insert(0,os.path.join(H
 import test_node_stub  # noqa: ROS stubs for node.py
 import scene_fixture as SF
 from team048_solution import _accel, arm, perception, trays as TR, grasp, planning, node as NODE
-V7_TRACE=os.environ.get('TEAM048_V7_TRACE','/workspace/fixes/kaggle-sim/out_v7/trace')   # Kaggle v7 trace frames (not shipped)
+V7_TRACE=os.environ.get('TEAM048_V7_TRACE',os.path.join(HERE,'..','..','..','research','kaggle-sim','out_v7','trace'))   # Kaggle v7 trace frames (research/, not in the submission: tests skip)
 FRAMES=sorted(glob.glob(os.path.join(V7_TRACE,'*','*.npz')))[:int(os.environ.get('T48_EQ_FRAMES',31))]
 FIX=os.path.join(HERE,'fixtures','v5_head_frame.npz')
 K=np.array([[343.16,0,320.],[0,343.16,180.],[0,0,1]])

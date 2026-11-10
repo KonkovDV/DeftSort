@@ -369,6 +369,7 @@ class Sol(Node):
         if pair is None or info is None:raise RuntimeError('no synchronised RGB-D pair / camera_info')
         rgbm,dm=pair
         rgb=np.frombuffer(bytes(rgbm.data),np.uint8).reshape(rgbm.height,rgbm.width,3)
+        if getattr(rgbm,'encoding','')=='bgr8':rgb=rgb[...,::-1]   # v14: tray colour (red/blue) must not swap; rgb8 unchanged
         dmm=np.frombuffer(bytes(dm.data),np.uint16).reshape(dm.height,dm.width).astype(float)
         K=np.array(info.k).reshape(3,3);T=s.tf('pelvis',dm.header.frame_id or default_frame,dm.header.stamp)
         P=deproject(dmm,K,T)   # X=(u-cx)Z/fx, Y=(v-cy)Z/fy, Z=mm/1000, pelvis = R@[X,Y,Z]+t (Rust kernel or NumPy reference)
@@ -490,19 +491,21 @@ class Sol(Node):
         if task.get('task') not in BUD.LIMITS:
             s.done.publish(Empty());return
         s.budget=BUD.TimeBudget(BUD.LIMITS[task['task']],t0)
-        cats=task['categories'];objs=task['objects']
-        s.use_robot_description()
-        s.arms={k:ARMMOD.Arm(k) for k in 'lr'}
-        s.log('startup',round(s.budget.elapsed(s.now()),1),'s of',s.budget.limit)
-        s.log('accel',*accel_status())
-        while not s.js:time.sleep(.05)
-        for k in 'lr':s.hand_open(k)
-        # v9fix: survey FIRST with the arms in the start posture (v7 s102 start frames: table plane, near edge and
-        # trays are measured with the arms hanging), then go home along a path certified against the MEASURED
-        # table. v9a: going home before the table was known commanded the straight start->home joint path, which
-        # sweeps the hands through the table front -> both arms jammed (|F| 258 N / 938 N) and 4 of 7 picks were lost.
-        handled=set();fails={};why='time budget'
+        handled=set();fails={};why='time budget';s.arms={}
         try:
+            # v14: inside the guarded block -- a malformed task message (no 'categories'/'objects') or an arm model that
+            # fails to build used to end the process before /sim/task/done (the robot had not moved yet)
+            cats=task['categories'];objs=task['objects']
+            s.use_robot_description()
+            s.arms={k:ARMMOD.Arm(k) for k in 'lr'}
+            s.log('startup',round(s.budget.elapsed(s.now()),1),'s of',s.budget.limit)
+            s.log('accel',*accel_status())
+            while not s.js:time.sleep(.05)
+            for k in 'lr':s.hand_open(k)
+            # v9fix: survey FIRST with the arms in the start posture (v7 s102 start frames: table plane, near edge and
+            # trays are measured with the arms hanging), then go home along a path certified against the MEASURED
+            # table. v9a: going home before the table was known commanded the straight start->home joint path, which
+            # sweeps the hands through the table front -> both arms jammed (|F| 258 N / 938 N) and 4 of 7 picks were lost.
             t_head=s.survey()
             if s.plane is not None:
                 for A in s.arms.values():A.set_scene(s.plane,list(s.trays.values()),getattr(s,'table_x',None))
@@ -566,6 +569,7 @@ class Sol(Node):
         """End of run: both arms up and home, waist back to 0. Every step is guarded on its own, so a failing step
         (planner, TF, a missing arm model) cannot keep /sim/task/done from being published."""
         for k in 'lr':
+            if k not in (getattr(s,'arms',None) or {}):continue   # no arm model built (failure before the robot moved)
             try:s.retreat(k)
             except Exception as e:s.log('end: retreat failed',k,type(e).__name__,e)
         try:
