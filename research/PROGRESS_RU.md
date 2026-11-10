@@ -271,3 +271,26 @@ probe всё ещё QUEUED (TpuV5E8, слот 1/1, ~6+ ч). Alt-типы TpuV5E1
   - собран из HEAD без `research/` и `HANDOFF.md`, 91 файл, `ls-tree` совпадает, SHA256 wheel OK;
   - тесты в `/tmp/submit-048`: Rust — 237 passed, `TEAM048_ACCEL=0` — 213 passed, 24 skipped;
   - чистая сборка в Python 3.10.22: `pip -r`, `setup.sh`, `colcon` — OK; pytest — 237 passed, без кадров v7 — 221 passed, 16 skipped.
+## 2026-11-11 00:55 MSK — v16: подготовка дерева сдачи (ветка fix/v16 от main `68a346d`, CPU, push нет)
+- Код: поведение не менялось.
+  - ruff F чистый: убраны неиспользуемые импорты и переменные.
+  - Добавлены докстринги всех публичных функций и классов (единицы, системы координат).
+  - Из комментариев убраны пути к `research/` и `fixes/`, TODO заменены явными пометками «не проверено в симуляторе».
+  - Кадры v7 подключаются только через `TEAM048_V7_TRACE`.
+  - Исправлен порядко-зависимый тест `test_look_times_out_when_no_joint_state`: он падал на 0.9999999990 < 1.0, если `test_v15` шёл первым.
+- README и README.en переписаны для судьи: быстрый старт, статус без непроверенных результатов, mermaid-схема, правила, ограничения, прогоны без хэшей, тесты по файлам, список документов.
+- docs: нет ссылок на файлы вне дерева сдачи, PARAMETERS сверен с кодом, PREPUSH_CHECKLIST переписан.
+- Новые скрипты в `research/diag/v16/`:
+  - `doc_refs.py` — якорь ссылки = текст строки кода, 110 ссылок;
+  - `md_links.py` — ссылки и якоря markdown;
+  - `build_orphan.sh` — воспроизводимый orphan без `research/`, `HANDOFF.md` и 8.6 МБ кадров бенчмарков.
+- Rust (rustc 1.89): `cargo clippy --all-targets --features python` — 0 предупреждений, `cargo test --release` — 18 passed, в том числе в дереве без данных бенчмарков.
+- Тесты, последовательно:
+  - Rust с кадрами v7 — 237 passed, 0 skipped;
+  - `TEAM048_ACCEL=0` — 213 passed, 24 skipped.
+- Планы `68a346d` → `1d500c5` на 62 кадрах: 0 различий из 5358 в двух средах, Python 3.10 / NumPy 1.26 и Python 3.13 / NumPy 2.
+- Orphan: 87 файлов, 2.45 МБ.
+- Чистая сборка дерева orphan по README в новом venv (Python 3.10.22, NumPy 1.26.4, scipy 1.13.1): `pip -r`, `setup.sh` (wheel 0.2.0, API 2) и `colcon build` прошли.
+  - pytest Rust — 221 passed, 16 skipped;
+  - pytest `TEAM048_ACCEL=0` — 213 passed, 24 skipped;
+  - `cargo test` и `clippy` OK.

@@ -20,18 +20,10 @@ ROS Humanoid Hack, трек манипуляции. Робот TienKung 2.0 Pro 
 - Пуш в `nssr-sol-team-048` — ТОЛЬКО по явной команде пользователя. Kaggle — только приватные ядра, токены никогда не печатать.
 
 ## 3. Где что лежит
-- Приватный репозиторий пользователя: `KonkovDV/DeftSort`, ветка `main` = `1cdd15e` (v13).
-  - Локальная ветка `fix/v15` (от `main` = `a99b259`, не запушена, fast-forward возможен). Аудит v15:
-    - таймаут ожидания `/joint_states`;
-    - свежесть кадра (не старше 0.06 с);
-    - `JointStateMissing`;
-    - атомарная история кисти;
-    - `argsort` с `kind='stable'`;
-    - тесты движения;
-    - удалён мёртвый код;
-    - обзор математики.
-    Итоги: последняя запись `research/PROGRESS_RU.md`, `research/diag/v14/AUDIT.md` (раздел v15), `research/diag/v15/MATH_REVIEW.md`.
-  - Локальная ветка `submit-048` и worktree `/tmp/submit-048`: orphan-коммит из `fix/v15` без `research/` и `HANDOFF.md`. Хэш: `git rev-parse submit-048`, в сообщении коммита — исходный коммит DeftSort. Пушить только после «пушь»: `git -C /tmp/submit-048 push <team-repo> submit-048:refs/heads/main`. В `main` DeftSort его не вливать.
+- Приватный репозиторий пользователя: `KonkovDV/DeftSort`, ветка `main` = `68a346d` (v15).
+  - Локальная ветка `fix/v16` (от `main` = `68a346d`, не запушена, fast-forward возможен): подготовка дерева сдачи (README, docs, докстринги, линтер, гигиена). Итоги: последняя запись `research/PROGRESS_RU.md`.
+  - Сборка orphan: `bash research/diag/v16/build_orphan.sh [SRC]` (воспроизводимо, без `research/`, `HANDOFF.md`, кадров бенчмарков). Ссылки в docs: `research/diag/v16/doc_refs.py --check`, ссылки markdown: `research/diag/v16/md_links.py /tmp/submit-048`.
+  - Локальная ветка `submit-048` и worktree `/tmp/submit-048`: orphan-коммит из `fix/v16` (скрипт выше). Хэш: `git rev-parse submit-048`, в сообщении коммита — исходный коммит DeftSort. Пушить только после «пушь»: `git -C /tmp/submit-048 push <team-repo> submit-048:refs/heads/main`. В `main` DeftSort его не вливать.
 - Запасные варианты: `497471e` (v11), `f525ed9` (v10, нарушает #648 на левой кисти: сила 1.0 в 5 из 6 раскладок).
   - `research/` (отчёты, логи, данные Kaggle, диагностика, заметки) и этот файл в командный репозиторий НЕ отправлять.
 - Архитектура и правила: `README.md`, `docs/ARCHITECTURE.md`, `docs/COMPLIANCE.md`.
