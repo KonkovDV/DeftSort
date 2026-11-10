@@ -115,3 +115,94 @@ class StableComponents(unittest.TestCase):
         s.assertEqual(len(pix),60);s.assertEqual(int(pix[0,0]),2*8,'tie broken toward the later component')
     def test_components_order_stable(s):
         c=TRY._components(s.mask());s.assertEqual([int(x[0,0])//2 for x in c[:2]],[8,9])
+
+class FakeRobot:
+    """Fake ROS side: an arm/waist/head command moves the measured joints to the commanded positions (clipped to the
+    URDF limits the simulator enforces), a hand command moves the hand state to its target; every sleep advances sim
+    time by 0.02 s. Records every command for sequence checks."""
+    def __init__(s,sol):
+        s.sol=sol;s.log=[];s.ids={}
+        for side,ids in N.IDS.items():
+            for i,n in zip(ids,sol.arms[side].chain.names):s.ids[i]=(side,n)
+        for g in ('arm','waist','head'):
+            sol.pub[g].publish=lambda m,g=g:s.on_cmd(g,m)
+        for k,p in sol.hand.items():p.publish=lambda m,k=k:s.on_hand(k,m)
+        side_of={v:k for k,v in N.SIDE_NAME.items()}
+        s.side_of=side_of
+        for k in 'lr':sol.hstate[k]=types.SimpleNamespace(position=[1.]*5+[0.],velocity=[0.]*6,effort=[0.]*6)
+    def on_cmd(s,g,m):
+        for c in m.cmds:
+            if g=='arm':
+                side,n=s.ids[c.name];A=s.sol.arms[side];j=A.chain.names.index(n)
+                s.log.append(('arm',side,n,c.pos,c.spd))
+                with s.sol.lock:s.sol.js[n]=float(np.clip(c.pos,A.chain.lower[j],A.chain.upper[j]))
+            elif g=='waist':
+                s.log.append(('waist',c.name,c.pos))
+                with s.sol.lock:s.sol.js['body_yaw_joint']=float(c.pos)
+            else:s.log.append((g,c.name,c.pos))
+    def on_hand(s,k,m):
+        side=s.side_of[k];s.log.append(('hand',side,list(m.position)))
+        s.sol.hstate[side]=types.SimpleNamespace(position=list(m.position),velocity=[0.]*6,effort=[0.]*6)
+    def arm_cmds(s,side=None):return [x for x in s.log if x[0]=='arm' and (side is None or x[1]==side)]
+
+def robot(js=None):
+    sol,logs=sol_with_arms(js);sol.hand_settings_step();return sol,logs,FakeRobot(sol)
+def in_limits(test,sol,fr):
+    for _,side,n,pos,spd in fr.arm_cmds():
+        A=sol.arms[side];j=A.chain.names.index(n)
+        test.assertGreaterEqual(pos,A.chain.lower[j]-1e-9,n);test.assertLessEqual(pos,A.chain.upper[j]+1e-9,n)
+        test.assertGreater(spd,0.);test.assertLessEqual(spd,.8)
+
+class MotionMethods(unittest.TestCase):
+    def test_go_home_from_home_and_from_a_raised_pose(s):
+        sol,logs,fr=robot();A=sol.arms['l']
+        ok,e=bounded(lambda:sol.go_home('l'));s.assertTrue(ok);s.assertIsNone(e)
+        s.assertTrue(np.allclose(sol.q_now('l'),A.home,atol=.02));in_limits(s,sol,fr)
+        q=np.asarray(A.home,float).copy();q[0]-=.3                     # shoulder pitched forward (arm raised)
+        q=np.clip(q,A.chain.lower,A.chain.upper);sol.js.update(zip(A.chain.names,q));fr.log.clear()
+        ok,e=bounded(lambda:sol.go_home('l'));s.assertTrue(ok);s.assertIsNone(e)
+        s.assertTrue(np.allclose(sol.q_now('l'),A.home,atol=.05));in_limits(s,sol,fr)
+        s.assertEqual({x[1] for x in fr.arm_cmds()},{'l'},'go_home moved the other arm')
+    def test_retreat_lifts_first_when_low(s):
+        sol,logs,fr=robot();A=sol.arms['r']
+        lifted=[];orig=A.lift
+        def lift(q,dz):lifted.append(dz);return orig(q,dz)
+        A.lift=lift;sol.plane=(np.array([0,0,1.]),-10.)                # table far above: TCP counts as low
+        ok,e=bounded(lambda:sol.retreat('r'));s.assertTrue(ok);s.assertIsNone(e)
+        s.assertEqual(lifted,[N.RETREAT_DZ]);in_limits(s,sol,fr)
+        s.assertTrue(np.allclose(sol.q_now('r'),A.home,atol=.05))
+    def test_waist_settles_and_times_out(s):
+        sol,logs,fr=robot();sol.js['body_yaw_joint']=.4
+        ok,e=bounded(lambda:sol.waist(0.));s.assertTrue(ok);s.assertIsNone(e)
+        s.assertEqual([x for x in fr.log if x[0]=='waist'],[('waist',31,0.)]);s.assertEqual(sol.js['body_yaw_joint'],0.)
+        sol.pub['waist'].publish=lambda m:None;t0=TS.Clock.t                # waist does not answer
+        out={}
+        ok,e=bounded(lambda:out.setdefault('r',sol.waist(.5)));s.assertTrue(ok)
+        s.assertFalse(out['r']);s.assertLessEqual(TS.Clock.t-t0,N.WAIST_TMAX+.1)
+    def test_approach_guard_trips_on_a_deflected_finger_only(s):
+        sol,logs,fr=robot();sol.hand_open('l')
+        s.assertIsNone(sol.approach_guard('l','side'))
+        h=sol.hstate['l'];p=list(h.position);p[3]=p[3]-.5                 # index finger pushed by contact
+        sol.hstate['l']=types.SimpleNamespace(position=p,velocity=h.velocity,effort=h.effort)
+        g=sol.approach_guard('l','side');s.assertIsNotNone(g);s.assertGreater(g['dev'],0.)
+    def test_recover_opens_hands_and_homes_both_arms(s):
+        sol,logs,fr=robot()
+        for k in 'lr':sol.hand_set(k,[0,0,0,0,0,0.])                   # both hands closed (on an object)
+        ok,e=bounded(sol.recover);s.assertTrue(ok);s.assertIsNone(e)
+        for k in 'lr':
+            s.assertTrue(sol.fingers_open(k));s.assertEqual(sol.hand_target[k],[1,1,1,1,1,0.])
+            s.assertTrue(np.allclose(sol.q_now(k),sol.arms[k].home,atol=.05))
+        first_arm=next(i for i,x in enumerate(fr.log) if x[0]=='arm');last_open=max(i for i,x in enumerate(fr.log) if x[0]=='hand')
+        s.assertLess(last_open,first_arm,'an arm moved before both hands were opened');in_limits(s,sol,fr)
+    def test_end_safe_hands_empty_arms_home_waist_zero(s):
+        sol,logs,fr=robot();sol.js['body_yaw_joint']=.3
+        ok,e=bounded(sol.end_safe);s.assertTrue(ok);s.assertIsNone(e)
+        for k in 'lr':s.assertTrue(np.allclose(sol.q_now(k),sol.arms[k].home,atol=.05))
+        s.assertEqual(sol.js['body_yaw_joint'],0.);in_limits(s,sol,fr)
+    def test_force_requests_both_hands_in_range(s):
+        sol,logs,fr=robot()
+        for (kind,side),r in sol.hand_requests().items():
+            if kind!='force':continue
+            v=[getattr(r,f'force{i}_ratio') for i in range(6)]
+            s.assertTrue(all(G.HAND_FORCE_MIN<=x<=G.HAND_FORCE_MAX for x in v[:5]),v);s.assertEqual(v[5],G.HAND_FORCE_THUMB_ROT)
+        s.assertEqual({k for (kind,k) in sol.hand_requests() if kind=='force'},{'l','r'})
