@@ -31,3 +31,38 @@ class RequiredTopics(unittest.TestCase):
             el=sol.budget.elapsed(TS.Clock.t);s.assertLessEqual(el,sol.budget.limit)
             s.assertTrue(any('joint_states' in l for l in logs))
         finally:TS.Clock.t=100.
+
+def sol_with_arms(js=None):
+    sol=N.Sol();sol.arms={k:ARM.Arm(k) for k in 'lr'};logs=[];sol.log=lambda *a:logs.append(' '.join(str(x) for x in a))
+    for A in sol.arms.values():A.set_scene(SF.plane(),list(SF.TRAYS.values()))
+    if js is None:
+        js={}
+        for A in sol.arms.values():js.update(zip(A.chain.names,A.home))
+    sol.js=dict(js);sol.plane=SF.plane();return sol,logs
+
+def bounded(fn,timeout=20.):
+    """fn() on a thread with a simulated clock (each sleep = +0.05 s sim); (finished, exception)."""
+    real_sleep=time.sleep;out={}
+    def tick(dt):TS.Clock.t+=.05;real_sleep(0)
+    def body():
+        try:out['r']=fn()
+        except BaseException as e:out['e']=e
+    th=threading.Thread(target=body,daemon=True)
+    with mock.patch.object(N.time,'sleep',tick):th.start();th.join(timeout)
+    return (not th.is_alive()),out.get('e')
+
+class MissingJoint(unittest.TestCase):
+    def test_missing_joint_is_not_zero_and_the_arm_is_not_moved(s):
+        sol,logs=sol_with_arms();del sol.js['elbow_pitch_r_joint']
+        ok,e=bounded(lambda:sol.q_now('r'));s.assertTrue(ok);s.assertIsInstance(e,getattr(N,'JointStateMissing',type(None)))
+        ok,e=bounded(lambda:sol.retreat('r'));s.assertTrue(ok,'retreat moved/waited from an invented posture')
+        s.assertIsInstance(e,getattr(N,'JointStateMissing',type(None)))
+        s.assertEqual(sol.pub['arm'].sent,[],'an arm command was sent from an invented posture')
+        s.assertTrue(any('elbow_pitch_r_joint' in l for l in logs))
+    def test_complete_joint_states_unchanged(s):
+        sol,_=sol_with_arms();A=sol.arms['l']
+        s.assertTrue(np.array_equal(sol.q_now('l'),np.asarray(A.home,float)))
+    def test_end_safe_without_joint_states_moves_nothing(s):
+        sol,logs=sol_with_arms(js={})
+        ok,e=bounded(sol.end_safe);s.assertTrue(ok);s.assertIsNone(e)
+        s.assertEqual(sol.pub['arm'].sent,[]);s.assertEqual(sol.pub['waist'].sent,[])

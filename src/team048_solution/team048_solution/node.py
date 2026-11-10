@@ -88,6 +88,8 @@ HAND_LOG_DT=.1        # s sim: hand-state log period during the guarded approach
 HAND_CFG_POLL_S=.2      # s wall between delivery passes
 HAND_CFG_REPLY_S=2.     # s wall to wait for a reply before the request is sent again
 HAND_CFG_SENDS_MAX=5    # sends per service; after that the request counts as delivered without a reply
+class JointStateMissing(RuntimeError):
+    """An arm joint has never been reported on /joint_states (v15: no motion from an invented posture)."""
 def quat_to_T(t,q):
     x,y,z,w=q;T=np.eye(4)
     T[:3,:3]=[[1-2*(y*y+z*z),2*(x*y-z*w),2*(x*z+y*w)],[2*(x*y+z*w),1-2*(x*x+z*z),2*(y*z-x*w)],[2*(x*z-y*w),2*(y*z+x*w),1-2*(x*x+y*y)]]
@@ -153,8 +155,17 @@ class Sol(Node):
             c=SetMotorPosition();c.name=int(i);c.pos=float(p);c.spd=float(min(.8,max(v,1e-3)));c.cur=1.0;m.cmds.append(c)
         s.pub[group].publish(m)
     def q_now(s,side):
+        """Measured arm joints from /joint_states. v15: a joint that never arrived used to read as 0 rad and the planner
+        started from that invented posture; now it is an error (JointStateMissing, logged) and the caller does not move
+        this arm. s.js keeps the last received value of every joint, so a joint missing in one message keeps its last
+        known value."""
         names=[f'{n}_{side}_joint' for n in ARMMOD.ARM]
-        with s.lock:return np.array([s.js.get(n,0.) for n in names])
+        with s.lock:
+            miss=[n for n in names if n not in s.js];q=None if miss else np.array([float(s.js[n]) for n in names])
+        if miss:
+            s.log('joint_states: no value for',miss,'-> arm',side,'not moved')
+            raise JointStateMissing(f'no /joint_states value for {miss}')
+        return q
     def move_arm(s,side,q,tol=.02,timeout=None,refine=2,vmax=.8,guard=None):
         """guard: optional callable polled every cycle; a truthy return stops the arm where it is (hold command at the
         measured joints), stores it in s.guard_trip and returns False (v8 fix 4: guarded approach)."""
