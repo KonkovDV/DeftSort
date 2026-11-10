@@ -113,7 +113,7 @@ flowchart LR
 | Perception, ms per frame | 146.7 | 47.9 | 3.1× |
 | Planning 10 objects, s | 0.672 | 0.374 | 1.8× |
 
-Equivalence is tested in `test_accel_equivalence.py` and `test_accel_phase2.py`: bit-exact except one segment-height quantile (≤ 1e-12, FMA in NumPy's BLAS) deprojection (≤ 1e-12, depends on the CPU's OpenBLAS kernel) and IK solutions (≥ 99.5 % of random targets agree to 1e-9; otherwise both branches must reach the target). Any import failure or error falls back to NumPy for the rest of the process. `vendor/` ships a SHA256-checked manylinux2014 abi3 wheel; `setup.sh` builds from source otherwise and never fails.
+Equivalence is tested in `test_accel_equivalence.py` and `test_accel_phase2.py`: bit-exact except one segment-height quantile (≤ 1e-12, FMA in NumPy's BLAS), deprojection (≤ 1e-12, depends on the CPU's OpenBLAS kernel) and IK solutions (≥ 99.5 % of random targets agree to 1e-9; otherwise both branches must reach the target). Any import failure or error falls back to NumPy for the rest of the process. `vendor/` ships a SHA256-checked manylinux2014 abi3 wheel; `setup.sh` builds from source otherwise and never fails.
 
 ## Install, run, test
 
