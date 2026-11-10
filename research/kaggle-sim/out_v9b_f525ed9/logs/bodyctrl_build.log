@@ -1,0 +1,43 @@
+Starting >>> bodyctrl_msgs
+--- stderr: bodyctrl_msgs
+CMake Warning (deprecated) at CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (policy) at /tmp/w/mm/envs/ros/share/python_cmake_module/cmake/Modules/FindPythonExtra.cmake:52 (find_package):
+  Policy CMP0148 is not set: The FindPythonInterp and FindPythonLibs modules
+  are removed.  Run "cmake --help-policy CMP0148" for policy details.  Use
+  the cmake_policy command to set the policy and suppress this warning.
+Call Stack (most recent call first):
+  /tmp/w/mm/envs/ros/share/rosidl_generator_py/cmake/rosidl_generator_py_generate_interfaces.cmake:33 (find_package)
+  /tmp/w/mm/envs/ros/share/ament_cmake_core/cmake/core/ament_execute_extensions.cmake:48 (include)
+  /tmp/w/mm/envs/ros/share/rosidl_cmake/cmake/rosidl_generate_interfaces.cmake:286 (ament_execute_extensions)
+  CMakeLists.txt:9 (rosidl_generate_interfaces)
+This warning is for project developers.  Use -Wno-author or -Wno-policy to
+suppress it.
+
+CMake Warning (policy) at /tmp/w/mm/envs/ros/share/python_cmake_module/cmake/Modules/FindPythonExtra.cmake:140 (find_package):
+  Policy CMP0148 is not set: The FindPythonInterp and FindPythonLibs modules
+  are removed.  Run "cmake --help-policy CMP0148" for policy details.  Use
+  the cmake_policy command to set the policy and suppress this warning.
+Call Stack (most recent call first):
+  /tmp/w/mm/envs/ros/share/rosidl_generator_py/cmake/rosidl_generator_py_generate_interfaces.cmake:33 (find_package)
+  /tmp/w/mm/envs/ros/share/ament_cmake_core/cmake/core/ament_execute_extensions.cmake:48 (include)
+  /tmp/w/mm/envs/ros/share/rosidl_cmake/cmake/rosidl_generate_interfaces.cmake:286 (ament_execute_extensions)
+  CMakeLists.txt:9 (rosidl_generate_interfaces)
+This warning is for project developers.  Use -Wno-author or -Wno-policy to
+suppress it.
+
+---
+Finished <<< bodyctrl_msgs [1min 54s]
+
+Summary: 1 package finished [1min 54s]
+  1 package had stderr output: bodyctrl_msgs
+bodyctrl_rc=0
+bodyctrl import OK

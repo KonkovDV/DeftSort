@@ -1,0 +1,163 @@
+11:49:01 MSK +0s SESSION B {'TASK': 'sort2', 'SEEDS': '101', 'RUNTO': '1400', 'HACK_SELF_COLLISION': '0', 'HACK_POOL': '3', 'SEED0': '100', 'SIMBOOT_MAX': '1500'} solution f525ed9c76
+11:49:01 MSK +0s GPU GPU 0: Tesla T4 (UUID: GPU-b5c7dd9f-0194-bbf4-1420-b27ebc8d7028)
+GPU 1: Tesla T4 (UUID: GPU-a5091d49-7c17-5a22-80dd-fa844a0ed2ff)
+11:49:01 MSK +0s START setup timeout 2100
+11:50:01 MSK +60s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=setup.log ::  | + mkdir -p /tmp/nssr_sim | + cp -r /kaggle/input/datasets/dmitrijkv/team048-polygon-assets/polygon/. /tmp/nssr_sim/ | + P=/tmp/w/mm/envs/isaac/bin/python | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cu128 | 
+11:51:02 MSK +121s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=setup.log :: ut/datasets/dmitrijkv/team048-polygon-assets/polygon/. /tmp/nssr_sim/ | + P=/tmp/w/mm/envs/isaac/bin/python | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cu128 | + ln -sfn /tmp/nssr_sim /nssr_sim | + wait 696 | 
+11:52:02 MSK +181s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=setup.log :: olygon-assets/polygon/. /tmp/nssr_sim/ | + P=/tmp/w/mm/envs/isaac/bin/python | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cu128 | + ln -sfn /tmp/nssr_sim /nssr_sim | + wait 696 | + echo ros_env_rc=0 | + wait 697 | 
+11:53:02 MSK +241s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=setup.log :: /bin/python -m pip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com | 
+11:54:02 MSK +301s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: thon -m pip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  | 
+11:55:02 MSK +361s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: n -m pip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  | 
+11:56:02 MSK +421s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: m pip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  | 
+11:57:02 MSK +481s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: ip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  | 
+11:58:02 MSK +541s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=bodyctrl_build.log :: 
+11:59:02 MSK +601s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=bodyctrl_build.log :: Starting >>> bodyctrl_msgs | 
+12:00:00 MSK +659s END setup rc 0
+12:00:00 MSK +659s SETUP_CHECK {'ros': True, 'isaac': True, 'bodyctrl': True, 'nssr': True}
+12:00:00 MSK +659s START sort timeout 3780
+12:00:02 MSK +661s HB step=sort gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: uild.log ::  | 11:59:02 MSK +601s HB step=setup gpu=[0 %, 0 MiB | 0 %, 0 MiB] last=bodyctrl_build.log :: Starting >>> bodyctrl_msgs |  | 12:00:00 MSK +659s END setup rc 0 | 12:00:00 MSK +659s SETUP_CHECK {'ros': True, 'isaac': True, 'bodyctrl': True, 'nssr': True} | 12:00:00 MSK +659s START sort timeout 3780 | 
+12:01:02 MSK +721s HB step=sort gpu=[0 %, 317 MiB
+0 %, 65 MiB] last=sort.log :: 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | + sleep 5 | + '[' 51 -lt 1509 ']' | ++ left | +++ date +%s | ++ echo 3790 | + '[' 3790 -gt 1000 ']' | + rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | + sleep 5 | 
+12:02:02 MSK +781s HB step=sort gpu=[0 %, 333 MiB
+0 %, 65 MiB] last=sort.log ::  8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | + sleep 5 | + '[' 109 -lt 1509 ']' | ++ left | +++ date +%s | ++ echo 3732 | + '[' 3732 -gt 1000 ']' | + rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | + sleep 5 | 
+12:03:02 MSK +841s HB step=sort gpu=[4 %, 333 MiB
+0 %, 65 MiB] last=sim_task_sort2.txt :: olcon_ordered_commands | +++ unset _colcon_prefix_sh_source_script | +++ unset _colcon_prefix_bash_COLCON_CURRENT_PREFIX | ++ unset COLCON_CURRENT_PREFIX | ++ unset _colcon_prefix_chain_bash_source_script | + timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | 
+12:04:02 MSK +901s HB step=sort gpu=[4 %, 333 MiB
+0 %, 65 MiB] last=sim_task_sort2.txt :: olcon_ordered_commands | +++ unset _colcon_prefix_sh_source_script | +++ unset _colcon_prefix_bash_COLCON_CURRENT_PREFIX | ++ unset COLCON_CURRENT_PREFIX | ++ unset _colcon_prefix_chain_bash_source_script | + timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | 
+12:05:03 MSK +961s HB step=sort gpu=[4 %, 365 MiB
+0 %, 65 MiB] last=sim_task_sort2.txt :: olcon_ordered_commands | +++ unset _colcon_prefix_sh_source_script | +++ unset _colcon_prefix_bash_COLCON_CURRENT_PREFIX | ++ unset COLCON_CURRENT_PREFIX | ++ unset _colcon_prefix_chain_bash_source_script | + timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | 
+12:06:03 MSK +1022s HB step=sort gpu=[4 %, 365 MiB
+0 %, 65 MiB] last=bridge_sort2.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794301548.295601016] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794301553.294419412] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794301558.294531330] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+12:07:03 MSK +1082s HB step=sort gpu=[4 %, 365 MiB
+0 %, 65 MiB] last=sort.log ::  8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | + sleep 5 | + '[' 413 -lt 1509 ']' | ++ left | +++ date +%s | ++ echo 3428 | + '[' 3428 -gt 1000 ']' | + rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | + sleep 5 | 
+12:08:03 MSK +1142s HB step=sort gpu=[4 %, 365 MiB
+0 %, 65 MiB] last=sort.log ::  8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | + sleep 5 | + '[' 472 -lt 1509 ']' | ++ left | +++ date +%s | ++ echo 3369 | + '[' 3369 -gt 1000 ']' | + rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | + sleep 5 | 
+12:09:03 MSK +1202s HB step=sort gpu=[4 %, 365 MiB
+0 %, 65 MiB] last=sort.log ::  8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | + sleep 5 | + '[' 530 -lt 1509 ']' | ++ left | +++ date +%s | ++ echo 3311 | + '[' 3311 -gt 1000 ']' | + rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | + sleep 5 | 
+12:10:03 MSK +1262s HB step=sort gpu=[4 %, 886 MiB
+0 %, 65 MiB] last=sim_task_sort2.txt :: olcon_ordered_commands | +++ unset _colcon_prefix_sh_source_script | +++ unset _colcon_prefix_bash_COLCON_CURRENT_PREFIX | ++ unset COLCON_CURRENT_PREFIX | ++ unset _colcon_prefix_chain_bash_source_script | + timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | 
+12:11:03 MSK +1322s HB step=sort gpu=[4 %, 886 MiB
+0 %, 65 MiB] last=bridge_sort2.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794301853.297126184] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794301858.294461308] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794301863.294554600] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+12:12:03 MSK +1382s HB step=sort gpu=[0 %, 905 MiB
+0 %, 65 MiB] last=bridge_sort2.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794301913.294591303] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794301918.294561438] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794301923.294557876] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+12:13:03 MSK +1442s HB step=sort gpu=[0 %, 906 MiB
+0 %, 65 MiB] last=bridge_sort2.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794301973.294587320] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794301978.294417772] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794301983.294501797] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+12:14:03 MSK +1502s HB step=sort gpu=[0 %, 906 MiB
+0 %, 65 MiB] last=bridge_sort2.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794302033.298299430] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794302038.294385005] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794302043.294390342] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+12:15:03 MSK +1562s HB step=sort gpu=[0 %, 906 MiB
+0 %, 65 MiB] last=bridge_sort2.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794302093.294859653] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794302098.294374252] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794302103.294728315] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+12:16:03 MSK +1622s HB step=sort gpu=[0 %, 1344 MiB
+0 %, 65 MiB] last=bridge_sort2.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794302153.294570647] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794302158.294400792] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794302163.294712346] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+12:17:03 MSK +1682s HB step=sort gpu=[4 %, 1344 MiB
+0 %, 65 MiB] last=bridge_sort2.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794302213.294518062] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794302218.294422811] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794302223.295298848] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+12:18:03 MSK +1742s HB step=sort gpu=[4 %, 1344 MiB
+0 %, 65 MiB] last=bridge_sort2.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794302273.294404908] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794302278.294487498] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794302283.294738254] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+12:19:03 MSK +1802s HB step=sort gpu=[40 %, 3246 MiB
+0 %, 65 MiB] last=sim_sort2.log :: 0ms | Total: 42.00ms | [PERF] Hz: 23.90 | Advance: 17.03ms | Preprocess: 0.01ms | EnvStep: 24.01ms | Total: 41.05ms | [PERF] Hz: 23.86 | Advance: 17.03ms | Preprocess: 0.01ms | EnvStep: 24.21ms | Total: 41.25ms | [PERF] Hz: 24.36 | Advance: 15.69ms | Preprocess: 0.01ms | EnvStep: 24.43ms | Total: 40.14ms | 
+12:20:03 MSK +1862s HB step=sort gpu=[22 %, 3246 MiB
+0 %, 65 MiB] last=bridge_sort2.log :: es/5s: cam_head=40, cam_torso=41 | [INFO] [1794302393.294532003] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40 | [INFO] [1794302398.296421792] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=38 | [INFO] [1794302403.294269669] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=39 | 
+12:21:04 MSK +1922s HB step=sort gpu=[30 %, 3246 MiB
+0 %, 65 MiB] last=sim_sort2.log :: 0ms | Total: 41.13ms | [PERF] Hz: 23.73 | Advance: 16.77ms | Preprocess: 0.01ms | EnvStep: 24.49ms | Total: 41.27ms | [PERF] Hz: 23.84 | Advance: 16.57ms | Preprocess: 0.01ms | EnvStep: 24.56ms | Total: 41.15ms | [PERF] Hz: 23.91 | Advance: 16.38ms | Preprocess: 0.01ms | EnvStep: 24.58ms | Total: 40.98ms | 
+12:22:04 MSK +1982s HB step=sort gpu=[22 %, 3246 MiB
+0 %, 65 MiB] last=bridge_sort2.log :: es/5s: cam_head=40, cam_torso=40 | [INFO] [1794302513.294555175] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40 | [INFO] [1794302518.294220530] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=40 | [INFO] [1794302523.294657137] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41 | 
+12:23:04 MSK +2043s HB step=sort gpu=[40 %, 3246 MiB
+0 %, 65 MiB] last=bridge_sort2.log :: es/5s: cam_head=40, cam_torso=40 | [INFO] [1794302573.295721211] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=39 | [INFO] [1794302578.294439691] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=40 | [INFO] [1794302583.294606084] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=39 | 
+12:24:04 MSK +2103s HB step=sort gpu=[37 %, 3246 MiB
+0 %, 65 MiB] last=run_sort2_101.log :: .0, 1.0, 1.0, 0.0]} | [INFO] [1794302644.055852382] [team048_solution]: HAND {"t": 81.57, "phase": "approach", "side": "r", "pos": [0.992, 0.99, 0.988, 0.989, 0.999, 0.0], "vel": [-0.0, -0.0, -0.0, -0.0, 0.0, 0.0], "eff": [0.041, 0.06, 0.065, 0.045, 0.023, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0]} | 
+12:25:04 MSK +2163s HB step=sort gpu=[28 %, 3246 MiB
+0 %, 65 MiB] last=bridge_sort2.log :: es/5s: cam_head=39, cam_torso=39 | [INFO] [1794302693.294226293] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39 | [INFO] [1794302698.294284134] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39 | [INFO] [1794302703.297171395] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39 | 
+12:26:04 MSK +2223s HB step=sort gpu=[32 %, 3246 MiB
+0 %, 65 MiB] last=sim_sort2.log :: 3ms | Total: 45.18ms | [PERF] Hz: 23.33 | Advance: 16.50ms | Preprocess: 0.02ms | EnvStep: 25.56ms | Total: 42.07ms | [PERF] Hz: 23.77 | Advance: 17.09ms | Preprocess: 0.01ms | EnvStep: 24.15ms | Total: 41.26ms | [PERF] Hz: 24.46 | Advance: 16.08ms | Preprocess: 0.01ms | EnvStep: 24.04ms | Total: 40.13ms | 
+12:27:04 MSK +2283s HB step=sort gpu=[27 %, 3246 MiB
+0 %, 65 MiB] last=bridge_sort2.log :: es/5s: cam_head=39, cam_torso=39 | [INFO] [1794302813.294897788] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39 | [INFO] [1794302818.294566050] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39 | [INFO] [1794302823.294428791] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=38 | 
+12:28:04 MSK +2343s HB step=sort gpu=[22 %, 3246 MiB
+0 %, 65 MiB] last=bridge_sort2.log :: es/5s: cam_head=40, cam_torso=40 | [INFO] [1794302873.294210069] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=41 | [INFO] [1794302878.294593182] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=39 | [INFO] [1794302883.294454359] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=40 | 
+12:29:04 MSK +2403s HB step=sort gpu=[39 %, 3246 MiB
+0 %, 65 MiB] last=sim_sort2.log :: 3ms | Total: 43.28ms | [PERF] Hz: 23.74 | Advance: 16.18ms | Preprocess: 0.01ms | EnvStep: 25.59ms | Total: 41.79ms | [PERF] Hz: 23.03 | Advance: 16.35ms | Preprocess: 0.01ms | EnvStep: 26.57ms | Total: 42.93ms | [PERF] Hz: 22.90 | Advance: 17.81ms | Preprocess: 0.01ms | EnvStep: 25.48ms | Total: 43.30ms | 
+12:30:04 MSK +2463s HB step=sort gpu=[38 %, 3246 MiB
+0 %, 65 MiB] last=run_sort2_101.log ::  0.0]} | [INFO] [1794303004.288173246] [team048_solution]: HAND {"t": 166.49, "phase": "approach", "side": "l", "pos": [1.0, 0.983, 0.984, 0.986, 0.995, -0.0], "vel": [-0.082, -0.011, -0.012, -0.013, 0.01, 0.0], "eff": [0.069, 0.033, 0.036, 0.033, 0.017, 0.095], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0]} | 
+12:31:04 MSK +2523s HB step=sort gpu=[32 %, 3246 MiB
+0 %, 65 MiB] last=bridge_sort2.log :: es/5s: cam_head=40, cam_torso=40 | [INFO] [1794303053.294255264] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=40 | [INFO] [1794303058.294212589] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40 | [INFO] [1794303063.294478100] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=40 | 
+12:32:04 MSK +2583s HB step=sort gpu=[33 %, 3246 MiB
+0 %, 65 MiB] last=sim_sort2.log :: 2ms | Total: 39.98ms | [PERF] Hz: 23.96 | Advance: 16.05ms | Preprocess: 0.01ms | EnvStep: 24.88ms | Total: 40.95ms | [PERF] Hz: 23.97 | Advance: 16.40ms | Preprocess: 0.01ms | EnvStep: 24.29ms | Total: 40.71ms | [PERF] Hz: 23.99 | Advance: 17.15ms | Preprocess: 0.01ms | EnvStep: 23.74ms | Total: 40.91ms | 
+12:33:04 MSK +2643s HB step=sort gpu=[22 %, 3246 MiB
+0 %, 65 MiB] last=bridge_sort2.log :: es/5s: cam_head=39, cam_torso=40 | [INFO] [1794303173.294921937] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39 | [INFO] [1794303178.294265659] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=38 | [INFO] [1794303183.294468981] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39 | 
+12:34:04 MSK +2703s HB step=sort gpu=[39 %, 3246 MiB
+0 %, 65 MiB] last=sim_sort2.log :: 8ms | Total: 40.23ms | [PERF] Hz: 23.24 | Advance: 16.88ms | Preprocess: 0.01ms | EnvStep: 25.50ms | Total: 42.40ms | [PERF] Hz: 23.75 | Advance: 16.15ms | Preprocess: 0.01ms | EnvStep: 25.33ms | Total: 41.49ms | [PERF] Hz: 23.92 | Advance: 16.42ms | Preprocess: 0.01ms | EnvStep: 24.81ms | Total: 41.24ms | 
+12:35:04 MSK +2763s HB step=sort gpu=[34 %, 3246 MiB
+0 %, 65 MiB] last=sim_sort2.log :: 9ms | Total: 41.51ms | [PERF] Hz: 23.91 | Advance: 16.42ms | Preprocess: 0.01ms | EnvStep: 24.94ms | Total: 41.37ms | [PERF] Hz: 23.31 | Advance: 16.72ms | Preprocess: 0.01ms | EnvStep: 25.78ms | Total: 42.51ms | [PERF] Hz: 23.71 | Advance: 16.56ms | Preprocess: 0.01ms | EnvStep: 25.08ms | Total: 41.65ms | 
+12:35:40 MSK +2799s END sort rc 0
+12:35:40 MSK +2799s ACCEL_SETUP + cd /tmp/sol
++ '[' -f setup.sh ']'
++ TEAM048_PY=/tmp/w/mm/envs/ros/bin/python
++ TEAM048_NO_BUILD=1
++ bash setup.sh
+[setup.sh] team048_accel 0.2.0 ready
+accel import OK 0.2.0
+
+12:35:40 MSK +2799s BUILD t _colcon_prefix_bash_COLCON_CURRENT_PREFIX
+++ unset COLCON_CURRENT_PREFIX
+++ unset _colcon_prefix_chain_bash_source_script
++ '[' -f /tmp/sol/install/setup.bash ']'
++ colcon build
+Starting >>> team048_solution
+Finished <<< team048_solution [0.97s]
+
+Summary: 1 package finished [1.09s]
+sol_build_rc=0
+
+12:35:40 MSK +2799s RESULTS {"task": "sort2", "seed": 101, "score_lb": 10, "sim_t_end": 245.069994522, "in_right_tray": 1, "in_wrong_tray": 0, "not_in_tray": 5, "total": 6, "objects": {"Utana_5_Porcelain_Ramekin_Large": {"tray": null, "ok": false}, "Threshold_Ramekin_White_Porcelain": {"tray": null, "ok": false}, "Ecoforms_Plant_Container_B4_Har": {"tray": null, "ok": false}, "Crunch_Girl_Scouts_Candy_Bars_Peanut_Butter_Creme_78_oz_box": {"tray": null, "ok": false}, "Crayola_Bonus_64_Crayons": {"tray": null, "ok": false}, "Perricone_MD_AcylGlutathione_Eye_Lid_Serum": {"tray": "tray_right", "ok": true}}}
+
+12:35:40 MSK +2799s KEYLINES run_sort2_101.log [INFO] [1794302313.329683850] [team048_solution]: accel on team048_accel 0.2.0
+[INFO] [1794302331.449662716] [team048_solution]: tray sources {"tray_left": {"source": "camera", "center": [0.346, 0.687]}, "tray_right": {"source": "camera", "center": [0.357, -0.709]}}
+[INFO] [1794302451.211914355] [team048_solution]: pick Threshold_Ramekin_White_Porcelain dish -> tray_left slot 0 arm r rim w 0.025 z 0.037 clear {"du": null, "dr": null, "margin": null}
+[INFO] [1794302472.679233840] [team048_solution]: guard: finger contact during approach Threshold_Ramekin_White_Porcelain {"dev": 0.217, "fingers": [5]} -> no close, re-observe
+[INFO] [1794302490.287001885] [team048_solution]: re-observe after contact Threshold_Ramekin_White_Porcelain
+[INFO] [1794302490.702535712] [team048_solution]: pick Threshold_Ramekin_White_Porcelain dish -> tray_left slot 0 arm r rim w 0.025 z 0.037 clear {"du": null, "dr": null, "margin": null}
+[INFO] [1794302512.079285443] [team048_solution]: guard: finger contact during approach Threshold_Ramekin_White_Porcelain {"dev": 0.254, "fingers": [5]} -> no close, re-observe
+[INFO] [1794302529.584665775] [team048_solution]: re-observe after contact Threshold_Ramekin_White_Porcelain
+[INFO] [1794302529.788612268] [team048_solution]: pick Ecoforms_Plant_Container_B4_Har dish -> tray_left slot 0 arm l rim w 0.025 z 0.056 clear {"du": null, "dr": null, "margin": null}
+[INFO] [1794302572.249857322] [team048_solution]: guard: finger contact during approach Ecoforms_Plant_Container_B4_Har {"dev": 0.186, "fingers": [5]} -> no close, re-observe
+[INFO] [1794302599.858912089] [team048_solution]: re-observe after contact Ecoforms_Plant_Container_B4_Har
+[INFO] [1794302600.172441173] [team048_solution]: pick Perricone_MD_AcylGlutathione_Eye_Lid_Serum box -> tray_right slot 0 arm r side w 0.054 z 0.054 clear {"du": 0.009, "dr": 0.025, "margin": 0.004}
+[INFO] [1794302656.820003084] [team048_solution]: jammed fingers (bent back past open, not re-targeted): [5]
+[INFO] [1794302762.454052016] [team048_solution]: pick Utana_5_Porcelain_Ramekin_Large dish -> tray_left slot 0 arm l rim w 0.025 z 0.054 clear {"du": null, "dr": null, "margin": null}
+[INFO] [1794302821.841184431] [team048_solution]: jammed fingers (bent back past open, not re-targeted): [3, 4]
+[INFO] [1794302836.930082254] [team048_solution]: grasp check: empty Utana_5_Porcelain_Ramekin_Large
+[INFO] [1794302861.459404844] [team048_solution]: re-observe after contact Utana_5_Porcelain_Ramekin_Large
+[INFO] [1794302861.664622731] [team048_solution]: pick Utana_5_Porcelain_Ramekin_Large dish -> tray_left slot 0 arm l rim w 0.025 z 0.054 clear {"du": null, "dr": null, "margin": null}
+[INFO] [1794302951.689349394] [team048_solution]: grasp check: empty Utana_5_Porcelain_Ramekin_Large
+[INFO] [1794302969.625267047] [team048_solution]: re-observe after contact Utana_5_Porcelain_Ramekin_Large
+[INFO] [1794302970.616443103] [team048_solution]: pick Crayola_Bonus_64_Crayons box -> tray_right slot 1 arm l side w 0.039 z 0.063 clear {"du": 0.018, "dr": 0.03, "margin": 0.004}
+[INFO] [1794303014.069114705] [team048_solution]: grasp check (contact): empty Crayola_Bonus_64_Crayons
+[INFO] [1794303033.128377899] [team048_solution]: pick Threshold_Ramekin_White_Porcelain dish -> tray_left slot 0 arm r rim w 0.025 z 0.037 clear {"du": null, "dr": null, "margin": null}
+[INFO] [1794303059.113579289] [team048_solution]: guard: finger contact during approach Threshold_Ramekin_White_Porcelain {"dev": 0.201, "fingers": [5]} -> no close, re-observe
+[INFO] [1794303076.695391269] [team048_solution]: re-observe after contact Threshold_Ramekin_White_Porcelain
+[INFO] [1794303077.074452879] [team048_solution]: pick Threshold_Ramekin_White_Porcelain dish -> tray_left slot 0 arm r rim w 0.025 z 0.037 clear {"du": null, "dr": null, "margin": null}
+[INFO] [1794303098.004162043] [team048_solution]: guard: finger contact during approach Threshold_Ramekin_White_Porcelain {"dev": 0.198, "fingers": [5]} -> no close, re-observe
+[INFO] [1794303115.574136750] [team048_solution]: re-observe after contact Threshold_Ramekin_White_Porcelain
+[INFO] [1794303115.772970273] [team048_solution]: pick Utana_5_Porcelain_Ramekin_Large dish -> tray_left slot 0 arm l rim w 0.025 z 0.053 clear {"du": null, "dr": null, "margin": null}
+[INFO] [1794303175.244516521] [team048_solution]: jammed fingers (bent back past open, not re-targeted): [3]
+[INFO] [1794303196.059496703] [team048_solution]: grasp check: empty Utana_5_Porcelain_Ramekin_Large
+[INFO] [1794303220.872042686] [team048_solution]: re-observe after contact Utana_5_Porcelain_Ramekin_Large
+[INFO] [1794303221.070017243] [team048_solution]: pick Utana_5_Porcelain_Ramekin_Large dish -> tray_left slot 0 arm l rim w 0.025 z 0.054 clear {"du": null, "dr": null, "margin": null}
+[INFO] [1794303303.637645095] [team048_solution]: grasp check: empty Utana_5_Porcelain_Ramekin_Large
+[INFO] [1794303322.090932462] [team048_solution]: re-observe after contact Utana_5_Porcelain_Ramekin_Large
+[INFO] [1794303322.110883998] [team048_solution]: done at 242.2 handled ['Perricone_MD_AcylGlutathione_Eye_Lid_Serum'] reason: time budget fails {"Threshold_Ramekin_White_": 2, "Utana_5_Porcelain_Rameki": 2}
+[INFO] [1794303322.111390640] [team048_solution]: accel at end on team048_accel 0.2.0
+run rc=0 cap=1400
+
+12:35:40 MSK +2799s KEYLINES run_sort_trace.log + echo 'run rc=0 cap=1400'
+
+12:35:40 MSK +2799s DONE

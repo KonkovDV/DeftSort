@@ -26,14 +26,15 @@ need={'compliance':'4cb594b','rust-accel2':'68d6b61','v8fixes':git('rev-parse','
 miss=[k for k,c in need.items() if git('merge-base','--is-ancestor',c,sha).returncode!=0]
 if miss and not a.force:sys.exit(f'{a.ref}={sha[:7]} does not contain {miss}; merge first (or --force for a diagnostic build)')
 # runtime only: Rust bench data (8 MB) and test fixtures are not needed on Kaggle (wheel is vendored; NO_BUILD=1)
-EXCL=[':(exclude)rust/team048_accel/benches/data',':(exclude)src/team048_solution/test/fixtures']
+EXCL=[':(exclude)rust/team048_accel/benches/data',':(exclude)src/team048_solution/test/fixtures',
+      ':(exclude)research',':(exclude)HANDOFF.md']   # v11: DeftSort carries research/ and HANDOFF.md, the kernel must not
 tar=subprocess.run(['git','-C',a.repo,'archive','--format=tar.gz','--prefix=solution/',sha,'--','.',*EXCL],capture_output=True).stdout
 names=subprocess.run(['tar','tzf','-'],input=tar,capture_output=True).stdout.decode().split()
 for f in ('solution/run.sh','solution/setup.sh','solution/src/team048_solution/team048_solution/node.py'):
     if f not in names:sys.exit('missing in archive: '+f)
 whl=[n for n in names if n.startswith('solution/vendor/team048_accel-') and n.endswith('.whl')]
 print('ref',a.ref,sha[:10],'wheel',whl or 'NONE (NumPy reference only)','missing',miss,'session_min',a.session_min,'setup_cap',a.setup_cap,'simboot',a.simboot,'RUNTO',VAR['RUNTO'])
-files={k:open(os.path.join(H,k)).read() for k in ['setup_env.sh','grab_frames.py','run_sort.sh','score.py']}
+files={k:open(os.path.join(H,k)).read() for k in ['setup_env.sh','grab_frames.py','run_sort.sh','score.py','wait_task.py']}
 sol=base64.b64encode(tar).decode()
 env=dict(TASK=VAR['TASK'],SEEDS=VAR['SEEDS'],RUNTO=VAR['RUNTO'],HACK_SELF_COLLISION=VAR['HACK_SELF_COLLISION'],HACK_POOL='3',SEED0='100',SIMBOOT_MAX=str(a.simboot))
 src=f"""import subprocess,os,time,base64,io,tarfile,threading,signal,glob,datetime,json

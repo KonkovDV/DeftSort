@@ -27,8 +27,12 @@ rosenv python teleoperation/bridges/ros2_zmq_bridge.py > $W/logs/bridge_$TASK.lo
 LD_LIBRARY_PATH=$T/nvlib:$LD_LIBRARY_PATH $MAMBA_ROOT_PREFIX/envs/isaac/bin/python scripts/sim_runner.py --task NSSRSim-TiangongPro-Parlor-v0 --enable_cameras --num_envs 1 --perf_stats --step_hz 100 --headless --device cpu > $W/logs/sim_$TASK.log 2>&1 & SIM=$!
 # v8: Isaac needed 22 min to the first camera frame (cold shader cache) -> wait up to SIMBOOT_MAX for /sim/task AND /clock
 D=$((SECONDS+${SIMBOOT_MAX:-1800})); up=0
+# v11: one long-lived waiter (wait_task.py: same QoS as the solution node) instead of 8 s CLI polls; v9a got nothing
+# from 105 polls in 1512 s with frames flowing for the last ~400 s. The CLI probe stays as a second check (cap 20 s).
 while [ $SECONDS -lt $D ] && [ $(left) -gt $((RUNTO/2+300)) ]; do
-  rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String > $W/logs/sim_task_$TASK.txt 2>&1 && { up=1; break; }; sleep 5
+  R=$(( D-SECONDS )); L2=$(( $(left)-(RUNTO/2+300) )); [ $L2 -lt $R ] && R=$L2; [ $R -lt 10 ] && R=10
+  rosenv timeout -k 5 $((R+10)) python $W/wait_task.py $R $W/logs/sim_task_$TASK.txt >> $W/logs/wait_task_$TASK.log 2>&1 && { up=1; break; }
+  rosenv timeout -k 2 20 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String > $W/logs/sim_task_$TASK.txt 2>&1 && { up=1; break; }; sleep 5
 done
 echo "sim boot: up=$up after ${SECONDS}s"; [ $up = 1 ] || { echo "SIM NOT UP"; kill -INT $SIM; exit 4; }
 grep -q "self-collisions ON" $W/logs/sim_$TASK.log && echo "self-collisions ON (sim log)" || echo "self-collisions: not reported by the sim (HACK_SELF_COLLISION=$HACK_SELF_COLLISION)"
