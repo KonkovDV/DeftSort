@@ -145,7 +145,7 @@ class EndOfRun595(unittest.TestCase):
         transport, the hand opens at the object and the arm retreats WITHOUT lifting."""
         from team048_solution import budget as B
         sol=TS.NodeWiring.s if hasattr(TS.NodeWiring,'s') else None
-        s=N.Sol();s.arms={k:ARM.Arm(k) for k in 'lr'}
+        s=N.Sol();s.arms={k:ARM.Arm(k) for k in 'lr'};s.hand_settings_step()
         for A in s.arms.values():A.set_scene(SF.plane(),list(SF.TRAYS.values()))
         s.trays=dict(SF.TRAYS);moves=[];hand=[]
         s.move_arm=lambda side,q,**k:moves.append(np.asarray(q).copy()) or True

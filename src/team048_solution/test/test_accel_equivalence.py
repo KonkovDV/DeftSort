@@ -93,7 +93,7 @@ class Equivalence(unittest.TestCase):
             s.assertIsNone(A.chain._fast);s.assertIsNone(A.col._fast)
         finally:_accel._disabled=saved
     def test_perception_kernels_match_reference(s):
-        frames=sorted(glob.glob('/workspace/fixes/kaggle-sim/out_v7/trace/*/*.npz'))[:12]
+        frames=sorted(glob.glob(os.path.join(os.environ.get('TEAM048_V7_TRACE','/workspace/fixes/kaggle-sim/out_v7/trace'),'*','*.npz')))[:12]
         if not frames:s.skipTest('v7 frames not on this machine')
         K=dict(fx=343.16,cx=320.,cy=180.)
         for fn in frames:

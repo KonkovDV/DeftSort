@@ -1,0 +1,13 @@
+{
+ "about": "Simulator-side confirmation of /inspire_hand/set_force per layout: the sim prints '[hack] <side> hand force limits: [...]' when the service handles a request. Before v11 the solution sent the requests once, only to services already discovered (node.hand_settings, service_is_ready).",
+ "layouts": [
+  {"run": "v7 sort3 seed 101", "log": "Kaggle run out_v7/logs/sim_sort3.log:154", "left": null, "right": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]},
+  {"run": "v7 sort3 seed 102", "log": "Kaggle run out_v7/logs/sim_sort3.log:521", "left": null, "right": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]},
+  {"run": "v7 sort3 seed 103", "log": "Kaggle run out_v7/logs/sim_sort3.log:930-931", "left": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "right": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]},
+  {"run": "v8 sort3 seed 103", "log": "Kaggle run out_v8/logs/sim_sort3.log:168", "left": null, "right": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]},
+  {"run": "v9a sort3 seed 103", "log": "Kaggle run out_v9a_v1/logs/sim_sort3.log:177", "left": null, "right": [0.4, 0.4, 0.4, 0.4, 0.4, 1.0]},
+  {"run": "v9b sort2 seed 101 (f525ed9)", "log": "Kaggle run out_v9b_f525ed9/logs/sim_sort2.log:174", "left": null, "right": [0.4, 0.4, 0.4, 0.4, 0.4, 1.0]}
+ ],
+ "v9b_left_hand_closes": 5,
+ "v9b_left_hand_closes_log": "Kaggle run out_v9b_f525ed9/logs/run_sort2_101.log:1227,1331,1389,1524,1627 (TRACE closed, side l)"
+}

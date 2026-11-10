@@ -9,10 +9,15 @@ class Msg:
 class Pub:
     def __init__(s,topic):s.topic=topic;s.sent=[]
     def publish(s,m):s.sent.append(m)
+class Fut:
+    """rclpy.task.Future stand-in: resolved immediately with `reply` (None = the service never answers)."""
+    def __init__(s,reply):s.reply=reply
+    def done(s):return s.reply is not None
+    def result(s):return s.reply
 class Cli:
-    def __init__(s,name):s.name=name;s.calls=[]
-    def service_is_ready(s):return True
-    def call_async(s,r):s.calls.append(r)
+    def __init__(s,name):s.name=name;s.calls=[];s.ready=True;s.reply=Msg()
+    def service_is_ready(s):return s.ready
+    def call_async(s,r):s.calls.append(r);return Fut(s.reply)
 class Clock:
     t=100.
     def now(s):return types.SimpleNamespace(nanoseconds=int(Clock.t*1e9))
@@ -51,7 +56,7 @@ def stamp(t):return types.SimpleNamespace(sec=int(t),nanosec=int(round((t-int(t)
 class NodeWiring(unittest.TestCase):
     @classmethod
     def setUpClass(c):
-        c.s=N.Sol();c.s.arms={k:ARM.Arm(k) for k in 'lr'}
+        c.s=N.Sol();c.s.arms={k:ARM.Arm(k) for k in 'lr'};c.s.hand_settings_step()   # hand force delivered (stub services)
         for A in c.s.arms.values():A.set_scene(SF.plane(),list(SF.TRAYS.values()))   # synthetic test scene
     def test_speed_cap_in_command(s):
         s.s.cmd('arm',[11,12],[0.,0.],[5.,0.])

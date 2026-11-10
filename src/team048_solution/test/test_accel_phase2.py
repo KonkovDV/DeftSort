@@ -7,7 +7,8 @@ HERE=os.path.dirname(os.path.abspath(__file__));sys.path.insert(0,os.path.join(H
 import test_node_stub  # noqa: ROS stubs for node.py
 import scene_fixture as SF
 from team048_solution import _accel, arm, perception, trays as TR, grasp, planning, node as NODE
-FRAMES=sorted(glob.glob('/workspace/fixes/kaggle-sim/out_v7/trace/*/*.npz'))[:int(os.environ.get('T48_EQ_FRAMES',31))]
+V7_TRACE=os.environ.get('TEAM048_V7_TRACE','/workspace/fixes/kaggle-sim/out_v7/trace')   # Kaggle v7 trace frames (not shipped)
+FRAMES=sorted(glob.glob(os.path.join(V7_TRACE,'*','*.npz')))[:int(os.environ.get('T48_EQ_FRAMES',31))]
 FIX=os.path.join(HERE,'fixtures','v5_head_frame.npz')
 K=np.array([[343.16,0,320.],[0,343.16,180.],[0,0,1]])
 # Target environment (ROS 2 Humble: Python 3.10, NumPy < 2): bit-identical. NumPy 2.x evaluates 2-vector products

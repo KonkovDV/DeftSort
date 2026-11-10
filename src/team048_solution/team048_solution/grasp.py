@@ -24,6 +24,8 @@ RIM_DEPTH=.015
 RIM_ANGLE_DEG=(0,30,-30,60,-60,90,-90)
 # Top-down depth below the object top (m). Study topdown_shallow (.01) ≈ topdown (.03) for ok-rate; keep .03.
 TOP_DEPTH=.03
+# Rim width used for the pinch (m): the pad that goes inside the rim needs free space this far in from the rim circle.
+RIM_W=.025
 
 _ANG=np.linspace(0,np.pi,180,endpoint=False)
 _DIRS=np.array([[np.cos(a),np.sin(a)] for a in _ANG])   # exactly the reference's per-angle u (scalar ufunc calls)
@@ -57,6 +59,15 @@ def _box(f,ax,w,cyl):
     return dict(center=np.asarray(f['center'],float).copy(),u=np.asarray(ax,float)[:2].copy(),w=float(w),L=float(L),
                 h=float(f['height']),cyl=bool(cyl))
 
+def rim_closed(cloud,plane,f,c0,r0):
+    """True when the measured dish has no cavity to pinch into: the points more than RIM_W inside the fitted rim circle
+    sit (median) higher than the pinch depth below the top, so the inner pad of a rim pinch would be commanded into
+    solid material. v9b (Threshold ramekin, every head frame of v7, v8 and v9b): 622-677 interior points, median 1 mm
+    under the top -> the thumb landed on the top in 4 of 4 approaches (0.4-1.0 mm from the measured surface) and the
+    approach guard stopped each one. Open dishes (Utana, Ecoforms upright): 0-6 interior points at 1.2 cm."""
+    h=cloud@plane[0]+plane[1];inner=np.linalg.norm(cloud[:,:2]-np.asarray(c0,float),axis=1)<r0-RIM_W
+    return bool(inner.any() and np.median(h[inner])>f['height']-RIM_DEPTH)
+
 def candidates(cloud,plane,category,others=(),W_MAX=.09,finger=.02,depth=.04,margin=.01,robot_xy=(0.,0.)):
     f=footprint(cloud,plane);out=[];cyl=False
     if category=='jar':   # visible arc of a cylinder under-estimates the diameter: circle fit on mid-height slice
@@ -85,11 +96,12 @@ def candidates(cloud,plane,category,others=(),W_MAX=.09,finger=.02,depth=.04,mar
         hull=f['hull'];c0,r0=circle_fit(hull) if len(hull)>5 else (f['center'],float(f['width'])/2)
         a0=float(np.arctan2(toward[1],toward[0]))
         z=f['height']-min(RIM_DEPTH,.3*f['height'])
-        for i,deg in enumerate(RIM_ANGLE_DEG):
+        f['rim_closed']=rim_closed(cloud,plane,f,c0,r0)
+        for i,deg in enumerate(() if f['rim_closed'] else RIM_ANGLE_DEG):
             a=a0+np.deg2rad(deg);p=c0+r0*np.array([np.cos(a),np.sin(a)])
             rad=(p-c0)/ (np.linalg.norm(p-c0)+1e-9)
             # close along the radius (toward the bowl centre), approach straight down
-            out.append(dict(kind='rim',center=p,close_axis=rad,approach=np.array([0.,0.,-1.]),width=.025,z=z,
+            out.append(dict(kind='rim',center=p,close_axis=rad,approach=np.array([0.,0.,-1.]),width=RIM_W,z=z,
                             score=1.0-.02*i))   # prefer the near-robot rim point
     allpts=None
     if _accel.enabled2() and out:

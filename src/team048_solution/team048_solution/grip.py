@@ -3,8 +3,8 @@
   /inspire_hand/state/{l,r}    sensor_msgs/JointState: position 0..1 (1 open), velocity = fraction of max speed,
                                effort = fraction of the force limit
 Verified on Kaggle v5 (check_interfaces): both wrists |F| = 0.00 N with an empty hand; hand state has 6 x pos/vel/eff.
-Loaded-hand values are NOT measured yet, so the decision thresholds below are TODO and the monitor answers
-None ("unknown") until they are set; callers then keep the previous behaviour (assume held).
+The held/empty decision is held_rule (finger deviation + effort, calibrated on v7+v8 traces below). The older
+finger_verdict/past_verdict and the wrist F/T are kept for the log only.
 """
 import numpy as np
 

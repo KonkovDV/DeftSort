@@ -1,8 +1,10 @@
 """Team 048 solution node: sort2/sort3 (pool from /sim/task). Sensor-only perception (head RGB-D + TF),
 object identity by assignment of segmented blobs to the task's object list using size priors, URDF IK with
 sphere self-collision checks, 0.8 rad/s-capped synchronized joint moves, Inspire hand pinch/side grasps.
-Per-layout time budget (startup included), sensor grasp check (wrist F/T + hand state; thresholds TODO until
-calibrated), slots inside trays, trays confirmed by camera colour, straight-up retreats, TCP check before closing.
+Per-layout time budget (startup included), grasp check from the hand state (grip.held_rule, approach guard; the
+wrist F/T is logged only), slots inside trays, trays confirmed by camera colour, straight-up retreats, TCP check
+before closing. Hand force/speed (#648) are sent to each hand as soon as its service appears, re-sent until the call
+returns, and an arm whose hand never got the force limit is not used.
 Tubes: not solved -> immediate /sim/task/done (0 points, allowed by SCORING).
 Debug topics (/sim/task/check, /sim/objects/*) are never used.
 Scene (#645): table plane + near edge and the trays are MEASURED by the cameras at run time (head survey with head
@@ -77,6 +79,15 @@ MOVE_SETTLE_S=2.6     # s per arm move on top of the 1.6x speed line (move_arm: 
 FAILS_MAX=2           # failed attempts per object before it is skipped (per round)
 RETRY_ROUNDS=1        # extra round with reset failure counters when time is left (v9a: stop at 124 s of 405 s)
 HAND_LOG_DT=.1        # s sim: hand-state log period during the guarded approach and the closing (10 Hz, v8 fix 4)
+# SetForce / SetSpeed delivery (#648: finger force 0.3-0.5 on BOTH hands). Until v10 the requests were sent once at
+# start and only to services that were already discovered: the simulator printed '[hack] <side> hand force limits'
+# for the right hand only in 5 of 6 recorded layouts (v7 x3, v8, v9a, v9b sim logs), so the left hand closed at the
+# default force 1.0 (v9b: 5 left-hand closes). Now every request is retried from a background thread until the
+# service has answered; an arm whose hand never received its force request is not used for picking.
+# The values below are wall-clock design choices (DDS discovery runs on wall time), not measured thresholds.
+HAND_CFG_POLL_S=.2      # s wall between delivery passes
+HAND_CFG_REPLY_S=2.     # s wall to wait for a reply before the request is sent again
+HAND_CFG_SENDS_MAX=5    # sends per service; after that the request counts as delivered without a reply
 def quat_to_T(t,q):
     x,y,z,w=q;T=np.eye(4)
     T[:3,:3]=[[1-2*(y*y+z*z),2*(x*y-z*w),2*(x*z+y*w)],[2*(x*y+z*w),1-2*(x*x+z*z),2*(y*z-x*w)],[2*(x*z-y*w),2*(y*z+x*w),1-2*(x*x+y*y)]]
@@ -119,14 +130,16 @@ class Sol(Node):
         except Exception:t=None
         if t is not None:hp=s.hpos[k];hp.append((t,list(m.position)));del hp[:-60]
     def hand_log(s,side,phase,force=False,**extra):
-        """Hand state (position/velocity/effort + command) at <= 10 Hz (HAND_LOG_DT, sim time) during guarded phases."""
+        """Hand state (position/velocity/effort + command) and the wrist force at <= 10 Hz (HAND_LOG_DT, sim time) during
+        guarded phases. The force is logged only: v9b Ecoforms reached |F| 26 N before the finger guard tripped, and the
+        approach force profile is needed before a force guard can be calibrated."""
         t=s.now()
         if not force and t-s.hand_log_t.get(side,-1e9)<HAND_LOG_DT:return
         s.hand_log_t[side]=t;h=s.hstate.get(side)
         r=lambda v:None if v is None else [round(float(x),3) for x in v]
         rec=dict(t=round(s.budget.elapsed(t),2) if getattr(s,'budget',None) else round(t,2),phase=phase,side=side,
                  pos=r(None if h is None else h.position),vel=r(None if h is None else h.velocity),
-                 eff=r(None if h is None else h.effort),cmd=r(s.hand_target.get(side)))
+                 eff=r(None if h is None else h.effort),cmd=r(s.hand_target.get(side)),F=r(s.wrench.get(side)))   # F: log only
         rec.update(extra);s.log('HAND',json.dumps(rec))
     def now(s):return s.get_clock().now().nanoseconds*1e-9
     def sleep(s,dt):
@@ -215,17 +228,67 @@ class Sol(Node):
             if s.now()-t>=tmin and GRIP.fingers_stalled(s.hpos[side],s.now(),since=t):return True
             time.sleep(.02)
         return False
-    def hand_settings(s):
-        """Explicit finger force/speed limits (bodyctrl_msgs/srv/SetForce, SetSpeed). Async, never blocks the run."""
+    def hand_requests(s):
+        """(service kind, side) -> request with the configured ratios (bodyctrl_msgs/srv/SetForce, SetSpeed)."""
+        out={}
         for k in 'lr':
-            if s.cli_force[k].service_is_ready():
-                r=SetForce.Request()
-                for i,v in enumerate(GRIP.force_vector()):setattr(r,f'force{i}_ratio',float(v))
-                s.cli_force[k].call_async(r)
-            if s.cli_speed[k].service_is_ready():
-                r=SetSpeed.Request()
-                for i in range(6):setattr(r,f'speed{i}_ratio',float(GRIP.HAND_SPEED_RATIO))
-                s.cli_speed[k].call_async(r)
+            r=SetForce.Request()
+            for i,v in enumerate(GRIP.force_vector()):setattr(r,f'force{i}_ratio',float(v))
+            out[('force',k)]=r
+            r=SetSpeed.Request()
+            for i in range(6):setattr(r,f'speed{i}_ratio',float(GRIP.HAND_SPEED_RATIO))
+            out[('speed',k)]=r
+        return out
+    def hand_settings_step(s,wall=None):
+        """One non-blocking delivery pass over the four hand requests. State per (kind, side) in s.hand_cfg:
+        'waiting' (service not discovered yet), 'sent' (request out, no reply yet), 'confirmed' (the service replied),
+        'unconfirmed' (HAND_CFG_SENDS_MAX sends without a reply). Returns True when nothing is left to do."""
+        wall=time.monotonic() if wall is None else wall
+        if not hasattr(s,'hand_cfg'):
+            s.hand_cfg={key:dict(state='waiting',sends=0,t_sent=None,future=None,t0=wall) for key in s.hand_requests()}
+        reqs=s.hand_requests();busy=False
+        for (kind,side),c in s.hand_cfg.items():
+            if c['state'] in ('confirmed','unconfirmed'):continue
+            cli=(s.cli_force if kind=='force' else s.cli_speed)[side];f=c['future']
+            if f is not None and f.done():
+                try:res=f.result()
+                except Exception as e:res=None;s.log('hand settings',SIDE_NAME[side],kind,'call failed:',type(e).__name__)
+                if res is not None:
+                    c['state']='confirmed';c['future']=None
+                    fields=getattr(res,'get_fields_and_field_types',None)
+                    reply={n:getattr(res,n,None) for n in fields()} if callable(fields) else {}
+                    s.log('hand settings',SIDE_NAME[side],kind,'confirmed after',c['sends'],'send(s),',
+                          round(wall-c['t0'],1),'s wall, reply',json.dumps(reply,default=str))
+                    continue
+                c['future']=None
+            if c['state']=='sent' and c['future'] is not None and wall-c['t_sent']<HAND_CFG_REPLY_S:busy=True;continue
+            if c['sends']>=HAND_CFG_SENDS_MAX:
+                c['state']='unconfirmed';s.log('hand settings',SIDE_NAME[side],kind,'sent',c['sends'],'times, no reply');continue
+            busy=True
+            if not cli.service_is_ready():continue
+            c['future']=cli.call_async(reqs[(kind,side)]);c['sends']+=1;c['t_sent']=wall;c['state']='sent'
+            vals=[round(getattr(reqs[(kind,side)],f'{kind}{i}_ratio'),3) for i in range(6)]
+            s.log('hand settings',SIDE_NAME[side],kind,vals,'send',c['sends'],'service seen after',round(wall-c['t0'],1),'s wall')
+        return not busy
+    def hand_settings(s,stop=None):
+        """Deliver SetForce/SetSpeed to both hands in the background: retry until every service has replied (or the
+        send limit is reached), never blocking the run. stop: threading.Event that ends the thread."""
+        s.hand_settings_step()
+        stop=stop or threading.Event();s.hand_cfg_stop=stop
+        def loop():
+            while not stop.is_set():
+                try:
+                    if s.hand_settings_step():return
+                except Exception as e:s.log('hand settings: pass failed',type(e).__name__,e)
+                stop.wait(HAND_CFG_POLL_S)
+        th=threading.Thread(target=loop,daemon=True);th.start();s.hand_cfg_thread=th;return th
+    def hand_force_applied(s,side):
+        """True when this hand's SetForce request reached the simulator's service (sent while the service was
+        discovered, replied or not). v9b: the right hand's sim-side confirmation line followed such a send."""
+        c=getattr(s,'hand_cfg',{}).get(('force',side))
+        return c is not None and c['state']!='waiting'
+    def hand_cfg_summary(s):
+        return {f"{SIDE_NAME[k]}_{kind}":c['state'] for (kind,k),c in sorted(getattr(s,'hand_cfg',{}).items())}
     def hand_verdict(s,side,grasp=None):
         """v8 fix 2: held iff a closing finger deviates >= GRIP.HELD_DEV from its current command with effort >=
         GRIP.HELD_EFF (15/15 on v7+v8). Wrist F/T, past_verdict and the v7 finger_verdict are LOG-ONLY
@@ -418,6 +481,7 @@ class Sol(Node):
         return out
     # ---------------- task ----------------
     def run(s):
+        s.hand_settings()     # background delivery starts before the task arrives (service discovery takes wall time)
         while s.task is None or s.now()<=0:time.sleep(.05)
         # v7 s101: 'startup 206.9 s' -- the wait for the (not yet running) sim clock was counted as sim time.
         # Only process start-up before the node could receive /clock is charged (pessimistically, RTF<=1).
@@ -431,7 +495,6 @@ class Sol(Node):
         s.arms={k:ARMMOD.Arm(k) for k in 'lr'}
         s.log('startup',round(s.budget.elapsed(s.now()),1),'s of',s.budget.limit)
         s.log('accel',*accel_status())
-        s.hand_settings()
         while not s.js:time.sleep(.05)
         for k in 'lr':s.hand_open(k)
         # v9fix: survey FIRST with the arms in the start posture (v7 s102 start frames: table plane, near edge and
@@ -488,9 +551,11 @@ class Sol(Node):
                 why='nothing pickable in %d observations'%empty;break
         for k in 'lr':s.retreat(k)
         if abs(s.js.get('body_yaw_joint',0.))>.05:s.waist(0.)
+        if getattr(s,'hand_cfg_stop',None) is not None:s.hand_cfg_stop.set()
         s.done.publish(Empty());s.log('done at',round(s.budget.elapsed(s.now()),1),'handled',sorted(handled),'reason:',why,
                                       'fails',json.dumps({k[:24]:v for k,v in fails.items()}))
         s.log('accel at end',*accel_status())
+        s.log('hand settings at end',json.dumps(s.hand_cfg_summary()))
     def use_robot_description(s,wait=1.):
         """#595.4: prefer the URDF the simulator publishes on /robot_description (TRANSIENT_LOCAL, latched). It is
         used only if it contains every link the planner needs; otherwise the bundled copy of the same organiser URDF
@@ -556,7 +621,10 @@ class Sol(Node):
         k=s.placed.get(tray,0);dl=TR.slot_offset(k,.5*f['length'],size=(ts,tl),ty=ty)   # along the MEASURED long axis
         sx,sy=tx+dl*ax,ty+dl*ay
         why={'candidates':len(C),'feasible':int(sum(1 for g in C if g['feasible'])),'pick_ik':{},'place':{},'hand_clear':{}}   # v8 fix 7
+        if 'rim_closed' in f:why['rim_closed']=f['rim_closed']
         for side in order:
+            if not s.hand_force_applied(side):   # #648: never grasp at the default force 1.0
+                why.setdefault('hand_force_not_applied',[]).append(side);continue
             A=s.arms[side];A.set_other(s.q_now('r' if side=='l' else 'l'))   # #625 arm-to-arm at the measured posture
             for g in C:
                 if not g['feasible']:continue
@@ -652,8 +720,10 @@ class Sol(Node):
                 s.trace('home',side,name)
                 s.placed[tray]=k+1
                 return True
+        if len(why.get('hand_force_not_applied',[]))==len(order):   # not a planning failure: retry once a hand is ready
+            why['reason']='hand force not applied on any arm';s.log('no plan:',name,json.dumps(why));return False
         s.last_infeasible=True   # nothing executed: no candidate had a collision-free pick + place plan
-        why['reason']=('no grasp candidate' if not C else 'no feasible grasp candidate' if not why['feasible'] else
+        why['reason']=('dish without an open rim (closed top measured)' if f.get('rim_closed') and not C else 'no grasp candidate' if not C else 'no feasible grasp candidate' if not why['feasible'] else
                        'no collision-free pick IK' if not why['place'] else 'no place plan (tray reach / collisions)')
         s.log('no plan:',name,json.dumps(why))
         return False
