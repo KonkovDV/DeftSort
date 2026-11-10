@@ -1,10 +1,16 @@
+# Python
 __pycache__/
 *.pyc
+*.egg-info/
+.pytest_cache/
+.coverage
+.coverage.*
+# colcon
 build/
 install/
 log/
+# Rust
 rust/team048_accel/target/
-__pycache__/
-*.pyc
-benches/data/*.f64
-benches/data/*.u8
+# benchmark frame data written by rust/team048_accel/benches/export_model.py (not part of the submission)
+rust/team048_accel/benches/data/*.f64
+rust/team048_accel/benches/data/*.u8
