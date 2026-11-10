@@ -1,0 +1,1415 @@
++ cd /tmp/sol
++ rosenv timeout --kill-after=20 1097 bash run.sh
+++ /tmp/w/bin/micromamba shell hook -s bash
++ eval '
+# Copyright (C) 2012 Anaconda, Inc
+# SPDX-License-Identifier: BSD-3-Clause
+
+__mamba_exe() (
+    "/tmp/w/bin/micromamba" "${@}"
+)
+
+__mamba_hashr() {
+    if [ -n "${ZSH_VERSION:+x}" ]; then
+        \rehash
+    elif [ -n "${POSH_VERSION:+x}" ]; then
+        :  # pass
+    else
+        \hash -r
+    fi
+}
+
+__mamba_xctivate() {
+    \local ask_mamba
+    ask_mamba="$(PS1="${PS1:-}" __mamba_exe shell "${@}" --shell bash)" || \return
+    \eval "${ask_mamba}"
+    __mamba_hashr
+}
+
+__mamba_wrap() {
+    \local cmd="${1-__missing__}"
+    case "${cmd}" in
+        activate|reactivate|deactivate)
+            for arg in "${@}"; do
+                case "${arg}" in
+                    -h|--help)
+                        __mamba_exe "${@}"
+                        return
+                        ;;
+                esac
+            done
+            __mamba_xctivate "${@}"
+            ;;
+        install|update|upgrade|remove|uninstall)
+            __mamba_exe "${@}" || \return
+            __mamba_xctivate reactivate
+            ;;
+        self-update)
+            __mamba_exe "${@}" || \return
+
+            # remove leftover backup file on Windows
+            if [ -f "/tmp/w/bin/micromamba.bkup" ]; then
+                rm -f "/tmp/w/bin/micromamba.bkup"
+            fi
+            ;;
+        *)
+            __mamba_exe "${@}"
+            ;;
+    esac
+}
+
+
+# We need to define a function with the same name as the executable to be called by the user.
+# There is no way to register it dynamically without relying on hacks or eval.
+__exe_name="$(basename "/tmp/w/bin/micromamba")"
+__exe_name="${__exe_name%.*}"
+
+case "${__exe_name}" in
+    micromamba)
+        micromamba() {
+            __mamba_wrap "$@"
+        }
+        ;;
+    mamba)
+        mamba() {
+            __mamba_wrap "$@"
+        }
+        ;;
+    *)
+        echo "Error unknown MAMBA_EXE: \"/tmp/w/bin/micromamba\", filename must be mamba or micromamba" 1>&2
+        ;;
+esac
+
+
+if [ -z "${CONDA_SHLVL+x}" ]; then
+    \export CONDA_SHLVL=0
+    \export PATH="${MAMBA_ROOT_PREFIX}/condabin:${PATH}"
+
+    # We'\''re not allowing PS1 to be unbound. It must at least be set.
+    # However, we'\''re not exporting it, which can cause problems when starting a second shell
+    # via a first shell (i.e. starting zsh from bash).
+    if [ -z "${PS1+x}" ]; then
+        PS1=
+    fi
+fi
+
+if [ -n "${ZSH_VERSION:+x}" ]; then
+  if ! command -v compinit > /dev/null; then
+    autoload -U +X compinit && if [[ "${ZSH_DISABLE_COMPFIX-}" = true ]]; then
+      compinit -u
+    else
+      compinit
+    fi
+  fi
+  autoload -U +X bashcompinit && bashcompinit
+
+  _umamba_zsh_completions()
+  {
+    COMPREPLY=($(__mamba_exe completer "${(@s: :)${(@s: :)COMP_LINE}:1}"))
+  }
+
+  complete -o default -F _umamba_zsh_completions micromamba
+fi
+if [ -n "${BASH_VERSION:+x}" ]; then
+  _umamba_bash_completions()
+  {
+    COMPREPLY=($(__mamba_exe completer "${COMP_WORDS[@]:1}"))
+  }
+  complete -o default -F _umamba_bash_completions micromamba
+fi'
++++ basename /tmp/w/bin/micromamba
+++ __exe_name=micromamba
+++ __exe_name=micromamba
+++ case "${__exe_name}" in
+++ '[' -z '' ']'
+++ export CONDA_SHLVL=0
+++ CONDA_SHLVL=0
+++ export PATH=/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin
+++ PATH=/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin
+++ '[' -z '' ']'
+++ PS1=
+++ '[' -n '' ']'
+++ '[' -n x ']'
+++ complete -o default -F _umamba_bash_completions micromamba
++ micromamba activate ros
++ __mamba_wrap activate ros
++ local cmd=activate
++ case "${cmd}" in
++ for arg in "${@}"
++ case "${arg}" in
++ for arg in "${@}"
++ case "${arg}" in
++ __mamba_xctivate activate ros
++ local ask_mamba
+++ PS1=
+++ __mamba_exe shell activate ros --shell bash
+++ /tmp/w/bin/micromamba shell activate ros --shell bash
++ ask_mamba='PS1='\''(ros) '\''
+export PATH='\''/tmp/w/mm/envs/ros/bin:/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin'\''
+export CONDA_PREFIX='\''/tmp/w/mm/envs/ros'\''
+export CONDA_SHLVL='\''1'\''
+export CONDA_DEFAULT_ENV='\''ros'\''
+export CONDA_PROMPT_MODIFIER='\''(ros) '\''
+. "/tmp/w/mm/envs/ros/etc/conda/activate.d/libglib_activate.sh"
+. "/tmp/w/mm/envs/ros/etc/conda/activate.d/libxml2_activate.sh"
+. "/tmp/w/mm/envs/ros/etc/conda/activate.d/ros-humble-ros-workspace_activate.sh"'
++ eval 'PS1='\''(ros) '\''
+export PATH='\''/tmp/w/mm/envs/ros/bin:/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin'\''
+export CONDA_PREFIX='\''/tmp/w/mm/envs/ros'\''
+export CONDA_SHLVL='\''1'\''
+export CONDA_DEFAULT_ENV='\''ros'\''
+export CONDA_PROMPT_MODIFIER='\''(ros) '\''
+. "/tmp/w/mm/envs/ros/etc/conda/activate.d/libglib_activate.sh"
+. "/tmp/w/mm/envs/ros/etc/conda/activate.d/libxml2_activate.sh"
+. "/tmp/w/mm/envs/ros/etc/conda/activate.d/ros-humble-ros-workspace_activate.sh"'
+++ PS1='(ros) '
+++ export PATH=/tmp/w/mm/envs/ros/bin:/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin
+++ PATH=/tmp/w/mm/envs/ros/bin:/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin
+++ export CONDA_PREFIX=/tmp/w/mm/envs/ros
+++ CONDA_PREFIX=/tmp/w/mm/envs/ros
+++ export CONDA_SHLVL=1
+++ CONDA_SHLVL=1
+++ export CONDA_DEFAULT_ENV=ros
+++ CONDA_DEFAULT_ENV=ros
+++ export 'CONDA_PROMPT_MODIFIER=(ros) '
+++ CONDA_PROMPT_MODIFIER='(ros) '
+++ . /tmp/w/mm/envs/ros/etc/conda/activate.d/libglib_activate.sh
++++ export XDG_DATA_DIRS_CONDA_BACKUP=
++++ XDG_DATA_DIRS_CONDA_BACKUP=
++++ export XDG_DATA_DIRS=/tmp/w/mm/envs/ros/share:/usr/share
++++ XDG_DATA_DIRS=/tmp/w/mm/envs/ros/share:/usr/share
+++ . /tmp/w/mm/envs/ros/etc/conda/activate.d/libxml2_activate.sh
++++ test -n ''
++++ xml_catalog_files_libxml2=
++++ XML_CATALOG_FILES=
++++ conda_catalog_files=
++++ ifs_libxml2=' 	
+'
++++ IFS=' '
++++ rem=/tmp/w/mm/envs/ros
++++ for pre in ${rem}
++++ test '' = /tmp/w/mm/envs/ros
++++ conda_catalog_files=/tmp/w/mm/envs/ros
++++ rem=
++++ IFS=' 	
+'
++++ conda_catalog_files='file:///tmp/w/mm/envs/ros/etc/xml/catalog file:///etc/xml/catalog'
++++ export 'XML_CATALOG_FILES=file:///tmp/w/mm/envs/ros/etc/xml/catalog file:///etc/xml/catalog'
++++ XML_CATALOG_FILES='file:///tmp/w/mm/envs/ros/etc/xml/catalog file:///etc/xml/catalog'
++++ unset conda_catalog_files ifs_libxml2 rem
+++ . /tmp/w/mm/envs/ros/etc/conda/activate.d/ros-humble-ros-workspace_activate.sh
++++ '[' '' = 1 -a '' '!=' '' ']'
++++ source /tmp/w/mm/envs/ros/setup.sh
+++++ : /tmp/w/mm/envs/ros
+++++ : sh
+++++ _prefix_setup_IFS=' 	
+'
+++++ IFS='
+'
+++++ _UNIQUE_PREFIX_PATH=
+++++ '[' -z SKIP_PARENT_PREFIX_PATH ']'
+++++ ament_append_unique_value _UNIQUE_PREFIX_PATH /tmp/w/mm/envs/ros
+++++ _listname=_UNIQUE_PREFIX_PATH
+++++ _value=/tmp/w/mm/envs/ros
+++++ eval '_values=$_UNIQUE_PREFIX_PATH'
++++++ _values=
+++++ _duplicate=
+++++ _ament_append_unique_value_IFS='
+'
+++++ IFS=:
+++++ '[' sh = zsh ']'
+++++ unset _item
+++++ '[' -z '' ']'
+++++ '[' -z '' ']'
+++++ eval '_UNIQUE_PREFIX_PATH="/tmp/w/mm/envs/ros"'
++++++ _UNIQUE_PREFIX_PATH=/tmp/w/mm/envs/ros
+++++ IFS='
+'
+++++ unset _ament_append_unique_value_IFS
+++++ unset _duplicate
+++++ unset _values
+++++ unset _value
+++++ unset _listname
+++++ unset AMENT_CURRENT_PREFIX
+++++ _prefix_setup_AMENT_SHELL=sh
+++++ IFS=:
+++++ '[' sh = zsh ']'
+++++ for _path in $_UNIQUE_PREFIX_PATH
+++++ '[' -n '' ']'
+++++ '[' -f /tmp/w/mm/envs/ros/local_setup.sh ']'
+++++ '[' sh = sh ']'
+++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++++ IFS=' 	
+'
+++++ . /tmp/w/mm/envs/ros/local_setup.sh
++++++ _ament_prefix_sh_AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ '[' -z /tmp/w/mm/envs/ros ']'
++++++ _ament_prefix_sh_AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ : sh
++++++ _ament_python_executable=/tmp/w/mm/envs/ros/bin/python
++++++ '[' -n '' ']'
++++++ '[' '!' -f /tmp/w/mm/envs/ros/bin/python ']'
++++++ _ament_additional_extension=
++++++ '[' sh '!=' sh ']'
+++++++ /tmp/w/mm/envs/ros/bin/python /tmp/w/mm/envs/ros/_local_setup_util.py sh
++++++ _ament_ordered_commands='export AMENT_PREFIX_PATH="/tmp/w/mm/envs/ros:$AMENT_PREFIX_PATH"
+export PYTHONPATH="/tmp/w/mm/envs/ros/lib/python3.11/site-packages:$PYTHONPATH"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh"
+export ROS_DISTRO="humble"
+export ROS_LOCALHOST_ONLY="0"
+export ROS_PYTHON_VERSION="3"
+export ROS_VERSION="2"
+export PYTHONPATH="/tmp/w/mm/envs/ros/lib/python311/site-packages:$PYTHONPATH"
+export AMENT_PREFIX_PATH=${AMENT_PREFIX_PATH#:}
+export AMENT_PREFIX_PATH=${AMENT_PREFIX_PATH%:}
+export ROS_DISTRO=${ROS_DISTRO#:}
+export ROS_DISTRO=${ROS_DISTRO%:}
+export ROS_PYTHON_VERSION=${ROS_PYTHON_VERSION#:}
+export ROS_PYTHON_VERSION=${ROS_PYTHON_VERSION%:}
+export ROS_VERSION=${ROS_VERSION#:}
+export ROS_VERSION=${ROS_VERSION%:}'
++++++ unset _ament_additional_extension
++++++ unset _ament_python_executable
++++++ '[' -n '' ']'
++++++ eval 'export AMENT_PREFIX_PATH="/tmp/w/mm/envs/ros:$AMENT_PREFIX_PATH"
+export PYTHONPATH="/tmp/w/mm/envs/ros/lib/python3.11/site-packages:$PYTHONPATH"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh"
+export ROS_DISTRO="humble"
+export ROS_LOCALHOST_ONLY="0"
+export ROS_PYTHON_VERSION="3"
+export ROS_VERSION="2"
+export PYTHONPATH="/tmp/w/mm/envs/ros/lib/python311/site-packages:$PYTHONPATH"
+export AMENT_PREFIX_PATH=${AMENT_PREFIX_PATH#:}
+export AMENT_PREFIX_PATH=${AMENT_PREFIX_PATH%:}
+export ROS_DISTRO=${ROS_DISTRO#:}
+export ROS_DISTRO=${ROS_DISTRO%:}
+export ROS_PYTHON_VERSION=${ROS_PYTHON_VERSION#:}
+export ROS_PYTHON_VERSION=${ROS_PYTHON_VERSION%:}
+export ROS_VERSION=${ROS_VERSION#:}
+export ROS_VERSION=${ROS_VERSION%:}'
+++++++ export AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros:
+++++++ AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros:
+++++++ export PYTHONPATH=/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++++ PYTHONPATH=/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++++++ _ament_prefix_sh_source_script /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh
+++++++ '[' -f /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh ']'
+++++++ '[' -n '' ']'
+++++++ . /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh
++++++++ '[' -n '' -a '' '!=' humble ']'
+++++++ export ROS_DISTRO=humble
+++++++ ROS_DISTRO=humble
+++++++ export ROS_LOCALHOST_ONLY=0
+++++++ ROS_LOCALHOST_ONLY=0
+++++++ export ROS_PYTHON_VERSION=3
+++++++ ROS_PYTHON_VERSION=3
+++++++ export ROS_VERSION=2
+++++++ ROS_VERSION=2
+++++++ export PYTHONPATH=/tmp/w/mm/envs/ros/lib/python311/site-packages:/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++++ PYTHONPATH=/tmp/w/mm/envs/ros/lib/python311/site-packages:/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++++ export AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros:
+++++++ AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros:
+++++++ export AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros
+++++++ AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros
+++++++ export ROS_DISTRO=humble
+++++++ ROS_DISTRO=humble
+++++++ export ROS_DISTRO=humble
+++++++ ROS_DISTRO=humble
+++++++ export ROS_PYTHON_VERSION=3
+++++++ ROS_PYTHON_VERSION=3
+++++++ export ROS_PYTHON_VERSION=3
+++++++ ROS_PYTHON_VERSION=3
+++++++ export ROS_VERSION=2
+++++++ ROS_VERSION=2
+++++++ export ROS_VERSION=2
+++++++ ROS_VERSION=2
++++++ unset _ament_ordered_commands
++++++ unset _ament_prefix_sh_source_script
++++++ unset _ament_prefix_sh_AMENT_CURRENT_PREFIX
+++++ AMENT_SHELL=sh
+++++ unset _path
+++++ IFS=' 	
+'
+++++ unset _prefix_setup_IFS
+++++ unset _prefix_setup_AMENT_SHELL
+++++ unset _UNIQUE_PREFIX_PATH
+++++ unset AMENT_SHELL
++++ case "$OSTYPE" in
++++ export ROS_OS_OVERRIDE=conda:linux
++++ ROS_OS_OVERRIDE=conda:linux
++++ export ROS_ETC_DIR=/tmp/w/mm/envs/ros/etc/ros
++++ ROS_ETC_DIR=/tmp/w/mm/envs/ros/etc/ros
++++ export AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros
++++ AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros
++ __mamba_hashr
++ '[' -n '' ']'
++ '[' -n '' ']'
++ hash -r
++ source /tmp/w/ws/install/setup.bash
+++ COLCON_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++ _colcon_prefix_chain_bash_source_script /tmp/w/mm/envs/ros/local_setup.bash
+++ '[' -f /tmp/w/mm/envs/ros/local_setup.bash ']'
+++ '[' -n '' ']'
+++ . /tmp/w/mm/envs/ros/local_setup.bash
++++ AMENT_SHELL=bash
++++++ dirname /tmp/w/mm/envs/ros/local_setup.bash
+++++ builtin cd /tmp/w/mm/envs/ros
+++++ pwd
++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++ '[' -n '' ']'
++++ . /tmp/w/mm/envs/ros/local_setup.sh
+++++ _ament_prefix_sh_AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++++ '[' -z /tmp/w/mm/envs/ros ']'
+++++ _ament_prefix_sh_AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++++ : bash
+++++ _ament_python_executable=/tmp/w/mm/envs/ros/bin/python
+++++ '[' -n '' ']'
+++++ '[' '!' -f /tmp/w/mm/envs/ros/bin/python ']'
+++++ _ament_additional_extension=
+++++ '[' bash '!=' sh ']'
+++++ _ament_additional_extension=bash
++++++ /tmp/w/mm/envs/ros/bin/python /tmp/w/mm/envs/ros/_local_setup_util.py sh bash
+++++ _ament_ordered_commands='AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh"
+export ROS_DISTRO="humble"
+# export ROS_LOCALHOST_ONLY="0"
+export ROS_PYTHON_VERSION="3"
+export ROS_VERSION="2"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash"'
+++++ unset _ament_additional_extension
+++++ unset _ament_python_executable
+++++ '[' -n '' ']'
+++++ eval 'AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh"
+export ROS_DISTRO="humble"
+# export ROS_LOCALHOST_ONLY="0"
+export ROS_PYTHON_VERSION="3"
+export ROS_VERSION="2"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash"'
++++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ _ament_prefix_sh_source_script /tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash
++++++ '[' -f /tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash ']'
++++++ '[' -n '' ']'
++++++ . /tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash
+++++++ type register-python-argcomplete
++++++++ register-python-argcomplete ros2
+++++++ eval '#compdef ros2
+# Run something, muting output or redirecting it to the debug stream
+# depending on the value of _ARC_DEBUG.
+# If ARGCOMPLETE_USE_TEMPFILES is set, use tempfiles for IPC.
+__python_argcomplete_run() {
+    if [[ -z "${ARGCOMPLETE_USE_TEMPFILES-}" ]]; then
+        __python_argcomplete_run_inner "$@"
+        return
+    fi
+    local tmpfile="$(mktemp)"
+    _ARGCOMPLETE_STDOUT_FILENAME="$tmpfile" __python_argcomplete_run_inner "$@"
+    local code=$?
+    cat "$tmpfile"
+    rm "$tmpfile"
+    return $code
+}
+
+__python_argcomplete_run_inner() {
+    if [[ -z "${_ARC_DEBUG-}" ]]; then
+        "$@" 8>&1 9>&2 1>/dev/null 2>&1 </dev/null
+    else
+        "$@" 8>&1 9>&2 1>&9 2>&1 </dev/null
+    fi
+}
+
+_python_argcomplete() {
+    local IFS=$'\''\013'\''
+    local script=""
+    if [[ -n "${ZSH_VERSION-}" ]]; then
+        local completions
+        completions=($(IFS="$IFS" \
+            COMP_LINE="$BUFFER" \
+            COMP_POINT="$CURSOR" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="zsh" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=1 \
+            __python_argcomplete_run ${script:-${words[1]}}))
+        local nosort=()
+        local nospace=()
+        if is-at-least 5.8; then
+            nosort=(-o nosort)
+        fi
+        if [[ "${completions-}" =~ ([^\\\\]): && "${match[1]}" =~ [=/:] ]]; then
+            nospace=(-S '\'''\'')
+        fi
+        _describe "${words[1]}" completions "${nosort[@]}" "${nospace[@]}"
+    else
+        local SUPPRESS_SPACE=0
+        if compopt +o nospace 2> /dev/null; then
+            SUPPRESS_SPACE=1
+        fi
+        COMPREPLY=($(IFS="$IFS" \
+            COMP_LINE="$COMP_LINE" \
+            COMP_POINT="$COMP_POINT" \
+            COMP_TYPE="$COMP_TYPE" \
+            _ARGCOMPLETE_COMP_WORDBREAKS="$COMP_WORDBREAKS" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="bash" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=$SUPPRESS_SPACE \
+            __python_argcomplete_run ${script:-$1}))
+        if [[ $? != 0 ]]; then
+            unset COMPREPLY
+        elif [[ $SUPPRESS_SPACE == 1 ]] && [[ "${COMPREPLY-}" =~ [=/:]$ ]]; then
+            compopt -o nospace
+        fi
+    fi
+}
+if [[ -z "${ZSH_VERSION-}" ]]; then
+    complete -o nospace -o default -o bashdefault -F _python_argcomplete ros2
+else
+    # When called by the Zsh completion system, this will end with
+    # "loadautofunc" when initially autoloaded and "shfunc" later on, otherwise,
+    # the script was "eval"-ed so use "compdef" to register it with the
+    # completion system
+    autoload is-at-least
+    if [[ $zsh_eval_context == *func ]]; then
+        _python_argcomplete "$@"
+    else
+        compdef _python_argcomplete ros2
+    fi
+fi'
++++++++ [[ -z '' ]]
++++++++ complete -o nospace -o default -o bashdefault -F _python_argcomplete ros2
++++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ _ament_prefix_sh_source_script /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh
++++++ '[' -f /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh ']'
++++++ '[' -n '' ']'
++++++ . /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh
+++++++ '[' -n humble -a humble '!=' humble ']'
++++++ export ROS_DISTRO=humble
++++++ ROS_DISTRO=humble
++++++ export ROS_PYTHON_VERSION=3
++++++ ROS_PYTHON_VERSION=3
++++++ export ROS_VERSION=2
++++++ ROS_VERSION=2
++++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ _ament_prefix_sh_source_script /tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash
++++++ '[' -f /tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash ']'
++++++ '[' -n '' ']'
++++++ . /tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash
+++++++ type register-python-argcomplete3
+++++++ type register-python-argcomplete
++++++++ register-python-argcomplete rosidl
+++++++ eval '#compdef rosidl
+# Run something, muting output or redirecting it to the debug stream
+# depending on the value of _ARC_DEBUG.
+# If ARGCOMPLETE_USE_TEMPFILES is set, use tempfiles for IPC.
+__python_argcomplete_run() {
+    if [[ -z "${ARGCOMPLETE_USE_TEMPFILES-}" ]]; then
+        __python_argcomplete_run_inner "$@"
+        return
+    fi
+    local tmpfile="$(mktemp)"
+    _ARGCOMPLETE_STDOUT_FILENAME="$tmpfile" __python_argcomplete_run_inner "$@"
+    local code=$?
+    cat "$tmpfile"
+    rm "$tmpfile"
+    return $code
+}
+
+__python_argcomplete_run_inner() {
+    if [[ -z "${_ARC_DEBUG-}" ]]; then
+        "$@" 8>&1 9>&2 1>/dev/null 2>&1 </dev/null
+    else
+        "$@" 8>&1 9>&2 1>&9 2>&1 </dev/null
+    fi
+}
+
+_python_argcomplete() {
+    local IFS=$'\''\013'\''
+    local script=""
+    if [[ -n "${ZSH_VERSION-}" ]]; then
+        local completions
+        completions=($(IFS="$IFS" \
+            COMP_LINE="$BUFFER" \
+            COMP_POINT="$CURSOR" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="zsh" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=1 \
+            __python_argcomplete_run ${script:-${words[1]}}))
+        local nosort=()
+        local nospace=()
+        if is-at-least 5.8; then
+            nosort=(-o nosort)
+        fi
+        if [[ "${completions-}" =~ ([^\\\\]): && "${match[1]}" =~ [=/:] ]]; then
+            nospace=(-S '\'''\'')
+        fi
+        _describe "${words[1]}" completions "${nosort[@]}" "${nospace[@]}"
+    else
+        local SUPPRESS_SPACE=0
+        if compopt +o nospace 2> /dev/null; then
+            SUPPRESS_SPACE=1
+        fi
+        COMPREPLY=($(IFS="$IFS" \
+            COMP_LINE="$COMP_LINE" \
+            COMP_POINT="$COMP_POINT" \
+            COMP_TYPE="$COMP_TYPE" \
+            _ARGCOMPLETE_COMP_WORDBREAKS="$COMP_WORDBREAKS" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="bash" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=$SUPPRESS_SPACE \
+            __python_argcomplete_run ${script:-$1}))
+        if [[ $? != 0 ]]; then
+            unset COMPREPLY
+        elif [[ $SUPPRESS_SPACE == 1 ]] && [[ "${COMPREPLY-}" =~ [=/:]$ ]]; then
+            compopt -o nospace
+        fi
+    fi
+}
+if [[ -z "${ZSH_VERSION-}" ]]; then
+    complete -o nospace -o default -o bashdefault -F _python_argcomplete rosidl
+else
+    # When called by the Zsh completion system, this will end with
+    # "loadautofunc" when initially autoloaded and "shfunc" later on, otherwise,
+    # the script was "eval"-ed so use "compdef" to register it with the
+    # completion system
+    autoload is-at-least
+    if [[ $zsh_eval_context == *func ]]; then
+        _python_argcomplete "$@"
+    else
+        compdef _python_argcomplete rosidl
+    fi
+fi'
++++++++ [[ -z '' ]]
++++++++ complete -o nospace -o default -o bashdefault -F _python_argcomplete rosidl
+++++ unset _ament_ordered_commands
+++++ unset _ament_prefix_sh_source_script
+++++ unset _ament_prefix_sh_AMENT_CURRENT_PREFIX
+++++ dirname /tmp/w/ws/install/setup.bash
++++ builtin cd /tmp/w/ws/install
++++ pwd
+++ COLCON_CURRENT_PREFIX=/tmp/w/ws/install
+++ _colcon_prefix_chain_bash_source_script /tmp/w/ws/install/local_setup.bash
+++ '[' -f /tmp/w/ws/install/local_setup.bash ']'
+++ '[' -n '' ']'
+++ . /tmp/w/ws/install/local_setup.bash
++++ '[' -z /tmp/w/ws/install ']'
++++ _colcon_prefix_bash_COLCON_CURRENT_PREFIX=/tmp/w/ws/install
++++ _colcon_prefix_bash_prepend_unique_value COLCON_PREFIX_PATH /tmp/w/ws/install
++++ _listname=COLCON_PREFIX_PATH
++++ _value=/tmp/w/ws/install
++++ eval '_values="$COLCON_PREFIX_PATH"'
+++++ _values=
++++ _colcon_prefix_bash_prepend_unique_value_IFS=' 	
+'
++++ IFS=:
++++ _all_values=/tmp/w/ws/install
++++ _contained_value=
++++ unset _item
++++ '[' -z '' ']'
++++ '[' -n '' ']'
++++ unset _contained_value
++++ IFS=' 	
+'
++++ unset _colcon_prefix_bash_prepend_unique_value_IFS
++++ eval export 'COLCON_PREFIX_PATH="/tmp/w/ws/install"'
+++++ export COLCON_PREFIX_PATH=/tmp/w/ws/install
+++++ COLCON_PREFIX_PATH=/tmp/w/ws/install
++++ unset _all_values
++++ unset _values
++++ unset _value
++++ unset _listname
++++ unset _colcon_prefix_bash_prepend_unique_value
++++ '[' -n '' ']'
++++ _colcon_python_executable=/tmp/w/mm/envs/ros/bin/python3.11
++++ '[' '!' -f /tmp/w/mm/envs/ros/bin/python3.11 ']'
+++++ /tmp/w/mm/envs/ros/bin/python3.11 /tmp/w/ws/install/_local_setup_util_sh.py sh bash
++++ _colcon_ordered_commands='export CMAKE_PREFIX_PATH="/tmp/w/ws/install/bodyctrl_msgs:$CMAKE_PREFIX_PATH"
+export LD_LIBRARY_PATH="/tmp/w/ws/install/bodyctrl_msgs/lib:$LD_LIBRARY_PATH"
+export PYTHONPATH="/tmp/w/ws/install/bodyctrl_msgs/lib/python3.11/site-packages:$PYTHONPATH"
+export AMENT_PREFIX_PATH="/tmp/w/ws/install/bodyctrl_msgs:$AMENT_PREFIX_PATH"
+if [ "$(echo -n $CMAKE_PREFIX_PATH | head -c 1)" = ":" ]; then export CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH#?} ; fi
+if [ "$(echo -n $CMAKE_PREFIX_PATH | tail -c 1)" = ":" ]; then export CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH%?} ; fi'
++++ unset _colcon_python_executable
++++ '[' -n '' ']'
++++ eval 'export CMAKE_PREFIX_PATH="/tmp/w/ws/install/bodyctrl_msgs:$CMAKE_PREFIX_PATH"
+export LD_LIBRARY_PATH="/tmp/w/ws/install/bodyctrl_msgs/lib:$LD_LIBRARY_PATH"
+export PYTHONPATH="/tmp/w/ws/install/bodyctrl_msgs/lib/python3.11/site-packages:$PYTHONPATH"
+export AMENT_PREFIX_PATH="/tmp/w/ws/install/bodyctrl_msgs:$AMENT_PREFIX_PATH"
+if [ "$(echo -n $CMAKE_PREFIX_PATH | head -c 1)" = ":" ]; then export CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH#?} ; fi
+if [ "$(echo -n $CMAKE_PREFIX_PATH | tail -c 1)" = ":" ]; then export CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH%?} ; fi'
+++++ export CMAKE_PREFIX_PATH=/tmp/w/ws/install/bodyctrl_msgs:
+++++ CMAKE_PREFIX_PATH=/tmp/w/ws/install/bodyctrl_msgs:
+++++ export LD_LIBRARY_PATH=/tmp/w/ws/install/bodyctrl_msgs/lib:/usr/local/nvidia/lib64:/usr/local/cuda/lib64:/usr/local/nvidia/lib:/usr/local/nvidia/lib64:/usr/local/cuda/lib64
+++++ LD_LIBRARY_PATH=/tmp/w/ws/install/bodyctrl_msgs/lib:/usr/local/nvidia/lib64:/usr/local/cuda/lib64:/usr/local/nvidia/lib:/usr/local/nvidia/lib64:/usr/local/cuda/lib64
+++++ export PYTHONPATH=/tmp/w/ws/install/bodyctrl_msgs/lib/python3.11/site-packages:/tmp/w/mm/envs/ros/lib/python311/site-packages:/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++ PYTHONPATH=/tmp/w/ws/install/bodyctrl_msgs/lib/python3.11/site-packages:/tmp/w/mm/envs/ros/lib/python311/site-packages:/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++ export AMENT_PREFIX_PATH=/tmp/w/ws/install/bodyctrl_msgs:/tmp/w/mm/envs/ros
+++++ AMENT_PREFIX_PATH=/tmp/w/ws/install/bodyctrl_msgs:/tmp/w/mm/envs/ros
++++++ echo -n /tmp/w/ws/install/bodyctrl_msgs:
++++++ head -c 1
+++++ '[' / = : ']'
++++++ echo -n /tmp/w/ws/install/bodyctrl_msgs:
++++++ tail -c 1
+++++ '[' : = : ']'
+++++ export CMAKE_PREFIX_PATH=/tmp/w/ws/install/bodyctrl_msgs
+++++ CMAKE_PREFIX_PATH=/tmp/w/ws/install/bodyctrl_msgs
++++ unset _colcon_ordered_commands
++++ unset _colcon_prefix_sh_source_script
++++ unset _colcon_prefix_bash_COLCON_CURRENT_PREFIX
+++ unset COLCON_CURRENT_PREFIX
+++ unset _colcon_prefix_chain_bash_source_script
++ '[' -f /tmp/sol/install/setup.bash ']'
++ source /tmp/sol/install/setup.bash
+++ COLCON_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++ _colcon_prefix_chain_bash_source_script /tmp/w/mm/envs/ros/local_setup.bash
+++ '[' -f /tmp/w/mm/envs/ros/local_setup.bash ']'
+++ '[' -n '' ']'
+++ . /tmp/w/mm/envs/ros/local_setup.bash
++++ AMENT_SHELL=bash
++++++ dirname /tmp/w/mm/envs/ros/local_setup.bash
+++++ builtin cd /tmp/w/mm/envs/ros
+++++ pwd
++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++ '[' -n '' ']'
++++ . /tmp/w/mm/envs/ros/local_setup.sh
+++++ _ament_prefix_sh_AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++++ '[' -z /tmp/w/mm/envs/ros ']'
+++++ _ament_prefix_sh_AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++++ : bash
+++++ _ament_python_executable=/tmp/w/mm/envs/ros/bin/python
+++++ '[' -n '' ']'
+++++ '[' '!' -f /tmp/w/mm/envs/ros/bin/python ']'
+++++ _ament_additional_extension=
+++++ '[' bash '!=' sh ']'
+++++ _ament_additional_extension=bash
++++++ /tmp/w/mm/envs/ros/bin/python /tmp/w/mm/envs/ros/_local_setup_util.py sh bash
+++++ _ament_ordered_commands='AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh"
+export ROS_DISTRO="humble"
+# export ROS_LOCALHOST_ONLY="0"
+export ROS_PYTHON_VERSION="3"
+export ROS_VERSION="2"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash"'
+++++ unset _ament_additional_extension
+++++ unset _ament_python_executable
+++++ '[' -n '' ']'
+++++ eval 'AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh"
+export ROS_DISTRO="humble"
+# export ROS_LOCALHOST_ONLY="0"
+export ROS_PYTHON_VERSION="3"
+export ROS_VERSION="2"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash"'
++++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ _ament_prefix_sh_source_script /tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash
++++++ '[' -f /tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash ']'
++++++ '[' -n '' ']'
++++++ . /tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash
+++++++ type register-python-argcomplete
++++++++ register-python-argcomplete ros2
+++++++ eval '#compdef ros2
+# Run something, muting output or redirecting it to the debug stream
+# depending on the value of _ARC_DEBUG.
+# If ARGCOMPLETE_USE_TEMPFILES is set, use tempfiles for IPC.
+__python_argcomplete_run() {
+    if [[ -z "${ARGCOMPLETE_USE_TEMPFILES-}" ]]; then
+        __python_argcomplete_run_inner "$@"
+        return
+    fi
+    local tmpfile="$(mktemp)"
+    _ARGCOMPLETE_STDOUT_FILENAME="$tmpfile" __python_argcomplete_run_inner "$@"
+    local code=$?
+    cat "$tmpfile"
+    rm "$tmpfile"
+    return $code
+}
+
+__python_argcomplete_run_inner() {
+    if [[ -z "${_ARC_DEBUG-}" ]]; then
+        "$@" 8>&1 9>&2 1>/dev/null 2>&1 </dev/null
+    else
+        "$@" 8>&1 9>&2 1>&9 2>&1 </dev/null
+    fi
+}
+
+_python_argcomplete() {
+    local IFS=$'\''\013'\''
+    local script=""
+    if [[ -n "${ZSH_VERSION-}" ]]; then
+        local completions
+        completions=($(IFS="$IFS" \
+            COMP_LINE="$BUFFER" \
+            COMP_POINT="$CURSOR" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="zsh" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=1 \
+            __python_argcomplete_run ${script:-${words[1]}}))
+        local nosort=()
+        local nospace=()
+        if is-at-least 5.8; then
+            nosort=(-o nosort)
+        fi
+        if [[ "${completions-}" =~ ([^\\\\]): && "${match[1]}" =~ [=/:] ]]; then
+            nospace=(-S '\'''\'')
+        fi
+        _describe "${words[1]}" completions "${nosort[@]}" "${nospace[@]}"
+    else
+        local SUPPRESS_SPACE=0
+        if compopt +o nospace 2> /dev/null; then
+            SUPPRESS_SPACE=1
+        fi
+        COMPREPLY=($(IFS="$IFS" \
+            COMP_LINE="$COMP_LINE" \
+            COMP_POINT="$COMP_POINT" \
+            COMP_TYPE="$COMP_TYPE" \
+            _ARGCOMPLETE_COMP_WORDBREAKS="$COMP_WORDBREAKS" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="bash" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=$SUPPRESS_SPACE \
+            __python_argcomplete_run ${script:-$1}))
+        if [[ $? != 0 ]]; then
+            unset COMPREPLY
+        elif [[ $SUPPRESS_SPACE == 1 ]] && [[ "${COMPREPLY-}" =~ [=/:]$ ]]; then
+            compopt -o nospace
+        fi
+    fi
+}
+if [[ -z "${ZSH_VERSION-}" ]]; then
+    complete -o nospace -o default -o bashdefault -F _python_argcomplete ros2
+else
+    # When called by the Zsh completion system, this will end with
+    # "loadautofunc" when initially autoloaded and "shfunc" later on, otherwise,
+    # the script was "eval"-ed so use "compdef" to register it with the
+    # completion system
+    autoload is-at-least
+    if [[ $zsh_eval_context == *func ]]; then
+        _python_argcomplete "$@"
+    else
+        compdef _python_argcomplete ros2
+    fi
+fi'
++++++++ [[ -z '' ]]
++++++++ complete -o nospace -o default -o bashdefault -F _python_argcomplete ros2
++++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ _ament_prefix_sh_source_script /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh
++++++ '[' -f /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh ']'
++++++ '[' -n '' ']'
++++++ . /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh
+++++++ '[' -n humble -a humble '!=' humble ']'
++++++ export ROS_DISTRO=humble
++++++ ROS_DISTRO=humble
++++++ export ROS_PYTHON_VERSION=3
++++++ ROS_PYTHON_VERSION=3
++++++ export ROS_VERSION=2
++++++ ROS_VERSION=2
++++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ _ament_prefix_sh_source_script /tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash
++++++ '[' -f /tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash ']'
++++++ '[' -n '' ']'
++++++ . /tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash
+++++++ type register-python-argcomplete3
+++++++ type register-python-argcomplete
++++++++ register-python-argcomplete rosidl
+++++++ eval '#compdef rosidl
+# Run something, muting output or redirecting it to the debug stream
+# depending on the value of _ARC_DEBUG.
+# If ARGCOMPLETE_USE_TEMPFILES is set, use tempfiles for IPC.
+__python_argcomplete_run() {
+    if [[ -z "${ARGCOMPLETE_USE_TEMPFILES-}" ]]; then
+        __python_argcomplete_run_inner "$@"
+        return
+    fi
+    local tmpfile="$(mktemp)"
+    _ARGCOMPLETE_STDOUT_FILENAME="$tmpfile" __python_argcomplete_run_inner "$@"
+    local code=$?
+    cat "$tmpfile"
+    rm "$tmpfile"
+    return $code
+}
+
+__python_argcomplete_run_inner() {
+    if [[ -z "${_ARC_DEBUG-}" ]]; then
+        "$@" 8>&1 9>&2 1>/dev/null 2>&1 </dev/null
+    else
+        "$@" 8>&1 9>&2 1>&9 2>&1 </dev/null
+    fi
+}
+
+_python_argcomplete() {
+    local IFS=$'\''\013'\''
+    local script=""
+    if [[ -n "${ZSH_VERSION-}" ]]; then
+        local completions
+        completions=($(IFS="$IFS" \
+            COMP_LINE="$BUFFER" \
+            COMP_POINT="$CURSOR" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="zsh" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=1 \
+            __python_argcomplete_run ${script:-${words[1]}}))
+        local nosort=()
+        local nospace=()
+        if is-at-least 5.8; then
+            nosort=(-o nosort)
+        fi
+        if [[ "${completions-}" =~ ([^\\\\]): && "${match[1]}" =~ [=/:] ]]; then
+            nospace=(-S '\'''\'')
+        fi
+        _describe "${words[1]}" completions "${nosort[@]}" "${nospace[@]}"
+    else
+        local SUPPRESS_SPACE=0
+        if compopt +o nospace 2> /dev/null; then
+            SUPPRESS_SPACE=1
+        fi
+        COMPREPLY=($(IFS="$IFS" \
+            COMP_LINE="$COMP_LINE" \
+            COMP_POINT="$COMP_POINT" \
+            COMP_TYPE="$COMP_TYPE" \
+            _ARGCOMPLETE_COMP_WORDBREAKS="$COMP_WORDBREAKS" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="bash" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=$SUPPRESS_SPACE \
+            __python_argcomplete_run ${script:-$1}))
+        if [[ $? != 0 ]]; then
+            unset COMPREPLY
+        elif [[ $SUPPRESS_SPACE == 1 ]] && [[ "${COMPREPLY-}" =~ [=/:]$ ]]; then
+            compopt -o nospace
+        fi
+    fi
+}
+if [[ -z "${ZSH_VERSION-}" ]]; then
+    complete -o nospace -o default -o bashdefault -F _python_argcomplete rosidl
+else
+    # When called by the Zsh completion system, this will end with
+    # "loadautofunc" when initially autoloaded and "shfunc" later on, otherwise,
+    # the script was "eval"-ed so use "compdef" to register it with the
+    # completion system
+    autoload is-at-least
+    if [[ $zsh_eval_context == *func ]]; then
+        _python_argcomplete "$@"
+    else
+        compdef _python_argcomplete rosidl
+    fi
+fi'
++++++++ [[ -z '' ]]
++++++++ complete -o nospace -o default -o bashdefault -F _python_argcomplete rosidl
+++++ unset _ament_ordered_commands
+++++ unset _ament_prefix_sh_source_script
+++++ unset _ament_prefix_sh_AMENT_CURRENT_PREFIX
+++ COLCON_CURRENT_PREFIX=/tmp/w/ws/install
+++ _colcon_prefix_chain_bash_source_script /tmp/w/ws/install/local_setup.bash
+++ '[' -f /tmp/w/ws/install/local_setup.bash ']'
+++ '[' -n '' ']'
+++ . /tmp/w/ws/install/local_setup.bash
++++ '[' -z /tmp/w/ws/install ']'
++++ _colcon_prefix_bash_COLCON_CURRENT_PREFIX=/tmp/w/ws/install
++++ _colcon_prefix_bash_prepend_unique_value COLCON_PREFIX_PATH /tmp/w/ws/install
++++ _listname=COLCON_PREFIX_PATH
++++ _value=/tmp/w/ws/install
++++ eval '_values="$COLCON_PREFIX_PATH"'
+++++ _values=/tmp/w/ws/install
++++ _colcon_prefix_bash_prepend_unique_value_IFS=' 	
+'
++++ IFS=:
++++ _all_values=/tmp/w/ws/install
++++ _contained_value=
++++ for _item in $_values
++++ '[' -z /tmp/w/ws/install ']'
++++ '[' /tmp/w/ws/install = /tmp/w/ws/install ']'
++++ _contained_value=1
++++ continue
++++ unset _item
++++ '[' -z 1 ']'
++++ unset _contained_value
++++ IFS=' 	
+'
++++ unset _colcon_prefix_bash_prepend_unique_value_IFS
++++ eval export 'COLCON_PREFIX_PATH="/tmp/w/ws/install"'
+++++ export COLCON_PREFIX_PATH=/tmp/w/ws/install
+++++ COLCON_PREFIX_PATH=/tmp/w/ws/install
++++ unset _all_values
++++ unset _values
++++ unset _value
++++ unset _listname
++++ unset _colcon_prefix_bash_prepend_unique_value
++++ '[' -n '' ']'
++++ _colcon_python_executable=/tmp/w/mm/envs/ros/bin/python3.11
++++ '[' '!' -f /tmp/w/mm/envs/ros/bin/python3.11 ']'
+++++ /tmp/w/mm/envs/ros/bin/python3.11 /tmp/w/ws/install/_local_setup_util_sh.py sh bash
++++ _colcon_ordered_commands=
++++ unset _colcon_python_executable
++++ '[' -n '' ']'
++++ eval ''
++++ unset _colcon_ordered_commands
++++ unset _colcon_prefix_sh_source_script
++++ unset _colcon_prefix_bash_COLCON_CURRENT_PREFIX
+++++ dirname /tmp/sol/install/setup.bash
++++ builtin cd /tmp/sol/install
++++ pwd
+++ COLCON_CURRENT_PREFIX=/tmp/sol/install
+++ _colcon_prefix_chain_bash_source_script /tmp/sol/install/local_setup.bash
+++ '[' -f /tmp/sol/install/local_setup.bash ']'
+++ '[' -n '' ']'
+++ . /tmp/sol/install/local_setup.bash
++++ '[' -z /tmp/sol/install ']'
++++ _colcon_prefix_bash_COLCON_CURRENT_PREFIX=/tmp/sol/install
++++ _colcon_prefix_bash_prepend_unique_value COLCON_PREFIX_PATH /tmp/sol/install
++++ _listname=COLCON_PREFIX_PATH
++++ _value=/tmp/sol/install
++++ eval '_values="$COLCON_PREFIX_PATH"'
+++++ _values=/tmp/w/ws/install
++++ _colcon_prefix_bash_prepend_unique_value_IFS=' 	
+'
++++ IFS=:
++++ _all_values=/tmp/sol/install
++++ _contained_value=
++++ for _item in $_values
++++ '[' -z /tmp/w/ws/install ']'
++++ '[' /tmp/w/ws/install = /tmp/sol/install ']'
++++ _all_values=/tmp/sol/install:/tmp/w/ws/install
++++ unset _item
++++ '[' -z '' ']'
++++ '[' -n '' ']'
++++ unset _contained_value
++++ IFS=' 	
+'
++++ unset _colcon_prefix_bash_prepend_unique_value_IFS
++++ eval export 'COLCON_PREFIX_PATH="/tmp/sol/install:/tmp/w/ws/install"'
+++++ export COLCON_PREFIX_PATH=/tmp/sol/install:/tmp/w/ws/install
+++++ COLCON_PREFIX_PATH=/tmp/sol/install:/tmp/w/ws/install
++++ unset _all_values
++++ unset _values
++++ unset _value
++++ unset _listname
++++ unset _colcon_prefix_bash_prepend_unique_value
++++ '[' -n '' ']'
++++ _colcon_python_executable=/tmp/w/mm/envs/ros/bin/python3.11
++++ '[' '!' -f /tmp/w/mm/envs/ros/bin/python3.11 ']'
+++++ /tmp/w/mm/envs/ros/bin/python3.11 /tmp/sol/install/_local_setup_util_sh.py sh bash
++++ _colcon_ordered_commands='export PYTHONPATH="/tmp/sol/install/team048_solution/lib/python3.11/site-packages:$PYTHONPATH"
+export AMENT_PREFIX_PATH="/tmp/sol/install/team048_solution:$AMENT_PREFIX_PATH"'
++++ unset _colcon_python_executable
++++ '[' -n '' ']'
++++ eval 'export PYTHONPATH="/tmp/sol/install/team048_solution/lib/python3.11/site-packages:$PYTHONPATH"
+export AMENT_PREFIX_PATH="/tmp/sol/install/team048_solution:$AMENT_PREFIX_PATH"'
+++++ export PYTHONPATH=/tmp/sol/install/team048_solution/lib/python3.11/site-packages:/tmp/w/ws/install/bodyctrl_msgs/lib/python3.11/site-packages:/tmp/w/mm/envs/ros/lib/python311/site-packages:/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++ PYTHONPATH=/tmp/sol/install/team048_solution/lib/python3.11/site-packages:/tmp/w/ws/install/bodyctrl_msgs/lib/python3.11/site-packages:/tmp/w/mm/envs/ros/lib/python311/site-packages:/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++ export AMENT_PREFIX_PATH=/tmp/sol/install/team048_solution:/tmp/w/ws/install/bodyctrl_msgs:/tmp/w/mm/envs/ros
+++++ AMENT_PREFIX_PATH=/tmp/sol/install/team048_solution:/tmp/w/ws/install/bodyctrl_msgs:/tmp/w/mm/envs/ros
++++ unset _colcon_ordered_commands
++++ unset _colcon_prefix_sh_source_script
++++ unset _colcon_prefix_bash_COLCON_CURRENT_PREFIX
+++ unset COLCON_CURRENT_PREFIX
+++ unset _colcon_prefix_chain_bash_source_script
++ timeout --kill-after=20 1097 bash run.sh
+[INFO] [1794313673.529216233] [team048_solution]: hand settings left force [0.4, 0.4, 0.4, 0.4, 0.4, 1.0] send 1 service seen after 0.0 s wall
+[INFO] [1794313673.532510462] [team048_solution]: hand settings left speed [0.5, 0.5, 0.5, 0.5, 0.5, 0.5] send 1 service seen after 0.0 s wall
+[INFO] [1794313673.534859890] [team048_solution]: hand settings right force [0.4, 0.4, 0.4, 0.4, 0.4, 1.0] send 1 service seen after 0.0 s wall
+[INFO] [1794313673.537232623] [team048_solution]: hand settings right speed [0.5, 0.5, 0.5, 0.5, 0.5, 0.5] send 1 service seen after 0.0 s wall
+[INFO] [1794313673.539842897] [team048_solution]: hand settings left force confirmed after 1 send(s), 0.2 s wall, reply {"force_accepted": true}
+[INFO] [1794313673.540614701] [team048_solution]: task sort2 pool 3
+[INFO] [1794313673.556877579] [team048_solution]: hand settings left speed confirmed after 1 send(s), 0.2 s wall, reply {"speed_accepted": true}
+[INFO] [1794313673.581568105] [team048_solution]: hand settings right force confirmed after 1 send(s), 0.2 s wall, reply {"force_accepted": true}
+[INFO] [1794313673.589149044] [team048_solution]: hand settings right speed confirmed after 1 send(s), 0.2 s wall, reply {"speed_accepted": true}
+[INFO] [1794313673.688450205] [team048_solution]: robot_description: in use
+[INFO] [1794313673.942324552] [team048_solution]: startup 2.5 s of 270.0
+[INFO] [1794313673.942927700] [team048_solution]: accel on team048_accel 0.2.0
+[INFO] [1794313678.251139447] [team048_solution]: head settled 0.401 yaw 0.0 after 1.0 s
+[INFO] [1794313683.881749659] [team048_solution]: head settled 0.402 yaw 0.598 after 1.21 s
+[INFO] [1794313684.004935367] [team048_solution]: tray tray_left red camera [0.346, 0.687] size [0.223, 0.326]
+[INFO] [1794313692.524985069] [team048_solution]: head settled 0.402 yaw -0.598 after 1.98 s
+[INFO] [1794313692.644017337] [team048_solution]: tray tray_right blue camera [0.357, -0.709] size [0.203, 0.276]
+[INFO] [1794313692.644790908] [team048_solution]: tray sources {"tray_left": {"source": "camera", "center": [0.346, 0.687]}, "tray_right": {"source": "camera", "center": [0.357, -0.709]}}
+[INFO] [1794313697.916945428] [team048_solution]: head settled 0.402 yaw -0.001 after 1.23 s
+[INFO] [1794313698.152910392] [team048_solution]: table near edge 0.24 measured
+[INFO] [1794313700.618912680] [team048_solution]: path home l via 2 waypoint(s)
+[INFO] [1794313761.208723939] [team048_solution]: path home r via 2 waypoint(s)
+[INFO] [1794313819.698822870] [team048_solution]: observe t 35.5 dets 10 assigned [('Crayola_Bonus_64_C', 8.32, 0.16), ('Utana_5_Porcelain_', 9.0, 0.16), ('Threshold_Ramekin_', 8.29, 0.05), ('Crunch_Girl_Scouts', 9.44, 0.15), ('Perricone_MD_AcylG', 4.74, 0.01), ('Ecoforms_Plant_Con', 5.84, 0.08)]
+[INFO] [1794313819.789015224] [team048_solution]: no plan: Threshold_Ramekin_White_Porcelain {"candidates": 0, "feasible": 0, "pick_ik": {}, "place": {}, "hand_clear": {}, "rim_closed": true, "reason": "dish without an open rim (closed top measured)"}
+[INFO] [1794313819.918491433] [team048_solution]: pick Ecoforms_Plant_Container_B4_Har dish -> tray_left slot 0 arm l rim w 0.025 z 0.056 clear {"du": null, "dr": null, "margin": null}
+[INFO] [1794313819.919534413] [team048_solution]: TRACE {"t": 35.52, "phase": "start", "side": "l", "obj": "Ecoforms_Plant_Container_B4_Har", "F": [0.002, -0.002, -0.001], "dF": null, "fing": [0.99, 0.988, 0.989, 0.992, 1.016, 0.0], "eff": [0.121, 0.135, 0.128, 0.092, 0.083, 0.0], "tcp": [0.5207, 0.3357, 0.226], "q": [-0.596, 0.249, -0.0, -1.201, 0.0, 0.0, -0.0], "kind": "rim", "center": [0.299, 0.028, -0.102]}
+[INFO] [1794313862.426462570] [team048_solution]: TRACE {"t": 44.94, "phase": "pre", "side": "l", "obj": "Ecoforms_Plant_Container_B4_Har", "F": [-1.19, 6.99, 0.366], "dF": null, "fing": [0.986, 0.983, 0.983, 0.985, 1.006, 0.0], "eff": [0.021, 0.009, 0.035, 0.053, 0.065, 0.043], "tcp": [0.3548, 0.0455, 0.1387], "q": [-1.549, 0.177, -2.184, -1.342, -1.149, -0.785, 0.6], "tcp_plan": [0.3573, 0.0511, 0.1348], "tcp_err": 0.0072}
+[INFO] [1794313862.429065203] [team048_solution]: HAND {"t": 44.94, "phase": "approach", "side": "l", "pos": [0.986, 0.983, 0.983, 0.985, 1.006, 0.0], "vel": [0.002, 0.002, 0.003, 0.003, 0.002, -0.0], "eff": [0.021, 0.009, 0.035, 0.053, 0.065, 0.043], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-1.19, 6.99, 0.366]}
+[INFO] [1794313862.933549241] [team048_solution]: HAND {"t": 45.05, "phase": "approach", "side": "l", "pos": [0.986, 0.983, 0.983, 0.985, 1.006, 0.0], "vel": [0.002, 0.002, 0.002, 0.002, -0.003, -0.0], "eff": [0.02, 0.007, 0.028, 0.044, 0.001, 0.029], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.598, 9.638, 1.747]}
+[INFO] [1794313863.398162497] [team048_solution]: HAND {"t": 45.16, "phase": "approach", "side": "l", "pos": [0.986, 0.983, 0.983, 0.985, 1.006, 0.0], "vel": [0.0, -0.001, -0.001, 0.0, 0.005, 0.0], "eff": [0.036, 0.017, 0.001, 0.012, 0.069, 0.005], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.167, 12.718, 3.547]}
+[INFO] [1794313863.857262107] [team048_solution]: HAND {"t": 45.27, "phase": "approach", "side": "l", "pos": [0.986, 0.983, 0.983, 0.985, 1.006, 0.0], "vel": [-0.001, -0.002, -0.002, -0.0, 0.01, 0.0], "eff": [0.047, 0.028, 0.015, 0.002, 0.092, 0.01], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.499, 14.582, 4.337]}
+[INFO] [1794313864.381548300] [team048_solution]: HAND {"t": 45.39, "phase": "approach", "side": "l", "pos": [0.985, 0.983, 0.982, 0.985, 1.007, 0.0], "vel": [-0.004, -0.005, -0.005, -0.004, 0.015, 0.0], "eff": [0.049, 0.068, 0.077, 0.087, 0.197, 0.021], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.614, 16.002, 5.145]}
+[INFO] [1794313864.900373804] [team048_solution]: HAND {"t": 45.5, "phase": "approach", "side": "l", "pos": [0.985, 0.982, 0.982, 0.984, 1.008, 0.0], "vel": [-0.001, -0.002, -0.001, -0.001, 0.005, 0.0], "eff": [0.126, 0.096, 0.084, 0.083, 0.156, 0.043], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [2.751, 19.257, 5.5]}
+[INFO] [1794313865.351469374] [team048_solution]: HAND {"t": 45.61, "phase": "approach", "side": "l", "pos": [0.993, 0.993, 0.995, 1.001, 0.908, -0.001], "vel": [0.15, 0.179, 0.212, 0.253, -0.176, 0.003], "eff": [0.078, 0.025, 0.105, 0.182, 1.0, 1.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [6.939, 26.833, 6.333]}
+[INFO] [1794313865.832292474] [team048_solution]: HAND {"t": 45.72, "phase": "approach", "side": "l", "pos": [1.002, 1.001, 1.003, 1.009, 0.843, -0.001], "vel": [0.068, 0.111, 0.147, 0.174, -0.251, -0.003], "eff": [0.044, 0.024, 0.115, 0.208, 1.0, 1.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [8.561, 27.918, 4.908]}
+[INFO] [1794313865.894308629] [team048_solution]: HAND {"t": 45.73, "phase": "guard_approach", "side": "l", "pos": [1.001, 1.0, 1.002, 1.008, 0.817, -0.001], "vel": [-0.057, -0.08, -0.1, -0.119, -1.0, -0.012], "eff": [0.03, 0.113, 0.211, 0.305, 1.0, 0.156], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [8.602, 28.674, 5.827], "dev": 0.183, "fingers": [5]}
+[INFO] [1794313865.895529000] [team048_solution]: TRACE {"t": 45.73, "phase": "guard", "side": "l", "obj": "Ecoforms_Plant_Container_B4_Har", "F": [8.602, 28.674, 5.827], "dF": null, "fing": [1.001, 1.0, 1.002, 1.008, 0.817, -0.001], "eff": [0.03, 0.113, 0.211, 0.305, 1.0, 0.156], "tcp": [0.3715, 0.0371, 0.129], "q": [-1.46, 0.168, -2.123, -1.207, -1.091, -0.785, 0.668], "where": "approach", "dev": 0.183, "fingers": [5]}
+[INFO] [1794313865.896386954] [team048_solution]: guard: finger contact during approach Ecoforms_Plant_Container_B4_Har {"dev": 0.183, "fingers": [5]} -> no close, re-observe
+[INFO] [1794313894.954509816] [team048_solution]: re-observe after contact Ecoforms_Plant_Container_B4_Har
+[INFO] [1794313895.058580453] [team048_solution]: observe t 52.3 dets 10 assigned [('Crayola_Bonus_64_C', 8.48, 0.08), ('Utana_5_Porcelain_', 8.32, 0.03), ('Perricone_MD_AcylG', 4.23, 0.01), ('Ecoforms_Plant_Con', 1.23, 2.22)]
+[INFO] [1794313895.291012575] [team048_solution]: pick Perricone_MD_AcylGlutathione_Eye_Lid_Serum box -> tray_right slot 0 arm r side w 0.054 z 0.054 clear {"du": 0.009, "dr": 0.025, "margin": 0.004}
+[INFO] [1794313895.292350692] [team048_solution]: TRACE {"t": 52.39, "phase": "start", "side": "r", "obj": "Perricone_MD_AcylGlutathione_Eye_Lid_Serum", "F": [0.004, 0.011, -0.005], "dF": null, "fing": [0.991, 0.989, 0.986, 0.992, 1.021, 0.0], "eff": [0.11, 0.124, 0.165, 0.096, 0.105, 0.0], "tcp": [0.5208, -0.3355, 0.2259], "q": [-0.596, -0.249, 0.001, -1.201, -0.0, -0.0, 0.0], "kind": "side", "center": [0.361, -0.392, -0.1]}
+[INFO] [1794313925.908143572] [team048_solution]: TRACE {"t": 59.33, "phase": "pre", "side": "r", "obj": "Perricone_MD_AcylGlutathione_Eye_Lid_Serum", "F": [-0.052, 0.606, 0.671], "dF": null, "fing": [0.993, 0.991, 0.989, 0.99, 0.999, 0.0], "eff": [0.04, 0.059, 0.068, 0.053, 0.016, 0.0], "tcp": [0.1036, -0.415, 0.0061], "q": [0.72, -0.79, 0.133, -1.475, 2.299, 0.586, -0.639], "tcp_plan": [0.1083, -0.4197, 0.0119], "tcp_err": 0.0089}
+[INFO] [1794313925.909852982] [team048_solution]: HAND {"t": 59.34, "phase": "approach", "side": "r", "pos": [0.993, 0.991, 0.989, 0.99, 0.999, 0.0], "vel": [0.0, 0.0, 0.0, 0.0, 0.001, 0.0], "eff": [0.039, 0.058, 0.067, 0.052, 0.017, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.05, 0.604, 0.669]}
+[INFO] [1794313926.437149891] [team048_solution]: HAND {"t": 59.46, "phase": "approach", "side": "r", "pos": [0.994, 0.992, 0.99, 0.991, 0.999, 0.0], "vel": [0.003, 0.003, 0.004, 0.003, -0.001, -0.0], "eff": [0.034, 0.051, 0.058, 0.045, 0.017, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.045, 0.513, 0.668]}
+[INFO] [1794313926.937834008] [team048_solution]: HAND {"t": 59.58, "phase": "approach", "side": "r", "pos": [0.994, 0.992, 0.99, 0.991, 0.999, 0.0], "vel": [-0.001, -0.001, -0.001, -0.0, 0.001, 0.0], "eff": [0.036, 0.053, 0.061, 0.047, 0.017, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.028, 0.526, 0.663]}
+[INFO] [1794313927.481668993] [team048_solution]: HAND {"t": 59.7, "phase": "approach", "side": "r", "pos": [0.994, 0.992, 0.99, 0.991, 0.999, 0.0], "vel": [-0.0, -0.0, -0.0, -0.0, 0.0, 0.0], "eff": [0.037, 0.054, 0.062, 0.047, 0.017, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.017, 0.537, 0.657]}
+[INFO] [1794313928.023191444] [team048_solution]: HAND {"t": 59.81, "phase": "approach", "side": "r", "pos": [0.994, 0.992, 0.99, 0.991, 0.999, 0.0], "vel": [-0.0, -0.0, -0.0, -0.0, -0.0, 0.0], "eff": [0.037, 0.055, 0.061, 0.046, 0.018, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.01, 0.545, 0.656]}
+[INFO] [1794313928.486517776] [team048_solution]: HAND {"t": 59.92, "phase": "approach", "side": "r", "pos": [0.994, 0.992, 0.99, 0.991, 0.999, 0.0], "vel": [-0.0, -0.0, -0.0, -0.0, -0.0, 0.0], "eff": [0.038, 0.055, 0.061, 0.046, 0.018, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.006, 0.551, 0.658]}
+[INFO] [1794313928.953519484] [team048_solution]: HAND {"t": 60.03, "phase": "approach", "side": "r", "pos": [0.994, 0.992, 0.99, 0.991, 0.999, 0.0], "vel": [-0.0, -0.0, -0.0, -0.0, -0.0, -0.0], "eff": [0.038, 0.054, 0.06, 0.045, 0.019, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.002, 0.557, 0.661]}
+[INFO] [1794313929.478556658] [team048_solution]: HAND {"t": 60.15, "phase": "approach", "side": "r", "pos": [0.994, 0.992, 0.99, 0.991, 0.999, 0.0], "vel": [0.0, 0.0, 0.0, -0.0, -0.001, 0.0], "eff": [0.037, 0.054, 0.059, 0.044, 0.02, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.0, 0.563, 0.666]}
+[INFO] [1794313929.995686204] [team048_solution]: HAND {"t": 60.26, "phase": "approach", "side": "r", "pos": [0.994, 0.992, 0.99, 0.991, 0.999, 0.0], "vel": [0.0, 0.0, 0.0, -0.0, -0.001, 0.0], "eff": [0.037, 0.053, 0.058, 0.042, 0.02, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.002, 0.57, 0.67]}
+[INFO] [1794313930.500209118] [team048_solution]: HAND {"t": 60.37, "phase": "approach", "side": "r", "pos": [0.994, 0.992, 0.99, 0.991, 0.999, 0.0], "vel": [0.0, 0.0, 0.0, 0.0, -0.001, -0.0], "eff": [0.036, 0.052, 0.056, 0.041, 0.021, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.003, 0.578, 0.676]}
+[INFO] [1794313930.974267145] [team048_solution]: HAND {"t": 60.48, "phase": "approach", "side": "r", "pos": [0.994, 0.992, 0.99, 0.991, 0.999, 0.0], "vel": [0.0, 0.0, 0.0, 0.0, -0.001, 0.0], "eff": [0.035, 0.051, 0.055, 0.039, 0.022, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.003, 0.586, 0.681]}
+[INFO] [1794313931.479163755] [team048_solution]: HAND {"t": 60.6, "phase": "approach", "side": "r", "pos": [0.994, 0.992, 0.99, 0.991, 0.998, 0.0], "vel": [0.0, 0.001, 0.001, 0.0, -0.003, -0.0], "eff": [0.034, 0.049, 0.052, 0.036, 0.024, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.011, 0.614, 0.671]}
+[INFO] [1794313932.045575092] [team048_solution]: HAND {"t": 60.72, "phase": "approach", "side": "r", "pos": [0.993, 0.991, 0.99, 0.99, 0.998, 0.0], "vel": [-0.006, -0.007, -0.009, -0.007, 0.008, 0.0], "eff": [0.043, 0.061, 0.065, 0.046, 0.023, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.04, 0.729, 0.731]}
+[INFO] [1794313932.563714640] [team048_solution]: HAND {"t": 60.84, "phase": "approach", "side": "r", "pos": [0.993, 0.991, 0.989, 0.99, 0.998, 0.0], "vel": [0.001, 0.002, 0.002, 0.002, -0.003, -0.0], "eff": [0.035, 0.051, 0.053, 0.036, 0.027, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.03, 0.663, 0.721]}
+[INFO] [1794313933.081771366] [team048_solution]: HAND {"t": 60.96, "phase": "approach", "side": "r", "pos": [0.993, 0.991, 0.99, 0.99, 0.998, 0.0], "vel": [-0.001, -0.001, -0.001, -0.001, -0.0, 0.0], "eff": [0.035, 0.051, 0.053, 0.037, 0.027, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.023, 0.659, 0.754]}
+[INFO] [1794313933.592755237] [team048_solution]: HAND {"t": 61.07, "phase": "approach", "side": "r", "pos": [0.993, 0.991, 0.989, 0.99, 0.998, 0.0], "vel": [-0.001, -0.001, -0.001, -0.001, 0.0, 0.0], "eff": [0.036, 0.052, 0.055, 0.038, 0.027, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.016, 0.663, 0.772]}
+[INFO] [1794313934.037601027] [team048_solution]: HAND {"t": 61.18, "phase": "approach", "side": "r", "pos": [0.993, 0.991, 0.989, 0.99, 0.998, 0.0], "vel": [-0.001, -0.001, -0.001, -0.001, 0.0, 0.0], "eff": [0.036, 0.053, 0.056, 0.039, 0.027, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.013, 0.669, 0.787]}
+[INFO] [1794313934.483636731] [team048_solution]: HAND {"t": 61.29, "phase": "approach", "side": "r", "pos": [0.993, 0.991, 0.989, 0.99, 0.998, 0.0], "vel": [-0.001, -0.001, -0.001, -0.001, 0.001, 0.0], "eff": [0.037, 0.054, 0.057, 0.039, 0.027, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.007, 0.67, 0.797]}
+[INFO] [1794313934.990204890] [team048_solution]: HAND {"t": 61.4, "phase": "approach", "side": "r", "pos": [0.993, 0.99, 0.989, 0.989, 0.998, 0.0], "vel": [-0.001, -0.001, -0.001, -0.001, 0.001, 0.0], "eff": [0.037, 0.055, 0.058, 0.04, 0.026, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.004, 0.669, 0.805]}
+[INFO] [1794313935.443396971] [team048_solution]: HAND {"t": 61.51, "phase": "approach", "side": "r", "pos": [0.993, 0.99, 0.989, 0.989, 0.998, 0.0], "vel": [-0.001, -0.001, -0.001, -0.001, 0.001, 0.0], "eff": [0.038, 0.056, 0.059, 0.041, 0.026, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.002, 0.667, 0.811]}
+[INFO] [1794313935.885145617] [team048_solution]: HAND {"t": 61.62, "phase": "approach", "side": "r", "pos": [0.993, 0.99, 0.989, 0.989, 0.998, 0.0], "vel": [-0.0, -0.001, -0.001, -0.001, 0.001, 0.0], "eff": [0.038, 0.056, 0.06, 0.041, 0.026, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.0, 0.664, 0.815]}
+[INFO] [1794313936.405206486] [team048_solution]: HAND {"t": 61.74, "phase": "approach", "side": "r", "pos": [0.992, 0.99, 0.988, 0.989, 0.999, 0.0], "vel": [-0.0, -0.0, -0.001, -0.0, 0.001, 0.0], "eff": [0.039, 0.057, 0.06, 0.042, 0.025, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.0, 0.661, 0.819]}
+[INFO] [1794313936.912772606] [team048_solution]: HAND {"t": 61.86, "phase": "approach", "side": "r", "pos": [0.992, 0.99, 0.988, 0.989, 0.999, 0.0], "vel": [-0.0, -0.0, -0.001, -0.0, 0.001, 0.0], "eff": [0.039, 0.057, 0.061, 0.042, 0.025, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.001, 0.657, 0.822]}
+[INFO] [1794313937.443784605] [team048_solution]: HAND {"t": 61.98, "phase": "approach", "side": "r", "pos": [0.992, 0.99, 0.988, 0.989, 0.999, 0.0], "vel": [-0.0, -0.0, -0.0, -0.0, 0.001, 0.0], "eff": [0.039, 0.058, 0.062, 0.043, 0.024, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.001, 0.653, 0.825]}
+[INFO] [1794313937.955638560] [team048_solution]: HAND {"t": 62.1, "phase": "approach", "side": "r", "pos": [0.992, 0.99, 0.988, 0.989, 0.999, 0.0], "vel": [-0.0, -0.0, -0.0, -0.0, 0.001, 0.0], "eff": [0.04, 0.058, 0.063, 0.043, 0.024, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.001, 0.649, 0.828]}
+[INFO] [1794313938.484745274] [team048_solution]: HAND {"t": 62.22, "phase": "approach", "side": "r", "pos": [0.992, 0.99, 0.988, 0.989, 0.999, 0.0], "vel": [-0.0, -0.0, -0.0, -0.0, 0.001, 0.0], "eff": [0.04, 0.059, 0.063, 0.044, 0.024, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.002, 0.645, 0.831]}
+[INFO] [1794313938.999196836] [team048_solution]: HAND {"t": 62.33, "phase": "approach", "side": "r", "pos": [0.992, 0.99, 0.988, 0.989, 0.999, 0.0], "vel": [-0.0, 0.0, 0.0, 0.0, -0.0, 0.0], "eff": [0.04, 0.059, 0.063, 0.043, 0.024, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.002, 0.64, 0.825]}
+[INFO] [1794313939.441628635] [team048_solution]: HAND {"t": 62.44, "phase": "approach", "side": "r", "pos": [0.992, 0.99, 0.988, 0.989, 0.999, 0.0], "vel": [-0.0, -0.0, -0.0, -0.0, 0.001, 0.0], "eff": [0.04, 0.059, 0.064, 0.044, 0.023, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.001, 0.638, 0.83]}
+[INFO] [1794313939.921618449] [team048_solution]: HAND {"t": 62.55, "phase": "approach", "side": "r", "pos": [0.992, 0.99, 0.988, 0.989, 0.999, 0.0], "vel": [-0.0, -0.0, -0.0, -0.0, 0.001, 0.0], "eff": [0.041, 0.059, 0.064, 0.044, 0.023, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.0, 0.637, 0.833]}
+[INFO] [1794313940.442097645] [team048_solution]: HAND {"t": 62.67, "phase": "approach", "side": "r", "pos": [0.992, 0.99, 0.988, 0.989, 0.999, 0.0], "vel": [-0.0, -0.0, -0.0, -0.0, 0.0, 0.0], "eff": [0.041, 0.06, 0.065, 0.044, 0.023, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.001, 0.637, 0.835]}
+[INFO] [1794313940.963928392] [team048_solution]: HAND {"t": 62.79, "phase": "approach", "side": "r", "pos": [0.992, 0.99, 0.988, 0.989, 0.999, 0.0], "vel": [-0.0, -0.0, -0.0, -0.0, 0.0, 0.0], "eff": [0.041, 0.06, 0.065, 0.044, 0.023, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.001, 0.636, 0.836]}
+[INFO] [1794313941.515161300] [team048_solution]: HAND {"t": 62.9, "phase": "approach", "side": "r", "pos": [0.992, 0.99, 0.988, 0.989, 0.999, 0.0], "vel": [-0.0, -0.0, -0.0, -0.0, 0.0, 0.0], "eff": [0.041, 0.06, 0.065, 0.045, 0.023, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.001, 0.636, 0.836]}
+[INFO] [1794313941.988037160] [team048_solution]: HAND {"t": 63.01, "phase": "approach", "side": "r", "pos": [0.992, 0.99, 0.988, 0.989, 0.999, 0.0], "vel": [-0.0, -0.0, -0.0, -0.0, 0.0, 0.0], "eff": [0.041, 0.06, 0.065, 0.045, 0.023, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.002, 0.636, 0.836]}
+[INFO] [1794313942.447237676] [team048_solution]: HAND {"t": 63.12, "phase": "approach", "side": "r", "pos": [0.992, 0.99, 0.988, 0.989, 0.999, 0.0], "vel": [-0.0, -0.0, -0.0, -0.0, 0.0, 0.0], "eff": [0.041, 0.06, 0.065, 0.045, 0.023, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.002, 0.636, 0.837]}
+[INFO] [1794313942.964086186] [team048_solution]: HAND {"t": 63.23, "phase": "approach", "side": "r", "pos": [0.992, 0.99, 0.988, 0.989, 0.999, 0.0], "vel": [-0.0, -0.0, -0.0, -0.0, 0.0, 0.0], "eff": [0.041, 0.06, 0.065, 0.045, 0.023, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.002, 0.636, 0.837]}
+[INFO] [1794313943.427127553] [team048_solution]: HAND {"t": 63.34, "phase": "approach", "side": "r", "pos": [0.993, 0.99, 0.989, 0.989, 0.999, 0.0], "vel": [0.012, 0.015, 0.02, 0.015, -0.015, -0.0], "eff": [0.018, 0.034, 0.032, 0.019, 0.031, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.358, 0.471, 0.729]}
+[INFO] [1794313943.912330137] [team048_solution]: HAND {"t": 63.45, "phase": "approach", "side": "r", "pos": [0.993, 0.991, 0.99, 0.99, 0.997, 0.0], "vel": [-0.001, -0.002, -0.002, -0.002, 0.001, -0.0], "eff": [0.032, 0.048, 0.049, 0.034, 0.029, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.01, 0.599, 0.692]}
+[INFO] [1794313944.426140216] [team048_solution]: HAND {"t": 63.56, "phase": "approach", "side": "r", "pos": [0.993, 0.991, 0.989, 0.99, 0.999, 0.0], "vel": [-0.005, -0.007, -0.01, -0.006, 0.017, 0.0], "eff": [0.045, 0.064, 0.071, 0.048, 0.016, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.095, 0.659, 0.836]}
+[INFO] [1794313944.900230416] [team048_solution]: HAND {"t": 63.67, "phase": "approach", "side": "r", "pos": [0.993, 0.99, 0.988, 0.989, 1.0, 0.0], "vel": [0.001, 0.001, 0.001, 0.001, 0.001, 0.0], "eff": [0.041, 0.059, 0.064, 0.043, 0.019, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.073, 0.642, 0.781]}
+[INFO] [1794313945.370723616] [team048_solution]: TRACE {"t": 63.78, "phase": "at_grasp", "side": "r", "obj": "Perricone_MD_AcylGlutathione_Eye_Lid_Serum", "F": [-0.043, 0.616, 0.745], "dF": null, "fing": [0.993, 0.991, 0.989, 0.99, 1.0, 0.0], "eff": [0.037, 0.053, 0.057, 0.038, 0.021, 0.0], "tcp": [0.1778, -0.4263, -0.0215], "q": [0.364, -0.788, 0.337, -1.228, 2.225, 0.54, -0.691], "tcp_plan": [0.1825, -0.4318, -0.0155], "tcp_err": 0.0093}
+[INFO] [1794313945.372157963] [team048_solution]: HAND {"t": 63.78, "phase": "close1", "side": "r", "pos": [0.993, 0.991, 0.989, 0.99, 1.0, 0.0], "vel": [0.003, 0.003, 0.004, 0.003, -0.003, -0.0], "eff": [0.037, 0.053, 0.057, 0.038, 0.021, 0.0], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [-0.043, 0.616, 0.745]}
+[INFO] [1794313945.861259586] [team048_solution]: HAND {"t": 63.9, "phase": "close1", "side": "r", "pos": [0.969, 0.968, 0.966, 0.967, 0.976, 0.0], "vel": [-0.311, -0.31, -0.307, -0.309, -0.314, -0.0], "eff": [0.02, 0.006, 0.006, 0.023, 0.001, 0.0], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [-0.022, 0.594, 0.721]}
+[INFO] [1794313946.367060531] [team048_solution]: HAND {"t": 64.01, "phase": "close1", "side": "r", "pos": [0.916, 0.914, 0.913, 0.913, 0.922, 0.0], "vel": [-0.436, -0.433, -0.429, -0.429, -0.434, -0.0], "eff": [0.016, 0.004, 0.007, 0.024, 0.001, 0.0], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [-0.013, 0.591, 0.712]}
+[INFO] [1794313946.823990731] [team048_solution]: HAND {"t": 64.12, "phase": "close1", "side": "r", "pos": [0.852, 0.851, 0.851, 0.851, 0.859, 0.0], "vel": [-0.473, -0.468, -0.463, -0.463, -0.472, -0.0], "eff": [0.019, 0.012, 0.021, 0.036, 0.002, 0.0], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [-0.008, 0.588, 0.707]}
+[INFO] [1794313947.272037470] [team048_solution]: HAND {"t": 64.23, "phase": "close1", "side": "r", "pos": [0.787, 0.786, 0.787, 0.787, 0.793, 0.0], "vel": [-0.483, -0.477, -0.471, -0.472, -0.484, -0.0], "eff": [0.026, 0.026, 0.041, 0.053, 0.006, 0.0], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [-0.005, 0.586, 0.704]}
+[INFO] [1794313947.777622570] [team048_solution]: HAND {"t": 64.34, "phase": "close1", "side": "r", "pos": [0.726, 0.727, 0.728, 0.727, 0.731, 0.0], "vel": [-0.487, -0.484, -0.484, -0.484, -0.499, -0.0], "eff": [0.077, 0.077, 0.089, 0.091, 0.001, 0.0], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [0.001, 0.56, 0.695]}
+[INFO] [1794313948.285222952] [team048_solution]: HAND {"t": 64.45, "phase": "close1", "side": "r", "pos": [0.654, 0.654, 0.702, 0.721, 0.681, 0.0], "vel": [-0.469, -0.47, 0.031, 0.086, -0.087, 0.004], "eff": [0.204, 0.192, 0.529, 1.0, 0.521, 0.315], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [0.461, 0.677, 0.566]}
+[INFO] [1794313948.739304555] [team048_solution]: HAND {"t": 64.56, "phase": "close1", "side": "r", "pos": [0.587, 0.61, 0.676, 0.709, 0.684, 0.001], "vel": [-0.503, -0.348, -0.3, -0.2, 0.182, 0.003], "eff": [0.246, 1.0, 1.0, 1.0, 0.426, 0.221], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [0.599, 1.033, 0.57]}
+[INFO] [1794313949.242630170] [team048_solution]: HAND {"t": 64.67, "phase": "close1", "side": "r", "pos": [0.522, 0.572, 0.637, 0.685, 0.71, 0.001], "vel": [-0.401, -0.081, -0.038, -0.244, 0.216, 0.006], "eff": [0.707, 1.0, 0.72, 1.0, 0.216, 0.004], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [0.494, 0.514, 0.64]}
+[INFO] [1794313949.685760776] [team048_solution]: HAND {"t": 64.78, "phase": "close1", "side": "r", "pos": [0.456, 0.537, 0.603, 0.654, 0.725, 0.001], "vel": [-0.487, -0.256, -0.308, -0.412, -0.07, 0.0], "eff": [0.952, 1.0, 1.0, 1.0, 0.536, 0.096], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [1.018, 1.12, 0.491]}
+[INFO] [1794313950.232689493] [team048_solution]: HAND {"t": 64.89, "phase": "close1", "side": "r", "pos": [0.391, 0.584, 0.65, 0.704, 0.692, 0.003], "vel": [-0.479, 0.523, 0.493, 0.338, -0.408, 0.009], "eff": [0.423, 0.524, 1.0, 1.0, 0.842, 0.655], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [0.206, 0.619, 0.675]}
+[INFO] [1794313950.759225955] [team048_solution]: HAND {"t": 65.0, "phase": "close1", "side": "r", "pos": [0.323, 0.617, 0.681, 0.744, 0.741, 0.004], "vel": [-0.504, 0.289, 0.226, 0.242, 0.621, 0.006], "eff": [0.394, 1.0, 1.0, 1.0, 1.0, 0.015], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [0.547, 0.967, 0.741]}
+[INFO] [1794313951.220613796] [team048_solution]: HAND {"t": 65.11, "phase": "close1", "side": "r", "pos": [0.258, 0.633, 0.701, 0.757, 0.858, 0.005], "vel": [-0.473, 0.04, 0.078, -0.014, 1.0, 0.012], "eff": [0.474, 1.0, 1.0, 1.0, 1.0, 0.563], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [0.996, 1.395, 0.292]}
+[INFO] [1794313951.666595904] [team048_solution]: HAND {"t": 65.22, "phase": "close1", "side": "r", "pos": [0.19, 0.655, 0.725, 0.781, 0.925, 0.006], "vel": [-0.506, 0.224, 0.033, 0.044, 0.516, 0.004], "eff": [0.499, 1.0, 1.0, 1.0, 1.0, 0.342], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [0.263, 0.163, 0.381]}
+[INFO] [1794313952.191936540] [team048_solution]: HAND {"t": 65.33, "phase": "close1", "side": "r", "pos": [0.12, 0.674, 0.751, 0.804, 0.986, 0.006], "vel": [-0.481, -0.239, 0.127, -0.056, 1.0, 0.018], "eff": [0.407, 1.0, 1.0, 1.0, 1.0, 0.28], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [0.871, 1.065, 0.64]}
+[INFO] [1794313952.653518003] [team048_solution]: HAND {"t": 65.44, "phase": "close1", "side": "r", "pos": [0.056, 0.627, 0.718, 0.767, 1.239, 0.008], "vel": [-0.345, -0.366, -0.468, -0.333, 1.0, 0.005], "eff": [0.236, 1.0, 1.0, 1.0, 1.0, 0.308], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [0.936, 0.638, 0.838]}
+[INFO] [1794313953.134681046] [team048_solution]: HAND {"t": 65.55, "phase": "close1", "side": "r", "pos": [0.028, 0.559, 0.657, 0.711, 1.466, 0.009], "vel": [-0.11, -0.291, -0.425, -0.307, 1.0, -0.005], "eff": [0.261, 1.0, 1.0, 1.0, 1.0, 0.481], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [0.728, 0.692, 0.838]}
+[INFO] [1794313953.681170313] [team048_solution]: HAND {"t": 65.67, "phase": "close1", "side": "r", "pos": [0.018, 0.475, 0.582, 0.628, 1.727, 0.01], "vel": [-0.026, -0.755, -0.783, -0.821, 1.0, 0.017], "eff": [0.234, 1.0, 1.0, 1.0, 1.0, 0.441], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [0.825, 0.813, 0.203]}
+[INFO] [1794313954.213165245] [team048_solution]: HAND {"t": 65.79, "phase": "close1", "side": "r", "pos": [0.015, 0.377, 0.49, 0.527, 1.988, 0.01], "vel": [0.0, -0.624, -0.444, -0.635, 0.702, -0.016], "eff": [0.339, 1.0, 1.0, 1.0, 1.0, 0.905], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [0.695, 0.776, 0.917]}
+[INFO] [1794313954.677194953] [team048_solution]: jammed fingers (bent back past open, not re-targeted): [5]
+[INFO] [1794313954.740932053] [team048_solution]: HAND {"t": 65.91, "phase": "close2", "side": "r", "pos": [0.015, 0.185, 0.357, 0.362, 2.24, 0.011], "vel": [0.024, -1.0, -1.0, -1.0, 1.0, -0.011], "eff": [0.415, 0.706, 1.0, 1.0, 1.0, 0.525], "cmd": [0.0, 0.07, 0.247, 0.253, 0.0, 0.0], "F": [0.518, -0.641, 0.73]}
+[INFO] [1794313955.240847110] [team048_solution]: HAND {"t": 66.02, "phase": "close2", "side": "r", "pos": [0.01, 0.097, 0.17, 0.131, 2.228, 0.008], "vel": [-0.056, -0.21, -0.758, -0.849, -1.0, -0.021], "eff": [0.041, 0.026, 1.0, 1.0, 1.0, 0.592], "cmd": [0.0, 0.07, 0.247, 0.253, 0.0, 0.0], "F": [0.983, 1.254, 0.726]}
+[INFO] [1794313955.720065375] [team048_solution]: HAND {"t": 66.13, "phase": "close2", "side": "r", "pos": [0.005, 0.081, 0.113, 0.069, 2.03, 0.005], "vel": [-0.014, -0.068, -0.246, -0.276, -1.0, -0.005], "eff": [0.122, 0.162, 1.0, 0.502, 1.0, 0.674], "cmd": [0.0, 0.07, 0.247, 0.253, 0.0, 0.0], "F": [0.814, 1.078, 0.325]}
+[INFO] [1794313956.181222387] [team048_solution]: HAND {"t": 66.24, "phase": "close2", "side": "r", "pos": [0.003, 0.075, 0.099, 0.054, 1.822, 0.002], "vel": [-0.016, -0.037, -0.231, -0.284, -1.0, -0.011], "eff": [0.023, 0.023, 1.0, 1.0, 1.0, 0.115], "cmd": [0.0, 0.07, 0.247, 0.253, 0.0, 0.0], "F": [0.131, 0.033, 0.663]}
+[INFO] [1794313956.727392308] [team048_solution]: HAND {"t": 66.36, "phase": "close2", "side": "r", "pos": [0.003, 0.074, 0.075, 0.032, 1.718, 0.001], "vel": [0.012, 0.01, -0.075, -0.129, -0.854, -0.006], "eff": [0.147, 0.162, 1.0, 1.0, 1.0, 0.006], "cmd": [0.0, 0.07, 0.247, 0.253, 0.0, 0.0], "F": [-0.345, -0.357, 0.893]}
+[INFO] [1794313957.262782948] [team048_solution]: HAND {"t": 66.48, "phase": "close2", "side": "r", "pos": [0.003, 0.073, 0.065, 0.017, 1.672, 0.001], "vel": [-0.007, -0.008, 0.001, -0.053, 1.0, -0.004], "eff": [0.134, 0.184, 1.0, 1.0, 1.0, 0.154], "cmd": [0.0, 0.07, 0.247, 0.253, 0.0, 0.0], "F": [-0.265, 0.398, 0.706]}
+[INFO] [1794313957.807279908] [team048_solution]: HAND {"t": 66.6, "phase": "close2", "side": "r", "pos": [0.003, 0.074, 0.069, 0.02, 1.614, 0.0], "vel": [0.01, 0.012, 0.047, 0.043, -1.0, 0.001], "eff": [0.057, 0.061, 1.0, 1.0, 1.0, 0.074], "cmd": [0.0, 0.07, 0.247, 0.253, 0.0, 0.0], "F": [-0.542, -0.726, 0.943]}
+[INFO] [1794313958.371553503] [team048_solution]: HAND {"t": 66.72, "phase": "close2", "side": "r", "pos": [0.003, 0.074, 0.085, 0.038, 1.506, 0.0], "vel": [-0.004, -0.007, -0.05, -0.06, -1.0, -0.002], "eff": [0.044, 0.046, 0.396, 1.0, 1.0, 0.011], "cmd": [0.0, 0.07, 0.247, 0.253, 0.0, 0.0], "F": [-0.262, -0.076, 0.718]}
+[INFO] [1794313958.870718931] [team048_solution]: HAND {"t": 66.83, "phase": "close2", "side": "r", "pos": [0.003, 0.074, 0.095, 0.047, 1.463, 0.0], "vel": [-0.008, -0.009, 0.107, 0.004, 1.0, -0.005], "eff": [0.099, 0.124, 0.21, 1.0, 1.0, 0.029], "cmd": [0.0, 0.07, 0.247, 0.253, 0.0, 0.0], "F": [-0.202, 0.099, 0.86]}
+[INFO] [1794313959.361270016] [team048_solution]: HAND {"t": 66.94, "phase": "close2", "side": "r", "pos": [0.003, 0.074, 0.099, 0.052, 1.429, 0.0], "vel": [0.004, 0.012, 0.142, 0.12, -1.0, -0.0], "eff": [0.049, 0.098, 0.288, 1.0, 1.0, 0.084], "cmd": [0.0, 0.07, 0.247, 0.253, 0.0, 0.0], "F": [-0.79, -1.104, 1.194]}
+[INFO] [1794313959.862802850] [team048_solution]: HAND {"t": 67.05, "phase": "close2", "side": "r", "pos": [0.003, 0.074, 0.11, 0.065, 1.361, 0.001], "vel": [0.003, 0.007, 0.11, 0.148, -0.823, 0.003], "eff": [0.095, 0.121, 1.0, 1.0, 1.0, 0.103], "cmd": [0.0, 0.07, 0.247, 0.253, 0.0, 0.0], "F": [-0.585, -0.573, 0.944]}
+[INFO] [1794313960.391036469] [team048_solution]: HAND {"t": 67.16, "phase": "close2", "side": "r", "pos": [0.003, 0.074, 0.124, 0.08, 1.262, 0.001], "vel": [0.011, 0.013, 0.015, -0.055, -1.0, 0.008], "eff": [0.291, 0.378, 0.606, 1.0, 1.0, 0.162], "cmd": [0.0, 0.07, 0.247, 0.253, 0.0, 0.0], "F": [-0.259, -0.048, 0.707]}
+[INFO] [1794313960.866547536] [team048_solution]: HAND {"t": 67.27, "phase": "close2", "side": "r", "pos": [0.003, 0.074, 0.122, 0.079, 1.289, 0.0], "vel": [0.0, 0.0, 0.007, 0.003, -0.103, -0.003], "eff": [0.065, 0.088, 0.126, 1.0, 1.0, 0.018], "cmd": [0.0, 0.07, 0.247, 0.253, 0.0, 0.0], "F": [-0.344, -0.242, 0.919]}
+[INFO] [1794313961.270019616] [team048_solution]: TRACE {"t": 67.36, "phase": "closed", "side": "r", "obj": "Perricone_MD_AcylGlutathione_Eye_Lid_Serum", "F": [-0.392, -0.224, 0.895], "dF": 0.922, "fing": [0.004, 0.074, 0.122, 0.079, 1.287, 0.0], "eff": [0.076, 0.102, 0.011, 1.0, 1.0, 0.027], "tcp": [0.1844, -0.4321, -0.0116], "q": [0.361, -0.806, 0.33, -1.239, 2.185, 0.555, -0.695], "tcp_plan": [0.1825, -0.4318, -0.0155], "tcp_err": 0.0044, "settled": false, "thumb": true, "contact": [0.014185320946478064, 0.21950896879111748, 0.39722524758844735, 0.40291492007141794, 2.190800219774246, 0.010298537777916339], "target2": [0.0, 0.06950896879111748, 0.24722524758844736, 0.2529149200714179, 0.0, 0.0], "empty": false, "jam": [5], "force": 0.4, "speed": 0.5, "past": 0.15}
+[INFO] [1794313976.619485499] [team048_solution]: TRACE {"t": 70.85, "phase": "lifted", "side": "r", "obj": "Perricone_MD_AcylGlutathione_Eye_Lid_Serum", "F": [-0.012, 0.474, 0.477], "dF": 0.305, "fing": [0.004, 0.075, 0.257, 0.263, 0.012, 0.0], "eff": [0.002, 0.002, 0.013, 0.01, 0.016, 0.001], "tcp": [0.1785, -0.4281, 0.0601], "q": [0.591, -1.063, 0.263, -1.601, 2.087, 0.512, -0.492], "tcp_plan": [0.183, -0.4299, 0.0639], "tcp_err": 0.0062, "verdict": false, "shadow": false, "verdict_past": false, "verdict_v7": false, "cmd": [0.0, 0.06950896879111748, 0.24722524758844736, 0.2529149200714179, 0.0, 0.0], "eff_thr": 0.917}
+[INFO] [1794313976.691499303] [team048_solution]: grasp check: empty Perricone_MD_AcylGlutathione_Eye_Lid_Serum
+[INFO] [1794314005.079169274] [team048_solution]: re-observe after contact Perricone_MD_AcylGlutathione_Eye_Lid_Serum
+[INFO] [1794314005.216299008] [team048_solution]: observe t 77.4 dets 10 assigned [('Crayola_Bonus_64_C', 8.48, 0.08), ('Utana_5_Porcelain_', 8.99, 0.04), ('Ecoforms_Plant_Con', 1.19, 2.26), ('Perricone_MD_AcylG', 4.72, 0.81)]
+[INFO] [1794314005.317803698] [team048_solution]: pick Perricone_MD_AcylGlutathione_Eye_Lid_Serum box -> tray_right slot 0 arm r top w 0.024 z 0.075 clear {"du": -0.0, "dr": 0.0, "margin": 0.004}
+[INFO] [1794314005.319584982] [team048_solution]: TRACE {"t": 77.44, "phase": "start", "side": "r", "obj": "Perricone_MD_AcylGlutathione_Eye_Lid_Serum", "F": [0.166, -0.079, -0.096], "dF": 1.111, "fing": [0.991, 0.989, 0.987, 0.992, 1.016, 0.0], "eff": [0.102, 0.114, 0.15, 0.089, 0.088, 0.0], "tcp": [0.5154, -0.335, 0.1992], "q": [-0.559, -0.24, 0.003, -1.183, 0.002, 0.002, 0.001], "kind": "top", "center": [0.312, -0.405, -0.083]}
+[INFO] [1794314033.342423490] [team048_solution]: TRACE {"t": 83.83, "phase": "pre", "side": "r", "obj": "Perricone_MD_AcylGlutathione_Eye_Lid_Serum", "F": [0.01, -5.434, 0.905], "dF": 6.052, "fing": [0.976, 0.972, 0.968, 0.973, 1.001, 0.0], "eff": [0.279, 0.333, 0.397, 0.325, 0.051, 0.001], "tcp": [0.2671, -0.3562, 0.1419], "q": [-0.001, -0.044, -0.23, -2.07, 2.072, 0.675, 1.658], "tcp_plan": [0.2707, -0.3583, 0.1539], "tcp_err": 0.0128}
+[INFO] [1794314033.343810030] [team048_solution]: HAND {"t": 83.83, "phase": "approach", "side": "r", "pos": [0.976, 0.972, 0.968, 0.973, 1.001, 0.0], "vel": [0.008, 0.01, 0.012, 0.01, -0.004, -0.0], "eff": [0.279, 0.333, 0.397, 0.325, 0.051, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.01, -5.434, 0.905]}
+[INFO] [1794314033.799277501] [team048_solution]: HAND {"t": 83.94, "phase": "approach", "side": "r", "pos": [0.976, 0.972, 0.969, 0.973, 1.001, 0.0], "vel": [-0.0, -0.0, -0.001, -0.0, 0.006, 0.0], "eff": [0.283, 0.34, 0.407, 0.331, 0.055, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.018, -5.41, 0.801]}
+[INFO] [1794314034.326200293] [team048_solution]: HAND {"t": 84.06, "phase": "approach", "side": "r", "pos": [0.976, 0.972, 0.968, 0.973, 1.002, 0.0], "vel": [-0.003, -0.003, -0.005, -0.003, 0.006, 0.0], "eff": [0.29, 0.348, 0.417, 0.339, 0.059, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.011, -5.426, 0.669]}
+[INFO] [1794314034.863524141] [team048_solution]: HAND {"t": 84.18, "phase": "approach", "side": "r", "pos": [0.976, 0.972, 0.967, 0.973, 1.003, 0.0], "vel": [-0.003, -0.003, -0.004, -0.003, 0.004, 0.0], "eff": [0.296, 0.354, 0.424, 0.343, 0.061, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.005, -5.411, 0.549]}
+[INFO] [1794314035.395001482] [team048_solution]: HAND {"t": 84.29, "phase": "approach", "side": "r", "pos": [0.975, 0.971, 0.967, 0.972, 1.003, 0.0], "vel": [-0.002, -0.002, -0.003, -0.002, 0.003, 0.0], "eff": [0.299, 0.358, 0.428, 0.346, 0.063, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.0, -5.379, 0.448]}
+[INFO] [1794314035.868802439] [team048_solution]: HAND {"t": 84.4, "phase": "approach", "side": "r", "pos": [0.975, 0.971, 0.967, 0.972, 1.004, 0.0], "vel": [-0.001, -0.002, -0.002, -0.002, 0.002, 0.0], "eff": [0.303, 0.36, 0.432, 0.348, 0.065, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.004, -5.335, 0.354]}
+[INFO] [1794314036.332154490] [team048_solution]: HAND {"t": 84.51, "phase": "approach", "side": "r", "pos": [0.975, 0.971, 0.966, 0.972, 1.004, 0.0], "vel": [-0.001, -0.001, -0.002, -0.001, 0.002, 0.0], "eff": [0.305, 0.363, 0.434, 0.35, 0.067, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.007, -5.287, 0.274]}
+[INFO] [1794314036.894901196] [team048_solution]: HAND {"t": 84.62, "phase": "approach", "side": "r", "pos": [0.975, 0.971, 0.966, 0.972, 1.004, 0.0], "vel": [-0.001, -0.001, -0.001, -0.001, 0.001, -0.0], "eff": [0.307, 0.364, 0.436, 0.351, 0.068, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.009, -5.223, 0.186]}
+[INFO] [1794314037.371455133] [team048_solution]: HAND {"t": 84.73, "phase": "approach", "side": "r", "pos": [0.975, 0.97, 0.966, 0.972, 1.004, 0.0], "vel": [-0.001, -0.001, -0.001, -0.0, 0.001, -0.0], "eff": [0.309, 0.366, 0.438, 0.351, 0.069, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.01, -5.158, 0.111]}
+[INFO] [1794314037.831855698] [team048_solution]: HAND {"t": 84.84, "phase": "approach", "side": "r", "pos": [0.975, 0.971, 0.966, 0.972, 1.004, 0.0], "vel": [0.003, 0.003, 0.004, 0.003, -0.005, -0.0], "eff": [0.305, 0.359, 0.429, 0.345, 0.066, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.012, -5.103, 0.091]}
+[INFO] [1794314038.378612093] [team048_solution]: HAND {"t": 84.96, "phase": "approach", "side": "r", "pos": [0.975, 0.971, 0.967, 0.972, 1.004, 0.0], "vel": [0.0, 0.0, 0.0, 0.0, -0.001, -0.0], "eff": [0.306, 0.361, 0.432, 0.346, 0.068, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.003, -5.022, 0.028]}
+[INFO] [1794314038.889115370] [team048_solution]: HAND {"t": 85.07, "phase": "approach", "side": "r", "pos": [0.975, 0.971, 0.967, 0.972, 1.003, 0.0], "vel": [0.002, 0.003, 0.004, 0.003, -0.004, -0.0], "eff": [0.303, 0.356, 0.425, 0.341, 0.066, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.027, -4.931, 0.006]}
+[INFO] [1794314039.365964837] [team048_solution]: HAND {"t": 85.18, "phase": "approach", "side": "r", "pos": [0.979, 0.976, 1.059, 0.977, 1.006, -0.0], "vel": [-0.008, -0.003, 0.984, -0.007, 0.038, -0.002], "eff": [0.177, 0.214, 0.815, 0.215, 0.063, 0.004], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.294, -4.378, 0.471]}
+[INFO] [1794314039.848065545] [team048_solution]: HAND {"t": 85.29, "phase": "approach", "side": "r", "pos": [0.977, 1.017, 1.127, 0.992, 1.01, -0.0], "vel": [0.011, -0.067, 0.047, 0.174, 0.002, -0.0], "eff": [0.438, 1.0, 0.748, 0.095, 0.082, 0.041], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.518, -3.106, 2.465]}
+[INFO] [1794314040.356101875] [team048_solution]: HAND {"t": 85.4, "phase": "approach", "side": "r", "pos": [0.979, 1.017, 1.119, 0.994, 1.008, -0.0], "vel": [-0.003, 0.416, 0.193, 0.831, 0.009, -0.0], "eff": [0.095, 1.0, 1.0, 0.314, 0.064, 0.029], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [1.128, -4.022, 2.166]}
+[INFO] [1794314040.840971655] [team048_solution]: HAND {"t": 85.51, "phase": "approach", "side": "r", "pos": [0.979, 1.026, 1.131, 1.001, 1.009, -0.0], "vel": [0.016, -0.079, 0.037, 0.093, -0.026, -0.0], "eff": [0.072, 0.536, 0.047, 0.731, 0.006, 0.038], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [1.425, -3.058, 2.84]}
+[INFO] [1794314041.299635135] [team048_solution]: HAND {"t": 85.62, "phase": "approach", "side": "r", "pos": [0.98, 1.01, 1.124, 1.002, 1.009, -0.0], "vel": [-0.005, -0.187, -0.123, -0.022, 0.021, 0.001], "eff": [0.068, 0.043, 0.188, 0.959, 0.06, 0.016], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.956, -2.222, 3.166]}
+[INFO] [1794314041.891548202] [team048_solution]: HAND {"t": 85.73, "phase": "approach", "side": "r", "pos": [0.98, 0.995, 1.115, 1.002, 1.009, -0.0], "vel": [-0.022, -0.074, -0.026, 0.051, 0.03, -0.0], "eff": [0.185, 1.0, 0.04, 0.122, 0.07, 0.018], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [1.25, -3.218, 2.939]}
+[INFO] [1794314042.380271396] [team048_solution]: HAND {"t": 85.84, "phase": "approach", "side": "r", "pos": [0.978, 0.98, 1.109, 1.001, 1.011, -0.0], "vel": [-0.006, 0.014, 0.101, 0.046, 0.017, 0.001], "eff": [0.202, 0.16, 0.349, 0.614, 0.028, 0.057], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [1.06, -2.847, 3.187]}
+[INFO] [1794314042.861980975] [team048_solution]: HAND {"t": 85.95, "phase": "approach", "side": "r", "pos": [0.979, 0.969, 1.105, 1.001, 1.01, -0.0], "vel": [0.017, -0.165, -0.23, -0.05, -0.008, 0.001], "eff": [0.113, 1.0, 0.074, 0.388, 0.037, 0.029], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [1.339, -3.462, 3.625]}
+[INFO] [1794314043.389917714] [team048_solution]: HAND {"t": 86.06, "phase": "approach", "side": "r", "pos": [0.98, 0.953, 1.091, 0.99, 1.009, -0.0], "vel": [-0.004, -0.386, -0.397, -0.488, 0.009, 0.0], "eff": [0.211, 0.405, 0.761, 1.0, 0.092, 0.042], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [1.452, -3.28, 3.667]}
+[INFO] [1794314043.863257852] [team048_solution]: HAND {"t": 86.17, "phase": "approach", "side": "r", "pos": [0.981, 0.945, 1.086, 0.986, 1.009, -0.0], "vel": [-0.018, -0.149, -0.131, -0.157, 0.034, 0.001], "eff": [0.23, 0.845, 0.635, 0.984, 0.071, 0.067], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [1.065, -2.969, 3.527]}
+[INFO] [1794314044.326101251] [team048_solution]: HAND {"t": 86.28, "phase": "approach", "side": "r", "pos": [0.979, 0.936, 1.079, 0.979, 1.01, -0.0], "vel": [-0.015, -0.408, -0.378, -0.542, 0.037, 0.001], "eff": [0.846, 0.662, 0.829, 1.0, 0.069, 0.055], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [1.263, -3.043, 3.343]}
+[INFO] [1794314044.851669151] [team048_solution]: HAND {"t": 86.39, "phase": "approach", "side": "r", "pos": [0.979, 0.96, 1.073, 0.974, 1.01, -0.0], "vel": [-0.032, 0.08, -0.695, -0.578, 0.056, 0.002], "eff": [1.0, 1.0, 1.0, 1.0, 1.0, 0.642], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [1.406, -1.951, 4.715]}
+[INFO] [1794314045.314339335] [team048_solution]: HAND {"t": 86.5, "phase": "approach", "side": "r", "pos": [0.978, 0.969, 1.083, 0.987, 1.011, -0.0], "vel": [-0.031, 0.015, 0.069, 0.144, 0.012, -0.002], "eff": [1.0, 1.0, 1.0, 1.0, 1.0, 0.055], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.71, -1.293, 4.638]}
+[INFO] [1794314045.769427448] [team048_solution]: HAND {"t": 86.61, "phase": "approach", "side": "r", "pos": [0.978, 0.974, 1.086, 0.99, 1.012, -0.0], "vel": [0.001, 0.016, 0.308, 0.323, 0.007, 0.0], "eff": [0.057, 0.028, 0.534, 1.0, 0.131, 0.05], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.54, -3.008, 2.941]}
+[INFO] [1794314046.302587424] [team048_solution]: HAND {"t": 86.73, "phase": "approach", "side": "r", "pos": [0.981, 0.978, 1.082, 0.988, 1.009, -0.0], "vel": [0.086, 0.108, 0.356, 0.358, -0.117, -0.001], "eff": [0.071, 0.121, 1.0, 0.412, 0.146, 0.104], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.437, -3.608, 3.114]}
+[INFO] [1794314046.841855056] [team048_solution]: HAND {"t": 86.85, "phase": "approach", "side": "r", "pos": [0.98, 0.977, 1.072, 0.977, 1.01, -0.0], "vel": [-0.039, -0.039, 0.139, 0.043, 0.045, 0.0], "eff": [0.095, 0.085, 0.132, 1.0, 0.027, 0.02], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.618, -3.164, 3.037]}
+[INFO] [1794314047.356268907] [team048_solution]: HAND {"t": 86.96, "phase": "approach", "side": "r", "pos": [0.979, 0.976, 1.071, 0.976, 1.011, -0.0], "vel": [-0.021, -0.02, 0.066, 0.102, 0.018, -0.001], "eff": [0.052, 0.093, 0.447, 1.0, 0.094, 0.02], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.982, -3.252, 3.397]}
+[INFO] [1794314047.827581856] [team048_solution]: HAND {"t": 87.07, "phase": "approach", "side": "r", "pos": [0.978, 0.976, 1.067, 0.971, 1.011, -0.0], "vel": [0.021, 0.025, 0.031, 0.106, -0.026, -0.0], "eff": [0.058, 0.018, 0.36, 1.0, 0.079, 0.03], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.741, -3.0, 3.525]}
+[INFO] [1794314048.330623055] [team048_solution]: HAND {"t": 87.18, "phase": "approach", "side": "r", "pos": [0.979, 0.976, 1.072, 0.977, 1.011, -0.0], "vel": [-0.03, -0.031, 0.2, 0.117, 0.036, 0.0], "eff": [0.252, 0.25, 0.293, 1.0, 0.053, 0.041], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.253, -2.91, 2.707]}
+[INFO] [1794314048.830537527] [team048_solution]: HAND {"t": 87.3, "phase": "approach", "side": "r", "pos": [0.979, 0.976, 1.068, 0.973, 1.011, -0.0], "vel": [0.001, 0.001, -0.073, -0.045, -0.005, -0.0], "eff": [0.007, 0.027, 0.075, 1.0, 0.066, 0.021], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [1.093, -3.456, 3.572]}
+[INFO] [1794314049.355471392] [team048_solution]: HAND {"t": 87.42, "phase": "approach", "side": "r", "pos": [0.978, 0.976, 1.072, 0.978, 1.011, -0.0], "vel": [-0.034, -0.037, 0.063, 0.037, 0.036, -0.001], "eff": [0.146, 0.102, 0.336, 1.0, 0.113, 0.059], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.884, -3.044, 3.409]}
+[INFO] [1794314049.871167711] [team048_solution]: HAND {"t": 87.54, "phase": "approach", "side": "r", "pos": [0.979, 0.977, 1.066, 0.971, 1.011, -0.0], "vel": [0.031, 0.036, -0.013, 0.001, -0.042, -0.0], "eff": [0.247, 0.233, 0.498, 1.0, 0.036, 0.045], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [1.106, -3.535, 3.461]}
+[INFO] [1794314050.392329983] [team048_solution]: HAND {"t": 87.65, "phase": "approach", "side": "r", "pos": [0.98, 0.977, 1.066, 0.971, 1.01, -0.0], "vel": [-0.008, -0.01, -0.016, 0.001, 0.01, 0.0], "eff": [0.234, 0.211, 0.307, 1.0, 0.048, 0.063], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.774, -3.041, 3.48]}
+[INFO] [1794314050.847029861] [team048_solution]: HAND {"t": 87.76, "phase": "approach", "side": "r", "pos": [0.98, 0.977, 1.066, 0.972, 1.01, -0.0], "vel": [-0.018, -0.022, 0.02, 0.015, 0.025, 0.0], "eff": [0.233, 0.202, 0.334, 1.0, 0.06, 0.076], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.462, -2.801, 3.423]}
+[INFO] [1794314051.324619357] [team048_solution]: HAND {"t": 87.87, "phase": "approach", "side": "r", "pos": [0.979, 0.976, 1.078, 0.982, 1.011, -0.0], "vel": [-0.013, -0.017, 0.121, 0.083, 0.023, -0.0], "eff": [0.115, 0.066, 0.234, 1.0, 0.14, 0.102], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.113, -2.779, 2.954]}
+[INFO] [1794314051.836821560] [team048_solution]: HAND {"t": 87.98, "phase": "approach", "side": "r", "pos": [0.977, 0.974, 1.086, 0.988, 1.013, -0.0], "vel": [-0.017, -0.017, -0.063, -0.081, 0.012, -0.001], "eff": [0.014, 0.025, 0.561, 1.0, 0.082, 0.008], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [1.004, -3.049, 4.328]}
+[INFO] [1794314052.325797495] [team048_solution]: HAND {"t": 88.09, "phase": "approach", "side": "r", "pos": [0.975, 0.973, 1.096, 0.997, 1.014, -0.0], "vel": [-0.033, -0.039, 0.014, -0.131, 0.045, 0.0], "eff": [0.043, 0.007, 0.155, 1.0, 0.147, 0.079], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.447, -2.311, 4.102]}
+[INFO] [1794314052.792838049] [team048_solution]: HAND {"t": 88.2, "phase": "approach", "side": "r", "pos": [0.975, 0.973, 1.1, 1.001, 1.014, -0.0], "vel": [0.016, 0.019, 0.068, 0.075, -0.021, -0.0], "eff": [0.175, 0.143, 0.245, 1.0, 0.093, 0.101], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.571, -2.811, 3.982]}
+[INFO] [1794314053.329228510] [team048_solution]: HAND {"t": 88.32, "phase": "approach", "side": "r", "pos": [0.979, 0.976, 1.103, 1.002, 1.011, -0.0], "vel": [-0.018, -0.028, -0.169, -0.265, 0.034, 0.002], "eff": [0.264, 0.265, 0.578, 1.0, 0.017, 0.095], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.048, -2.027, 4.335]}
+[INFO] [1794314053.869261268] [team048_solution]: HAND {"t": 88.43, "phase": "approach", "side": "r", "pos": [0.98, 0.978, 1.103, 1.002, 1.009, -0.0], "vel": [-0.012, -0.018, -0.094, -0.193, 0.023, 0.001], "eff": [0.285, 0.29, 0.451, 1.0, 0.018, 0.109], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.057, -1.907, 4.29]}
+[INFO] [1794314054.348611876] [team048_solution]: HAND {"t": 88.54, "phase": "approach", "side": "r", "pos": [0.982, 0.979, 1.103, 1.005, 1.008, -0.0], "vel": [0.1, 0.117, 0.175, 0.121, -0.126, -0.001], "eff": [0.008, 0.032, 1.0, 0.974, 0.135, 0.087], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.422, -2.196, 4.242]}
+[INFO] [1794314054.802939470] [team048_solution]: HAND {"t": 88.65, "phase": "approach", "side": "r", "pos": [0.982, 0.98, 1.105, 1.006, 1.007, -0.0], "vel": [0.038, 0.045, 0.087, 0.24, -0.054, -0.001], "eff": [0.408, 0.41, 0.957, 0.388, 0.014, 0.123], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.98, -3.663, 3.095]}
+[INFO] [1794314055.325910699] [team048_solution]: HAND {"t": 88.77, "phase": "approach", "side": "r", "pos": [0.98, 0.978, 1.1, 1.002, 1.009, -0.0], "vel": [0.005, -0.004, -0.269, -0.069, 0.021, 0.002], "eff": [0.088, 0.035, 0.508, 0.064, 0.11, 0.093], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.735, -2.874, 3.99]}
+[INFO] [1794314055.849797914] [team048_solution]: HAND {"t": 88.89, "phase": "approach", "side": "r", "pos": [0.982, 0.979, 1.102, 1.003, 1.007, -0.0], "vel": [-0.048, -0.063, -0.326, -0.331, 0.076, 0.002], "eff": [0.486, 0.513, 1.0, 0.061, 0.001, 0.096], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.45, -2.136, 4.276]}
+[INFO] [1794314056.380983014] [team048_solution]: HAND {"t": 89.01, "phase": "approach", "side": "r", "pos": [0.981, 0.979, 1.11, 1.01, 1.008, -0.0], "vel": [-0.125, -0.128, 0.166, 0.041, 0.157, 0.0], "eff": [0.493, 0.528, 0.832, 1.0, 0.044, 0.116], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.854, -1.055, 4.013]}
+[INFO] [1794314056.921407219] [team048_solution]: HAND {"t": 89.13, "phase": "approach", "side": "r", "pos": [0.981, 0.978, 1.108, 1.009, 1.008, -0.0], "vel": [-0.055, -0.06, 0.11, 0.128, 0.04, -0.001], "eff": [1.0, 1.0, 1.0, 0.365, 1.0, 0.052], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.023, -1.272, 5.059]}
+[INFO] [1794314057.471068386] [team048_solution]: HAND {"t": 89.25, "phase": "approach", "side": "r", "pos": [0.98, 0.977, 1.107, 1.008, 1.009, -0.0], "vel": [-0.018, -0.021, 0.125, 0.137, 0.025, 0.0], "eff": [0.145, 0.115, 0.076, 1.0, 0.057, 0.107], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.388, -1.821, 4.009]}
+[INFO] [1794314058.054688669] [team048_solution]: HAND {"t": 89.36, "phase": "approach", "side": "r", "pos": [0.979, 0.976, 1.102, 1.002, 1.01, -0.0], "vel": [-0.004, -0.012, -0.403, -0.129, 0.022, 0.002], "eff": [0.263, 0.255, 0.417, 0.05, 0.02, 0.147], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.318, -2.025, 5.074]}
+[INFO] [1794314058.510491781] [team048_solution]: HAND {"t": 89.47, "phase": "approach", "side": "r", "pos": [0.979, 0.977, 1.105, 1.005, 1.01, -0.0], "vel": [-0.061, -0.068, 0.017, -0.074, 0.07, -0.0], "eff": [0.243, 0.227, 0.152, 0.805, 0.037, 0.038], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.157, -2.17, 4.553]}
+[INFO] [1794314058.971790005] [team048_solution]: HAND {"t": 89.58, "phase": "approach", "side": "r", "pos": [0.977, 0.968, 1.104, 1.003, 1.012, -0.0], "vel": [-0.078, -0.568, -0.589, -0.579, 0.13, 0.003], "eff": [0.004, 1.0, 0.359, 1.0, 0.172, 0.092], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.294, -0.622, 5.397]}
+[INFO] [1794314059.493128308] [team048_solution]: HAND {"t": 89.7, "phase": "approach", "side": "r", "pos": [0.979, 0.973, 1.111, 1.009, 1.01, -0.0], "vel": [0.032, 0.072, 0.067, 0.048, -0.044, -0.0], "eff": [0.094, 0.495, 0.041, 1.0, 0.01, 0.033], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.737, -1.626, 4.876]}
+[INFO] [1794314060.018441807] [team048_solution]: HAND {"t": 89.81, "phase": "approach", "side": "r", "pos": [0.98, 0.971, 1.108, 1.006, 1.009, -0.0], "vel": [-0.035, 0.222, 0.213, 0.127, 0.039, -0.0], "eff": [0.016, 0.464, 0.729, 0.658, 0.028, 0.027], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.729, -2.529, 4.563]}
+[INFO] [1794314060.482117432] [team048_solution]: HAND {"t": 89.92, "phase": "approach", "side": "r", "pos": [0.982, 0.971, 1.108, 1.007, 1.007, -0.0], "vel": [0.056, 0.139, 0.121, 0.263, -0.078, -0.0], "eff": [0.642, 0.377, 1.0, 1.0, 0.049, 0.143], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.022, -2.358, 4.605]}
+[INFO] [1794314060.973568413] [team048_solution]: HAND {"t": 90.03, "phase": "approach", "side": "r", "pos": [0.982, 0.97, 1.106, 1.004, 1.007, -0.0], "vel": [0.005, -0.004, -0.006, -0.003, -0.005, 0.0], "eff": [0.588, 0.481, 1.0, 0.604, 0.031, 0.15], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.351, -1.825, 4.747]}
+[INFO] [1794314061.490040213] [team048_solution]: HAND {"t": 90.15, "phase": "approach", "side": "r", "pos": [0.983, 0.969, 1.105, 1.003, 1.007, -0.0], "vel": [0.001, -0.002, -0.003, -0.001, -0.001, 0.0], "eff": [0.592, 0.519, 1.0, 0.566, 0.034, 0.149], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.388, -1.787, 4.742]}
+[INFO] [1794314062.020664181] [team048_solution]: HAND {"t": 90.26, "phase": "approach", "side": "r", "pos": [0.983, 0.969, 1.105, 1.003, 1.006, -0.0], "vel": [0.0, -0.003, -0.002, -0.002, -0.0, 0.0], "eff": [0.595, 0.538, 1.0, 0.553, 0.036, 0.148], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.401, -1.762, 4.744]}
+[INFO] [1794314062.479937610] [team048_solution]: HAND {"t": 90.37, "phase": "approach", "side": "r", "pos": [0.983, 0.969, 1.105, 1.003, 1.006, -0.0], "vel": [-0.0, -0.002, -0.0, -0.002, 0.0, -0.0], "eff": [0.593, 0.534, 1.0, 0.577, 0.035, 0.148], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.412, -1.746, 4.746]}
+[INFO] [1794314062.958175777] [team048_solution]: HAND {"t": 90.48, "phase": "approach", "side": "r", "pos": [0.983, 0.969, 1.105, 1.003, 1.007, -0.0], "vel": [-0.0, -0.001, -0.001, -0.001, 0.0, -0.0], "eff": [0.592, 0.53, 1.0, 0.591, 0.034, 0.147], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.408, -1.748, 4.746]}
+[INFO] [1794314063.481306207] [team048_solution]: HAND {"t": 90.6, "phase": "approach", "side": "r", "pos": [0.983, 0.969, 1.105, 1.003, 1.007, -0.0], "vel": [-0.0, -0.003, -0.005, -0.004, 0.0, 0.0], "eff": [0.592, 0.497, 1.0, 0.614, 0.033, 0.148], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.403, -1.757, 4.748]}
+[INFO] [1794314064.022518622] [team048_solution]: HAND {"t": 90.72, "phase": "approach", "side": "r", "pos": [0.983, 0.969, 1.105, 1.003, 1.007, -0.0], "vel": [0.0, -0.002, 0.0, -0.001, -0.0, -0.0], "eff": [0.592, 0.515, 1.0, 0.617, 0.034, 0.147], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.407, -1.749, 4.744]}
+[INFO] [1794314064.295656969] [team048_solution]: TRACE {"t": 90.77, "phase": "at_grasp", "side": "r", "obj": "Perricone_MD_AcylGlutathione_Eye_Lid_Serum", "F": [-0.406, -1.749, 4.744], "dF": 4.66, "fing": [0.983, 0.969, 1.105, 1.003, 1.007, -0.0], "eff": [0.591, 0.515, 1.0, 0.61, 0.033, 0.147], "tcp": [0.2717, -0.361, 0.0771], "q": [0.083, -0.203, -0.031, -1.866, 1.809, 1.007, 1.359], "tcp_plan": [0.2704, -0.3586, 0.0738], "tcp_err": 0.0043}
+[INFO] [1794314064.563472839] [team048_solution]: HAND {"t": 90.84, "phase": "close1", "side": "r", "pos": [0.983, 0.973, 1.111, 1.009, 1.001, -0.0], "vel": [0.011, 0.207, 0.261, 0.262, -0.179, -0.001], "eff": [0.452, 0.268, 0.788, 0.089, 0.016, 0.151], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [-0.207, -2.513, 4.333]}
+[INFO] [1794314065.108145561] [team048_solution]: HAND {"t": 90.96, "phase": "close1", "side": "r", "pos": [0.978, 0.995, 1.149, 1.049, 0.964, -0.0], "vel": [-0.016, 0.305, 0.424, 0.575, -0.38, -0.002], "eff": [0.386, 1.0, 1.0, 0.069, 0.206, 0.029], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [-0.016, -2.538, 4.509]}
+[INFO] [1794314065.626228848] [team048_solution]: HAND {"t": 91.07, "phase": "close1", "side": "r", "pos": [0.975, 1.035, 1.214, 1.113, 0.903, -0.001], "vel": [0.01, 0.253, 0.442, 0.498, -0.459, 0.002], "eff": [0.311, 0.046, 1.0, 0.553, 0.201, 0.016], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [-0.074, -2.621, 4.281]}
+[INFO] [1794314066.103807208] [team048_solution]: HAND {"t": 91.18, "phase": "close1", "side": "r", "pos": [0.975, 1.068, 1.269, 1.161, 0.838, -0.0], "vel": [0.045, -0.036, 0.261, 0.385, -0.532, -0.0], "eff": [0.052, 0.524, 1.0, 1.0, 0.125, 0.048], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [-1.57, -1.563, 4.202]}
+[INFO] [1794314066.572014713] [team048_solution]: HAND {"t": 91.29, "phase": "close1", "side": "r", "pos": [1.005, 1.133, 1.355, 1.252, 0.766, -0.0], "vel": [0.568, 0.516, 0.691, 0.829, -0.513, 0.002], "eff": [0.516, 1.0, 1.0, 1.0, 0.255, 0.023], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [-0.343, -2.964, 3.44]}
+[INFO] [1794314067.105505003] [team048_solution]: HAND {"t": 91.41, "phase": "close1", "side": "r", "pos": [1.058, 1.179, 1.433, 1.319, 0.686, 0.0], "vel": [0.576, 0.489, 0.662, 0.598, -0.615, 0.008], "eff": [0.786, 1.0, 1.0, 1.0, 0.066, 0.014], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [-0.201, -3.016, 3.422]}
+[INFO] [1794314067.639952792] [team048_solution]: HAND {"t": 91.53, "phase": "close1", "side": "r", "pos": [1.088, 1.207, 1.489, 1.363, 0.605, 0.001], "vel": [-0.06, -0.052, 0.278, -0.005, -0.38, -0.005], "eff": [0.562, 0.208, 1.0, 1.0, 0.11, 0.012], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [-0.599, -0.713, 4.732]}
+[INFO] [1794314068.204038229] [team048_solution]: HAND {"t": 91.65, "phase": "close1", "side": "r", "pos": [1.125, 1.243, 1.556, 1.407, 0.505, 0.003], "vel": [-0.305, -0.234, 0.082, -0.05, -0.317, -0.01], "eff": [1.0, 1.0, 1.0, 1.0, 0.574, 0.15], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [-1.306, 1.035, 4.192]}
+[INFO] [1794314068.743873009] [team048_solution]: HAND {"t": 91.77, "phase": "close1", "side": "r", "pos": [1.148, 1.263, 1.616, 1.461, 0.429, 0.003], "vel": [-0.005, 0.016, 0.326, 0.504, -0.387, -0.007], "eff": [1.0, 1.0, 1.0, 1.0, 0.383, 0.04], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [-1.362, 0.406, 4.458]}
+[INFO] [1794314069.260945624] [team048_solution]: HAND {"t": 91.88, "phase": "close1", "side": "r", "pos": [1.175, 1.281, 1.678, 1.511, 0.38, 0.002], "vel": [0.39, 0.254, 0.599, 0.692, -0.502, 0.004], "eff": [1.0, 0.472, 1.0, 1.0, 0.248, 0.078], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [-0.78, 1.655, 4.404]}
+[INFO] [1794314069.734242664] [team048_solution]: HAND {"t": 91.99, "phase": "close1", "side": "r", "pos": [1.215, 1.314, 1.749, 1.571, 0.314, 0.002], "vel": [0.798, 0.686, 0.939, 0.724, -0.688, 0.018], "eff": [1.0, 0.791, 1.0, 1.0, 1.0, 0.04], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [-0.949, 4.344, 4.71]}
+[INFO] [1794314070.200702096] [team048_solution]: HAND {"t": 92.1, "phase": "close1", "side": "r", "pos": [1.269, 1.357, 1.835, 1.644, 0.259, 0.001], "vel": [0.492, 0.285, 0.818, -0.143, -0.27, -0.01], "eff": [1.0, 1.0, 1.0, 1.0, 0.686, 0.217], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [-0.94, 4.64, 5.166]}
+[INFO] [1794314070.731917074] [team048_solution]: HAND {"t": 92.22, "phase": "close1", "side": "r", "pos": [1.277, 1.361, 1.887, 1.698, 0.241, 0.0], "vel": [0.148, -0.043, 0.264, 0.758, 0.071, -0.015], "eff": [1.0, 1.0, 1.0, 1.0, 0.853, 0.118], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [-1.038, 2.02, 4.424]}
+[INFO] [1794314071.288512361] [team048_solution]: HAND {"t": 92.34, "phase": "close1", "side": "r", "pos": [1.301, 1.384, 1.94, 1.744, 0.236, 0.0], "vel": [-0.13, -0.369, -0.036, -0.047, -0.083, 0.009], "eff": [1.0, 1.0, 1.0, 1.0, 1.0, 0.284], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [-0.877, -0.722, 2.968]}
+[INFO] [1794314071.843987759] [team048_solution]: HAND {"t": 92.46, "phase": "close1", "side": "r", "pos": [1.325, 1.406, 1.968, 1.771, 0.23, 0.001], "vel": [-0.073, -0.163, -0.05, -0.288, -0.007, 0.004], "eff": [1.0, 1.0, 1.0, 1.0, 0.958, 0.113], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.328, -0.115, 3.16]}
+[INFO] [1794314072.381252831] [team048_solution]: HAND {"t": 92.57, "phase": "close1", "side": "r", "pos": [1.311, 1.396, 1.96, 1.77, 0.237, -0.0], "vel": [0.623, 0.526, 0.349, 0.917, 0.043, 0.003], "eff": [1.0, 1.0, 1.0, 1.0, 1.0, 0.268], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.247, 0.242, 3.271]}
+[INFO] [1794314072.844460025] [team048_solution]: HAND {"t": 92.68, "phase": "close1", "side": "r", "pos": [1.3, 1.39, 1.956, 1.766, 0.24, -0.001], "vel": [0.47, 0.481, 0.531, 0.746, 0.021, -0.002], "eff": [1.0, 1.0, 1.0, 1.0, 1.0, 0.09], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.406, -2.96, 1.586]}
+[INFO] [1794314073.321882700] [team048_solution]: HAND {"t": 92.79, "phase": "close1", "side": "r", "pos": [1.286, 1.373, 1.942, 1.749, 0.241, -0.001], "vel": [-0.515, -0.749, -0.521, -0.573, 0.023, 0.005], "eff": [1.0, 1.0, 1.0, 1.0, 0.518, 0.213], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.333, 1.361, 4.826]}
+[INFO] [1794314073.769453188] [team048_solution]: jammed fingers (bent back past open, not re-targeted): [3, 4]
+[INFO] [1794314073.832046430] [team048_solution]: HAND {"t": 92.91, "phase": "close2", "side": "r", "pos": [1.282, 1.371, 1.941, 1.748, 0.242, -0.001], "vel": [-0.048, -0.087, 0.025, 0.029, -0.0, 0.0], "eff": [1.0, 1.0, 1.0, 1.0, 0.998, 0.223], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.085, -2.526, 3.13]}
+[INFO] [1794314074.361312988] [team048_solution]: HAND {"t": 93.02, "phase": "close2", "side": "r", "pos": [1.296, 1.39, 1.952, 1.752, 0.239, -0.0], "vel": [0.192, 0.039, 0.047, 0.013, -0.045, 0.009], "eff": [1.0, 1.0, 1.0, 1.0, 0.832, 0.213], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.421, -0.252, 3.606]}
+[INFO] [1794314074.818307753] [team048_solution]: HAND {"t": 93.13, "phase": "close2", "side": "r", "pos": [1.289, 1.375, 1.946, 1.751, 0.239, -0.0], "vel": [-0.497, -0.87, -0.42, -0.368, 0.031, 0.005], "eff": [1.0, 1.0, 1.0, 1.0, 0.28, 0.055], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [-0.498, 2.575, 5.065]}
+[INFO] [1794314075.299510517] [team048_solution]: HAND {"t": 93.24, "phase": "close2", "side": "r", "pos": [1.292, 1.381, 1.95, 1.759, 0.24, -0.0], "vel": [0.248, 0.181, 0.202, 0.519, 0.045, 0.001], "eff": [1.0, 1.0, 1.0, 1.0, 0.759, 0.025], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.177, -2.127, 3.509]}
+[INFO] [1794314075.818214128] [team048_solution]: HAND {"t": 93.36, "phase": "close2", "side": "r", "pos": [1.282, 1.371, 1.942, 1.75, 0.241, -0.001], "vel": [-0.062, -0.056, -0.052, -0.039, 0.013, -0.002], "eff": [1.0, 1.0, 1.0, 1.0, 0.895, 0.129], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.29, -2.434, 3.22]}
+[INFO] [1794314076.349125456] [team048_solution]: HAND {"t": 93.47, "phase": "close2", "side": "r", "pos": [1.27, 1.36, 1.934, 1.744, 0.243, -0.001], "vel": [0.127, 0.164, 0.263, 0.169, -0.032, -0.004], "eff": [1.0, 1.0, 1.0, 1.0, 0.628, 0.129], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [-0.243, -3.237, 2.536]}
+[INFO] [1794314076.818998664] [team048_solution]: HAND {"t": 93.58, "phase": "close2", "side": "r", "pos": [1.277, 1.363, 1.94, 1.757, 0.245, -0.001], "vel": [0.792, 0.076, 0.433, 1.0, -0.003, 0.018], "eff": [1.0, 1.0, 1.0, 1.0, 1.0, 0.243], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [-1.057, 3.271, 3.737]}
+[INFO] [1794314077.300708942] [team048_solution]: HAND {"t": 93.69, "phase": "close2", "side": "r", "pos": [1.291, 1.383, 1.95, 1.76, 0.236, -0.0], "vel": [0.122, 0.168, 0.025, 0.108, -0.057, 0.005], "eff": [1.0, 1.0, 1.0, 1.0, 0.804, 0.034], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [-0.371, 0.943, 3.913]}
+[INFO] [1794314077.833533282] [team048_solution]: HAND {"t": 93.81, "phase": "close2", "side": "r", "pos": [1.318, 1.405, 1.97, 1.776, 0.228, 0.001], "vel": [0.16, 0.119, 0.114, 0.061, -0.043, 0.004], "eff": [1.0, 1.0, 1.0, 1.0, 0.944, 0.051], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [-0.751, 2.133, 3.689]}
+[INFO] [1794314078.401760559] [team048_solution]: HAND {"t": 93.93, "phase": "close2", "side": "r", "pos": [1.328, 1.415, 1.976, 1.784, 0.23, 0.0], "vel": [-0.158, -0.115, -0.111, -0.04, 0.136, -0.014], "eff": [1.0, 1.0, 1.0, 1.0, 0.863, 0.194], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [-0.275, -0.341, 3.601]}
+[INFO] [1794314078.948746612] [team048_solution]: HAND {"t": 94.04, "phase": "close2", "side": "r", "pos": [1.298, 1.388, 1.955, 1.775, 0.247, -0.001], "vel": [0.091, 0.091, 0.118, 0.254, 0.212, -0.014], "eff": [1.0, 1.0, 1.0, 1.0, 0.267, 0.179], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.657, -3.689, 2.714]}
+[INFO] [1794314079.435950920] [team048_solution]: HAND {"t": 94.15, "phase": "close2", "side": "r", "pos": [1.252, 1.347, 1.927, 1.746, 0.262, -0.002], "vel": [-0.037, -0.025, 0.18, 0.072, 0.113, -0.008], "eff": [1.0, 1.0, 1.0, 1.0, 0.063, 0.096], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.372, -3.67, 2.766]}
+[INFO] [1794314079.945527705] [team048_solution]: HAND {"t": 94.26, "phase": "close2", "side": "r", "pos": [1.264, 1.36, 1.939, 1.744, 0.254, -0.002], "vel": [0.153, 0.116, 0.142, 0.053, -0.087, 0.008], "eff": [1.0, 1.0, 1.0, 1.0, 0.72, 0.207], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [-0.067, -1.716, 3.215]}
+[INFO] [1794314080.495265243] [team048_solution]: HAND {"t": 94.38, "phase": "close2", "side": "r", "pos": [1.286, 1.383, 1.951, 1.754, 0.245, -0.001], "vel": [0.567, 0.942, 0.274, 0.648, 0.059, -0.004], "eff": [1.0, 1.0, 1.0, 1.0, 0.853, 0.126], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.066, -2.041, 3.185]}
+[INFO] [1794314081.044675824] [team048_solution]: HAND {"t": 94.5, "phase": "close2", "side": "r", "pos": [1.269, 1.365, 1.938, 1.755, 0.253, -0.002], "vel": [0.229, 0.367, 0.208, 0.871, 0.054, -0.005], "eff": [1.0, 1.0, 1.0, 1.0, 1.0, 0.242], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.267, -2.357, 4.048]}
+[INFO] [1794314081.574240604] [team048_solution]: HAND {"t": 94.62, "phase": "close2", "side": "r", "pos": [1.243, 1.342, 1.919, 1.734, 0.26, -0.002], "vel": [-0.081, -0.161, 0.1, 0.002, 0.057, -0.002], "eff": [1.0, 1.0, 1.0, 1.0, 0.327, 0.086], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.214, -3.316, 3.07]}
+[INFO] [1794314082.138253147] [team048_solution]: HAND {"t": 94.73, "phase": "close2", "side": "r", "pos": [1.248, 1.35, 1.927, 1.737, 0.259, -0.002], "vel": [0.071, -0.031, -0.043, 0.019, -0.09, 0.005], "eff": [1.0, 1.0, 1.0, 1.0, 0.727, 0.06], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.139, -1.941, 3.596]}
+[INFO] [1794314082.596900826] [team048_solution]: HAND {"t": 94.84, "phase": "close2", "side": "r", "pos": [1.258, 1.356, 1.932, 1.742, 0.254, -0.002], "vel": [0.123, 0.122, 0.125, 0.076, -0.006, -0.003], "eff": [1.0, 1.0, 1.0, 1.0, 0.979, 0.211], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [-0.133, -2.4, 2.859]}
+[INFO] [1794314083.051743026] [team048_solution]: HAND {"t": 94.95, "phase": "close2", "side": "r", "pos": [1.265, 1.364, 1.939, 1.745, 0.252, -0.001], "vel": [0.038, -0.037, 0.08, 0.062, -0.028, 0.003], "eff": [1.0, 1.0, 1.0, 1.0, 0.721, 0.059], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.104, -2.116, 3.412]}
+[INFO] [1794314083.313337325] [team048_solution]: TRACE {"t": 95.0, "phase": "closed", "side": "r", "obj": "Perricone_MD_AcylGlutathione_Eye_Lid_Serum", "F": [-0.25, -2.354, 2.807], "dF": 2.034, "fing": [1.269, 1.365, 1.94, 1.75, 0.249, -0.001], "eff": [1.0, 1.0, 1.0, 1.0, 1.0, 0.218], "tcp": [0.2683, -0.3545, 0.0663], "q": [0.092, -0.194, -0.027, -1.855, 1.778, 0.989, 1.389], "tcp_plan": [0.2704, -0.3586, 0.0738], "tcp_err": 0.0088, "settled": false, "thumb": true, "contact": [1.282709234563909, 1.3720918545934015, 1.9416436576700176, 1.747062528571596, 0.24153915295998252, -0.000622208434990279], "target2": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "empty": false, "jam": [3, 4], "force": 0.4, "speed": 0.5, "past": 0.15}
+[INFO] [1794314097.329471097] [team048_solution]: TRACE {"t": 98.15, "phase": "lifted", "side": "r", "obj": "Perricone_MD_AcylGlutathione_Eye_Lid_Serum", "F": [0.004, -5.502, 0.639], "dF": 5.576, "fing": [0.975, 0.971, 0.12, 0.12, 0.231, 0.001], "eff": [0.301, 0.362, 0.151, 0.176, 0.118, 0.005], "tcp": [0.2698, -0.3583, 0.1508], "q": [-0.011, -0.066, -0.22, -2.083, 2.075, 0.688, 1.658], "tcp_plan": [0.2709, -0.3591, 0.1545], "tcp_err": 0.0039, "verdict": false, "shadow": true, "verdict_past": null, "verdict_v7": false, "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "eff_thr": 0.917}
+[INFO] [1794314097.389345057] [team048_solution]: grasp check: empty Perricone_MD_AcylGlutathione_Eye_Lid_Serum
+[INFO] [1794314125.780815506] [team048_solution]: re-observe after contact Perricone_MD_AcylGlutathione_Eye_Lid_Serum
+[INFO] [1794314125.884855551] [team048_solution]: observe t 104.7 dets 10 assigned [('Crayola_Bonus_64_C', 8.48, 0.08), ('Utana_5_Porcelain_', 8.99, 0.04), ('Ecoforms_Plant_Con', 1.2, 2.26), ('Threshold_Ramekin_', 5.89, 0.58)]
+[INFO] [1794314125.885688745] [team048_solution]: no plan: Threshold_Ramekin_White_Porcelain {"reason": "unchanged scene since the last failed planning"}
+[INFO] [1794314125.939907529] [team048_solution]: no plan: Ecoforms_Plant_Container_B4_Har {"candidates": 0, "feasible": 0, "pick_ik": {}, "place": {}, "hand_clear": {}, "rim_closed": true, "reason": "dish without an open rim (closed top measured)"}
+[INFO] [1794314126.035157764] [team048_solution]: pick Utana_5_Porcelain_Ramekin_Large dish -> tray_left slot 0 arm l rim w 0.025 z 0.054 clear {"du": null, "dr": null, "margin": null}
+[INFO] [1794314126.046934862] [team048_solution]: TRACE {"t": 104.72, "phase": "start", "side": "l", "obj": "Utana_5_Porcelain_Ramekin_Large", "F": [0.006, -0.016, -0.008], "dF": 5.075, "fing": [0.99, 0.988, 0.989, 0.992, 1.016, 0.0], "eff": [0.122, 0.138, 0.13, 0.094, 0.084, 0.0], "tcp": [0.5207, 0.3356, 0.2259], "q": [-0.596, 0.249, -0.001, -1.201, 0.0, -0.0, -0.0], "kind": "rim", "center": [0.357, 0.361, -0.1]}
+[INFO] [1794314151.946710325] [team048_solution]: TRACE {"t": 110.59, "phase": "pre", "side": "l", "obj": "Utana_5_Porcelain_Ramekin_Large", "F": [0.004, 4.979, 0.461], "dF": 7.987, "fing": [0.975, 0.971, 0.97, 0.973, 1.001, 0.0], "eff": [0.318, 0.372, 0.38, 0.339, 0.063, 0.001], "tcp": [0.2972, 0.3296, 0.1258], "q": [-0.0, 0.072, 0.138, -2.019, -1.801, 0.529, -1.46], "tcp_plan": [0.3018, 0.3314, 0.138], "tcp_err": 0.0132}
+[INFO] [1794314151.948292882] [team048_solution]: HAND {"t": 110.59, "phase": "approach", "side": "l", "pos": [0.975, 0.971, 0.97, 0.973, 1.001, 0.0], "vel": [0.008, 0.009, 0.01, 0.009, -0.003, -0.0], "eff": [0.318, 0.372, 0.38, 0.339, 0.063, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.005, 4.98, 0.449]}
+[INFO] [1794314152.426982930] [team048_solution]: HAND {"t": 110.7, "phase": "approach", "side": "l", "pos": [0.976, 0.972, 0.971, 0.974, 1.001, 0.0], "vel": [-0.0, -0.001, -0.001, -0.0, 0.007, 0.0], "eff": [0.322, 0.377, 0.385, 0.343, 0.067, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.004, 4.929, 0.359]}
+[INFO] [1794314152.930177388] [team048_solution]: HAND {"t": 110.81, "phase": "approach", "side": "l", "pos": [0.975, 0.971, 0.97, 0.973, 1.002, 0.0], "vel": [-0.003, -0.004, -0.004, -0.003, 0.007, 0.0], "eff": [0.329, 0.386, 0.394, 0.351, 0.071, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.003, 4.917, 0.232]}
+[INFO] [1794314153.395314790] [team048_solution]: HAND {"t": 110.92, "phase": "approach", "side": "l", "pos": [0.975, 0.971, 0.97, 0.973, 1.003, 0.0], "vel": [-0.003, -0.004, -0.004, -0.003, 0.005, 0.0], "eff": [0.334, 0.393, 0.401, 0.356, 0.073, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.002, 4.876, 0.119]}
+[INFO] [1794314153.860659736] [team048_solution]: HAND {"t": 111.03, "phase": "approach", "side": "l", "pos": [0.974, 0.97, 0.969, 0.972, 1.004, 0.0], "vel": [-0.002, -0.003, -0.003, -0.002, 0.004, 0.0], "eff": [0.338, 0.397, 0.405, 0.36, 0.076, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.001, 4.815, 0.016]}
+[INFO] [1794314154.409129350] [team048_solution]: HAND {"t": 111.15, "phase": "approach", "side": "l", "pos": [0.974, 0.97, 0.969, 0.972, 1.004, 0.0], "vel": [-0.002, -0.002, -0.002, -0.002, 0.003, 0.0], "eff": [0.342, 0.4, 0.408, 0.363, 0.078, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.0, 4.733, -0.088]}
+[INFO] [1794314154.947809939] [team048_solution]: HAND {"t": 111.27, "phase": "approach", "side": "l", "pos": [0.974, 0.97, 0.969, 0.972, 1.004, 0.0], "vel": [-0.001, -0.001, -0.001, -0.001, 0.002, 0.0], "eff": [0.344, 0.403, 0.411, 0.365, 0.08, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.002, 4.64, -0.186]}
+[INFO] [1794314155.502380283] [team048_solution]: HAND {"t": 111.38, "phase": "approach", "side": "l", "pos": [0.974, 0.969, 0.969, 0.972, 1.005, 0.0], "vel": [-0.001, -0.001, -0.001, -0.001, 0.002, 0.0], "eff": [0.346, 0.405, 0.413, 0.366, 0.082, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.002, 4.546, -0.27]}
+[INFO] [1794314155.982367894] [team048_solution]: HAND {"t": 111.49, "phase": "approach", "side": "l", "pos": [0.974, 0.969, 0.969, 0.972, 1.005, 0.0], "vel": [-0.001, -0.001, -0.001, -0.001, 0.001, 0.0], "eff": [0.348, 0.407, 0.414, 0.367, 0.083, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.002, 4.457, -0.342]}
+[INFO] [1794314156.445523650] [team048_solution]: HAND {"t": 111.6, "phase": "approach", "side": "l", "pos": [0.974, 0.969, 0.968, 0.972, 1.005, 0.0], "vel": [-0.001, -0.001, -0.001, -0.0, 0.001, -0.0], "eff": [0.349, 0.408, 0.415, 0.368, 0.085, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.003, 4.345, -0.424]}
+[INFO] [1794314156.978296686] [team048_solution]: HAND {"t": 111.72, "phase": "approach", "side": "l", "pos": [0.974, 0.969, 0.968, 0.971, 1.005, 0.0], "vel": [-0.001, -0.001, -0.001, -0.0, 0.001, 0.0], "eff": [0.351, 0.409, 0.416, 0.368, 0.087, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.003, 4.228, -0.5]}
+[INFO] [1794314157.481239241] [team048_solution]: HAND {"t": 111.84, "phase": "approach", "side": "l", "pos": [0.974, 0.969, 0.969, 0.972, 1.005, 0.0], "vel": [0.004, 0.005, 0.005, 0.004, -0.006, -0.0], "eff": [0.347, 0.403, 0.41, 0.363, 0.085, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.002, 4.133, -0.524]}
+[INFO] [1794314158.049770302] [team048_solution]: HAND {"t": 111.95, "phase": "approach", "side": "l", "pos": [0.974, 0.97, 0.969, 0.972, 1.004, 0.0], "vel": [0.001, 0.001, 0.001, 0.001, -0.002, -0.0], "eff": [0.348, 0.405, 0.412, 0.365, 0.086, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.003, 4.064, -0.532]}
+[INFO] [1794314158.486439807] [team048_solution]: HAND {"t": 112.06, "phase": "approach", "side": "l", "pos": [0.974, 0.97, 0.969, 0.972, 1.004, 0.0], "vel": [0.0, 0.0, 0.0, 0.0, -0.003, -0.0], "eff": [0.349, 0.406, 0.413, 0.365, 0.086, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.02, 4.017, -0.51]}
+[INFO] [1794314158.966172756] [team048_solution]: HAND {"t": 112.17, "phase": "approach", "side": "l", "pos": [0.978, 0.974, 0.973, 0.976, 1.004, 0.0], "vel": [0.077, 0.09, 0.092, 0.083, -0.014, -0.0], "eff": [0.169, 0.208, 0.214, 0.181, 0.064, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.002, 4.006, -0.555]}
+[INFO] [1794314159.484395538] [team048_solution]: HAND {"t": 112.28, "phase": "approach", "side": "l", "pos": [0.984, 0.981, 0.981, 0.983, 1.002, 0.0], "vel": [0.026, 0.031, 0.032, 0.028, -0.008, -0.0], "eff": [0.164, 0.203, 0.208, 0.175, 0.061, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.002, 3.987, -0.481]}
+[INFO] [1794314159.975738891] [team048_solution]: HAND {"t": 112.39, "phase": "approach", "side": "l", "pos": [1.0, 0.986, 0.985, 0.987, 1.002, 0.0], "vel": [0.028, 0.037, 0.035, 0.032, -0.005, -0.0], "eff": [1.0, 0.415, 0.405, 0.362, 0.064, 0.077], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.074, 0.534, 1.757]}
+[INFO] [1794314160.459232433] [team048_solution]: HAND {"t": 112.5, "phase": "approach", "side": "l", "pos": [1.017, 0.989, 0.989, 0.99, 1.001, 0.0], "vel": [0.245, -0.001, 0.001, 0.0, -0.014, -0.0], "eff": [1.0, 0.326, 0.33, 0.291, 0.055, 0.067], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.205, 2.726, 0.694]}
+[INFO] [1794314161.008550058] [team048_solution]: HAND {"t": 112.62, "phase": "approach", "side": "l", "pos": [1.046, 0.99, 0.989, 0.99, 1.001, 0.0], "vel": [0.177, -0.013, -0.009, -0.011, -0.015, -0.0], "eff": [1.0, 0.099, 0.118, 0.102, 0.073, 0.011], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.215, 0.302, 1.766]}
+[INFO] [1794314161.527078102] [team048_solution]: HAND {"t": 112.73, "phase": "approach", "side": "l", "pos": [1.085, 0.989, 0.989, 0.99, 1.001, 0.0], "vel": [0.346, -0.035, -0.032, -0.03, 0.001, 0.0], "eff": [1.0, 0.148, 0.16, 0.138, 0.14, 0.011], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.449, 1.499, 0.891]}
+[INFO] [1794314162.008834504] [team048_solution]: HAND {"t": 112.84, "phase": "approach", "side": "l", "pos": [1.126, 0.987, 0.986, 0.988, 1.001, 0.0], "vel": [0.51, -0.019, -0.017, -0.014, 0.018, 0.0], "eff": [1.0, 0.256, 0.295, 0.295, 0.136, 0.059], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.097, 2.078, 0.605]}
+[INFO] [1794314162.482300963] [team048_solution]: HAND {"t": 112.95, "phase": "approach", "side": "l", "pos": [1.162, 0.985, 0.984, 0.986, 1.001, 0.0], "vel": [0.294, 0.001, 0.001, -0.0, -0.003, -0.0], "eff": [1.0, 0.195, 0.223, 0.216, 0.055, 0.032], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.465, 1.792, 0.632]}
+[INFO] [1794314163.031137608] [team048_solution]: HAND {"t": 113.07, "phase": "approach", "side": "l", "pos": [1.207, 0.983, 0.983, 0.985, 1.0, 0.0], "vel": [0.336, 0.001, 0.001, 0.001, -0.0, 0.0], "eff": [1.0, 0.208, 0.239, 0.233, 0.069, 0.027], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.404, 1.966, 0.512]}
+[INFO] [1794314163.579402653] [team048_solution]: HAND {"t": 113.19, "phase": "approach", "side": "l", "pos": [1.239, 0.98, 0.98, 0.982, 1.001, 0.0], "vel": [0.187, -0.032, -0.029, -0.027, 0.001, 0.0], "eff": [1.0, 0.306, 0.317, 0.294, 0.095, 0.019], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.432, 2.879, 0.377]}
+[INFO] [1794314164.116320940] [team048_solution]: HAND {"t": 113.31, "phase": "approach", "side": "l", "pos": [1.264, 0.978, 0.979, 0.98, 1.0, 0.0], "vel": [0.113, -0.016, -0.015, -0.014, 0.0, 0.0], "eff": [1.0, 0.352, 0.36, 0.335, 0.116, 0.017], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.383, 3.381, 0.237]}
+[INFO] [1794314164.639402452] [team048_solution]: HAND {"t": 113.43, "phase": "approach", "side": "l", "pos": [1.276, 0.978, 0.978, 0.98, 1.0, 0.0], "vel": [0.099, 0.005, 0.004, 0.004, 0.004, 0.0], "eff": [1.0, 0.492, 0.483, 0.442, 0.184, 0.013], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.354, 3.74, 0.101]}
+[INFO] [1794314165.180322790] [team048_solution]: HAND {"t": 113.54, "phase": "approach", "side": "l", "pos": [1.286, 0.977, 0.977, 0.979, 1.0, 0.0], "vel": [0.041, -0.005, -0.004, -0.004, -0.001, 0.0], "eff": [1.0, 0.379, 0.387, 0.362, 0.127, 0.017], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.327, 3.674, 0.181]}
+[INFO] [1794314165.656472335] [team048_solution]: HAND {"t": 113.65, "phase": "approach", "side": "l", "pos": [1.289, 0.977, 0.977, 0.979, 1.0, 0.0], "vel": [0.017, -0.003, -0.003, -0.003, -0.001, -0.0], "eff": [1.0, 0.374, 0.382, 0.358, 0.122, 0.018], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.327, 3.61, 0.226]}
+[INFO] [1794314166.155186098] [team048_solution]: HAND {"t": 113.76, "phase": "approach", "side": "l", "pos": [1.291, 0.976, 0.977, 0.979, 1.0, 0.0], "vel": [0.007, -0.002, -0.002, -0.002, -0.0, 0.0], "eff": [1.0, 0.374, 0.383, 0.359, 0.121, 0.018], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.325, 3.584, 0.243]}
+[INFO] [1794314166.698812153] [team048_solution]: HAND {"t": 113.87, "phase": "approach", "side": "l", "pos": [1.291, 0.976, 0.976, 0.978, 1.0, 0.0], "vel": [0.002, -0.001, -0.001, -0.001, -0.0, 0.0], "eff": [1.0, 0.37, 0.38, 0.357, 0.119, 0.018], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.315, 3.576, 0.243]}
+[INFO] [1794314167.200506961] [team048_solution]: HAND {"t": 113.98, "phase": "approach", "side": "l", "pos": [1.291, 0.976, 0.976, 0.978, 1.0, 0.0], "vel": [0.001, -0.0, -0.0, -0.0, -0.0, -0.0], "eff": [1.0, 0.371, 0.381, 0.357, 0.119, 0.018], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.321, 3.561, 0.252]}
+[INFO] [1794314167.665684510] [team048_solution]: HAND {"t": 114.09, "phase": "approach", "side": "l", "pos": [1.291, 0.976, 0.976, 0.978, 1.0, 0.0], "vel": [0.0, -0.0, -0.0, -0.0, -0.0, 0.0], "eff": [1.0, 0.361, 0.372, 0.35, 0.115, 0.018], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.314, 3.567, 0.246]}
+[INFO] [1794314168.227666354] [team048_solution]: HAND {"t": 114.2, "phase": "approach", "side": "l", "pos": [1.291, 0.976, 0.976, 0.978, 1.0, 0.0], "vel": [-0.0, -0.0, -0.0, -0.0, 0.0, 0.0], "eff": [1.0, 0.37, 0.379, 0.356, 0.118, 0.018], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.317, 3.554, 0.251]}
+[INFO] [1794314168.707632449] [team048_solution]: HAND {"t": 114.31, "phase": "approach", "side": "l", "pos": [1.291, 0.976, 0.976, 0.978, 1.0, 0.0], "vel": [-0.0, -0.0, -0.0, -0.0, 0.0, 0.0], "eff": [1.0, 0.368, 0.378, 0.355, 0.118, 0.018], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.319, 3.555, 0.251]}
+[INFO] [1794314169.170392179] [team048_solution]: HAND {"t": 114.42, "phase": "approach", "side": "l", "pos": [1.291, 0.976, 0.976, 0.978, 1.0, 0.0], "vel": [-0.0, -0.0, -0.0, -0.0, -0.0, 0.0], "eff": [1.0, 0.37, 0.379, 0.356, 0.119, 0.018], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.321, 3.558, 0.252]}
+[INFO] [1794314169.699398694] [team048_solution]: HAND {"t": 114.54, "phase": "approach", "side": "l", "pos": [1.291, 0.976, 0.976, 0.978, 1.0, 0.0], "vel": [-0.03, -0.009, -0.009, -0.008, 0.01, 0.0], "eff": [1.0, 0.368, 0.378, 0.355, 0.118, 0.018], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.319, 3.559, 0.251]}
+[INFO] [1794314170.216337075] [team048_solution]: HAND {"t": 114.66, "phase": "approach", "side": "l", "pos": [1.206, 0.979, 0.979, 0.981, 1.001, 0.0], "vel": [-0.791, 0.023, 0.021, 0.018, 0.0, 0.0], "eff": [1.0, 0.576, 0.536, 0.466, 0.251, 0.008], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.591, 4.854, -0.442]}
+[INFO] [1794314170.737139880] [team048_solution]: HAND {"t": 114.77, "phase": "approach", "side": "l", "pos": [1.115, 0.981, 0.981, 0.983, 1.0, 0.0], "vel": [-0.39, -0.006, -0.006, -0.005, 0.012, 0.0], "eff": [0.106, 0.225, 0.245, 0.233, 0.084, 0.02], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.112, 4.837, -0.773]}
+[INFO] [1794314170.880594787] [team048_solution]: TRACE {"t": 114.81, "phase": "at_grasp", "side": "l", "obj": "Utana_5_Porcelain_Ramekin_Large", "F": [0.613, 4.922, -0.786], "dF": 8.725, "fing": [1.095, 0.982, 0.982, 0.984, 1.0, 0.0], "eff": [0.013, 0.205, 0.203, 0.161, 0.083, 0.024], "tcp": [0.2974, 0.3289, 0.0469], "q": [0.062, 0.042, 0.111, -1.785, -1.635, 0.597, -1.104], "tcp_plan": [0.302, 0.3317, 0.0564], "tcp_err": 0.011}
+[INFO] [1794314171.212497322] [team048_solution]: HAND {"t": 114.88, "phase": "approach", "side": "l", "pos": [1.071, 0.984, 0.984, 0.985, 1.0, 0.0], "vel": [0.06, 0.03, 0.028, 0.026, -0.004, 0.0], "eff": [0.956, 0.183, 0.196, 0.175, 0.074, 0.012], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.37, 3.003, 0.322]}
+[INFO] [1794314171.673081066] [team048_solution]: HAND {"t": 114.99, "phase": "approach", "side": "l", "pos": [1.089, 0.983, 0.983, 0.984, 1.001, 0.0], "vel": [0.109, -0.017, -0.016, -0.014, 0.005, 0.0], "eff": [1.0, 0.204, 0.205, 0.17, 0.075, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.259, 2.937, 0.316]}
+[INFO] [1794314172.193497758] [team048_solution]: HAND {"t": 115.11, "phase": "approach", "side": "l", "pos": [1.104, 0.983, 0.983, 0.984, 1.001, 0.0], "vel": [0.087, -0.007, -0.007, -0.006, 0.003, 0.0], "eff": [1.0, 0.19, 0.194, 0.163, 0.072, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.284, 2.896, 0.266]}
+[INFO] [1794314172.727740020] [team048_solution]: HAND {"t": 115.22, "phase": "approach", "side": "l", "pos": [1.11, 0.982, 0.982, 0.983, 1.001, 0.0], "vel": [0.032, -0.005, -0.005, -0.005, -0.0, -0.0], "eff": [1.0, 0.22, 0.22, 0.185, 0.075, 0.002], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.241, 2.899, 0.317]}
+[INFO] [1794314173.189401214] [team048_solution]: HAND {"t": 115.33, "phase": "approach", "side": "l", "pos": [1.113, 0.981, 0.981, 0.983, 1.001, 0.0], "vel": [0.013, -0.003, -0.003, -0.003, -0.001, 0.0], "eff": [1.0, 0.232, 0.231, 0.195, 0.078, 0.003], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.243, 2.912, 0.332]}
+[INFO] [1794314173.649482396] [team048_solution]: HAND {"t": 115.44, "phase": "approach", "side": "l", "pos": [1.115, 0.982, 0.982, 0.984, 1.001, 0.0], "vel": [0.042, 0.027, 0.026, 0.024, -0.002, -0.0], "eff": [1.0, 0.19, 0.197, 0.169, 0.073, 0.003], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.201, 2.468, 0.405]}
+[INFO] [1794314174.181635600] [team048_solution]: HAND {"t": 115.56, "phase": "approach", "side": "l", "pos": [1.122, 0.983, 0.983, 0.984, 1.001, 0.0], "vel": [0.008, 0.003, 0.003, 0.003, -0.003, -0.0], "eff": [1.0, 0.205, 0.212, 0.182, 0.067, 0.006], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.213, 2.595, 0.387]}
+[INFO] [1794314174.710477526] [team048_solution]: HAND {"t": 115.68, "phase": "approach", "side": "l", "pos": [1.123, 0.982, 0.982, 0.984, 1.001, 0.0], "vel": [-0.002, 0.001, 0.001, 0.001, -0.001, -0.0], "eff": [1.0, 0.204, 0.211, 0.181, 0.067, 0.007], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.272, 2.888, 0.276]}
+[INFO] [1794314175.267029137] [team048_solution]: HAND {"t": 115.79, "phase": "approach", "side": "l", "pos": [1.124, 0.982, 0.982, 0.984, 1.001, 0.0], "vel": [0.003, -0.002, -0.001, -0.001, 0.0, 0.0], "eff": [1.0, 0.205, 0.21, 0.179, 0.07, 0.005], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.253, 2.822, 0.308]}
+[INFO] [1794314175.724669532] [team048_solution]: HAND {"t": 115.9, "phase": "approach", "side": "l", "pos": [1.124, 0.982, 0.982, 0.984, 1.001, 0.0], "vel": [0.0, -0.0, -0.0, -0.0, -0.0, -0.0], "eff": [1.0, 0.206, 0.211, 0.18, 0.069, 0.005], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.247, 2.81, 0.317]}
+[INFO] [1794314176.191326819] [team048_solution]: HAND {"t": 116.01, "phase": "approach", "side": "l", "pos": [1.124, 0.982, 0.982, 0.984, 1.001, 0.0], "vel": [0.001, -0.001, -0.001, -0.001, 0.0, 0.0], "eff": [1.0, 0.205, 0.21, 0.18, 0.07, 0.005], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.249, 2.837, 0.305]}
+[INFO] [1794314176.732307364] [team048_solution]: HAND {"t": 116.12, "phase": "approach", "side": "l", "pos": [1.124, 0.982, 0.982, 0.984, 1.001, 0.0], "vel": [-0.0, -0.0, -0.0, -0.0, -0.0, -0.0], "eff": [1.0, 0.205, 0.21, 0.18, 0.069, 0.005], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.245, 2.811, 0.316]}
+[INFO] [1794314177.195944990] [team048_solution]: HAND {"t": 116.23, "phase": "approach", "side": "l", "pos": [1.124, 0.982, 0.982, 0.984, 1.001, 0.0], "vel": [-0.002, 0.0, 0.0, 0.0, 0.0, 0.0], "eff": [1.0, 0.206, 0.211, 0.18, 0.069, 0.005], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.244, 2.802, 0.32]}
+[INFO] [1794314177.662990734] [team048_solution]: HAND {"t": 116.34, "phase": "approach", "side": "l", "pos": [1.124, 0.982, 0.982, 0.984, 1.001, 0.0], "vel": [0.0, 0.0, 0.0, 0.0, -0.0, -0.0], "eff": [1.0, 0.206, 0.211, 0.181, 0.069, 0.005], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.248, 2.815, 0.314]}
+[INFO] [1794314178.226095138] [team048_solution]: HAND {"t": 116.46, "phase": "approach", "side": "l", "pos": [1.124, 0.982, 0.982, 0.984, 1.001, 0.0], "vel": [0.001, -0.0, -0.0, -0.0, 0.0, 0.0], "eff": [1.0, 0.206, 0.211, 0.181, 0.07, 0.005], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.248, 2.819, 0.312]}
+[INFO] [1794314178.752604314] [team048_solution]: HAND {"t": 116.57, "phase": "approach", "side": "l", "pos": [1.124, 0.982, 0.982, 0.984, 1.001, 0.0], "vel": [0.0, -0.0, -0.0, -0.0, 0.0, 0.0], "eff": [1.0, 0.206, 0.211, 0.18, 0.069, 0.005], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.247, 2.819, 0.314]}
+[INFO] [1794314179.208992056] [team048_solution]: HAND {"t": 116.68, "phase": "approach", "side": "l", "pos": [1.124, 0.982, 0.982, 0.984, 1.001, 0.0], "vel": [0.0, -0.0, -0.0, -0.0, 0.0, 0.0], "eff": [1.0, 0.206, 0.211, 0.18, 0.07, 0.005], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.248, 2.812, 0.316]}
+[INFO] [1794314179.676471491] [team048_solution]: HAND {"t": 116.79, "phase": "approach", "side": "l", "pos": [1.124, 0.982, 0.982, 0.984, 1.001, 0.0], "vel": [0.002, -0.0, -0.0, -0.0, 0.0, 0.0], "eff": [1.0, 0.206, 0.211, 0.18, 0.07, 0.005], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.251, 2.825, 0.31]}
+[INFO] [1794314180.190567053] [team048_solution]: HAND {"t": 116.91, "phase": "approach", "side": "l", "pos": [1.124, 0.982, 0.982, 0.984, 1.001, 0.0], "vel": [-0.002, 0.001, 0.001, 0.001, -0.0, -0.0], "eff": [1.0, 0.206, 0.211, 0.181, 0.068, 0.006], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.239, 2.787, 0.327]}
+[INFO] [1794314180.524470204] [team048_solution]: TRACE {"t": 116.98, "phase": "corrected", "side": "l", "obj": "Utana_5_Porcelain_Ramekin_Large", "F": [0.256, 2.846, 0.299], "dF": 6.428, "fing": [1.124, 0.982, 0.982, 0.984, 1.001, 0.0], "eff": [1.0, 0.206, 0.211, 0.18, 0.071, 0.005], "tcp": [0.2959, 0.3274, 0.0456], "q": [0.066, 0.037, 0.111, -1.787, -1.632, 0.603, -1.102], "tcp_plan": [0.302, 0.3317, 0.0564], "tcp_err": 0.0131}
+[INFO] [1794314180.725016437] [team048_solution]: HAND {"t": 117.02, "phase": "close1", "side": "l", "pos": [1.124, 0.982, 0.98, 0.982, 0.999, 0.0], "vel": [0.002, -0.001, -0.08, -0.081, -0.082, 0.0], "eff": [1.0, 0.205, 0.147, 0.117, 0.093, 0.004], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.236, 2.784, 0.333]}
+[INFO] [1794314181.218845877] [team048_solution]: HAND {"t": 117.13, "phase": "close1", "side": "l", "pos": [1.123, 0.982, 0.945, 0.947, 0.964, 0.0], "vel": [-0.002, 0.001, -0.357, -0.358, -0.358, 0.0], "eff": [1.0, 0.205, 0.163, 0.133, 0.09, 0.005], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.244, 2.806, 0.319]}
+[INFO] [1794314181.683475446] [team048_solution]: HAND {"t": 117.24, "phase": "close1", "side": "l", "pos": [1.123, 0.982, 0.889, 0.89, 0.907, 0.0], "vel": [0.001, -0.0, -0.44, -0.442, -0.444, 0.0], "eff": [1.0, 0.205, 0.163, 0.136, 0.092, 0.005], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.255, 2.846, 0.298]}
+[INFO] [1794314182.225506615] [team048_solution]: HAND {"t": 117.35, "phase": "close1", "side": "l", "pos": [1.123, 0.982, 0.826, 0.827, 0.843, 0.0], "vel": [0.001, -0.001, -0.461, -0.464, -0.472, 0.0], "eff": [1.0, 0.203, 0.148, 0.126, 0.093, 0.005], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.258, 2.863, 0.288]}
+[INFO] [1794314182.717470740] [team048_solution]: HAND {"t": 117.46, "phase": "close1", "side": "l", "pos": [1.123, 0.982, 0.763, 0.763, 0.777, 0.0], "vel": [-0.003, 0.001, -0.463, -0.466, -0.483, 0.0], "eff": [1.0, 0.204, 0.121, 0.105, 0.093, 0.006], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.245, 2.802, 0.314]}
+[INFO] [1794314183.185228172] [team048_solution]: HAND {"t": 117.57, "phase": "close1", "side": "l", "pos": [1.122, 0.982, 0.76, 0.721, 0.711, 0.0], "vel": [0.097, 0.012, 0.282, 0.198, -0.492, 0.0], "eff": [0.236, 0.548, 0.597, 1.0, 0.172, 0.171], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.341, 3.902, -0.459]}
+[INFO] [1794314183.714136384] [team048_solution]: HAND {"t": 117.68, "phase": "close1", "side": "l", "pos": [1.128, 0.985, 0.806, 0.761, 0.644, 0.0], "vel": [0.026, -0.017, 0.253, 0.204, -0.469, 0.0], "eff": [1.0, 0.24, 0.562, 0.177, 0.001, 0.096], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [-0.134, 2.428, 0.412]}
+[INFO] [1794314184.189753164] [team048_solution]: HAND {"t": 117.79, "phase": "close1", "side": "l", "pos": [1.138, 0.983, 0.852, 0.807, 0.576, 0.0], "vel": [0.135, 0.026, 0.398, 0.391, -0.507, -0.0], "eff": [1.0, 0.193, 1.0, 0.976, 0.028, 0.061], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.508, 3.416, -0.439]}
+[INFO] [1794314184.675281891] [team048_solution]: HAND {"t": 117.9, "phase": "close1", "side": "l", "pos": [1.149, 0.985, 0.901, 0.852, 0.509, 0.0], "vel": [0.14, 0.026, 0.495, 0.319, -0.51, -0.0], "eff": [1.0, 0.259, 1.0, 1.0, 0.083, 0.209], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [-0.389, 3.156, -0.323]}
+[INFO] [1794314185.207808474] [team048_solution]: HAND {"t": 118.02, "phase": "close1", "side": "l", "pos": [1.163, 0.983, 0.953, 0.904, 0.435, 0.0], "vel": [0.182, 0.019, 0.403, 0.4, -0.499, 0.0], "eff": [1.0, 0.197, 1.0, 1.0, 0.041, 0.164], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.31, 3.362, -0.585]}
+[INFO] [1794314185.748482239] [team048_solution]: HAND {"t": 118.14, "phase": "close1", "side": "l", "pos": [1.169, 0.985, 0.992, 0.945, 0.362, 0.0], "vel": [0.087, 0.003, 0.392, 0.395, -0.521, -0.001], "eff": [1.0, 0.095, 1.0, 1.0, 0.007, 0.093], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.446, 4.2, -0.871]}
+[INFO] [1794314186.313880578] [team048_solution]: HAND {"t": 118.26, "phase": "close1", "side": "l", "pos": [1.185, 0.983, 1.044, 0.999, 0.287, 0.0], "vel": [0.126, -0.012, 0.182, 0.398, -0.49, 0.0], "eff": [1.0, 0.009, 1.0, 1.0, 0.029, 0.24], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.3, 3.074, -0.58]}
+[INFO] [1794314186.892956706] [team048_solution]: HAND {"t": 118.38, "phase": "close1", "side": "l", "pos": [1.176, 0.984, 1.068, 1.02, 0.24, 0.0], "vel": [-0.129, -0.063, 0.074, -0.146, -0.165, 0.002], "eff": [1.0, 0.041, 1.0, 1.0, 0.001, 0.125], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.286, 4.288, -0.734]}
+[INFO] [1794314187.415833876] [team048_solution]: HAND {"t": 118.49, "phase": "close1", "side": "l", "pos": [1.181, 0.982, 1.095, 1.058, 0.223, 0.0], "vel": [0.011, -0.023, 0.135, 0.203, -0.065, -0.0], "eff": [1.0, 0.351, 1.0, 1.0, 0.192, 0.181], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.44, 4.709, -0.934]}
+[INFO] [1794314187.916513331] [team048_solution]: HAND {"t": 118.6, "phase": "close1", "side": "l", "pos": [1.185, 0.983, 1.112, 1.075, 0.218, 0.0], "vel": [-0.052, -0.0, -0.06, 0.031, -0.024, -0.0], "eff": [1.0, 0.262, 1.0, 1.0, 0.144, 0.187], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.692, 4.242, -0.625]}
+[INFO] [1794314188.410323354] [team048_solution]: HAND {"t": 118.71, "phase": "close1", "side": "l", "pos": [1.189, 0.983, 1.119, 1.081, 0.216, 0.0], "vel": [0.043, 0.005, 0.031, 0.055, -0.01, -0.0], "eff": [1.0, 0.272, 1.0, 1.0, 0.176, 0.247], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.296, 3.844, -0.649]}
+[INFO] [1794314188.795831305] [team048_solution]: jammed fingers (bent back past open, not re-targeted): [3, 4]
+[INFO] [1794314188.929597993] [team048_solution]: HAND {"t": 118.82, "phase": "close2", "side": "l", "pos": [1.19, 0.982, 1.121, 1.084, 0.215, 0.0], "vel": [0.004, -0.003, 0.006, 0.008, -0.001, 0.0], "eff": [1.0, 0.422, 1.0, 1.0, 0.238, 0.27], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.197, 3.852, -0.715]}
+[INFO] [1794314189.401925404] [team048_solution]: HAND {"t": 118.93, "phase": "close2", "side": "l", "pos": [1.191, 0.982, 1.122, 1.085, 0.215, 0.0], "vel": [0.02, -0.004, 0.02, 0.001, 0.003, 0.0], "eff": [1.0, 0.42, 1.0, 1.0, 0.243, 0.278], "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "F": [0.146, 3.754, -0.733]}
+[INFO] [1794314189.739552323] [team048_solution]: TRACE {"t": 119.01, "phase": "closed", "side": "l", "obj": "Utana_5_Porcelain_Ramekin_Large", "F": [0.204, 3.84, -0.703], "dF": 1.412, "fing": [1.19, 0.982, 1.122, 1.085, 0.215, 0.0], "eff": [1.0, 0.368, 1.0, 1.0, 0.217, 0.269], "tcp": [0.2943, 0.3278, 0.0422], "q": [0.07, 0.038, 0.111, -1.78, -1.627, 0.604, -1.1], "tcp_plan": [0.302, 0.3317, 0.0564], "tcp_err": 0.0166, "settled": true, "thumb": true, "contact": [1.1895831924404137, 0.9824480949401497, 1.120755600821945, 1.0835071525355522, 0.21555897841850913, 0.0002994845228617704], "target2": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "empty": false, "jam": [3, 4], "force": 0.4, "speed": 0.5, "past": 0.15}
+[INFO] [1794314204.846702107] [team048_solution]: TRACE {"t": 122.38, "phase": "lifted", "side": "l", "obj": "Utana_5_Porcelain_Ramekin_Large", "F": [0.579, 7.527, -2.127], "dF": 5.282, "fing": [0.988, 0.986, 1.077, 1.047, 0.215, 0.0], "eff": [0.627, 0.728, 1.0, 1.0, 0.324, 0.324], "tcp": [0.299, 0.3289, 0.1283], "q": [-0.003, 0.108, 0.109, -2.021, -1.781, 0.564, -1.475], "tcp_plan": [0.3021, 0.3316, 0.1365], "tcp_err": 0.0091, "verdict": true, "shadow": true, "verdict_past": null, "verdict_v7": true, "cmd": [1.0, 1.0, 0.1, 0.1, 0.2, 0.0], "eff_thr": 0.917}
+[INFO] [1794314216.586919229] [team048_solution]: TRACE {"t": 125.02, "phase": "carry", "side": "l", "obj": "Utana_5_Porcelain_Ramekin_Large", "F": [0.257, 8.094, -0.553], "dF": 5.317, "fing": [0.988, 0.986, 1.182, 1.115, 0.215, 0.0], "eff": [0.831, 0.9, 1.0, 1.0, 0.419, 0.213], "tcp": [0.2971, 0.3289, 0.1627], "q": [-0.055, 0.136, 0.118, -2.104, -1.848, 0.515, -1.658], "tcp_plan": [0.3014, 0.3316, 0.1802], "tcp_err": 0.0182}
+[INFO] [1794314235.905936478] [team048_solution]: TRACE {"t": 129.35, "phase": "over_tray", "side": "l", "obj": "Utana_5_Porcelain_Ramekin_Large", "F": [0.03, 4.557, 0.023], "dF": 1.748, "fing": [0.977, 0.972, 0.121, 0.12, 0.23, 0.0], "eff": [0.313, 0.369, 0.23, 0.229, 0.132, 0.004], "tcp": [0.3209, 0.603, 0.1573], "q": [-0.441, 0.523, 0.468, -1.121, -1.689, 0.818, -1.323], "tcp_plan": [0.3238, 0.6118, 0.1804], "tcp_err": 0.0248, "tray": "tray_left", "tray_xy": [0.346, 0.687], "yaw": 0.0, "verdict": false, "verdict_past": null, "verdict_v7": false}
+[INFO] [1794314240.399200700] [team048_solution]: TRACE {"t": 130.37, "phase": "released", "side": "l", "obj": "Utana_5_Porcelain_Ramekin_Large", "F": [0.001, 4.596, -0.367], "dF": 1.89, "fing": [0.974, 0.969, 0.674, 0.673, 0.781, 0.0], "eff": [0.353, 0.416, 0.067, 0.074, 0.107, 0.001], "tcp": [0.3228, 0.6111, 0.1776], "q": [-0.464, 0.55, 0.467, -1.13, -1.7, 0.812, -1.323], "tcp_plan": [0.3238, 0.6118, 0.1804], "tcp_err": 0.0031}
+[INFO] [1794314280.115999324] [team048_solution]: TRACE {"t": 139.36, "phase": "home", "side": "l", "obj": "Utana_5_Porcelain_Ramekin_Large", "F": [0.096, 0.075, -0.064], "dF": 2.799, "fing": [0.99, 0.988, 0.989, 0.992, 1.011, -0.0], "eff": [0.114, 0.127, 0.12, 0.087, 0.069, 0.0], "tcp": [0.5142, 0.3348, 0.1941], "q": [-0.551, 0.239, -0.003, -1.18, -0.002, 0.002, -0.001]}
+[INFO] [1794314280.256944952] [team048_solution]: observe t 139.4 dets 10 assigned [('Crayola_Bonus_64_C', 8.82, 0.11), ('Ecoforms_Plant_Con', 1.68, 1.57), ('Threshold_Ramekin_', 5.96, 0.62)]
+[INFO] [1794314280.290603811] [team048_solution]: no plan: Threshold_Ramekin_White_Porcelain {"candidates": 0, "feasible": 0, "pick_ik": {}, "place": {}, "hand_clear": {}, "rim_closed": true, "reason": "dish without an open rim (closed top measured)"}
+[INFO] [1794314281.350960660] [team048_solution]: pick Crayola_Bonus_64_Crayons box -> tray_right slot 0 arm l side w 0.039 z 0.063 clear {"du": 0.018, "dr": 0.03, "margin": 0.004}
+[INFO] [1794314281.352419961] [team048_solution]: TRACE {"t": 139.63, "phase": "start", "side": "l", "obj": "Crayola_Bonus_64_Crayons", "F": [0.073, 0.016, -0.042], "dF": 2.856, "fing": [0.99, 0.989, 0.989, 0.992, 1.013, 0.0], "eff": [0.119, 0.133, 0.126, 0.091, 0.078, 0.0], "tcp": [0.5191, 0.3354, 0.2167], "q": [-0.583, 0.246, -0.001, -1.194, -0.0, 0.001, -0.0], "kind": "side", "center": [0.39, 0.205, -0.089]}
+[INFO] [1794314302.553538100] [team048_solution]: TRACE {"t": 144.42, "phase": "pre", "side": "l", "obj": "Crayola_Bonus_64_Crayons", "F": [0.043, -0.243, 0.324], "dF": 3.096, "fing": [0.986, 0.984, 0.985, 0.987, 0.995, -0.0], "eff": [0.095, 0.108, 0.1, 0.071, 0.022, 0.0], "tcp": [0.1318, 0.2902, -0.0207], "q": [0.675, 0.072, 0.02, -1.756, -0.11, -0.146, 0.241], "tcp_plan": [0.1338, 0.2915, -0.0144], "tcp_err": 0.0068}
+[INFO] [1794314302.555481213] [team048_solution]: HAND {"t": 144.42, "phase": "approach", "side": "l", "pos": [0.986, 0.984, 0.985, 0.987, 0.995, -0.0], "vel": [0.0, -0.0, -0.0, -0.0, 0.004, 0.0], "eff": [0.095, 0.108, 0.1, 0.071, 0.022, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.043, -0.243, 0.324]}
+[INFO] [1794314303.066824737] [team048_solution]: HAND {"t": 144.53, "phase": "approach", "side": "l", "pos": [0.986, 0.985, 0.985, 0.988, 0.996, -0.0], "vel": [0.002, 0.002, 0.002, 0.002, 0.004, 0.0], "eff": [0.09, 0.102, 0.094, 0.067, 0.021, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.021, -0.152, 0.402]}
+[INFO] [1794314303.536131641] [team048_solution]: HAND {"t": 144.64, "phase": "approach", "side": "l", "pos": [0.986, 0.985, 0.985, 0.987, 0.997, -0.0], "vel": [-0.001, -0.002, -0.002, -0.001, 0.003, 0.0], "eff": [0.095, 0.108, 0.1, 0.071, 0.019, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.011, -0.189, 0.389]}
+[INFO] [1794314303.991627496] [team048_solution]: HAND {"t": 144.75, "phase": "approach", "side": "l", "pos": [0.986, 0.984, 0.985, 0.987, 0.997, -0.0], "vel": [-0.002, -0.002, -0.002, -0.002, 0.003, 0.0], "eff": [0.098, 0.112, 0.104, 0.075, 0.018, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.006, -0.216, 0.383]}
+[INFO] [1794314304.517799072] [team048_solution]: HAND {"t": 144.87, "phase": "approach", "side": "l", "pos": [0.986, 0.984, 0.984, 0.987, 0.997, -0.0], "vel": [-0.001, -0.002, -0.002, -0.001, 0.002, 0.0], "eff": [0.1, 0.115, 0.107, 0.077, 0.016, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.0, -0.235, 0.385]}
+[INFO] [1794314305.022035801] [team048_solution]: HAND {"t": 144.98, "phase": "approach", "side": "l", "pos": [0.985, 0.984, 0.984, 0.987, 0.998, -0.0], "vel": [-0.001, -0.001, -0.002, -0.001, 0.002, 0.0], "eff": [0.102, 0.117, 0.11, 0.079, 0.015, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.001, -0.248, 0.391]}
+[INFO] [1794314305.490684719] [team048_solution]: HAND {"t": 145.09, "phase": "approach", "side": "l", "pos": [0.985, 0.984, 0.984, 0.987, 0.998, -0.0], "vel": [-0.0, -0.0, -0.0, -0.0, 0.0, 0.0], "eff": [0.102, 0.117, 0.11, 0.079, 0.014, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.003, -0.258, 0.397]}
+[INFO] [1794314305.940473835] [team048_solution]: HAND {"t": 145.2, "phase": "approach", "side": "l", "pos": [0.986, 0.984, 0.984, 0.987, 0.997, -0.0], "vel": [0.002, 0.002, 0.002, 0.002, -0.003, -0.0], "eff": [0.1, 0.115, 0.107, 0.076, 0.015, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.005, -0.257, 0.397]}
+[INFO] [1794314306.461152424] [team048_solution]: HAND {"t": 145.31, "phase": "approach", "side": "l", "pos": [0.986, 0.984, 0.985, 0.987, 0.997, -0.0], "vel": [-0.003, -0.003, -0.003, -0.003, -0.002, 0.0], "eff": [0.101, 0.115, 0.107, 0.077, 0.017, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.117, -0.315, 0.278]}
+[INFO] [1794314306.933589145] [team048_solution]: HAND {"t": 145.42, "phase": "approach", "side": "l", "pos": [0.985, 0.984, 0.984, 0.987, 0.997, -0.0], "vel": [-0.001, -0.001, -0.0, -0.0, -0.002, -0.0], "eff": [0.102, 0.118, 0.111, 0.08, 0.015, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.074, -0.365, 0.347]}
+[INFO] [1794314307.387447405] [team048_solution]: HAND {"t": 145.53, "phase": "approach", "side": "l", "pos": [0.985, 0.983, 0.984, 0.986, 0.996, -0.0], "vel": [-0.0, -0.0, -0.0, -0.0, -0.003, -0.0], "eff": [0.103, 0.119, 0.111, 0.079, 0.015, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.045, -0.381, 0.399]}
+[INFO] [1794314307.927838512] [team048_solution]: HAND {"t": 145.65, "phase": "approach", "side": "l", "pos": [0.985, 0.984, 0.984, 0.987, 0.996, -0.0], "vel": [0.001, 0.002, 0.002, 0.001, -0.004, -0.0], "eff": [0.099, 0.114, 0.106, 0.075, 0.017, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.03, -0.365, 0.403]}
+[INFO] [1794314308.505497329] [team048_solution]: HAND {"t": 145.76, "phase": "approach", "side": "l", "pos": [0.985, 0.984, 0.984, 0.987, 0.995, -0.0], "vel": [0.001, 0.001, 0.001, 0.001, -0.003, -0.0], "eff": [0.097, 0.111, 0.104, 0.074, 0.018, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.019, -0.359, 0.403]}
+[INFO] [1794314308.963156072] [team048_solution]: HAND {"t": 145.87, "phase": "approach", "side": "l", "pos": [0.986, 0.984, 0.984, 0.987, 0.995, -0.0], "vel": [0.001, 0.001, 0.001, 0.001, -0.002, -0.0], "eff": [0.096, 0.11, 0.103, 0.073, 0.019, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.011, -0.356, 0.403]}
+[INFO] [1794314309.426935503] [team048_solution]: HAND {"t": 145.98, "phase": "approach", "side": "l", "pos": [0.975, 0.983, 0.984, 0.986, 0.995, -0.0], "vel": [-0.163, -0.006, -0.006, -0.005, -0.0, 0.0], "eff": [0.456, 0.202, 0.205, 0.192, 0.054, 0.066], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.212, -0.166, 0.791]}
+[INFO] [1794314309.948432344] [team048_solution]: HAND {"t": 146.09, "phase": "approach", "side": "l", "pos": [0.973, 0.983, 0.984, 0.986, 0.995, -0.0], "vel": [0.075, -0.001, -0.001, -0.002, 0.009, 0.0], "eff": [0.798, 0.083, 0.091, 0.082, 0.034, 0.067], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.24, -0.282, 0.578]}
+[INFO] [1794314310.421183855] [team048_solution]: HAND {"t": 146.2, "phase": "approach", "side": "l", "pos": [0.968, 0.983, 0.984, 0.986, 0.994, -0.0], "vel": [0.092, 0.0, -0.001, -0.002, 0.012, 0.0], "eff": [1.0, 0.054, 0.059, 0.048, 0.037, 0.104], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.281, -0.296, 0.561]}
+[INFO] [1794314310.889235841] [team048_solution]: HAND {"t": 146.31, "phase": "approach", "side": "l", "pos": [0.967, 0.983, 0.984, 0.986, 0.994, -0.0], "vel": [-0.077, 0.011, 0.01, 0.011, -0.006, -0.0], "eff": [1.0, 0.153, 0.166, 0.165, 0.087, 0.152], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.039, -0.264, 0.62]}
+[INFO] [1794314311.406636076] [team048_solution]: HAND {"t": 146.42, "phase": "approach", "side": "l", "pos": [0.964, 0.983, 0.984, 0.987, 0.995, -0.0], "vel": [-0.185, -0.007, -0.008, -0.01, 0.014, 0.0], "eff": [0.17, 0.13, 0.133, 0.117, 0.033, 0.06], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.227, -0.234, 0.67]}
+[INFO] [1794314311.879148321] [team048_solution]: HAND {"t": 146.53, "phase": "approach", "side": "l", "pos": [0.96, 0.984, 0.984, 0.987, 0.995, -0.0], "vel": [-0.037, -0.002, -0.002, -0.002, 0.0, 0.0], "eff": [0.16, 0.054, 0.068, 0.064, 0.025, 0.063], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.163, -0.284, 0.558]}
+[INFO] [1794314312.340496913] [team048_solution]: HAND {"t": 146.64, "phase": "approach", "side": "l", "pos": [0.957, 0.983, 0.984, 0.986, 0.995, -0.0], "vel": [-0.015, -0.002, -0.001, -0.001, 0.0, -0.0], "eff": [0.224, 0.064, 0.077, 0.072, 0.03, 0.07], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.174, -0.265, 0.587]}
+[INFO] [1794314312.892084605] [team048_solution]: HAND {"t": 146.76, "phase": "approach", "side": "l", "pos": [0.956, 0.983, 0.984, 0.987, 0.995, -0.0], "vel": [-0.163, -0.001, -0.002, -0.003, 0.009, 0.0], "eff": [0.408, 0.134, 0.141, 0.13, 0.037, 0.055], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.134, -0.322, 0.517]}
+[INFO] [1794314313.418570066] [team048_solution]: HAND {"t": 146.88, "phase": "approach", "side": "l", "pos": [0.955, 0.983, 0.984, 0.987, 0.995, -0.0], "vel": [-0.005, -0.0, -0.0, -0.0, 0.0, -0.0], "eff": [0.475, 0.078, 0.091, 0.084, 0.026, 0.053], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.191, -0.26, 0.607]}
+[INFO] [1794314313.943992892] [team048_solution]: HAND {"t": 146.99, "phase": "approach", "side": "l", "pos": [0.954, 0.983, 0.984, 0.987, 0.995, -0.0], "vel": [-0.002, -0.0, -0.0, 0.0, -0.0, 0.0], "eff": [0.489, 0.08, 0.092, 0.086, 0.028, 0.058], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.188, -0.257, 0.611]}
+[INFO] [1794314314.420382185] [team048_solution]: HAND {"t": 147.1, "phase": "approach", "side": "l", "pos": [0.954, 0.983, 0.984, 0.987, 0.995, -0.0], "vel": [0.001, -0.0, -0.0, -0.0, -0.0, 0.0], "eff": [0.429, 0.079, 0.092, 0.086, 0.03, 0.062], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.182, -0.257, 0.608]}
+[INFO] [1794314314.889599695] [team048_solution]: HAND {"t": 147.21, "phase": "approach", "side": "l", "pos": [0.954, 0.983, 0.984, 0.986, 0.995, -0.0], "vel": [-0.0, -0.0, -0.0, -0.0, 0.0, 0.0], "eff": [0.376, 0.074, 0.087, 0.082, 0.029, 0.061], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.184, -0.258, 0.607]}
+[INFO] [1794314315.414431128] [team048_solution]: HAND {"t": 147.33, "phase": "approach", "side": "l", "pos": [0.954, 0.983, 0.984, 0.986, 0.995, -0.0], "vel": [0.001, -0.0, -0.0, -0.0, 0.0, 0.0], "eff": [0.375, 0.076, 0.088, 0.083, 0.029, 0.061], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.185, -0.258, 0.607]}
+[INFO] [1794314315.945627257] [team048_solution]: HAND {"t": 147.45, "phase": "approach", "side": "l", "pos": [0.954, 0.983, 0.984, 0.986, 0.995, -0.0], "vel": [-0.001, -0.0, -0.0, -0.0, 0.0, -0.0], "eff": [0.326, 0.071, 0.084, 0.079, 0.028, 0.061], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.183, -0.26, 0.603]}
+[INFO] [1794314316.454379735] [team048_solution]: HAND {"t": 147.57, "phase": "approach", "side": "l", "pos": [0.954, 0.983, 0.984, 0.986, 0.995, -0.0], "vel": [0.004, 0.0, 0.0, 0.0, -0.0, 0.0], "eff": [0.392, 0.075, 0.088, 0.083, 0.029, 0.061], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.182, -0.258, 0.607]}
+[INFO] [1794314316.994650180] [team048_solution]: HAND {"t": 147.68, "phase": "approach", "side": "l", "pos": [0.95, 0.983, 0.984, 0.986, 0.995, -0.0], "vel": [-0.191, -0.01, -0.011, -0.009, 0.021, 0.0], "eff": [0.693, 0.091, 0.106, 0.099, 0.039, 0.057], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.166, -0.391, 0.721]}
+[INFO] [1794314317.453670512] [team048_solution]: HAND {"t": 147.79, "phase": "approach", "side": "l", "pos": [0.971, 0.984, 0.984, 0.987, 0.995, -0.0], "vel": [0.127, 0.007, 0.006, 0.005, -0.002, 0.0], "eff": [0.089, 0.109, 0.101, 0.071, 0.018, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.001, -0.302, 0.419]}
+[INFO] [1794314317.916282129] [team048_solution]: HAND {"t": 147.9, "phase": "approach", "side": "l", "pos": [0.981, 0.984, 0.984, 0.987, 0.995, -0.0], "vel": [0.041, 0.001, 0.001, 0.0, 0.003, 0.0], "eff": [0.094, 0.111, 0.104, 0.074, 0.016, 0.0], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.052, -0.31, 0.393]}
+[INFO] [1794314318.340931172] [team048_solution]: TRACE {"t": 147.98, "phase": "at_grasp", "side": "l", "obj": "Crayola_Bonus_64_Crayons", "F": [0.037, -0.308, 0.402], "dF": 3.163, "fing": [0.983, 0.984, 0.984, 0.987, 0.996, -0.0], "eff": [0.097, 0.113, 0.106, 0.075, 0.014, 0.0], "tcp": [0.1949, 0.2526, -0.0475], "q": [0.453, 0.003, -0.056, -1.58, -0.189, -0.088, 0.292], "tcp_plan": [0.1982, 0.2528, -0.0417], "tcp_err": 0.0066}
+[INFO] [1794314318.474450572] [team048_solution]: HAND {"t": 148.02, "phase": "close1", "side": "l", "pos": [0.984, 0.984, 0.984, 0.987, 0.995, -0.0], "vel": [-0.019, -0.026, -0.025, -0.027, -0.026, 0.0], "eff": [0.035, 0.051, 0.044, 0.013, 0.009, 0.0], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [0.031, -0.301, 0.407]}
+[INFO] [1794314319.004865408] [team048_solution]: HAND {"t": 148.14, "phase": "close1", "side": "l", "pos": [0.948, 0.948, 0.948, 0.95, 0.96, -0.0], "vel": [-0.356, -0.36, -0.361, -0.362, -0.357, 0.0], "eff": [0.048, 0.064, 0.057, 0.027, 0.008, 0.0], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [0.018, -0.298, 0.412]}
+[INFO] [1794314319.528357305] [team048_solution]: HAND {"t": 148.26, "phase": "close1", "side": "l", "pos": [0.886, 0.885, 0.885, 0.887, 0.897, -0.0], "vel": [-0.448, -0.448, -0.45, -0.453, -0.45, 0.0], "eff": [0.052, 0.066, 0.06, 0.033, 0.011, 0.0], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [0.011, -0.3, 0.417]}
+[INFO] [1794314320.065149596] [team048_solution]: HAND {"t": 148.38, "phase": "close1", "side": "l", "pos": [0.817, 0.816, 0.816, 0.817, 0.827, -0.0], "vel": [-0.469, -0.467, -0.468, -0.473, -0.477, 0.0], "eff": [0.044, 0.052, 0.046, 0.025, 0.015, 0.0], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [0.007, -0.3, 0.42]}
+[INFO] [1794314320.593331178] [team048_solution]: HAND {"t": 148.5, "phase": "close1", "side": "l", "pos": [0.746, 0.746, 0.745, 0.746, 0.755, -0.0], "vel": [-0.471, -0.468, -0.469, -0.474, -0.485, 0.0], "eff": [0.026, 0.028, 0.022, 0.007, 0.019, 0.0], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [0.005, -0.299, 0.423]}
+[INFO] [1794314321.135735777] [team048_solution]: HAND {"t": 148.62, "phase": "close1", "side": "l", "pos": [0.675, 0.675, 0.675, 0.675, 0.682, -0.0], "vel": [-0.471, -0.467, -0.468, -0.473, -0.489, 0.0], "eff": [0.004, 0.001, 0.007, 0.017, 0.022, 0.0], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [0.003, -0.299, 0.425]}
+[INFO] [1794314321.675281790] [team048_solution]: HAND {"t": 148.74, "phase": "close1", "side": "l", "pos": [0.605, 0.605, 0.605, 0.604, 0.608, -0.0], "vel": [-0.473, -0.47, -0.47, -0.474, -0.49, 0.0], "eff": [0.018, 0.029, 0.034, 0.04, 0.026, 0.0], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [0.003, -0.298, 0.426]}
+[INFO] [1794314322.223298899] [team048_solution]: HAND {"t": 148.86, "phase": "close1", "side": "l", "pos": [0.533, 0.534, 0.534, 0.533, 0.535, -0.0], "vel": [-0.477, -0.475, -0.475, -0.477, -0.492, 0.0], "eff": [0.037, 0.051, 0.056, 0.059, 0.028, 0.0], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [0.002, -0.298, 0.428]}
+[INFO] [1794314322.779208709] [team048_solution]: HAND {"t": 148.98, "phase": "close1", "side": "l", "pos": [0.461, 0.462, 0.462, 0.461, 0.461, -0.0], "vel": [-0.483, -0.482, -0.482, -0.483, -0.493, 0.0], "eff": [0.052, 0.066, 0.071, 0.072, 0.03, 0.0], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [0.002, -0.298, 0.429]}
+[INFO] [1794314323.308860188] [team048_solution]: HAND {"t": 149.1, "phase": "close1", "side": "l", "pos": [0.387, 0.388, 0.387, 0.386, 0.386, -0.0], "vel": [-0.527, -0.531, -0.529, -0.525, -0.524, -0.0], "eff": [0.046, 0.047, 0.048, 0.051, 0.023, 0.0], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [-0.039, -0.298, 0.457]}
+[INFO] [1794314323.823963008] [team048_solution]: HAND {"t": 149.21, "phase": "close1", "side": "l", "pos": [0.316, 0.354, 0.317, 0.316, 0.315, -0.0], "vel": [-0.508, -0.826, -0.512, -0.51, -0.505, 0.0], "eff": [0.053, 0.045, 0.055, 0.057, 0.025, 0.0], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [0.019, -0.309, 0.435]}
+[INFO] [1794314324.296040661] [team048_solution]: HAND {"t": 149.32, "phase": "close1", "side": "l", "pos": [0.247, 0.26, 0.247, 0.247, 0.246, -0.0], "vel": [-0.504, -0.608, -0.505, -0.504, -0.501, 0.0], "eff": [0.056, 0.055, 0.057, 0.059, 0.024, 0.0], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [0.009, -0.286, 0.433]}
+[INFO] [1794314324.765010771] [team048_solution]: HAND {"t": 149.43, "phase": "close1", "side": "l", "pos": [0.178, 0.182, 0.178, 0.177, 0.177, -0.0], "vel": [-0.503, -0.538, -0.504, -0.503, -0.5, 0.0], "eff": [0.059, 0.059, 0.06, 0.061, 0.024, 0.0], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [0.006, -0.284, 0.436]}
+[INFO] [1794314325.282899119] [team048_solution]: HAND {"t": 149.55, "phase": "close1", "side": "l", "pos": [0.103, 0.105, 0.103, 0.103, 0.103, 0.0], "vel": [-0.47, -0.478, -0.468, -0.47, -0.459, 0.001], "eff": [0.076, 0.079, 0.08, 0.078, 0.036, 0.001], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [0.104, -0.283, 0.369]}
+[INFO] [1794314325.801273543] [team048_solution]: HAND {"t": 149.67, "phase": "close1", "side": "l", "pos": [0.04, 0.041, 0.04, 0.04, 0.042, 0.0], "vel": [-0.274, -0.278, -0.275, -0.274, -0.266, 0.0], "eff": [0.017, 0.019, 0.019, 0.017, 0.013, 0.001], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [-0.012, -0.284, 0.447]}
+[INFO] [1794314326.314939406] [team048_solution]: HAND {"t": 149.78, "phase": "close1", "side": "l", "pos": [0.018, 0.019, 0.019, 0.018, 0.021, 0.0], "vel": [-0.093, -0.094, -0.092, -0.092, -0.087, 0.0], "eff": [0.02, 0.023, 0.023, 0.02, 0.015, 0.001], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [-0.007, -0.289, 0.439]}
+[INFO] [1794314326.762282565] [team048_solution]: HAND {"t": 149.89, "phase": "close1", "side": "l", "pos": [0.011, 0.011, 0.011, 0.011, 0.014, 0.0], "vel": [-0.031, -0.032, -0.031, -0.031, -0.029, 0.0], "eff": [0.021, 0.024, 0.024, 0.021, 0.015, 0.001], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [-0.004, -0.292, 0.436]}
+[INFO] [1794314327.203487982] [team048_solution]: HAND {"t": 150.0, "phase": "close1", "side": "l", "pos": [0.008, 0.009, 0.009, 0.008, 0.012, 0.0], "vel": [-0.011, -0.011, -0.011, -0.011, -0.009, 0.0], "eff": [0.021, 0.024, 0.024, 0.021, 0.016, 0.001], "cmd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "F": [-0.002, -0.293, 0.434]}
+[INFO] [1794314327.205189743] [team048_solution]: TRACE {"t": 150.0, "phase": "closed", "side": "l", "obj": "Crayola_Bonus_64_Crayons", "F": [-0.002, -0.293, 0.434], "dF": 0.05, "fing": [0.008, 0.009, 0.009, 0.008, 0.012, 0.0], "eff": [0.021, 0.024, 0.024, 0.021, 0.016, 0.001], "tcp": [0.1974, 0.253, -0.0429], "q": [0.452, 0.005, -0.055, -1.593, -0.205, -0.088, 0.293], "tcp_plan": [0.1982, 0.2528, -0.0417], "tcp_err": 0.0014, "settled": true, "thumb": true, "contact": [0.008178532078850997, 0.00879550498853654, 0.008748107446554632, 0.00829130245703813, 0.011878855526447296, 0.0001806736610401316], "target2": null, "empty": true, "jam": [], "force": 0.4, "speed": 0.5, "past": 0.15}
+[INFO] [1794314327.265879044] [team048_solution]: grasp check (contact): empty Crayola_Bonus_64_Crayons
+[INFO] [1794314346.720183320] [team048_solution]: observe t 154.5 dets 10 assigned [('Ecoforms_Plant_Con', 1.68, 1.58), ('Threshold_Ramekin_', 5.97, 0.61)]
+[INFO] [1794314346.721323824] [team048_solution]: retry round 1 objects ['Threshold_Ramekin_White_', 'Ecoforms_Plant_Container', 'Perricone_MD_AcylGlutath']
+[INFO] [1794314346.899623595] [team048_solution]: observe t 154.5 dets 11 assigned [('Ecoforms_Plant_Con', 1.56, 1.8), ('Threshold_Ramekin_', 5.93, 0.64)]
+[INFO] [1794314346.934883159] [team048_solution]: no plan: Threshold_Ramekin_White_Porcelain {"candidates": 0, "feasible": 0, "pick_ik": {}, "place": {}, "hand_clear": {}, "rim_closed": true, "reason": "dish without an open rim (closed top measured)"}
+[INFO] [1794314347.242794116] [team048_solution]: pick Ecoforms_Plant_Container_B4_Har dish -> tray_left slot 1 arm l rim w 0.025 z 0.053 clear {"du": null, "dr": null, "margin": null}
+[INFO] [1794314347.244291796] [team048_solution]: TRACE {"t": 154.59, "phase": "start", "side": "l", "obj": "Ecoforms_Plant_Container_B4_Har", "F": [0.13, 0.037, -0.075], "dF": 0.597, "fing": [0.99, 0.989, 0.989, 0.992, 1.012, -0.0], "eff": [0.117, 0.131, 0.124, 0.09, 0.074, 0.0], "tcp": [0.5176, 0.3353, 0.2092], "q": [-0.573, 0.244, -0.002, -1.189, -0.001, 0.001, -0.001], "kind": "rim", "center": [0.381, 0.413, -0.098]}
+[INFO] [1794314367.366097484] [team048_solution]: TRACE {"t": 159.18, "phase": "pre", "side": "l", "obj": "Ecoforms_Plant_Container_B4_Har", "F": [-0.007, 1.572, -0.757], "dF": 2.209, "fing": [0.974, 0.97, 0.969, 0.973, 1.002, 0.0], "eff": [0.296, 0.342, 0.344, 0.306, 0.041, 0.001], "tcp": [0.3408, 0.4631, 0.1288], "q": [-0.206, 1.054, -0.361, -1.331, -0.686, -0.785, -0.465], "tcp_plan": [0.3463, 0.4652, 0.1383], "tcp_err": 0.0112}
+[INFO] [1794314367.367906790] [team048_solution]: HAND {"t": 159.18, "phase": "approach", "side": "l", "pos": [0.974, 0.97, 0.969, 0.973, 1.002, 0.0], "vel": [-0.001, -0.001, -0.001, -0.001, 0.001, 0.0], "eff": [0.296, 0.342, 0.344, 0.306, 0.041, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.007, 1.572, -0.757]}
+[INFO] [1794314367.866683394] [team048_solution]: HAND {"t": 159.3, "phase": "approach", "side": "l", "pos": [0.975, 0.971, 0.97, 0.973, 1.002, 0.0], "vel": [0.006, 0.007, 0.007, 0.006, -0.006, -0.0], "eff": [0.278, 0.32, 0.321, 0.286, 0.034, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.038, 1.64, -0.612]}
+[INFO] [1794314368.407871019] [team048_solution]: HAND {"t": 159.41, "phase": "approach", "side": "l", "pos": [0.975, 0.971, 0.971, 0.974, 1.001, 0.0], "vel": [-0.003, -0.004, -0.004, -0.003, 0.003, 0.0], "eff": [0.286, 0.33, 0.332, 0.295, 0.037, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.01, 1.532, -0.673]}
+[INFO] [1794314368.867231260] [team048_solution]: HAND {"t": 159.52, "phase": "approach", "side": "l", "pos": [0.975, 0.971, 0.97, 0.973, 1.002, 0.0], "vel": [-0.003, -0.003, -0.003, -0.003, 0.001, 0.0], "eff": [0.29, 0.336, 0.338, 0.301, 0.039, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.004, 1.425, -0.687]}
+[INFO] [1794314369.325416211] [team048_solution]: HAND {"t": 159.63, "phase": "approach", "side": "l", "pos": [0.974, 0.97, 0.97, 0.973, 1.002, 0.0], "vel": [-0.001, -0.001, -0.001, -0.001, -0.001, 0.0], "eff": [0.289, 0.335, 0.338, 0.301, 0.039, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.002, 1.329, -0.666]}
+[INFO] [1794314369.825971804] [team048_solution]: HAND {"t": 159.74, "phase": "approach", "side": "l", "pos": [0.974, 0.97, 0.97, 0.973, 1.001, 0.0], "vel": [0.0, 0.0, 0.0, 0.0, -0.002, -0.0], "eff": [0.287, 0.333, 0.337, 0.3, 0.038, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.001, 1.23, -0.637]}
+[INFO] [1794314370.305973725] [team048_solution]: HAND {"t": 159.85, "phase": "approach", "side": "l", "pos": [0.975, 0.97, 0.97, 0.973, 1.001, 0.0], "vel": [0.001, 0.001, 0.001, 0.001, -0.003, 0.0], "eff": [0.284, 0.331, 0.335, 0.299, 0.038, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.003, 1.126, -0.601]}
+[INFO] [1794314370.766451356] [team048_solution]: HAND {"t": 159.96, "phase": "approach", "side": "l", "pos": [0.975, 0.97, 0.97, 0.973, 1.001, 0.0], "vel": [0.001, 0.001, 0.001, 0.001, -0.003, -0.0], "eff": [0.281, 0.328, 0.333, 0.297, 0.037, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.005, 1.018, -0.559]}
+[INFO] [1794314371.284201394] [team048_solution]: HAND {"t": 160.08, "phase": "approach", "side": "l", "pos": [0.975, 0.971, 0.97, 0.973, 1.0, 0.0], "vel": [0.001, 0.001, 0.001, 0.001, -0.003, -0.0], "eff": [0.278, 0.325, 0.33, 0.295, 0.037, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.005, 0.898, -0.508]}
+[INFO] [1794314371.817361980] [team048_solution]: HAND {"t": 160.2, "phase": "approach", "side": "l", "pos": [0.975, 0.971, 0.971, 0.974, 0.999, 0.0], "vel": [0.005, 0.006, 0.006, 0.005, -0.009, -0.0], "eff": [0.268, 0.313, 0.317, 0.284, 0.032, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.005, 0.824, -0.448]}
+[INFO] [1794314372.361814990] [team048_solution]: HAND {"t": 160.32, "phase": "approach", "side": "l", "pos": [0.977, 0.974, 0.973, 0.976, 1.0, 0.0], "vel": [0.072, 0.084, 0.085, 0.077, 0.011, -0.0], "eff": [0.146, 0.18, 0.185, 0.161, 0.039, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.181, 0.455, -0.606]}
+[INFO] [1794314372.905561115] [team048_solution]: HAND {"t": 160.44, "phase": "approach", "side": "l", "pos": [0.984, 0.977, 0.993, 0.995, 1.0, 0.0], "vel": [0.027, -0.017, 0.168, 0.162, -0.013, -0.0], "eff": [0.066, 1.0, 0.184, 0.192, 0.03, 0.011], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.336, 1.141, 3.218]}
+[INFO] [1794314373.469895496] [team048_solution]: HAND {"t": 160.56, "phase": "approach", "side": "l", "pos": [0.986, 0.981, 1.006, 1.008, 0.999, 0.0], "vel": [-0.009, -0.103, 0.074, 0.075, 0.013, 0.0], "eff": [0.151, 1.0, 0.095, 0.115, 0.033, 0.031], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [0.387, 0.891, 4.203]}
+[INFO] [1794314374.005754941] [team048_solution]: HAND {"t": 160.68, "phase": "approach", "side": "l", "pos": [0.987, 0.983, 1.009, 1.01, 0.999, 0.0], "vel": [0.016, 0.03, -0.007, -0.009, -0.014, -0.0], "eff": [1.0, 1.0, 1.0, 1.0, 0.358, 0.029], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.162, 0.915, 3.787]}
+[INFO] [1794314374.539259260] [team048_solution]: HAND {"t": 160.79, "phase": "approach", "side": "l", "pos": [0.987, 0.985, 1.008, 1.009, 0.999, 0.0], "vel": [0.003, 0.005, -0.008, -0.008, -0.007, -0.0], "eff": [0.95, 0.844, 1.0, 1.0, 0.286, 0.024], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.511, 0.848, 3.13]}
+[INFO] [1794314375.015391136] [team048_solution]: HAND {"t": 160.9, "phase": "approach", "side": "l", "pos": [0.987, 0.985, 0.996, 0.998, 0.973, -0.001], "vel": [-0.012, -0.012, -0.109, -0.107, -0.147, -0.003], "eff": [0.125, 0.154, 0.163, 0.142, 0.03, 0.001], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-0.046, 0.625, -0.092]}
+[INFO] [1794314375.101886781] [team048_solution]: HAND {"t": 160.92, "phase": "guard_approach", "side": "l", "pos": [0.982, 0.98, 0.99, 0.992, 0.83, -0.003], "vel": [-0.149, -0.108, -0.137, -0.081, -1.0, -0.073], "eff": [1.0, 1.0, 1.0, 1.0, 0.557, 0.412], "cmd": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0], "F": [-2.186, 2.743, 1.754], "dev": 0.17, "fingers": [5]}
+[INFO] [1794314375.102960790] [team048_solution]: TRACE {"t": 160.92, "phase": "guard", "side": "l", "obj": "Ecoforms_Plant_Container_B4_Har", "F": [-2.186, 2.743, 1.754], "dF": 4.008, "fing": [0.982, 0.98, 0.99, 0.992, 0.83, -0.003], "eff": [1.0, 1.0, 1.0, 1.0, 0.557, 0.412], "tcp": [0.3273, 0.454, 0.0261], "q": [-0.243, 0.882, -0.518, -1.073, -0.976, -0.785, -0.193], "where": "approach", "dev": 0.17, "fingers": [5]}
+[INFO] [1794314375.103573503] [team048_solution]: guard: finger contact during approach Ecoforms_Plant_Container_B4_Har {"dev": 0.17, "fingers": [5]} -> no close, re-observe
+[INFO] [1794314394.220273173] [team048_solution]: re-observe after contact Ecoforms_Plant_Container_B4_Har
+[INFO] [1794314394.366796926] [team048_solution]: observe t 165.3 dets 10 assigned [('Ecoforms_Plant_Con', 1.43, 2.17), ('Threshold_Ramekin_', 5.97, 0.61)]
+[INFO] [1794314394.367570965] [team048_solution]: no plan: Threshold_Ramekin_White_Porcelain {"reason": "unchanged scene since the last failed planning"}
+[INFO] [1794314394.386004041] [team048_solution]: no plan: Ecoforms_Plant_Container_B4_Har {"candidates": 0, "feasible": 0, "pick_ik": {}, "place": {}, "hand_clear": {}, "rim_closed": true, "reason": "dish without an open rim (closed top measured)"}
+[INFO] [1794314394.505729727] [team048_solution]: observe t 165.3 dets 11 assigned [('Ecoforms_Plant_Con', 1.44, 2.16), ('Threshold_Ramekin_', 5.92, 0.64)]
+[INFO] [1794314394.506483433] [team048_solution]: no plan: Threshold_Ramekin_White_Porcelain {"reason": "unchanged scene since the last failed planning"}
+[INFO] [1794314394.510320088] [team048_solution]: done at 165.3 handled ['Utana_5_Porcelain_Ramekin_Large'] reason: nothing pickable in 2 observations fails {"Threshold_Ramekin_White_": 1, "Ecoforms_Plant_Container": 2}
+[INFO] [1794314394.511020530] [team048_solution]: accel at end on team048_accel 0.2.0
+[INFO] [1794314394.511772667] [team048_solution]: hand settings at end {"left_force": "confirmed", "right_force": "confirmed", "left_speed": "confirmed", "right_speed": "confirmed"}
+run rc=0 cap=1097

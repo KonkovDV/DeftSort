@@ -1,0 +1,210 @@
+[
+ {
+  "run": "v7 s101",
+  "line": 1010,
+  "obj": "Threshold_Rame",
+  "frame": 234.44,
+  "r0": 0.0294,
+  "mass": 0.2,
+  "torque": 0.058,
+  "closed": false,
+  "rim_old": 7,
+  "rim_new": 7
+ },
+ {
+  "run": "v7 s101",
+  "line": 1022,
+  "obj": "Ecoforms_Plant",
+  "frame": 239.95,
+  "r0": 0.0497,
+  "mass": 0.1,
+  "torque": 0.049,
+  "closed": false,
+  "rim_old": 7,
+  "rim_new": 7
+ },
+ {
+  "run": "v7 s102",
+  "line": 1010,
+  "obj": "Utana_5_Porcel",
+  "frame": 18.44,
+  "r0": 0.0643,
+  "mass": 0.35,
+  "torque": 0.221,
+  "closed": false,
+  "rim_old": 7,
+  "rim_new": 0
+ },
+ {
+  "run": "v7 s102",
+  "line": 1036,
+  "obj": "Threshold_Rame",
+  "frame": 87.28,
+  "r0": 0.0646,
+  "mass": 0.2,
+  "torque": 0.127,
+  "closed": false,
+  "rim_old": 7,
+  "rim_new": 7
+ },
+ {
+  "run": "v7 s103",
+  "line": 1010,
+  "obj": "Ecoforms_Plant",
+  "frame": 30.81,
+  "r0": 0.066,
+  "mass": 0.1,
+  "torque": 0.065,
+  "closed": false,
+  "rim_old": 7,
+  "rim_new": 7
+ },
+ {
+  "run": "v8",
+  "line": 1010,
+  "obj": "Utana_5_Porcel",
+  "frame": 29.64,
+  "r0": 0.0605,
+  "mass": 0.35,
+  "torque": 0.208,
+  "closed": false,
+  "rim_old": 7,
+  "rim_new": 0,
+  "fk_centre_err_mm": 12.8
+ },
+ {
+  "run": "v8",
+  "line": 1017,
+  "obj": "Threshold_Rame",
+  "frame": 29.64,
+  "r0": 0.0554,
+  "mass": 0.2,
+  "torque": 0.109,
+  "closed": true,
+  "rim_old": 0,
+  "rim_new": 0,
+  "fk_centre_err_mm": 12.9
+ },
+ {
+  "run": "v9b",
+  "line": 1019,
+  "obj": "Threshold_Ramekin_White_Porcelain",
+  "frame": null
+ },
+ {
+  "run": "v9b",
+  "line": 1037,
+  "obj": "Threshold_Ramekin_White_Porcelain",
+  "frame": null
+ },
+ {
+  "run": "v9b",
+  "line": 1055,
+  "obj": "Ecoforms_Plant_Container_B4_Har",
+  "frame": null
+ },
+ {
+  "run": "v9b",
+  "line": 1148,
+  "obj": "Utana_5_Porcel",
+  "frame": 100.92,
+  "r0": 0.0621,
+  "mass": 0.35,
+  "torque": 0.213,
+  "closed": false,
+  "rim_old": 7,
+  "rim_new": 0,
+  "fk_centre_err_mm": 11.5
+ },
+ {
+  "run": "v9b",
+  "line": 1233,
+  "obj": "Utana_5_Porcel",
+  "frame": 126.91,
+  "r0": 0.0635,
+  "mass": 0.35,
+  "torque": 0.218,
+  "closed": false,
+  "rim_old": 7,
+  "rim_new": 0
+ },
+ {
+  "run": "v9b",
+  "line": 1395,
+  "obj": "Threshold_Rame",
+  "frame": 168.81,
+  "r0": 0.0554,
+  "mass": 0.2,
+  "torque": 0.109,
+  "closed": true,
+  "rim_old": 0,
+  "rim_new": 0
+ },
+ {
+  "run": "v9b",
+  "line": 1414,
+  "obj": "Threshold_Rame",
+  "frame": 168.81,
+  "r0": 0.0554,
+  "mass": 0.2,
+  "torque": 0.109,
+  "closed": true,
+  "rim_old": 0,
+  "rim_new": 0
+ },
+ {
+  "run": "v9b",
+  "line": 1432,
+  "obj": "Utana_5_Porcel",
+  "frame": 168.81,
+  "r0": 0.0652,
+  "mass": 0.35,
+  "torque": 0.224,
+  "closed": false,
+  "rim_old": 7,
+  "rim_new": 0,
+  "fk_centre_err_mm": 10.4
+ },
+ {
+  "run": "v9b",
+  "line": 1530,
+  "obj": "Utana_5_Porcel",
+  "frame": 212.27,
+  "r0": 0.0627,
+  "mass": 0.35,
+  "torque": 0.215,
+  "closed": false,
+  "rim_old": 7,
+  "rim_new": 0
+ },
+ {
+  "run": "v11b",
+  "line": 1028,
+  "obj": "Ecoforms_Plant_Container_B4_Har",
+  "frame": null
+ },
+ {
+  "run": "v11b",
+  "line": 1236,
+  "obj": "Utana_5_Porcel",
+  "frame": 98.15,
+  "r0": 0.0625,
+  "mass": 0.35,
+  "torque": 0.215,
+  "closed": false,
+  "rim_old": 7,
+  "rim_new": 0
+ },
+ {
+  "run": "v11b",
+  "line": 1385,
+  "obj": "Ecoforms_Plant",
+  "frame": 150.0,
+  "r0": 0.1307,
+  "mass": 0.1,
+  "torque": 0.128,
+  "closed": false,
+  "rim_old": 7,
+  "rim_new": 7
+ }
+]

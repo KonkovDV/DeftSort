@@ -1,0 +1,107 @@
++ T=/tmp/w
++ export MAMBA_ROOT_PREFIX=/tmp/w/mm
++ MAMBA_ROOT_PREFIX=/tmp/w/mm
++ MM=/tmp/w/bin/micromamba
++ cd /tmp/nssr_sim
++ export ROS_DOMAIN_ID=146 RMW_IMPLEMENTATION=rmw_fastrtps_cpp ACCEPT_EULA=Y PRIVACY_CONSENT=Y OMNI_KIT_ACCEPT_EULA=YES
++ ROS_DOMAIN_ID=146
++ RMW_IMPLEMENTATION=rmw_fastrtps_cpp
++ ACCEPT_EULA=Y
++ PRIVACY_CONSENT=Y
++ OMNI_KIT_ACCEPT_EULA=YES
++ export FASTRTPS_DEFAULT_PROFILES_FILE=/tmp/nssr_sim/hackathon/docker/fastdds_hack.xml
++ FASTRTPS_DEFAULT_PROFILES_FILE=/tmp/nssr_sim/hackathon/docker/fastdds_hack.xml
++ export VK_ICD_FILENAMES=/tmp/w/nvidia_icd.json VK_DRIVER_FILES=/tmp/w/nvidia_icd.json __EGL_VENDOR_LIBRARY_DIRS=/tmp/w/egl
++ VK_ICD_FILENAMES=/tmp/w/nvidia_icd.json
++ VK_DRIVER_FILES=/tmp/w/nvidia_icd.json
++ __EGL_VENDOR_LIBRARY_DIRS=/tmp/w/egl
++ : sort2
++ : 101
++ : 1400
++ DL=1794314986
++ RPY=/tmp/w/mm/envs/ros/bin/python
++ rm -rf /tmp/sol
++ cp -r /kaggle/working/solution /tmp/sol
++ /tmp/w/mm/envs/ros/bin/python -m pip --version
++ /tmp/w/mm/envs/ros/bin/python -c 'import team048_accel as m;print('\''accel import OK'\'',m.__version__)'
++ cd /tmp/sol
++ rosenv colcon build
++ echo sol_build_rc=0
++ grep -q sol_build_rc=0 /kaggle/working/logs/sol_build.log
++ export HACK_TASK=sort2 HACK_POOL=3 HACK_SEED=100 HACK_HEADLESS=1 HACK_RES=1280x720 HACK_RENDER_INTERVAL=3
++ HACK_TASK=sort2
++ HACK_POOL=3
++ HACK_SEED=100
++ HACK_HEADLESS=1
++ HACK_RES=1280x720
++ HACK_RENDER_INTERVAL=3
++ export HACK_SELF_COLLISION=0
++ HACK_SELF_COLLISION=0
++ export 'HACK_KIT_ARGS=--/rtx/raytracing/fractionalCutoutOpacity=true --/rtx/pathtracing/fractionalCutoutOpacity=true --/rtx/translucency/maxRefractionBounces=4 --/app/runLoops/main/rateLimitEnabled=false --/app/renderer/resolution/width=1280 --/app/renderer/resolution/height=720'
++ HACK_KIT_ARGS='--/rtx/raytracing/fractionalCutoutOpacity=true --/rtx/pathtracing/fractionalCutoutOpacity=true --/rtx/translucency/maxRefractionBounces=4 --/app/runLoops/main/rateLimitEnabled=false --/app/renderer/resolution/width=1280 --/app/renderer/resolution/height=720'
++ BR=7430
++ sleep 3
++ rosenv python teleoperation/bridges/ros2_zmq_bridge.py
++ SIM=7524
++ D=1509
++ up=0
++ LD_LIBRARY_PATH=/tmp/w/nvlib:/usr/local/nvidia/lib64:/usr/local/cuda/lib64:/usr/local/nvidia/lib:/usr/local/nvidia/lib64:/usr/local/cuda/lib64
++ /tmp/w/mm/envs/isaac/bin/python scripts/sim_runner.py --task NSSRSim-TiangongPro-Parlor-v0 --enable_cameras --num_envs 1 --perf_stats --step_hz 100 --headless --device cpu
++ '[' 9 -lt 1509 ']'
+++ left
++++ date +%s
+++ echo 2480
++ '[' 2480 -gt 1000 ']'
++ R=1500
+++ left
++++ date +%s
+++ echo 2480
++ L2=1480
++ '[' 1480 -lt 1500 ']'
++ R=1480
++ '[' 1480 -lt 10 ']'
++ rosenv timeout -k 5 1490 python /kaggle/working/wait_task.py 1480 /kaggle/working/logs/sim_task_sort2.txt
+sim boot: up=1 after 1152s
++ up=1
++ break
++ echo 'sim boot: up=1 after 1152s'
++ '[' 1 = 1 ']'
++ grep -q 'self-collisions ON' /kaggle/working/logs/sim_sort2.log
++ echo 'self-collisions: not reported by the sim (HACK_SELF_COLLISION=0)'
+self-collisions: not reported by the sim (HACK_SELF_COLLISION=0)
++ for S in $SEEDS
+++ left
++++ date +%s
+++ echo 1337
++ L=1337
+WARNING: wall cap reduced to 1097 s by the session deadline (needed 1400)
++ '[' 1337 -lt 400 ']'
++ RT=1097
++ '[' 1097 -lt 1400 ']'
++ echo 'WARNING: wall cap reduced to 1097 s by the session deadline (needed 1400)'
++ rosenv ros2 topic pub --once /sim/objects/randomize std_msgs/msg/Int32 '{data: 101}'
++ sleep 15
+++ seq 1 36
++ for w in $(seq 1 36)
++ rosenv timeout -k 5 30 python /kaggle/working/score.py start
++ grep -q '"sim_t": [0-9]'
++ break
++ rosenv timeout -k 5 60 python /kaggle/working/score.py start
++ GRAB_OUT=/kaggle/working/frames_end/sort2_101_start
++ rosenv timeout -k 5 60 python /kaggle/working/grab_frames.py
++ export TEAM048_TRACE_DIR=/kaggle/working/trace/sort2_101
++ TEAM048_TRACE_DIR=/kaggle/working/trace/sort2_101
++ echo 'run rc=0 cap=1097'
++ rosenv timeout -k 5 120 python /kaggle/working/score.py check sort2 101
++ GRAB_OUT=/kaggle/working/frames_end/sort2_101_end
++ rosenv timeout -k 5 60 python /kaggle/working/grab_frames.py
++ tail -1 /kaggle/working/results.jsonl
+{"task": "sort2", "seed": 101, "score_lb": 0, "sim_t_end": 167.589996254, "in_right_tray": null, "in_wrong_tray": null, "not_in_tray": null, "total": null, "objects": null}
++ kill -INT 7524
++ sleep 10
++ kill 7430
++ pkill -f sim_node.py
++ pkill -f camera_bridge.py
++ pkill -f robot_state_publisher
++ pkill -9 -f sim_runner.py
++ sleep 5

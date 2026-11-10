@@ -45,7 +45,7 @@ for S in $SEEDS; do
   GRAB_OUT=$W/frames_end/${TASK}_${S}_start rosenv timeout -k 5 60 python $W/grab_frames.py > /dev/null 2>&1
   export TEAM048_TRACE_DIR=$W/trace/${TASK}_$S
   ( cd /tmp/sol && rosenv timeout --kill-after=20 $RT bash run.sh ) > $W/logs/run_${TASK}_$S.log 2>&1; echo "run rc=$? cap=$RT" >> $W/logs/run_${TASK}_$S.log
-  rosenv timeout -k 5 120 python $W/score.py check $TASK $S >> $W/results.jsonl 2>> $W/logs/score_err.log
+  rosenv timeout -k 5 160 python $W/score.py check $TASK $S >> $W/results.jsonl 2>> $W/logs/score_err.log
   GRAB_OUT=$W/frames_end/${TASK}_${S}_end rosenv timeout -k 5 60 python $W/grab_frames.py > /dev/null 2>&1
   tail -1 $W/results.jsonl
 done
