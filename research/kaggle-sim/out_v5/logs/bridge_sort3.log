@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/tmp/nssr_sim/teleoperation/bridges/ros2_zmq_bridge.py", line 348, in <module>
+    node = TiangongRosBridge()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/tmp/nssr_sim/teleoperation/bridges/ros2_zmq_bridge.py", line 62, in __init__
+    self.cmd_socket.bind(f"tcp://*:{zmq_cfg['cmd_port']}")
+  File "/tmp/w/mm/envs/ros/lib/python3.11/site-packages/zmq/sugar/socket.py", line 322, in bind
+    super().bind(addr)
+  File "zmq/backend/cython/_zmq.py", line 1009, in zmq.backend.cython._zmq.Socket.bind
+  File "zmq/backend/cython/_zmq.py", line 190, in zmq.backend.cython._zmq._check_rc
+zmq.error.ZMQError: Address already in use (addr='tcp://*:5555')

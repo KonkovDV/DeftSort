@@ -1,0 +1,7 @@
+09:14:31Z +     3s src=/kaggle/input/datasets/dmitrijkv/team048-tpu-cpu-inputs/sol_src cfg={"mode": "grasp", "task": "sort2", "pool": {"electronics": ["Razer_Taipan_White_Ambidextrous_Gaming_Mouse", "JBL_Charge_Speaker_portable_wireless_wired_Green", "Crosley_Alarm_Clock_Vintage_Metal"], "box": ["Nestle_Nips_Hard_Candy_Peanut_Butter", "Nips_Hard_Candy_Rich_Creamy_Butter_Rum_4_oz_1133_g", "009_gelatin_box"]}, "cats": ["electronics", "box"], "l0": 0, "l1": 8, "meta": {"Razer_Taipan_White_Ambidextrous_Gaming_Mouse": ["electronics", [0.1, 0.182, 0.04]], "JBL_Charge_Speaker_portable_wireless_wired_Green": ["electronics", [0.17600000000000002, 0.073, 0.075]], "Crosley_Alarm_Clock_Vintage_Metal": ["electronics", [0.109, 0.054000000000000006, 0.162]], "Nestle_Nips_Hard_Candy_Peanut_Butter": ["box", [0.08800000000000001, 0.042, 0.153]], "Nips_Hard_Candy_Rich_Creamy_Butter_Rum_4_oz_1133_g": ["box", [0.08900000000000001, 0.043, 0.153]], "009_gelatin_box": ["box", [0.08900000000000001, 0.10099999999999999, 0.03]]}, "seed_base": 76500, "grasp_cats": ["electronics", "box"], "deadline_s": 2880}
+09:14:31Z +     3s 48 jobs, 4 cpus
+09:24:38Z +   610s 10/48 done
+09:41:48Z +  1640s 20/48 done
+09:55:58Z +  2490s 30/48 done
+10:02:54Z +  2906s DEADLINE after 35 jobs, terminating
+10:02:54Z +  2906s END done=35/48

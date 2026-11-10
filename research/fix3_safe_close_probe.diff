@@ -1,0 +1,39 @@
+--- orig/native_probe.py
++++ fixed/native_probe.py
+@@ -199,6 +199,21 @@
+    result['graph_removed']=not bool(stage.GetPrimAtPath('/NativeClock'))
+   r['minimal_activity']=result;save();atomic_report(OUT/'minimal_activity.json',result)
+ 
++
++def safe_pre_close(app):
++ # Fix 3 (workaround): release ROS2 bridge + simulation_manager event subscriptions
++ # while carb.events is still alive, i.e. before SimulationApp.close()->unload_all_plugins().
++ import omni.kit.app
++ em=omni.kit.app.get_app().get_extension_manager();res=[]
++ for name in ['isaacsim.ros2.bridge','isaacsim.core.simulation_manager']:
++  try:
++   was=em.is_extension_enabled(name)
++   if was:em.set_extension_enabled_immediate(name,False)
++   for _ in range(5):app.update()
++   res.append({'ext':name,'was_enabled':was,'enabled_after':em.is_extension_enabled(name)})
++  except Exception as e:res.append({'ext':name,'error':str(e)})
++ r['safe_pre_close']=res;save()
++
+ try:
+  if mode=='never_bare':
+   from isaacsim import SimulationApp
+@@ -232,7 +247,7 @@
+    extensions_checkpoint('before_close');gc.collect();r['threads_before_close']=threads();r['close_requested']=True;save()
+    (OUT/'native_maps_before_close.txt').write_text(Path('/proc/self/maps').read_text())
+    faulthandler.dump_traceback_later(90,repeat=False)
+-   sys.settrace(close_trace);t=time.monotonic();app.close();sys.settrace(None)
++   safe_pre_close(app);sys.settrace(close_trace);t=time.monotonic();app.close();sys.settrace(None)
+    faulthandler.cancel_dump_traceback_later();r['close_seconds']=time.monotonic()-t;r['closed']=True;r['threads_after_close']=threads();save();print('NORMAL_CLOSE_RETURNED '+mode,flush=True)
+    # Keep a bounded hang diagnostic active through Python finalization.
+    faulthandler.dump_traceback_later(45,repeat=False)
+@@ -243,4 +258,4 @@
+   a=full_acceptance(r,0,(r.get('ros_bridge') or {}).get('receiver',{}));atomic_report(OUT/'scene_acceptance.json',a);code=0 if a['passed'] else 1
+  else:code=0 if r.get('closed') and not r.get('exception') and not r.get('close_error') else 1
+  print('PYTHON_MAIN_FINISHED '+mode+' '+str(code),flush=True)
+- sys.exit(code)
++ r['post_close_exit']='os._exit after flush (skip interpreter finalization of unloaded native plugins)';save();sys.stdout.flush();sys.stderr.flush();os._exit(code)

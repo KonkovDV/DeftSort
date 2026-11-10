@@ -1,0 +1,33 @@
+09:59:22Z +     0s src=/workspace/fixes/kaggle-tpu/study/ds/sol_src cfg={"mode": "grasp", "task": "sort3", "pool": {"dish": ["Utana_5_Porcelain_Ramekin_Large", "Threshold_Ramekin_White_Porcelain", "Ecoforms_Plant_Container_B4_Har"], "box": ["Crunch_Girl_Scouts_Candy_Bars_Peanut_Butter_Creme_78_oz_box", "Crayola_Bonus_64_Crayons", "Perricone_MD_AcylGlutathione_Eye_Lid_Serum"], "jar": ["006_mustard_bottle", "Saccharomyces_Boulardii_MOS_Value_Size", "Hyaluronic_Acid"]}, "cats": ["dish", "box", "jar"], "l0": 0, "l1": 100, "meta": {"Utana_5_Porcelain_Ramekin_Large": ["dish", [0.132, 0.132, 0.07]], "Threshold_Ramekin_White_Porcelain": ["dish", [0.11199999999999999, 0.11199999999999999, 0.053]], "Ecoforms_Plant_Container_B4_Har": ["dish", [0.10099999999999999, 0.10099999999999999, 0.07200000000000001]], "Crunch_Girl_Scouts_Candy_Bars_Peanut_Butter_Creme_78_oz_box": ["box", [0.139, 0.063, 0.16399999999999998]], "Crayola_Bonus_64_Crayons": ["box", [0.147, 0.043, 0.127]], "Perricone_MD_AcylGlutathione_Eye_Lid_Serum": ["box", [0.08, 0.055999999999999994, 0.10800000000000001]], "006_mustard_bottle": ["jar", [0.09699999999999999, 0.067, 0.191]], "Saccharomyces_Boulardii_MOS_Value_Size": ["jar", [0.075, 0.07400000000000001, 0.135]], "Hyaluronic_Acid": ["jar", [0.054000000000000006, 0.054000000000000006, 0.098]]}, "seed_base": 73000, "grasp_cats": ["dish"], "out": "/workspace/fixes/kaggle-tpu/study/out/local-g3dx", "src": "/workspace/fixes/kaggle-tpu/study/ds", "procs": 7, "deadline_s": 10800}
+09:59:52Z +    29s 300 jobs, 8 cpus
+09:59:53Z +    31s 10/300 done
+09:59:54Z +    32s 20/300 done
+09:59:55Z +    33s 30/300 done
+09:59:56Z +    34s 40/300 done
+09:59:57Z +    35s 50/300 done
+09:59:58Z +    36s 60/300 done
+09:59:59Z +    37s 70/300 done
+10:00:00Z +    38s 80/300 done
+10:00:01Z +    39s 90/300 done
+10:00:02Z +    40s 100/300 done
+10:00:03Z +    41s 110/300 done
+10:00:04Z +    42s 120/300 done
+10:00:05Z +    43s 130/300 done
+10:00:06Z +    44s 140/300 done
+10:00:07Z +    45s 150/300 done
+10:00:08Z +    46s 160/300 done
+10:00:09Z +    47s 170/300 done
+10:00:10Z +    48s 180/300 done
+10:00:11Z +    49s 190/300 done
+10:00:12Z +    50s 200/300 done
+10:00:13Z +    51s 210/300 done
+10:00:14Z +    52s 220/300 done
+10:00:15Z +    53s 230/300 done
+10:00:16Z +    54s 240/300 done
+10:00:17Z +    55s 250/300 done
+10:00:18Z +    56s 260/300 done
+10:00:19Z +    57s 270/300 done
+10:00:20Z +    58s 280/300 done
+10:00:21Z +    59s 290/300 done
+10:00:22Z +    60s 300/300 done
+10:00:22Z +    60s END done=300/300

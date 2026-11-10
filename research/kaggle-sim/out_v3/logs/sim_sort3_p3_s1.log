@@ -1,0 +1,46 @@
+[Warning] [simulation_app.simulation_app] Modules: ['omni.kit_app'] were loaded before SimulationApp was started and might not be loaded correctly.
+[Warning] [simulation_app.simulation_app] Please check to make sure no extra omniverse or pxr modules are imported before the call to SimulationApp(...)
+2026-11-08T18:17:41Z [0ms] [Error] [carb.glinterop.plugin] GLInteropContext::init: carb::windowing is not available
+cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or directory
+Warp CUDA error: Failed to get driver entry point 'cuDeviceGetUuid' (CUDA error 1)
+Warp CUDA error: Function cuDeviceGetUuid_f: a suitable driver entry point was not found
+Warp CUDA error 36: API call is not supported in the installed CUDA driver (in function cuda_init, /builds/omniverse/warp/warp/native/warp.cu:277)
+Warp CUDA error: Function cuDeviceGetUuid_f: a suitable driver entry point was not found
+Warp CUDA error 36: API call is not supported in the installed CUDA driver (in function cuda_init, /builds/omniverse/warp/warp/native/warp.cu:277)
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 580.178.04    | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | Tesla T4                         | Yes: 0 |     | 15606   MB | 10de      | 0          |
+|     |                                  |        |     |            | 1eb8      | d3117678.. |
+|     |                                  |        |     |            | 0         |            |
+|---------------------------------------------------------------------------------------------|
+| 1   | Tesla T4                         |        |     | 15606   MB | 10de      | 0          |
+|     |                                  |        |     |            | 1eb8      | 31ec98f7.. |
+|     |                                  |        |     |            | 0         |            |
+|=============================================================================================|
+| OS: 24.04.4 LTS (Noble Numbat) ubuntu, Version: 24.04.4, Kernel: 6.18.55+
+| Processor: Intel(R) Xeon(R) CPU @ 2.00GHz
+| Bare Metal Cores: 2 | Bare Metal Logical Cores: 4
+| Core Usage Quota: 4
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 30720 | Free Memory: 10448
+| Total Page/Swap (MB): 0 | Free Page/Swap: 0
+|---------------------------------------------------------------------------------------------|
+[INFO][AppLauncher]: Using device: cpu
+[INFO][AppLauncher]: Loading experience file: /tmp/w/mm/envs/isaac/lib/python3.11/site-packages/isaaclab/apps/isaaclab.python.headless.rendering.kit
+[hack] robot USD default prim /World; links: ['L_tcp_link', 'R_tcp_link', 'ankle_pitch_l_link', 'ankle_pitch_r_link', 'ankle_roll_l_link', 'ankle_roll_r_link', 'base_link', 'body_yaw_link', 'elbow_pitch_l_link', 'elbow_pitch_r_link', 'elbow_yaw_l_link', 'elbow_yaw_r_link', 'head_pitch_link', 'head_roll_link', 'head_yaw_link', 'hip_pitch_l_link', 'hip_pitch_r_link', 'hip_roll_l_link', 'hip_roll_r_link', 'hip_yaw_l_link', 'hip_yaw_r_link', 'humanoid', 'knee_pitch_l_link', 'knee_pitch_r_link', 'pelvis', 'shoulder_pitch_l_link', 'shoulder_pitch_r_link', 'shoulder_roll_l_link', 'shoulder_roll_r_link', 'shoulder_yaw_l_link', 'shoulder_yaw_r_link', 'wrist_pitch_l_link', 'wrist_pitch_r_link', 'wrist_roll_l_link', 'wrist_roll_r_link']
+[hack] torso camera parent: humanoid/body_yaw_link
+[INFO]: Parsing configuration from: nssr_sim.task.tiangong_parlor.tiangong_parlor_env_cfg:TiangongParlorEnvCfg
+[hack] polygon: pelvis world (7.869,6.083,1.006) [offset in USD (0.0, 0.0, 0.988)], floor z 0.126, table top z 0.826 (0.70 m above floor, -0.180 m vs pelvis)
+[hack] environment: hackathon/assets/scenes/nssr-polygon/env_base.usd
+[hack] task sort3: Сортировка: 3 категории по 3 объекта, 3 лотка
+[hack] table 2.44x0.76 m at x+0.22 m, top 0.700 m, visual packing_table.usd; trays: ['tray_left', 'tray_right', 'tray_center']
+[hack] back bins: 2 pallets, 4 open boxes, 14 static objects from 9 (random)
+[hack] warehouse: 1095 instanced props, 12 lamp lights from https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.0
+[hack] decor: 0 Isaac props, 0 lamp lights, from https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.0, units by metrics assembler
+[hack] objects (pool 3, seed 1): dish: 3, box: 3, jar: 3

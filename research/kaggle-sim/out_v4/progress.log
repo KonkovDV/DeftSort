@@ -1,0 +1,232 @@
+08:31:49 MSK +0s GPU GPU 0: Tesla T4 (UUID: GPU-971a30e8-814f-827c-7b5f-128efdd0fa05)
+GPU 1: Tesla T4 (UUID: GPU-f0b5e64e-1f4e-d6d3-3bbb-97c4044058e5) internet 200
+08:31:49 MSK +0s START setup timeout 5400
+08:32:49 MSK +60s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  964G  89% /] last=setup.log :: assets/polygon | + echo SRC=/kaggle/input/datasets/dmitrijkv/team048-polygon-assets/polygon | SRC=/kaggle/input/datasets/dmitrijkv/team048-polygon-assets/polygon | + ls /kaggle/input | datasets | + mkdir -p /tmp/nssr_sim | + cp -r /kaggle/input/datasets/dmitrijkv/team048-polygon-assets/polygon/. /tmp/nssr_sim/ | 
+08:33:49 MSK +120s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  957G  89% /] last=setup.log ::  | + mkdir -p /tmp/nssr_sim | + cp -r /kaggle/input/datasets/dmitrijkv/team048-polygon-assets/polygon/. /tmp/nssr_sim/ | + P=/tmp/w/mm/envs/isaac/bin/python | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cu128 | 
+08:34:49 MSK +180s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  952G  89% /] last=setup.log :: olygon-assets/polygon/. /tmp/nssr_sim/ | + P=/tmp/w/mm/envs/isaac/bin/python | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cu128 | + ln -sfn /tmp/nssr_sim /nssr_sim | + wait 701 | + echo ros_env_rc=0 | + wait 702 | 
+08:35:49 MSK +240s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  951G  89% /] last=setup.log :: /bin/python -m pip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com | 
+08:36:49 MSK +300s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  946G  89% /] last=progress.log :: thon -m pip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  | 
+08:37:49 MSK +360s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  946G  89% /] last=progress.log :: n -m pip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  | 
+08:38:50 MSK +421s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  940G  89% /] last=progress.log :: m pip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  | 
+08:39:50 MSK +481s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=progress.log :: ip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  | 
+08:40:50 MSK +541s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  935G  89% /] last=progress.log :: install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  |  | 
+08:41:50 MSK +601s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bodyctrl_build.log :: Starting >>> bodyctrl_msgs | 
+08:42:50 MSK +661s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=progress.log :: mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  |  |  | 08:41:50 MSK +601s HB step=setup gpu=[0 %, 0 MiB | 0 %, 0 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bodyctrl_build.log :: Starting >>> bodyctrl_msgs |  | 
+08:43:06 MSK +677s END setup rc 0
+08:43:06 MSK +677s SETUP_CHECK {'ros': True, 'isaac': True, 'bodyctrl': True, 'nssr': True}
+08:43:06 MSK +677s TAIL ros_env.log ros_env_rc=0
+
+08:43:06 MSK +677s TAIL isaac_env.log ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+wheel 0.48.0 requires packaging>=24.0, but you have packaging 23.0 which is incompatible.
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+isaacsim-core 5.0.0.0 requires packaging==23.0, but you have packaging 24.2 which is incompatible.
+isaac_env_rc=0
+
+08:43:06 MSK +677s TAIL bodyctrl_build.log emoved.  Run "cmake --help-policy CMP0148" for policy details.  Use
+  the cmake_policy command to set the policy and suppress this warning.
+Call Stack (most recent call first):
+  /tmp/w/mm/envs/ros/share/rosidl_generator_py/cmake/rosidl_generator_py_generate_interfaces.cmake:33 (find_package)
+  /tmp/w/mm/envs/ros/share/ament_cmake_core/cmake/core/ament_execute_extensions.cmake:48 (include)
+  /tmp/w/mm/envs/ros/share/rosidl_cmake/cmake/rosidl_generate_interfaces.cmake:286 (ament_execute_extensions)
+  CMakeLists.txt:9 (rosidl_generate_interfaces)
+This warning is for project developers.  Use -Wno-author or -Wno-policy to
+suppress it.
+
+---
+Finished <<< bodyctrl_msgs [1min 52s]
+
+Summary: 1 package finished [1min 52s]
+  1 package had stderr output: bodyctrl_msgs
+bodyctrl_rc=0
+bodyctrl import OK
+
+08:43:06 MSK +677s TAIL nssr_pkg.log nssr_sim OK
+
+08:43:06 MSK +677s START stage34 timeout 2700
+08:43:50 MSK +721s HB step=stage34 gpu=[0 %, 230 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203018.422957641] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203023.423002062] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203028.424650085] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+08:44:51 MSK +781s HB step=stage34 gpu=[0 %, 332 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203078.422772991] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203083.422881382] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203088.422946312] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+08:45:51 MSK +841s HB step=stage34 gpu=[1 %, 332 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203138.422912511] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203143.422747304] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203148.422894394] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+08:46:51 MSK +901s HB step=stage34 gpu=[4 %, 332 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203198.425331977] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203203.423342583] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203208.423341009] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+08:47:51 MSK +961s HB step=stage34 gpu=[4 %, 365 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203258.422804986] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203263.422821880] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203268.422990272] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+08:48:51 MSK +1021s HB step=stage34 gpu=[4 %, 365 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203318.423600352] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203323.423406524] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203328.423920149] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+08:49:51 MSK +1082s HB step=stage34 gpu=[4 %, 365 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203378.423501780] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203383.422801299] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203388.423351335] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+08:50:51 MSK +1142s HB step=stage34 gpu=[4 %, 365 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203438.422938132] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203443.422875025] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203448.422947637] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+08:51:51 MSK +1202s HB step=stage34 gpu=[4 %, 365 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203498.424211485] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203503.422807746] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203508.423015379] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+08:52:51 MSK +1262s HB step=stage34 gpu=[4 %, 886 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203558.423699896] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203563.422790424] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203568.422958884] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+08:53:51 MSK +1322s HB step=stage34 gpu=[1 %, 886 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203618.423019505] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203623.422785453] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203628.424817197] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+08:54:51 MSK +1382s HB step=stage34 gpu=[4 %, 886 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203678.422953542] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203683.423069979] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203688.423042562] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+08:55:51 MSK +1442s HB step=stage34 gpu=[4 %, 905 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  938G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203738.423063046] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203743.423028130] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203748.423046005] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+08:56:51 MSK +1502s HB step=stage34 gpu=[4 %, 906 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  938G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203798.422885738] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203803.422898986] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203808.422876401] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+08:57:51 MSK +1562s HB step=stage34 gpu=[3 %, 906 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203858.422824729] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203863.425649951] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203868.423577257] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+08:58:51 MSK +1622s HB step=stage34 gpu=[0 %, 1344 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203918.422797612] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203923.422642584] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203928.424975076] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+08:59:51 MSK +1682s HB step=stage34 gpu=[0 %, 1344 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203978.423034258] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203983.429091528] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794203988.425298719] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+09:00:52 MSK +1742s HB step=stage34 gpu=[4 %, 1344 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794204038.423509327] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794204043.423563669] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794204048.422875324] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+09:01:52 MSK +1802s HB step=stage34 gpu=[21 %, 3294 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3_p3_s1.log :: 0ms | Total: 45.98ms | [PERF] Hz: 22.88 | Advance: 17.28ms | Preprocess: 0.01ms | EnvStep: 25.69ms | Total: 42.98ms | [PERF] Hz: 23.29 | Advance: 17.55ms | Preprocess: 0.01ms | EnvStep: 24.54ms | Total: 42.10ms | [PERF] Hz: 22.76 | Advance: 18.43ms | Preprocess: 0.01ms | EnvStep: 24.76ms | Total: 43.20ms | 
+09:02:52 MSK +1862s HB step=stage34 gpu=[35 %, 3294 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3_p3_s1.log :: 8ms | Total: 42.87ms | [PERF] Hz: 22.95 | Advance: 17.97ms | Preprocess: 0.01ms | EnvStep: 24.87ms | Total: 42.85ms | [PERF] Hz: 22.64 | Advance: 17.30ms | Preprocess: 0.01ms | EnvStep: 25.95ms | Total: 43.26ms | [PERF] Hz: 23.46 | Advance: 17.56ms | Preprocess: 0.01ms | EnvStep: 24.20ms | Total: 41.77ms | 
+09:03:52 MSK +1922s HB step=stage34 gpu=[30 %, 3294 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3_p3_s1.log :: 1ms | Total: 42.33ms | [PERF] Hz: 22.91 | Advance: 18.50ms | Preprocess: 0.01ms | EnvStep: 24.48ms | Total: 43.00ms | [PERF] Hz: 23.45 | Advance: 16.77ms | Preprocess: 0.01ms | EnvStep: 25.01ms | Total: 41.80ms | [PERF] Hz: 22.97 | Advance: 18.23ms | Preprocess: 0.01ms | EnvStep: 24.74ms | Total: 42.99ms | 
+09:04:52 MSK +1982s HB step=stage34 gpu=[22 %, 3294 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3_p3_s1.log :: 3ms | Total: 41.33ms | [PERF] Hz: 23.48 | Advance: 16.69ms | Preprocess: 0.01ms | EnvStep: 25.25ms | Total: 41.95ms | [PERF] Hz: 22.72 | Advance: 18.25ms | Preprocess: 0.01ms | EnvStep: 25.02ms | Total: 43.28ms | [PERF] Hz: 23.39 | Advance: 16.89ms | Preprocess: 0.01ms | EnvStep: 25.20ms | Total: 42.11ms | 
+09:05:52 MSK +2043s HB step=stage34 gpu=[40 %, 3294 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=tf_pelvis_camhead.txt ::  0.648] | - Rotation: in Quaternion [0.613, -0.613, 0.353, -0.353] | - Rotation: in RPY (radian) [-2.097, -0.000, -1.571] | - Rotation: in RPY (degree) [-120.158, -0.005, -89.990] | - Matrix: |   0.000 -0.502  0.865  0.105 |  -1.000 -0.000  0.000  0.011 |   0.000 -0.865 -0.502  0.648 |   0.000  0.000  0.000  1.000 | 
+09:06:22 MSK +2073s END stage34 rc 1
+09:06:22 MSK +2073s SIM_TASK 
+09:06:22 MSK +2073s CHECK        subscribers 1
+  OK   /inspire_hand/set_angle_flexible/left_hand service
+  OK   /inspire_hand/set_angle_flexible/right_hand service
+  OK   /inspire_hand/set_speed/left_hand          service
+  OK   /inspire_hand/set_speed/right_hand         service
+  OK   /inspire_hand/set_force/left_hand          service
+  OK   /inspire_hand/set_force/right_hand         service
+  OK   /inspire_hand/set_clear_error/left_hand    service
+  OK   /inspire_hand/set_clear_error/right_hand   service
+  n/a  /hric/robot/float_base_rpyz_cmd (torso pitch/roll/height: real robot only, sim torso = yaw 31)
+  n/a  /leg/* (legs are fixed in the sim)
+  OK   hand state has position/velocity/effort x6
+  info /arm_6dof_left: |F| = 0.00 N, frame wrist_roll_l_link (empty hand: should be ~0)
+  info /arm_6dof_right: |F| = 0.00 N, frame wrist_roll_r_link (empty hand: should be ~0)
+== 3. motion: each motor +delta and back (sim time 1.0 s each way) ==
+  OK    1 head_roll_joint            cmd +0.20  got +0.200 rad
+  OK    2 head_pitch_joint           cmd +0.20  got +0.202 rad
+  OK    3 head_yaw_joint             cmd +0.30  got +0.300 rad
+  OK   31 body_yaw_joint             cmd +0.25  got +0.250 rad
+  OK   11 shoulder_pitch_l_joint     cmd +0.20  got +0.164 rad
+  OK   12 shoulder_roll_l_joint      cmd +0.20  got +0.170 rad
+  OK   13 shoulder_yaw_l_joint       cmd +0.30  got +0.286 rad
+  OK   14 elbow_pitch_l_joint        cmd -0.30  got -0.279 rad
+  OK   15 elbow_yaw_l_joint          cmd +0.30  got +0.287 rad
+  OK   16 wrist_pitch_l_joint        cmd +0.20  got +0.193 rad
+  OK   17 wrist_roll_l_joint         cmd +0.30  got +0.285 rad
+  OK   21 shoulder_pitch_r_joint     cmd +0.20  got +0.164 rad
+  OK   22 shoulder_roll_r_joint      cmd -0.20  got -0.170 rad
+  OK   23 shoulder_yaw_r_joint       cmd -0.30  got -0.287 rad
+  OK   24 elbow_pitch_r_joint        cmd -0.30  got -0.279 rad
+  OK   25 elbow_yaw_r_joint          cmd -0.30  got -0.286 rad
+  OK   26 wrist_pitch_r_joint        cmd +0.20  got +0.193 rad
+  OK   27 wrist_roll_r_joint         cmd -0.30  got -0.285 rad
+== 3b. SDK semantics: spd, cmd_vel, hand set_speed ==
+  OK   cmd_pos +0.50 at spd 0.25 rad/s: after 1.0 s +0.223 (expect ~+0.25)
+  OK   cmd_vel -0.30 rad/s for 1.0 s: -0.268 (expect ~-0.30)
+  OK   set_speed 0.25, index 1 -> 0: after 0.8 s at 0.79 (expect ~0.75)
+== 4. fingers: each finger to 0.3 (0 = closed, 1 = open) and back ==
+  OK   left  1 little_1_joint   moved 0.876 rad
+  OK   left  2 ring_1_joint     moved 0.868 rad
+  OK   left  3 middle_1_joint   moved 0.865 rad
+  OK   left  4 index_1_joint    moved 0.866 rad
+  OK   left  5 thumb_2_joint    moved 0.312 rad
+  OK   left  6 thumb_1_joint    moved 0.856 rad
+  OK   right 1 little_1_joint   moved 0.874 rad
+  OK   right 2 ring_1_joint     moved 0.868 rad
+  OK   right 3 middle_1_joint   moved 0.866 rad
+  OK   right 4 index_1_joint    moved 0.866 rad
+  OK   right 5 thumb_2_joint    moved 0.312 rad
+  OK   right 6 thumb_1_joint    moved 0.857 rad
+== RESULT: ALL OK ==
+check_rc=0
+
+09:06:22 MSK +2073s START sort timeout 4200
+09:06:52 MSK +2103s HB step=sort gpu=[62 %, 875 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=bridge_sort3.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794204398.504418085] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794204403.505013866] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794204408.505151159] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+09:07:52 MSK +2163s HB step=sort gpu=[31 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 8ms | Total: 39.22ms | [PERF] Hz: 24.82 | Advance: 15.60ms | Preprocess: 0.01ms | EnvStep: 23.66ms | Total: 39.27ms | [PERF] Hz: 24.99 | Advance: 15.32ms | Preprocess: 0.01ms | EnvStep: 23.48ms | Total: 38.81ms | [PERF] Hz: 25.00 | Advance: 16.05ms | Preprocess: 0.01ms | EnvStep: 22.95ms | Total: 39.01ms | 
+09:08:52 MSK +2223s HB step=sort gpu=[37 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 7ms | Total: 39.49ms | [PERF] Hz: 25.03 | Advance: 15.32ms | Preprocess: 0.01ms | EnvStep: 23.49ms | Total: 38.83ms | [PERF] Hz: 24.80 | Advance: 15.62ms | Preprocess: 0.01ms | EnvStep: 23.82ms | Total: 39.45ms | [PERF] Hz: 22.43 | Advance: 19.19ms | Preprocess: 0.02ms | EnvStep: 24.47ms | Total: 43.67ms | 
+09:09:52 MSK +2283s HB step=sort gpu=[40 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 9ms | Total: 39.60ms | [PERF] Hz: 23.98 | Advance: 17.07ms | Preprocess: 0.01ms | EnvStep: 23.57ms | Total: 40.65ms | [PERF] Hz: 24.53 | Advance: 15.64ms | Preprocess: 0.01ms | EnvStep: 24.03ms | Total: 39.68ms | [PERF] Hz: 24.75 | Advance: 15.72ms | Preprocess: 0.01ms | EnvStep: 23.47ms | Total: 39.21ms | 
+09:10:52 MSK +2343s HB step=sort gpu=[39 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 3ms | Total: 39.00ms | [PERF] Hz: 24.42 | Advance: 16.12ms | Preprocess: 0.01ms | EnvStep: 23.61ms | Total: 39.74ms | [PERF] Hz: 24.89 | Advance: 15.53ms | Preprocess: 0.01ms | EnvStep: 23.53ms | Total: 39.07ms | [PERF] Hz: 24.97 | Advance: 15.88ms | Preprocess: 0.01ms | EnvStep: 23.07ms | Total: 38.96ms | 
+09:11:52 MSK +2403s HB step=sort gpu=[32 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 8ms | Total: 39.26ms | [PERF] Hz: 24.86 | Advance: 15.65ms | Preprocess: 0.01ms | EnvStep: 23.53ms | Total: 39.20ms | [PERF] Hz: 23.84 | Advance: 16.86ms | Preprocess: 0.01ms | EnvStep: 24.00ms | Total: 40.87ms | [PERF] Hz: 24.37 | Advance: 16.93ms | Preprocess: 0.01ms | EnvStep: 22.99ms | Total: 39.94ms | 
+09:12:52 MSK +2463s HB step=sort gpu=[39 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 3ms | Total: 40.11ms | [PERF] Hz: 24.86 | Advance: 15.44ms | Preprocess: 0.01ms | EnvStep: 23.67ms | Total: 39.12ms | [PERF] Hz: 21.81 | Advance: 20.33ms | Preprocess: 0.01ms | EnvStep: 24.73ms | Total: 45.08ms | [PERF] Hz: 24.36 | Advance: 15.69ms | Preprocess: 0.01ms | EnvStep: 24.48ms | Total: 40.18ms | 
+09:13:52 MSK +2523s HB step=sort gpu=[23 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 5ms | Total: 42.27ms | [PERF] Hz: 24.91 | Advance: 16.32ms | Preprocess: 0.01ms | EnvStep: 22.73ms | Total: 39.06ms | [PERF] Hz: 23.99 | Advance: 16.51ms | Preprocess: 0.01ms | EnvStep: 24.10ms | Total: 40.61ms | [PERF] Hz: 24.56 | Advance: 15.88ms | Preprocess: 0.01ms | EnvStep: 23.65ms | Total: 39.55ms | 
+09:14:52 MSK +2583s HB step=sort gpu=[29 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 6ms | Total: 40.61ms | [PERF] Hz: 25.24 | Advance: 15.31ms | Preprocess: 0.01ms | EnvStep: 23.31ms | Total: 38.63ms | [PERF] Hz: 24.80 | Advance: 15.34ms | Preprocess: 0.01ms | EnvStep: 23.98ms | Total: 39.34ms | [PERF] Hz: 24.96 | Advance: 15.43ms | Preprocess: 0.01ms | EnvStep: 23.59ms | Total: 39.03ms | 
+09:15:52 MSK +2643s HB step=sort gpu=[39 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 0ms | Total: 39.15ms | [PERF] Hz: 24.81 | Advance: 15.88ms | Preprocess: 0.01ms | EnvStep: 23.32ms | Total: 39.21ms | [PERF] Hz: 24.18 | Advance: 17.12ms | Preprocess: 0.02ms | EnvStep: 23.37ms | Total: 40.50ms | [PERF] Hz: 24.33 | Advance: 15.86ms | Preprocess: 0.01ms | EnvStep: 24.04ms | Total: 39.92ms | 
+09:16:52 MSK +2703s HB step=sort gpu=[29 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 8ms | Total: 39.98ms | [PERF] Hz: 23.90 | Advance: 17.16ms | Preprocess: 0.02ms | EnvStep: 23.75ms | Total: 40.93ms | [PERF] Hz: 23.82 | Advance: 16.74ms | Preprocess: 0.01ms | EnvStep: 24.18ms | Total: 40.93ms | [PERF] Hz: 24.88 | Advance: 16.01ms | Preprocess: 0.01ms | EnvStep: 23.00ms | Total: 39.02ms | 
+09:17:52 MSK +2763s HB step=sort gpu=[40 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sort.log :: 7 -gt 908 ']' | + rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | + sleep 5 | + for i in $(seq 1 120) | + '[' 681 -gt 908 ']' | + rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String | + sleep 5 | 
+09:18:53 MSK +2823s HB step=sort gpu=[33 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 3ms | Total: 39.83ms | [PERF] Hz: 24.89 | Advance: 15.84ms | Preprocess: 0.01ms | EnvStep: 23.28ms | Total: 39.13ms | [PERF] Hz: 24.51 | Advance: 15.65ms | Preprocess: 0.02ms | EnvStep: 24.27ms | Total: 39.94ms | [PERF] Hz: 25.20 | Advance: 15.41ms | Preprocess: 0.01ms | EnvStep: 23.04ms | Total: 38.46ms | 
+09:19:53 MSK +2883s HB step=sort gpu=[40 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 4ms | Total: 39.75ms | [PERF] Hz: 24.93 | Advance: 15.57ms | Preprocess: 0.01ms | EnvStep: 23.52ms | Total: 39.11ms | [PERF] Hz: 25.05 | Advance: 15.37ms | Preprocess: 0.02ms | EnvStep: 23.57ms | Total: 38.95ms | [PERF] Hz: 22.87 | Advance: 17.07ms | Preprocess: 0.02ms | EnvStep: 25.78ms | Total: 42.87ms | 
+09:20:53 MSK +2943s HB step=sort gpu=[39 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 6ms | Total: 40.34ms | [PERF] Hz: 23.04 | Advance: 17.94ms | Preprocess: 0.01ms | EnvStep: 24.41ms | Total: 42.36ms | [PERF] Hz: 24.23 | Advance: 16.73ms | Preprocess: 0.01ms | EnvStep: 23.48ms | Total: 40.22ms | [PERF] Hz: 24.93 | Advance: 15.87ms | Preprocess: 0.01ms | EnvStep: 23.14ms | Total: 39.03ms | 
+09:21:53 MSK +3003s HB step=sort gpu=[23 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 8ms | Total: 44.56ms | [PERF] Hz: 23.31 | Advance: 16.68ms | Preprocess: 0.01ms | EnvStep: 25.46ms | Total: 42.16ms | [PERF] Hz: 23.59 | Advance: 16.71ms | Preprocess: 0.01ms | EnvStep: 25.11ms | Total: 41.84ms | [PERF] Hz: 23.62 | Advance: 16.57ms | Preprocess: 0.01ms | EnvStep: 25.24ms | Total: 41.81ms | 
+09:22:53 MSK +3063s HB step=sort gpu=[40 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sort.log :: ": {"tray": null, "ok": false}, "Saccharomyces_Boulardii_MOS_Value_Size": {"tray": null, "ok": false}, "Hyaluronic_Acid": {"tray": null, "ok": false}}} | + for k in $(seq 1 ${NLAYOUTS:-5}) | + S=102 | + '[' 2 -gt 1 ']' | + rosenv ros2 topic pub --once /sim/objects/randomize std_msgs/msg/Int32 '{data: 102}' | 
+09:23:53 MSK +3124s HB step=sort gpu=[31 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 3ms | Total: 43.21ms | [PERF] Hz: 22.19 | Advance: 18.57ms | Preprocess: 0.01ms | EnvStep: 26.28ms | Total: 44.86ms | [PERF] Hz: 19.34 | Advance: 21.72ms | Preprocess: 0.01ms | EnvStep: 29.62ms | Total: 51.36ms | [PERF] Hz: 20.09 | Advance: 19.69ms | Preprocess: 0.01ms | EnvStep: 29.82ms | Total: 49.52ms | 
+09:24:53 MSK +3184s HB step=sort gpu=[36 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 8ms | Total: 41.43ms | [PERF] Hz: 23.95 | Advance: 16.19ms | Preprocess: 0.01ms | EnvStep: 25.13ms | Total: 41.33ms | [PERF] Hz: 23.29 | Advance: 16.21ms | Preprocess: 0.01ms | EnvStep: 26.30ms | Total: 42.52ms | [PERF] Hz: 23.98 | Advance: 16.01ms | Preprocess: 0.01ms | EnvStep: 25.17ms | Total: 41.19ms | 
+09:25:53 MSK +3244s HB step=sort gpu=[31 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 8ms | Total: 45.35ms | [PERF] Hz: 22.14 | Advance: 18.62ms | Preprocess: 0.04ms | EnvStep: 25.94ms | Total: 44.60ms | [PERF] Hz: 21.99 | Advance: 18.73ms | Preprocess: 0.02ms | EnvStep: 26.24ms | Total: 44.99ms | [PERF] Hz: 19.17 | Advance: 23.25ms | Preprocess: 0.02ms | EnvStep: 28.55ms | Total: 51.81ms | 
+09:26:53 MSK +3304s HB step=sort gpu=[23 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 4ms | Total: 46.28ms | [PERF] Hz: 21.88 | Advance: 19.36ms | Preprocess: 0.01ms | EnvStep: 25.97ms | Total: 45.34ms | [PERF] Hz: 21.92 | Advance: 19.10ms | Preprocess: 0.01ms | EnvStep: 25.96ms | Total: 45.07ms | [PERF] Hz: 18.43 | Advance: 23.29ms | Preprocess: 0.02ms | EnvStep: 30.75ms | Total: 54.06ms | 
+09:27:53 MSK +3364s HB step=sort gpu=[41 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 0ms | Total: 41.83ms | [PERF] Hz: 23.98 | Advance: 15.93ms | Preprocess: 0.01ms | EnvStep: 25.53ms | Total: 41.47ms | [PERF] Hz: 22.44 | Advance: 18.23ms | Preprocess: 0.01ms | EnvStep: 26.04ms | Total: 44.29ms | [PERF] Hz: 22.93 | Advance: 17.08ms | Preprocess: 0.01ms | EnvStep: 26.30ms | Total: 43.39ms | 
+09:28:53 MSK +3424s HB step=sort gpu=[32 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=bridge_sort3.log :: es/5s: cam_head=41, cam_torso=41 | [INFO] [1794205723.506204433] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40 | [INFO] [1794205728.506393443] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=38 | [INFO] [1794205733.504989149] [hack_camera_bridge]: frames/5s: cam_head=35, cam_torso=34 | 
+09:29:53 MSK +3484s HB step=sort gpu=[22 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=bridge_sort3.log :: es/5s: cam_head=38, cam_torso=39 | [INFO] [1794205783.505183105] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=37 | [INFO] [1794205788.504762431] [hack_camera_bridge]: frames/5s: cam_head=37, cam_torso=38 | [INFO] [1794205793.504629515] [hack_camera_bridge]: frames/5s: cam_head=35, cam_torso=34 | 
+09:30:53 MSK +3544s HB step=sort gpu=[35 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=bridge_sort3.log :: es/5s: cam_head=42, cam_torso=42 | [INFO] [1794205843.504312454] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42 | [INFO] [1794205848.504692614] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41 | [INFO] [1794205853.505516288] [hack_camera_bridge]: frames/5s: cam_head=36, cam_torso=36 | 
+09:31:53 MSK +3604s HB step=sort gpu=[22 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 8ms | Total: 40.32ms | [PERF] Hz: 24.50 | Advance: 15.40ms | Preprocess: 0.01ms | EnvStep: 24.84ms | Total: 40.25ms | [PERF] Hz: 22.87 | Advance: 17.88ms | Preprocess: 0.01ms | EnvStep: 25.28ms | Total: 43.18ms | [PERF] Hz: 23.30 | Advance: 16.51ms | Preprocess: 0.01ms | EnvStep: 26.00ms | Total: 42.53ms | 
+09:32:53 MSK +3664s HB step=sort gpu=[28 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=bridge_sort3.log :: es/5s: cam_head=41, cam_torso=41 | [INFO] [1794205963.504940140] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40 | [INFO] [1794205968.504598050] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41 | [INFO] [1794205973.504386120] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39 | 
+09:33:53 MSK +3724s HB step=sort gpu=[35 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=bridge_sort3.log :: es/5s: cam_head=39, cam_torso=39 | [INFO] [1794206023.505368786] [hack_camera_bridge]: frames/5s: cam_head=37, cam_torso=37 | [INFO] [1794206028.504425852] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=38 | [INFO] [1794206033.504832413] [hack_camera_bridge]: frames/5s: cam_head=34, cam_torso=34 | 
+09:34:53 MSK +3784s HB step=sort gpu=[22 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=bridge_sort3.log :: es/5s: cam_head=40, cam_torso=40 | [INFO] [1794206083.504671846] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40 | [INFO] [1794206088.506134037] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41 | [INFO] [1794206093.505079095] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39 | 
+09:35:53 MSK +3844s HB step=sort gpu=[27 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=bridge_sort3.log :: es/5s: cam_head=40, cam_torso=41 | [INFO] [1794206143.504941375] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41 | [INFO] [1794206148.505071968] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41 | [INFO] [1794206153.504897101] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39 | 
+09:36:54 MSK +3904s HB step=sort gpu=[41 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 6ms | Total: 39.69ms | [PERF] Hz: 24.98 | Advance: 15.20ms | Preprocess: 0.01ms | EnvStep: 24.17ms | Total: 39.38ms | [PERF] Hz: 22.89 | Advance: 16.65ms | Preprocess: 0.01ms | EnvStep: 26.60ms | Total: 43.27ms | [PERF] Hz: 23.94 | Advance: 16.53ms | Preprocess: 0.01ms | EnvStep: 24.69ms | Total: 41.23ms | 
+09:37:54 MSK +3964s HB step=sort gpu=[26 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=bridge_sort3.log :: es/5s: cam_head=42, cam_torso=42 | [INFO] [1794206263.505066698] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40 | [INFO] [1794206268.505516073] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41 | [INFO] [1794206273.504959610] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39 | 
+09:38:54 MSK +4024s HB step=sort gpu=[34 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=bridge_sort3.log :: es/5s: cam_head=40, cam_torso=40 | [INFO] [1794206323.504703994] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41 | [INFO] [1794206328.504661910] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40 | [INFO] [1794206333.504807141] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39 | 
+09:39:54 MSK +4084s HB step=sort gpu=[22 %, 3324 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 9ms | Total: 42.04ms | [PERF] Hz: 23.92 | Advance: 16.64ms | Preprocess: 0.01ms | EnvStep: 24.24ms | Total: 40.89ms | [PERF] Hz: 20.94 | Advance: 21.25ms | Preprocess: 0.01ms | EnvStep: 26.03ms | Total: 47.29ms | [PERF] Hz: 21.78 | Advance: 18.21ms | Preprocess: 0.01ms | EnvStep: 27.14ms | Total: 45.37ms | 
+09:40:23 MSK +4113s END sort rc 0
+09:40:23 MSK +4113s RESULTS {"task": "sort3", "seed": 101, "score_lb": 0, "sim_t_end": 226.879994928, "in_right_tray": 0, "in_wrong_tray": 0, "not_in_tray": 9, "total": 9, "objects": {"Utana_5_Porcelain_Ramekin_Large": {"tray": null, "ok": false}, "Threshold_Ramekin_White_Porcelain": {"tray": null, "ok": false}, "Ecoforms_Plant_Container_B4_Har": {"tray": null, "ok": false}, "Crunch_Girl_Scouts_Candy_Bars_Peanut_Butter_Creme_78_oz_box": {"tray": null, "ok": false}, "Crayola_Bonus_64_Crayons": {"tray": null, "ok": false}, "Perricone_MD_AcylGlutathione_Eye_Lid_Serum": {"tray": null, "ok": false}, "006_mustard_bottle": {"tray": null, "ok": false}, "Saccharomyces_Boulardii_MOS_Value_Size": {"tray": null, "ok": false}, "Hyaluronic_Acid": {"tray": null, "ok": false}}}
+{"task": "sort3", "seed": 102, "score_lb": 10, "sim_t_end": 330.049992622, "in_right_tray": 1, "in_wrong_tray": 0, "not_in_tray": 8, "total": 9, "objects": {"Utana_5_Porcelain_Ramekin_Large": {"tray": null, "ok": false}, "Threshold_Ramekin_White_Porcelain": {"tray": null, "ok": false}, "Ecoforms_Plant_Container_B4_Har": {"tray": null, "ok": false}, "Crunch_Girl_Scouts_Candy_Bars_Peanut_Butter_Creme_78_oz_box": {"tray": null, "ok": false}, "Crayola_Bonus_64_Crayons": {"tray": null, "ok": false}, "Perricone_MD_AcylGlutathione_Eye_Lid_Serum": {"tray": null, "ok": false}, "006_mustard_bottle": {"tray": null, "ok": false}, "Saccharomyces_Boulardii_MOS_Value_Size": {"tray": "tray_center", "ok": true}, "Hyaluronic_Acid": {"tray": null, "ok": false}}}
+{"task": "sort3", "seed": 103, "score_lb": 0, "sim_t_end": 468.739989522, "in_right_tray": 0, "in_wrong_tray": 0, "not_in_tray": 9, "total": 9, "objects": {"Utana_5_Porcelain_Ramekin_Large": {"tray": null, "ok": false}, "Threshold_Ramekin_White_Porcelain": {"tray": null, "ok": false}, "Ecoforms_Plant_Container_B4_Har": {"tray": null, "ok": false}, "Crunch_Girl_Scouts_Candy_Bars_Peanut_Butter_Creme_78_oz_box": {"tray": null, "ok": false}, "Crayola_Bonus_64_Crayons": {"tray": null, "ok": false}, "Perricone_MD_AcylGlutathione_Eye_Lid_Serum": {"tray": null, "ok": false}, "006_mustard_bottle": {"tray": null, "ok": false}, "Saccharomyces_Boulardii_MOS_Value_Size": {"tray": null, "ok": false}, "Hyaluronic_Acid": {"tray": null, "ok": false}}}
+
+09:40:23 MSK +4113s DONE

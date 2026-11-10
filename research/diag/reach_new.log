@@ -1,0 +1,106 @@
+W_MAX 0.09498527137704767 opposed_open 0.10498527137704766
+Utana_5_Porcelain_Rame 0.3 -0.4 1.61 [('rim', 0.025)] no_place 4.8
+Utana_5_Porcelain_Rame 0.3 -0.15 0.46 [('rim', 0.025)] no_ik 2.5
+Utana_5_Porcelain_Rame 0.3 0.15 2.83 [('rim', 0.025)] no_ik 3.0
+Utana_5_Porcelain_Rame 0.3 0.4 1.14 [('rim', 0.025)] ok_l 3.4
+Utana_5_Porcelain_Rame 0.4 -0.4 0.07 [('rim', 0.025)] no_place 4.9
+Utana_5_Porcelain_Rame 0.4 -0.15 2.67 [('rim', 0.025)] ok_l 2.9
+Utana_5_Porcelain_Rame 0.4 0.15 2.23 [('rim', 0.025)] ok_l 3.5
+Utana_5_Porcelain_Rame 0.4 0.4 2.62 [('rim', 0.025)] ok_l 3.4
+Utana_5_Porcelain_Rame 0.48 -0.4 2.29 [('rim', 0.025)] no_place 4.4
+Utana_5_Porcelain_Rame 0.48 -0.15 1.95 [('rim', 0.025)] ok_l 3.4
+Utana_5_Porcelain_Rame 0.48 0.15 0.51 [('rim', 0.025)] ok_l 3.4
+Utana_5_Porcelain_Rame 0.48 0.4 0.46 [('rim', 0.025)] ok_l 3.1
+Threshold_Ramekin_Whit 0.3 -0.4 1.34 [('rim', 0.025)] no_place 4.7
+Threshold_Ramekin_Whit 0.3 -0.15 2.43 [('rim', 0.025)] no_ik 2.6
+Threshold_Ramekin_Whit 0.3 0.15 1.77 [('rim', 0.025)] no_ik 2.7
+Threshold_Ramekin_Whit 0.3 0.4 0.66 [('rim', 0.025)] ok_l 3.4
+Threshold_Ramekin_Whit 0.4 -0.4 0.73 [('rim', 0.025)] no_place 4.8
+Threshold_Ramekin_Whit 0.4 -0.15 1.1 [('rim', 0.025)] ok_l 3.0
+Threshold_Ramekin_Whit 0.4 0.15 1.57 [('rim', 0.025)] ok_l 3.5
+Threshold_Ramekin_Whit 0.4 0.4 0.1 [('rim', 0.025)] ok_l 3.3
+Threshold_Ramekin_Whit 0.48 -0.4 0.11 [('rim', 0.025)] no_place 4.3
+Threshold_Ramekin_Whit 0.48 -0.15 3.06 [('rim', 0.025)] ok_l 3.5
+Threshold_Ramekin_Whit 0.48 0.15 0.65 [('rim', 0.025)] ok_l 3.5
+Threshold_Ramekin_Whit 0.48 0.4 2.23 [('rim', 0.025)] ok_l 3.2
+Ecoforms_Plant_Contain 0.3 -0.4 2.78 [('rim', 0.025)] no_place 5.0
+Ecoforms_Plant_Contain 0.3 -0.15 0.1 [('rim', 0.025)] no_ik 2.5
+Ecoforms_Plant_Contain 0.3 0.15 1.82 [('rim', 0.025)] no_ik 2.9
+Ecoforms_Plant_Contain 0.3 0.4 1.93 [('rim', 0.025)] ok_l 3.4
+Ecoforms_Plant_Contain 0.4 -0.4 0.56 [('rim', 0.025)] no_place 4.8
+Ecoforms_Plant_Contain 0.4 -0.15 2.88 [('rim', 0.025)] ok_l 3.0
+Ecoforms_Plant_Contain 0.4 0.15 0.81 [('rim', 0.025)] ok_l 3.6
+Ecoforms_Plant_Contain 0.4 0.4 0.33 [('rim', 0.025)] ok_l 3.4
+Ecoforms_Plant_Contain 0.48 -0.4 3.09 [('rim', 0.025)] no_place 4.3
+Ecoforms_Plant_Contain 0.48 -0.15 0.24 [('rim', 0.025)] ok_l 3.5
+Ecoforms_Plant_Contain 0.48 0.15 1.93 [('rim', 0.025)] ok_l 3.5
+Ecoforms_Plant_Contain 0.48 0.4 2.43 [('rim', 0.025)] ok_l 3.2
+Crunch_Girl_Scouts_Can 0.3 -0.4 2.44 [('side', 0.064)] ok_r 4.1
+Crunch_Girl_Scouts_Can 0.3 -0.15 0.48 [('side', 0.064)] ok_r 4.3
+Crunch_Girl_Scouts_Can 0.3 0.15 0.23 [('side', 0.064)] no_place 5.4
+Crunch_Girl_Scouts_Can 0.3 0.4 1.68 [('side', 0.064)] no_place 5.2
+Crunch_Girl_Scouts_Can 0.4 -0.4 2.74 [('side', 0.063)] ok_r 3.7
+Crunch_Girl_Scouts_Can 0.4 -0.15 1.9 [('side', 0.064)] ok_r 4.5
+Crunch_Girl_Scouts_Can 0.4 0.15 0.58 [('side', 0.063)] ok_r 4.2
+Crunch_Girl_Scouts_Can 0.4 0.4 1.52 [('side', 0.063)] no_place 5.4
+Crunch_Girl_Scouts_Can 0.48 -0.4 0.34 [('side', 0.064)] ok_r 4.0
+Crunch_Girl_Scouts_Can 0.48 -0.15 0.99 [('side', 0.064)] ok_r 3.4
+Crunch_Girl_Scouts_Can 0.48 0.15 2.46 [('side', 0.063)] no_place 4.3
+Crunch_Girl_Scouts_Can 0.48 0.4 2.94 [('side', 0.064)] no_place 3.8
+Crayola_Bonus_64_Crayo 0.3 -0.4 3.02 [('side', 0.043)] ok_r 4.3
+Crayola_Bonus_64_Crayo 0.3 -0.15 0.02 [('side', 0.043)] ok_r 4.2
+Crayola_Bonus_64_Crayo 0.3 0.15 0.13 [('side', 0.044)] no_place 5.4
+Crayola_Bonus_64_Crayo 0.3 0.4 0.45 [('side', 0.043)] no_place 4.9
+Crayola_Bonus_64_Crayo 0.4 -0.4 1.64 [('side', 0.043)] ok_r 4.0
+Crayola_Bonus_64_Crayo 0.4 -0.15 1.63 [('side', 0.044)] no_place 3.9
+Crayola_Bonus_64_Crayo 0.4 0.15 2.26 [('side', 0.044)] no_place 4.1
+Crayola_Bonus_64_Crayo 0.4 0.4 3.04 [('side', 0.044)] no_place 3.9
+Crayola_Bonus_64_Crayo 0.48 -0.4 2.78 [('side', 0.044)] ok_r 4.9
+Crayola_Bonus_64_Crayo 0.48 -0.15 1.85 [('side', 0.043)] ok_r 4.3
+Crayola_Bonus_64_Crayo 0.48 0.15 1.18 [('side', 0.044)] ok_r 4.2
+Crayola_Bonus_64_Crayo 0.48 0.4 0.45 [('side', 0.044)] no_place 5.4
+Perricone_MD_AcylGluta 0.3 -0.4 2.38 [('side', 0.056)] ok_r 3.7
+Perricone_MD_AcylGluta 0.3 -0.15 0.28 [('side', 0.056)] ok_r 4.4
+Perricone_MD_AcylGluta 0.3 0.15 1.4 [('side', 0.056)] no_ik 2.4
+Perricone_MD_AcylGluta 0.3 0.4 0.1 [('side', 0.057)] no_place 5.5
+Perricone_MD_AcylGluta 0.4 -0.4 2.86 [('side', 0.056)] ok_r 4.4
+Perricone_MD_AcylGluta 0.4 -0.15 0.19 [('side', 0.057)] ok_r 4.2
+Perricone_MD_AcylGluta 0.4 0.15 1.15 [('side', 0.057)] no_ik 3.0
+Perricone_MD_AcylGluta 0.4 0.4 1.2 [('side', 0.057)] no_place 6.5
+Perricone_MD_AcylGluta 0.48 -0.4 1.83 [('side', 0.056)] ok_r 4.9
+Perricone_MD_AcylGluta 0.48 -0.15 1.2 [('side', 0.057)] ok_r 3.5
+Perricone_MD_AcylGluta 0.48 0.15 2.55 [('side', 0.056)] no_place 4.7
+Perricone_MD_AcylGluta 0.48 0.4 1.03 [('side', 0.056)] no_place 6.1
+Saccharomyces_Boulardi 0.3 -0.4 2.84 [('side', 0.075), ('side', 0.075)] ok_r 3.3
+Saccharomyces_Boulardi 0.3 -0.15 1.46 [('side', 0.075), ('side', 0.075)] ok_r 5.4
+Saccharomyces_Boulardi 0.3 0.15 1.4 [('side', 0.075), ('side', 0.075)] ok_l 4.1
+Saccharomyces_Boulardi 0.3 0.4 1.26 [('side', 0.075), ('side', 0.075)] ok_l 3.7
+Saccharomyces_Boulardi 0.4 -0.4 1.16 [('side', 0.075), ('side', 0.075)] ok_r 3.8
+Saccharomyces_Boulardi 0.4 -0.15 2.51 [('side', 0.075), ('side', 0.075)] ok_r 3.2
+Saccharomyces_Boulardi 0.4 0.15 2.21 [('side', 0.075), ('side', 0.075)] ok_l 3.7
+Saccharomyces_Boulardi 0.4 0.4 0.74 [('side', 0.075), ('side', 0.075)] ok_l 3.3
+Saccharomyces_Boulardi 0.48 -0.4 1.99 [('side', 0.075), ('side', 0.075)] ok_r 3.4
+Saccharomyces_Boulardi 0.48 -0.15 2.02 [('side', 0.075), ('side', 0.075)] ok_r 3.5
+Saccharomyces_Boulardi 0.48 0.15 2.02 [('side', 0.075), ('side', 0.075)] ok_l 3.3
+Saccharomyces_Boulardi 0.48 0.4 1.12 [('side', 0.075), ('side', 0.075)] ok_l 4.3
+Hyaluronic_Acid 0.3 -0.4 3.02 [('side', 0.055), ('side', 0.055)] ok_r 3.7
+Hyaluronic_Acid 0.3 -0.15 1.65 [('side', 0.055), ('side', 0.055)] ok_r 6.1
+Hyaluronic_Acid 0.3 0.15 1.61 [('side', 0.055), ('side', 0.055)] ok_l 5.2
+Hyaluronic_Acid 0.3 0.4 2.6 [('side', 0.055), ('side', 0.055)] ok_l 4.8
+Hyaluronic_Acid 0.4 -0.4 1.29 [('side', 0.055), ('side', 0.055)] ok_r 3.3
+Hyaluronic_Acid 0.4 -0.15 0.89 [('side', 0.055), ('side', 0.055)] ok_r 3.8
+Hyaluronic_Acid 0.4 0.15 1.43 [('side', 0.055), ('side', 0.055)] ok_l 3.8
+Hyaluronic_Acid 0.4 0.4 2.71 [('side', 0.055), ('side', 0.055)] ok_l 4.4
+Hyaluronic_Acid 0.48 -0.4 0.1 [('side', 0.055), ('side', 0.055)] ok_r 3.7
+Hyaluronic_Acid 0.48 -0.15 2.87 [('side', 0.055), ('side', 0.055)] ok_r 4.0
+Hyaluronic_Acid 0.48 0.15 2.78 [('side', 0.055), ('side', 0.055)] ok_l 4.3
+Hyaluronic_Acid 0.48 0.4 0.02 [('side', 0.055), ('side', 0.055)] ok_l 4.1
+Utana_5_Porcelain_Ramekin_Larg {'no_place': 3, 'no_ik': 2, 'ok_l': 7}
+Threshold_Ramekin_White_Porcel {'no_place': 3, 'no_ik': 2, 'ok_l': 7}
+Ecoforms_Plant_Container_B4_Ha {'no_place': 3, 'no_ik': 2, 'ok_l': 7}
+Crunch_Girl_Scouts_Candy_Bars_ {'ok_r': 7, 'no_place': 5}
+Crayola_Bonus_64_Crayons {'ok_r': 6, 'no_place': 6}
+Perricone_MD_AcylGlutathione_E {'ok_r': 6, 'no_ik': 2, 'no_place': 4}
+006_mustard_bottle {'no_candidate': 12}
+Saccharomyces_Boulardii_MOS_Va {'ok_r': 6, 'ok_l': 6}
+Hyaluronic_Acid {'ok_r': 6, 'ok_l': 6}

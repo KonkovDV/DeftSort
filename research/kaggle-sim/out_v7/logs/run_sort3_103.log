@@ -1,0 +1,1051 @@
++ cd /tmp/sol
++ rosenv timeout --kill-after=20 900 bash run.sh
+++ /tmp/w/bin/micromamba shell hook -s bash
++ eval '
+# Copyright (C) 2012 Anaconda, Inc
+# SPDX-License-Identifier: BSD-3-Clause
+
+__mamba_exe() (
+    "/tmp/w/bin/micromamba" "${@}"
+)
+
+__mamba_hashr() {
+    if [ -n "${ZSH_VERSION:+x}" ]; then
+        \rehash
+    elif [ -n "${POSH_VERSION:+x}" ]; then
+        :  # pass
+    else
+        \hash -r
+    fi
+}
+
+__mamba_xctivate() {
+    \local ask_mamba
+    ask_mamba="$(PS1="${PS1:-}" __mamba_exe shell "${@}" --shell bash)" || \return
+    \eval "${ask_mamba}"
+    __mamba_hashr
+}
+
+__mamba_wrap() {
+    \local cmd="${1-__missing__}"
+    case "${cmd}" in
+        activate|reactivate|deactivate)
+            for arg in "${@}"; do
+                case "${arg}" in
+                    -h|--help)
+                        __mamba_exe "${@}"
+                        return
+                        ;;
+                esac
+            done
+            __mamba_xctivate "${@}"
+            ;;
+        install|update|upgrade|remove|uninstall)
+            __mamba_exe "${@}" || \return
+            __mamba_xctivate reactivate
+            ;;
+        self-update)
+            __mamba_exe "${@}" || \return
+
+            # remove leftover backup file on Windows
+            if [ -f "/tmp/w/bin/micromamba.bkup" ]; then
+                rm -f "/tmp/w/bin/micromamba.bkup"
+            fi
+            ;;
+        *)
+            __mamba_exe "${@}"
+            ;;
+    esac
+}
+
+
+# We need to define a function with the same name as the executable to be called by the user.
+# There is no way to register it dynamically without relying on hacks or eval.
+__exe_name="$(basename "/tmp/w/bin/micromamba")"
+__exe_name="${__exe_name%.*}"
+
+case "${__exe_name}" in
+    micromamba)
+        micromamba() {
+            __mamba_wrap "$@"
+        }
+        ;;
+    mamba)
+        mamba() {
+            __mamba_wrap "$@"
+        }
+        ;;
+    *)
+        echo "Error unknown MAMBA_EXE: \"/tmp/w/bin/micromamba\", filename must be mamba or micromamba" 1>&2
+        ;;
+esac
+
+
+if [ -z "${CONDA_SHLVL+x}" ]; then
+    \export CONDA_SHLVL=0
+    \export PATH="${MAMBA_ROOT_PREFIX}/condabin:${PATH}"
+
+    # We'\''re not allowing PS1 to be unbound. It must at least be set.
+    # However, we'\''re not exporting it, which can cause problems when starting a second shell
+    # via a first shell (i.e. starting zsh from bash).
+    if [ -z "${PS1+x}" ]; then
+        PS1=
+    fi
+fi
+
+if [ -n "${ZSH_VERSION:+x}" ]; then
+  if ! command -v compinit > /dev/null; then
+    autoload -U +X compinit && if [[ "${ZSH_DISABLE_COMPFIX-}" = true ]]; then
+      compinit -u
+    else
+      compinit
+    fi
+  fi
+  autoload -U +X bashcompinit && bashcompinit
+
+  _umamba_zsh_completions()
+  {
+    COMPREPLY=($(__mamba_exe completer "${(@s: :)${(@s: :)COMP_LINE}:1}"))
+  }
+
+  complete -o default -F _umamba_zsh_completions micromamba
+fi
+if [ -n "${BASH_VERSION:+x}" ]; then
+  _umamba_bash_completions()
+  {
+    COMPREPLY=($(__mamba_exe completer "${COMP_WORDS[@]:1}"))
+  }
+  complete -o default -F _umamba_bash_completions micromamba
+fi'
++++ basename /tmp/w/bin/micromamba
+++ __exe_name=micromamba
+++ __exe_name=micromamba
+++ case "${__exe_name}" in
+++ '[' -z '' ']'
+++ export CONDA_SHLVL=0
+++ CONDA_SHLVL=0
+++ export PATH=/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin
+++ PATH=/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin
+++ '[' -z '' ']'
+++ PS1=
+++ '[' -n '' ']'
+++ '[' -n x ']'
+++ complete -o default -F _umamba_bash_completions micromamba
++ micromamba activate ros
++ __mamba_wrap activate ros
++ local cmd=activate
++ case "${cmd}" in
++ for arg in "${@}"
++ case "${arg}" in
++ for arg in "${@}"
++ case "${arg}" in
++ __mamba_xctivate activate ros
++ local ask_mamba
+++ PS1=
+++ __mamba_exe shell activate ros --shell bash
+++ /tmp/w/bin/micromamba shell activate ros --shell bash
++ ask_mamba='PS1='\''(ros) '\''
+export PATH='\''/tmp/w/mm/envs/ros/bin:/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin'\''
+export CONDA_PREFIX='\''/tmp/w/mm/envs/ros'\''
+export CONDA_SHLVL='\''1'\''
+export CONDA_DEFAULT_ENV='\''ros'\''
+export CONDA_PROMPT_MODIFIER='\''(ros) '\''
+. "/tmp/w/mm/envs/ros/etc/conda/activate.d/libglib_activate.sh"
+. "/tmp/w/mm/envs/ros/etc/conda/activate.d/libxml2_activate.sh"
+. "/tmp/w/mm/envs/ros/etc/conda/activate.d/ros-humble-ros-workspace_activate.sh"'
++ eval 'PS1='\''(ros) '\''
+export PATH='\''/tmp/w/mm/envs/ros/bin:/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin'\''
+export CONDA_PREFIX='\''/tmp/w/mm/envs/ros'\''
+export CONDA_SHLVL='\''1'\''
+export CONDA_DEFAULT_ENV='\''ros'\''
+export CONDA_PROMPT_MODIFIER='\''(ros) '\''
+. "/tmp/w/mm/envs/ros/etc/conda/activate.d/libglib_activate.sh"
+. "/tmp/w/mm/envs/ros/etc/conda/activate.d/libxml2_activate.sh"
+. "/tmp/w/mm/envs/ros/etc/conda/activate.d/ros-humble-ros-workspace_activate.sh"'
+++ PS1='(ros) '
+++ export PATH=/tmp/w/mm/envs/ros/bin:/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin
+++ PATH=/tmp/w/mm/envs/ros/bin:/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin
+++ export CONDA_PREFIX=/tmp/w/mm/envs/ros
+++ CONDA_PREFIX=/tmp/w/mm/envs/ros
+++ export CONDA_SHLVL=1
+++ CONDA_SHLVL=1
+++ export CONDA_DEFAULT_ENV=ros
+++ CONDA_DEFAULT_ENV=ros
+++ export 'CONDA_PROMPT_MODIFIER=(ros) '
+++ CONDA_PROMPT_MODIFIER='(ros) '
+++ . /tmp/w/mm/envs/ros/etc/conda/activate.d/libglib_activate.sh
++++ export GSETTINGS_SCHEMA_DIR_CONDA_BACKUP=
++++ GSETTINGS_SCHEMA_DIR_CONDA_BACKUP=
++++ export GSETTINGS_SCHEMA_DIR=/tmp/w/mm/envs/ros/share/glib-2.0/schemas
++++ GSETTINGS_SCHEMA_DIR=/tmp/w/mm/envs/ros/share/glib-2.0/schemas
+++ . /tmp/w/mm/envs/ros/etc/conda/activate.d/libxml2_activate.sh
++++ test -n ''
++++ xml_catalog_files_libxml2=
++++ XML_CATALOG_FILES=
++++ conda_catalog_files=
++++ ifs_libxml2=' 	
+'
++++ IFS=' '
++++ rem=/tmp/w/mm/envs/ros
++++ for pre in ${rem}
++++ test '' = /tmp/w/mm/envs/ros
++++ conda_catalog_files=/tmp/w/mm/envs/ros
++++ rem=
++++ IFS=' 	
+'
++++ conda_catalog_files='file:///tmp/w/mm/envs/ros/etc/xml/catalog file:///etc/xml/catalog'
++++ export 'XML_CATALOG_FILES=file:///tmp/w/mm/envs/ros/etc/xml/catalog file:///etc/xml/catalog'
++++ XML_CATALOG_FILES='file:///tmp/w/mm/envs/ros/etc/xml/catalog file:///etc/xml/catalog'
++++ unset conda_catalog_files ifs_libxml2 rem
+++ . /tmp/w/mm/envs/ros/etc/conda/activate.d/ros-humble-ros-workspace_activate.sh
++++ '[' '' = 1 -a '' '!=' '' ']'
++++ source /tmp/w/mm/envs/ros/setup.sh
+++++ : /tmp/w/mm/envs/ros
+++++ : sh
+++++ _prefix_setup_IFS=' 	
+'
+++++ IFS='
+'
+++++ _UNIQUE_PREFIX_PATH=
+++++ '[' -z SKIP_PARENT_PREFIX_PATH ']'
+++++ ament_append_unique_value _UNIQUE_PREFIX_PATH /tmp/w/mm/envs/ros
+++++ _listname=_UNIQUE_PREFIX_PATH
+++++ _value=/tmp/w/mm/envs/ros
+++++ eval '_values=$_UNIQUE_PREFIX_PATH'
++++++ _values=
+++++ _duplicate=
+++++ _ament_append_unique_value_IFS='
+'
+++++ IFS=:
+++++ '[' sh = zsh ']'
+++++ unset _item
+++++ '[' -z '' ']'
+++++ '[' -z '' ']'
+++++ eval '_UNIQUE_PREFIX_PATH="/tmp/w/mm/envs/ros"'
++++++ _UNIQUE_PREFIX_PATH=/tmp/w/mm/envs/ros
+++++ IFS='
+'
+++++ unset _ament_append_unique_value_IFS
+++++ unset _duplicate
+++++ unset _values
+++++ unset _value
+++++ unset _listname
+++++ unset AMENT_CURRENT_PREFIX
+++++ _prefix_setup_AMENT_SHELL=sh
+++++ IFS=:
+++++ '[' sh = zsh ']'
+++++ for _path in $_UNIQUE_PREFIX_PATH
+++++ '[' -n '' ']'
+++++ '[' -f /tmp/w/mm/envs/ros/local_setup.sh ']'
+++++ '[' sh = sh ']'
+++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++++ IFS=' 	
+'
+++++ . /tmp/w/mm/envs/ros/local_setup.sh
++++++ _ament_prefix_sh_AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ '[' -z /tmp/w/mm/envs/ros ']'
++++++ _ament_prefix_sh_AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ : sh
++++++ _ament_python_executable=/tmp/w/mm/envs/ros/bin/python
++++++ '[' -n '' ']'
++++++ '[' '!' -f /tmp/w/mm/envs/ros/bin/python ']'
++++++ _ament_additional_extension=
++++++ '[' sh '!=' sh ']'
+++++++ /tmp/w/mm/envs/ros/bin/python /tmp/w/mm/envs/ros/_local_setup_util.py sh
++++++ _ament_ordered_commands='export AMENT_PREFIX_PATH="/tmp/w/mm/envs/ros:$AMENT_PREFIX_PATH"
+export PYTHONPATH="/tmp/w/mm/envs/ros/lib/python3.11/site-packages:$PYTHONPATH"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh"
+export ROS_DISTRO="humble"
+export ROS_LOCALHOST_ONLY="0"
+export ROS_PYTHON_VERSION="3"
+export ROS_VERSION="2"
+export PYTHONPATH="/tmp/w/mm/envs/ros/lib/python311/site-packages:$PYTHONPATH"
+export AMENT_PREFIX_PATH=${AMENT_PREFIX_PATH#:}
+export AMENT_PREFIX_PATH=${AMENT_PREFIX_PATH%:}
+export ROS_DISTRO=${ROS_DISTRO#:}
+export ROS_DISTRO=${ROS_DISTRO%:}
+export ROS_PYTHON_VERSION=${ROS_PYTHON_VERSION#:}
+export ROS_PYTHON_VERSION=${ROS_PYTHON_VERSION%:}
+export ROS_VERSION=${ROS_VERSION#:}
+export ROS_VERSION=${ROS_VERSION%:}'
++++++ unset _ament_additional_extension
++++++ unset _ament_python_executable
++++++ '[' -n '' ']'
++++++ eval 'export AMENT_PREFIX_PATH="/tmp/w/mm/envs/ros:$AMENT_PREFIX_PATH"
+export PYTHONPATH="/tmp/w/mm/envs/ros/lib/python3.11/site-packages:$PYTHONPATH"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh"
+export ROS_DISTRO="humble"
+export ROS_LOCALHOST_ONLY="0"
+export ROS_PYTHON_VERSION="3"
+export ROS_VERSION="2"
+export PYTHONPATH="/tmp/w/mm/envs/ros/lib/python311/site-packages:$PYTHONPATH"
+export AMENT_PREFIX_PATH=${AMENT_PREFIX_PATH#:}
+export AMENT_PREFIX_PATH=${AMENT_PREFIX_PATH%:}
+export ROS_DISTRO=${ROS_DISTRO#:}
+export ROS_DISTRO=${ROS_DISTRO%:}
+export ROS_PYTHON_VERSION=${ROS_PYTHON_VERSION#:}
+export ROS_PYTHON_VERSION=${ROS_PYTHON_VERSION%:}
+export ROS_VERSION=${ROS_VERSION#:}
+export ROS_VERSION=${ROS_VERSION%:}'
+++++++ export AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros:
+++++++ AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros:
+++++++ export PYTHONPATH=/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++++ PYTHONPATH=/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++++++ _ament_prefix_sh_source_script /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh
+++++++ '[' -f /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh ']'
+++++++ '[' -n '' ']'
+++++++ . /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh
++++++++ '[' -n '' -a '' '!=' humble ']'
+++++++ export ROS_DISTRO=humble
+++++++ ROS_DISTRO=humble
+++++++ export ROS_LOCALHOST_ONLY=0
+++++++ ROS_LOCALHOST_ONLY=0
+++++++ export ROS_PYTHON_VERSION=3
+++++++ ROS_PYTHON_VERSION=3
+++++++ export ROS_VERSION=2
+++++++ ROS_VERSION=2
+++++++ export PYTHONPATH=/tmp/w/mm/envs/ros/lib/python311/site-packages:/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++++ PYTHONPATH=/tmp/w/mm/envs/ros/lib/python311/site-packages:/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++++ export AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros:
+++++++ AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros:
+++++++ export AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros
+++++++ AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros
+++++++ export ROS_DISTRO=humble
+++++++ ROS_DISTRO=humble
+++++++ export ROS_DISTRO=humble
+++++++ ROS_DISTRO=humble
+++++++ export ROS_PYTHON_VERSION=3
+++++++ ROS_PYTHON_VERSION=3
+++++++ export ROS_PYTHON_VERSION=3
+++++++ ROS_PYTHON_VERSION=3
+++++++ export ROS_VERSION=2
+++++++ ROS_VERSION=2
+++++++ export ROS_VERSION=2
+++++++ ROS_VERSION=2
++++++ unset _ament_ordered_commands
++++++ unset _ament_prefix_sh_source_script
++++++ unset _ament_prefix_sh_AMENT_CURRENT_PREFIX
+++++ AMENT_SHELL=sh
+++++ unset _path
+++++ IFS=' 	
+'
+++++ unset _prefix_setup_IFS
+++++ unset _prefix_setup_AMENT_SHELL
+++++ unset _UNIQUE_PREFIX_PATH
+++++ unset AMENT_SHELL
++++ case "$OSTYPE" in
++++ export ROS_OS_OVERRIDE=conda:linux
++++ ROS_OS_OVERRIDE=conda:linux
++++ export ROS_ETC_DIR=/tmp/w/mm/envs/ros/etc/ros
++++ ROS_ETC_DIR=/tmp/w/mm/envs/ros/etc/ros
++++ export AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros
++++ AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros
++ __mamba_hashr
++ '[' -n '' ']'
++ '[' -n '' ']'
++ hash -r
++ source /tmp/w/ws/install/setup.bash
+++ COLCON_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++ _colcon_prefix_chain_bash_source_script /tmp/w/mm/envs/ros/local_setup.bash
+++ '[' -f /tmp/w/mm/envs/ros/local_setup.bash ']'
+++ '[' -n '' ']'
+++ . /tmp/w/mm/envs/ros/local_setup.bash
++++ AMENT_SHELL=bash
++++++ dirname /tmp/w/mm/envs/ros/local_setup.bash
+++++ builtin cd /tmp/w/mm/envs/ros
+++++ pwd
++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++ '[' -n '' ']'
++++ . /tmp/w/mm/envs/ros/local_setup.sh
+++++ _ament_prefix_sh_AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++++ '[' -z /tmp/w/mm/envs/ros ']'
+++++ _ament_prefix_sh_AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++++ : bash
+++++ _ament_python_executable=/tmp/w/mm/envs/ros/bin/python
+++++ '[' -n '' ']'
+++++ '[' '!' -f /tmp/w/mm/envs/ros/bin/python ']'
+++++ _ament_additional_extension=
+++++ '[' bash '!=' sh ']'
+++++ _ament_additional_extension=bash
++++++ /tmp/w/mm/envs/ros/bin/python /tmp/w/mm/envs/ros/_local_setup_util.py sh bash
+++++ _ament_ordered_commands='AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh"
+export ROS_DISTRO="humble"
+# export ROS_LOCALHOST_ONLY="0"
+export ROS_PYTHON_VERSION="3"
+export ROS_VERSION="2"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash"'
+++++ unset _ament_additional_extension
+++++ unset _ament_python_executable
+++++ '[' -n '' ']'
+++++ eval 'AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh"
+export ROS_DISTRO="humble"
+# export ROS_LOCALHOST_ONLY="0"
+export ROS_PYTHON_VERSION="3"
+export ROS_VERSION="2"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash"'
++++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ _ament_prefix_sh_source_script /tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash
++++++ '[' -f /tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash ']'
++++++ '[' -n '' ']'
++++++ . /tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash
+++++++ type register-python-argcomplete
++++++++ register-python-argcomplete ros2
+++++++ eval '#compdef ros2
+# Run something, muting output or redirecting it to the debug stream
+# depending on the value of _ARC_DEBUG.
+# If ARGCOMPLETE_USE_TEMPFILES is set, use tempfiles for IPC.
+__python_argcomplete_run() {
+    if [[ -z "${ARGCOMPLETE_USE_TEMPFILES-}" ]]; then
+        __python_argcomplete_run_inner "$@"
+        return
+    fi
+    local tmpfile="$(mktemp)"
+    _ARGCOMPLETE_STDOUT_FILENAME="$tmpfile" __python_argcomplete_run_inner "$@"
+    local code=$?
+    cat "$tmpfile"
+    rm "$tmpfile"
+    return $code
+}
+
+__python_argcomplete_run_inner() {
+    if [[ -z "${_ARC_DEBUG-}" ]]; then
+        "$@" 8>&1 9>&2 1>/dev/null 2>&1 </dev/null
+    else
+        "$@" 8>&1 9>&2 1>&9 2>&1 </dev/null
+    fi
+}
+
+_python_argcomplete() {
+    local IFS=$'\''\013'\''
+    local script=""
+    if [[ -n "${ZSH_VERSION-}" ]]; then
+        local completions
+        completions=($(IFS="$IFS" \
+            COMP_LINE="$BUFFER" \
+            COMP_POINT="$CURSOR" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="zsh" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=1 \
+            __python_argcomplete_run ${script:-${words[1]}}))
+        local nosort=()
+        local nospace=()
+        if is-at-least 5.8; then
+            nosort=(-o nosort)
+        fi
+        if [[ "${completions-}" =~ ([^\\\\]): && "${match[1]}" =~ [=/:] ]]; then
+            nospace=(-S '\'''\'')
+        fi
+        _describe "${words[1]}" completions "${nosort[@]}" "${nospace[@]}"
+    else
+        local SUPPRESS_SPACE=0
+        if compopt +o nospace 2> /dev/null; then
+            SUPPRESS_SPACE=1
+        fi
+        COMPREPLY=($(IFS="$IFS" \
+            COMP_LINE="$COMP_LINE" \
+            COMP_POINT="$COMP_POINT" \
+            COMP_TYPE="$COMP_TYPE" \
+            _ARGCOMPLETE_COMP_WORDBREAKS="$COMP_WORDBREAKS" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="bash" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=$SUPPRESS_SPACE \
+            __python_argcomplete_run ${script:-$1}))
+        if [[ $? != 0 ]]; then
+            unset COMPREPLY
+        elif [[ $SUPPRESS_SPACE == 1 ]] && [[ "${COMPREPLY-}" =~ [=/:]$ ]]; then
+            compopt -o nospace
+        fi
+    fi
+}
+if [[ -z "${ZSH_VERSION-}" ]]; then
+    complete -o nospace -o default -o bashdefault -F _python_argcomplete ros2
+else
+    # When called by the Zsh completion system, this will end with
+    # "loadautofunc" when initially autoloaded and "shfunc" later on, otherwise,
+    # the script was "eval"-ed so use "compdef" to register it with the
+    # completion system
+    autoload is-at-least
+    if [[ $zsh_eval_context == *func ]]; then
+        _python_argcomplete "$@"
+    else
+        compdef _python_argcomplete ros2
+    fi
+fi'
++++++++ [[ -z '' ]]
++++++++ complete -o nospace -o default -o bashdefault -F _python_argcomplete ros2
++++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ _ament_prefix_sh_source_script /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh
++++++ '[' -f /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh ']'
++++++ '[' -n '' ']'
++++++ . /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh
+++++++ '[' -n humble -a humble '!=' humble ']'
++++++ export ROS_DISTRO=humble
++++++ ROS_DISTRO=humble
++++++ export ROS_PYTHON_VERSION=3
++++++ ROS_PYTHON_VERSION=3
++++++ export ROS_VERSION=2
++++++ ROS_VERSION=2
++++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ _ament_prefix_sh_source_script /tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash
++++++ '[' -f /tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash ']'
++++++ '[' -n '' ']'
++++++ . /tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash
+++++++ type register-python-argcomplete3
+++++++ type register-python-argcomplete
++++++++ register-python-argcomplete rosidl
+++++++ eval '#compdef rosidl
+# Run something, muting output or redirecting it to the debug stream
+# depending on the value of _ARC_DEBUG.
+# If ARGCOMPLETE_USE_TEMPFILES is set, use tempfiles for IPC.
+__python_argcomplete_run() {
+    if [[ -z "${ARGCOMPLETE_USE_TEMPFILES-}" ]]; then
+        __python_argcomplete_run_inner "$@"
+        return
+    fi
+    local tmpfile="$(mktemp)"
+    _ARGCOMPLETE_STDOUT_FILENAME="$tmpfile" __python_argcomplete_run_inner "$@"
+    local code=$?
+    cat "$tmpfile"
+    rm "$tmpfile"
+    return $code
+}
+
+__python_argcomplete_run_inner() {
+    if [[ -z "${_ARC_DEBUG-}" ]]; then
+        "$@" 8>&1 9>&2 1>/dev/null 2>&1 </dev/null
+    else
+        "$@" 8>&1 9>&2 1>&9 2>&1 </dev/null
+    fi
+}
+
+_python_argcomplete() {
+    local IFS=$'\''\013'\''
+    local script=""
+    if [[ -n "${ZSH_VERSION-}" ]]; then
+        local completions
+        completions=($(IFS="$IFS" \
+            COMP_LINE="$BUFFER" \
+            COMP_POINT="$CURSOR" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="zsh" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=1 \
+            __python_argcomplete_run ${script:-${words[1]}}))
+        local nosort=()
+        local nospace=()
+        if is-at-least 5.8; then
+            nosort=(-o nosort)
+        fi
+        if [[ "${completions-}" =~ ([^\\\\]): && "${match[1]}" =~ [=/:] ]]; then
+            nospace=(-S '\'''\'')
+        fi
+        _describe "${words[1]}" completions "${nosort[@]}" "${nospace[@]}"
+    else
+        local SUPPRESS_SPACE=0
+        if compopt +o nospace 2> /dev/null; then
+            SUPPRESS_SPACE=1
+        fi
+        COMPREPLY=($(IFS="$IFS" \
+            COMP_LINE="$COMP_LINE" \
+            COMP_POINT="$COMP_POINT" \
+            COMP_TYPE="$COMP_TYPE" \
+            _ARGCOMPLETE_COMP_WORDBREAKS="$COMP_WORDBREAKS" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="bash" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=$SUPPRESS_SPACE \
+            __python_argcomplete_run ${script:-$1}))
+        if [[ $? != 0 ]]; then
+            unset COMPREPLY
+        elif [[ $SUPPRESS_SPACE == 1 ]] && [[ "${COMPREPLY-}" =~ [=/:]$ ]]; then
+            compopt -o nospace
+        fi
+    fi
+}
+if [[ -z "${ZSH_VERSION-}" ]]; then
+    complete -o nospace -o default -o bashdefault -F _python_argcomplete rosidl
+else
+    # When called by the Zsh completion system, this will end with
+    # "loadautofunc" when initially autoloaded and "shfunc" later on, otherwise,
+    # the script was "eval"-ed so use "compdef" to register it with the
+    # completion system
+    autoload is-at-least
+    if [[ $zsh_eval_context == *func ]]; then
+        _python_argcomplete "$@"
+    else
+        compdef _python_argcomplete rosidl
+    fi
+fi'
++++++++ [[ -z '' ]]
++++++++ complete -o nospace -o default -o bashdefault -F _python_argcomplete rosidl
+++++ unset _ament_ordered_commands
+++++ unset _ament_prefix_sh_source_script
+++++ unset _ament_prefix_sh_AMENT_CURRENT_PREFIX
+++++ dirname /tmp/w/ws/install/setup.bash
++++ builtin cd /tmp/w/ws/install
++++ pwd
+++ COLCON_CURRENT_PREFIX=/tmp/w/ws/install
+++ _colcon_prefix_chain_bash_source_script /tmp/w/ws/install/local_setup.bash
+++ '[' -f /tmp/w/ws/install/local_setup.bash ']'
+++ '[' -n '' ']'
+++ . /tmp/w/ws/install/local_setup.bash
++++ '[' -z /tmp/w/ws/install ']'
++++ _colcon_prefix_bash_COLCON_CURRENT_PREFIX=/tmp/w/ws/install
++++ _colcon_prefix_bash_prepend_unique_value COLCON_PREFIX_PATH /tmp/w/ws/install
++++ _listname=COLCON_PREFIX_PATH
++++ _value=/tmp/w/ws/install
++++ eval '_values="$COLCON_PREFIX_PATH"'
+++++ _values=
++++ _colcon_prefix_bash_prepend_unique_value_IFS=' 	
+'
++++ IFS=:
++++ _all_values=/tmp/w/ws/install
++++ _contained_value=
++++ unset _item
++++ '[' -z '' ']'
++++ '[' -n '' ']'
++++ unset _contained_value
++++ IFS=' 	
+'
++++ unset _colcon_prefix_bash_prepend_unique_value_IFS
++++ eval export 'COLCON_PREFIX_PATH="/tmp/w/ws/install"'
+++++ export COLCON_PREFIX_PATH=/tmp/w/ws/install
+++++ COLCON_PREFIX_PATH=/tmp/w/ws/install
++++ unset _all_values
++++ unset _values
++++ unset _value
++++ unset _listname
++++ unset _colcon_prefix_bash_prepend_unique_value
++++ '[' -n '' ']'
++++ _colcon_python_executable=/tmp/w/mm/envs/ros/bin/python3.11
++++ '[' '!' -f /tmp/w/mm/envs/ros/bin/python3.11 ']'
+++++ /tmp/w/mm/envs/ros/bin/python3.11 /tmp/w/ws/install/_local_setup_util_sh.py sh bash
++++ _colcon_ordered_commands='export CMAKE_PREFIX_PATH="/tmp/w/ws/install/bodyctrl_msgs:$CMAKE_PREFIX_PATH"
+export LD_LIBRARY_PATH="/tmp/w/ws/install/bodyctrl_msgs/lib:$LD_LIBRARY_PATH"
+export PYTHONPATH="/tmp/w/ws/install/bodyctrl_msgs/lib/python3.11/site-packages:$PYTHONPATH"
+export AMENT_PREFIX_PATH="/tmp/w/ws/install/bodyctrl_msgs:$AMENT_PREFIX_PATH"
+if [ "$(echo -n $CMAKE_PREFIX_PATH | head -c 1)" = ":" ]; then export CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH#?} ; fi
+if [ "$(echo -n $CMAKE_PREFIX_PATH | tail -c 1)" = ":" ]; then export CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH%?} ; fi'
++++ unset _colcon_python_executable
++++ '[' -n '' ']'
++++ eval 'export CMAKE_PREFIX_PATH="/tmp/w/ws/install/bodyctrl_msgs:$CMAKE_PREFIX_PATH"
+export LD_LIBRARY_PATH="/tmp/w/ws/install/bodyctrl_msgs/lib:$LD_LIBRARY_PATH"
+export PYTHONPATH="/tmp/w/ws/install/bodyctrl_msgs/lib/python3.11/site-packages:$PYTHONPATH"
+export AMENT_PREFIX_PATH="/tmp/w/ws/install/bodyctrl_msgs:$AMENT_PREFIX_PATH"
+if [ "$(echo -n $CMAKE_PREFIX_PATH | head -c 1)" = ":" ]; then export CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH#?} ; fi
+if [ "$(echo -n $CMAKE_PREFIX_PATH | tail -c 1)" = ":" ]; then export CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH%?} ; fi'
+++++ export CMAKE_PREFIX_PATH=/tmp/w/ws/install/bodyctrl_msgs:
+++++ CMAKE_PREFIX_PATH=/tmp/w/ws/install/bodyctrl_msgs:
+++++ export LD_LIBRARY_PATH=/tmp/w/ws/install/bodyctrl_msgs/lib:/usr/local/nvidia/lib64:/usr/local/cuda/lib64:/usr/local/nvidia/lib:/usr/local/nvidia/lib64:/usr/local/cuda/lib64
+++++ LD_LIBRARY_PATH=/tmp/w/ws/install/bodyctrl_msgs/lib:/usr/local/nvidia/lib64:/usr/local/cuda/lib64:/usr/local/nvidia/lib:/usr/local/nvidia/lib64:/usr/local/cuda/lib64
+++++ export PYTHONPATH=/tmp/w/ws/install/bodyctrl_msgs/lib/python3.11/site-packages:/tmp/w/mm/envs/ros/lib/python311/site-packages:/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++ PYTHONPATH=/tmp/w/ws/install/bodyctrl_msgs/lib/python3.11/site-packages:/tmp/w/mm/envs/ros/lib/python311/site-packages:/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++ export AMENT_PREFIX_PATH=/tmp/w/ws/install/bodyctrl_msgs:/tmp/w/mm/envs/ros
+++++ AMENT_PREFIX_PATH=/tmp/w/ws/install/bodyctrl_msgs:/tmp/w/mm/envs/ros
++++++ echo -n /tmp/w/ws/install/bodyctrl_msgs:
++++++ head -c 1
+++++ '[' / = : ']'
++++++ echo -n /tmp/w/ws/install/bodyctrl_msgs:
++++++ tail -c 1
+++++ '[' : = : ']'
+++++ export CMAKE_PREFIX_PATH=/tmp/w/ws/install/bodyctrl_msgs
+++++ CMAKE_PREFIX_PATH=/tmp/w/ws/install/bodyctrl_msgs
++++ unset _colcon_ordered_commands
++++ unset _colcon_prefix_sh_source_script
++++ unset _colcon_prefix_bash_COLCON_CURRENT_PREFIX
+++ unset COLCON_CURRENT_PREFIX
+++ unset _colcon_prefix_chain_bash_source_script
++ '[' -f /tmp/sol/install/setup.bash ']'
++ source /tmp/sol/install/setup.bash
+++ COLCON_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++ _colcon_prefix_chain_bash_source_script /tmp/w/mm/envs/ros/local_setup.bash
+++ '[' -f /tmp/w/mm/envs/ros/local_setup.bash ']'
+++ '[' -n '' ']'
+++ . /tmp/w/mm/envs/ros/local_setup.bash
++++ AMENT_SHELL=bash
++++++ dirname /tmp/w/mm/envs/ros/local_setup.bash
+++++ builtin cd /tmp/w/mm/envs/ros
+++++ pwd
++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++ '[' -n '' ']'
++++ . /tmp/w/mm/envs/ros/local_setup.sh
+++++ _ament_prefix_sh_AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++++ '[' -z /tmp/w/mm/envs/ros ']'
+++++ _ament_prefix_sh_AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++++ : bash
+++++ _ament_python_executable=/tmp/w/mm/envs/ros/bin/python
+++++ '[' -n '' ']'
+++++ '[' '!' -f /tmp/w/mm/envs/ros/bin/python ']'
+++++ _ament_additional_extension=
+++++ '[' bash '!=' sh ']'
+++++ _ament_additional_extension=bash
++++++ /tmp/w/mm/envs/ros/bin/python /tmp/w/mm/envs/ros/_local_setup_util.py sh bash
+++++ _ament_ordered_commands='AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh"
+export ROS_DISTRO="humble"
+# export ROS_LOCALHOST_ONLY="0"
+export ROS_PYTHON_VERSION="3"
+export ROS_VERSION="2"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash"'
+++++ unset _ament_additional_extension
+++++ unset _ament_python_executable
+++++ '[' -n '' ']'
+++++ eval 'AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh"
+export ROS_DISTRO="humble"
+# export ROS_LOCALHOST_ONLY="0"
+export ROS_PYTHON_VERSION="3"
+export ROS_VERSION="2"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash"'
++++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ _ament_prefix_sh_source_script /tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash
++++++ '[' -f /tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash ']'
++++++ '[' -n '' ']'
++++++ . /tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash
+++++++ type register-python-argcomplete
++++++++ register-python-argcomplete ros2
+++++++ eval '#compdef ros2
+# Run something, muting output or redirecting it to the debug stream
+# depending on the value of _ARC_DEBUG.
+# If ARGCOMPLETE_USE_TEMPFILES is set, use tempfiles for IPC.
+__python_argcomplete_run() {
+    if [[ -z "${ARGCOMPLETE_USE_TEMPFILES-}" ]]; then
+        __python_argcomplete_run_inner "$@"
+        return
+    fi
+    local tmpfile="$(mktemp)"
+    _ARGCOMPLETE_STDOUT_FILENAME="$tmpfile" __python_argcomplete_run_inner "$@"
+    local code=$?
+    cat "$tmpfile"
+    rm "$tmpfile"
+    return $code
+}
+
+__python_argcomplete_run_inner() {
+    if [[ -z "${_ARC_DEBUG-}" ]]; then
+        "$@" 8>&1 9>&2 1>/dev/null 2>&1 </dev/null
+    else
+        "$@" 8>&1 9>&2 1>&9 2>&1 </dev/null
+    fi
+}
+
+_python_argcomplete() {
+    local IFS=$'\''\013'\''
+    local script=""
+    if [[ -n "${ZSH_VERSION-}" ]]; then
+        local completions
+        completions=($(IFS="$IFS" \
+            COMP_LINE="$BUFFER" \
+            COMP_POINT="$CURSOR" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="zsh" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=1 \
+            __python_argcomplete_run ${script:-${words[1]}}))
+        local nosort=()
+        local nospace=()
+        if is-at-least 5.8; then
+            nosort=(-o nosort)
+        fi
+        if [[ "${completions-}" =~ ([^\\\\]): && "${match[1]}" =~ [=/:] ]]; then
+            nospace=(-S '\'''\'')
+        fi
+        _describe "${words[1]}" completions "${nosort[@]}" "${nospace[@]}"
+    else
+        local SUPPRESS_SPACE=0
+        if compopt +o nospace 2> /dev/null; then
+            SUPPRESS_SPACE=1
+        fi
+        COMPREPLY=($(IFS="$IFS" \
+            COMP_LINE="$COMP_LINE" \
+            COMP_POINT="$COMP_POINT" \
+            COMP_TYPE="$COMP_TYPE" \
+            _ARGCOMPLETE_COMP_WORDBREAKS="$COMP_WORDBREAKS" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="bash" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=$SUPPRESS_SPACE \
+            __python_argcomplete_run ${script:-$1}))
+        if [[ $? != 0 ]]; then
+            unset COMPREPLY
+        elif [[ $SUPPRESS_SPACE == 1 ]] && [[ "${COMPREPLY-}" =~ [=/:]$ ]]; then
+            compopt -o nospace
+        fi
+    fi
+}
+if [[ -z "${ZSH_VERSION-}" ]]; then
+    complete -o nospace -o default -o bashdefault -F _python_argcomplete ros2
+else
+    # When called by the Zsh completion system, this will end with
+    # "loadautofunc" when initially autoloaded and "shfunc" later on, otherwise,
+    # the script was "eval"-ed so use "compdef" to register it with the
+    # completion system
+    autoload is-at-least
+    if [[ $zsh_eval_context == *func ]]; then
+        _python_argcomplete "$@"
+    else
+        compdef _python_argcomplete ros2
+    fi
+fi'
++++++++ [[ -z '' ]]
++++++++ complete -o nospace -o default -o bashdefault -F _python_argcomplete ros2
++++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ _ament_prefix_sh_source_script /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh
++++++ '[' -f /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh ']'
++++++ '[' -n '' ']'
++++++ . /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh
+++++++ '[' -n humble -a humble '!=' humble ']'
++++++ export ROS_DISTRO=humble
++++++ ROS_DISTRO=humble
++++++ export ROS_PYTHON_VERSION=3
++++++ ROS_PYTHON_VERSION=3
++++++ export ROS_VERSION=2
++++++ ROS_VERSION=2
++++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ _ament_prefix_sh_source_script /tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash
++++++ '[' -f /tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash ']'
++++++ '[' -n '' ']'
++++++ . /tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash
+++++++ type register-python-argcomplete3
+++++++ type register-python-argcomplete
++++++++ register-python-argcomplete rosidl
+++++++ eval '#compdef rosidl
+# Run something, muting output or redirecting it to the debug stream
+# depending on the value of _ARC_DEBUG.
+# If ARGCOMPLETE_USE_TEMPFILES is set, use tempfiles for IPC.
+__python_argcomplete_run() {
+    if [[ -z "${ARGCOMPLETE_USE_TEMPFILES-}" ]]; then
+        __python_argcomplete_run_inner "$@"
+        return
+    fi
+    local tmpfile="$(mktemp)"
+    _ARGCOMPLETE_STDOUT_FILENAME="$tmpfile" __python_argcomplete_run_inner "$@"
+    local code=$?
+    cat "$tmpfile"
+    rm "$tmpfile"
+    return $code
+}
+
+__python_argcomplete_run_inner() {
+    if [[ -z "${_ARC_DEBUG-}" ]]; then
+        "$@" 8>&1 9>&2 1>/dev/null 2>&1 </dev/null
+    else
+        "$@" 8>&1 9>&2 1>&9 2>&1 </dev/null
+    fi
+}
+
+_python_argcomplete() {
+    local IFS=$'\''\013'\''
+    local script=""
+    if [[ -n "${ZSH_VERSION-}" ]]; then
+        local completions
+        completions=($(IFS="$IFS" \
+            COMP_LINE="$BUFFER" \
+            COMP_POINT="$CURSOR" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="zsh" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=1 \
+            __python_argcomplete_run ${script:-${words[1]}}))
+        local nosort=()
+        local nospace=()
+        if is-at-least 5.8; then
+            nosort=(-o nosort)
+        fi
+        if [[ "${completions-}" =~ ([^\\\\]): && "${match[1]}" =~ [=/:] ]]; then
+            nospace=(-S '\'''\'')
+        fi
+        _describe "${words[1]}" completions "${nosort[@]}" "${nospace[@]}"
+    else
+        local SUPPRESS_SPACE=0
+        if compopt +o nospace 2> /dev/null; then
+            SUPPRESS_SPACE=1
+        fi
+        COMPREPLY=($(IFS="$IFS" \
+            COMP_LINE="$COMP_LINE" \
+            COMP_POINT="$COMP_POINT" \
+            COMP_TYPE="$COMP_TYPE" \
+            _ARGCOMPLETE_COMP_WORDBREAKS="$COMP_WORDBREAKS" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="bash" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=$SUPPRESS_SPACE \
+            __python_argcomplete_run ${script:-$1}))
+        if [[ $? != 0 ]]; then
+            unset COMPREPLY
+        elif [[ $SUPPRESS_SPACE == 1 ]] && [[ "${COMPREPLY-}" =~ [=/:]$ ]]; then
+            compopt -o nospace
+        fi
+    fi
+}
+if [[ -z "${ZSH_VERSION-}" ]]; then
+    complete -o nospace -o default -o bashdefault -F _python_argcomplete rosidl
+else
+    # When called by the Zsh completion system, this will end with
+    # "loadautofunc" when initially autoloaded and "shfunc" later on, otherwise,
+    # the script was "eval"-ed so use "compdef" to register it with the
+    # completion system
+    autoload is-at-least
+    if [[ $zsh_eval_context == *func ]]; then
+        _python_argcomplete "$@"
+    else
+        compdef _python_argcomplete rosidl
+    fi
+fi'
++++++++ [[ -z '' ]]
++++++++ complete -o nospace -o default -o bashdefault -F _python_argcomplete rosidl
+++++ unset _ament_ordered_commands
+++++ unset _ament_prefix_sh_source_script
+++++ unset _ament_prefix_sh_AMENT_CURRENT_PREFIX
+++ COLCON_CURRENT_PREFIX=/tmp/w/ws/install
+++ _colcon_prefix_chain_bash_source_script /tmp/w/ws/install/local_setup.bash
+++ '[' -f /tmp/w/ws/install/local_setup.bash ']'
+++ '[' -n '' ']'
+++ . /tmp/w/ws/install/local_setup.bash
++++ '[' -z /tmp/w/ws/install ']'
++++ _colcon_prefix_bash_COLCON_CURRENT_PREFIX=/tmp/w/ws/install
++++ _colcon_prefix_bash_prepend_unique_value COLCON_PREFIX_PATH /tmp/w/ws/install
++++ _listname=COLCON_PREFIX_PATH
++++ _value=/tmp/w/ws/install
++++ eval '_values="$COLCON_PREFIX_PATH"'
+++++ _values=/tmp/w/ws/install
++++ _colcon_prefix_bash_prepend_unique_value_IFS=' 	
+'
++++ IFS=:
++++ _all_values=/tmp/w/ws/install
++++ _contained_value=
++++ for _item in $_values
++++ '[' -z /tmp/w/ws/install ']'
++++ '[' /tmp/w/ws/install = /tmp/w/ws/install ']'
++++ _contained_value=1
++++ continue
++++ unset _item
++++ '[' -z 1 ']'
++++ unset _contained_value
++++ IFS=' 	
+'
++++ unset _colcon_prefix_bash_prepend_unique_value_IFS
++++ eval export 'COLCON_PREFIX_PATH="/tmp/w/ws/install"'
+++++ export COLCON_PREFIX_PATH=/tmp/w/ws/install
+++++ COLCON_PREFIX_PATH=/tmp/w/ws/install
++++ unset _all_values
++++ unset _values
++++ unset _value
++++ unset _listname
++++ unset _colcon_prefix_bash_prepend_unique_value
++++ '[' -n '' ']'
++++ _colcon_python_executable=/tmp/w/mm/envs/ros/bin/python3.11
++++ '[' '!' -f /tmp/w/mm/envs/ros/bin/python3.11 ']'
+++++ /tmp/w/mm/envs/ros/bin/python3.11 /tmp/w/ws/install/_local_setup_util_sh.py sh bash
++++ _colcon_ordered_commands=
++++ unset _colcon_python_executable
++++ '[' -n '' ']'
++++ eval ''
++++ unset _colcon_ordered_commands
++++ unset _colcon_prefix_sh_source_script
++++ unset _colcon_prefix_bash_COLCON_CURRENT_PREFIX
+++++ dirname /tmp/sol/install/setup.bash
++++ builtin cd /tmp/sol/install
++++ pwd
+++ COLCON_CURRENT_PREFIX=/tmp/sol/install
+++ _colcon_prefix_chain_bash_source_script /tmp/sol/install/local_setup.bash
+++ '[' -f /tmp/sol/install/local_setup.bash ']'
+++ '[' -n '' ']'
+++ . /tmp/sol/install/local_setup.bash
++++ '[' -z /tmp/sol/install ']'
++++ _colcon_prefix_bash_COLCON_CURRENT_PREFIX=/tmp/sol/install
++++ _colcon_prefix_bash_prepend_unique_value COLCON_PREFIX_PATH /tmp/sol/install
++++ _listname=COLCON_PREFIX_PATH
++++ _value=/tmp/sol/install
++++ eval '_values="$COLCON_PREFIX_PATH"'
+++++ _values=/tmp/w/ws/install
++++ _colcon_prefix_bash_prepend_unique_value_IFS=' 	
+'
++++ IFS=:
++++ _all_values=/tmp/sol/install
++++ _contained_value=
++++ for _item in $_values
++++ '[' -z /tmp/w/ws/install ']'
++++ '[' /tmp/w/ws/install = /tmp/sol/install ']'
++++ _all_values=/tmp/sol/install:/tmp/w/ws/install
++++ unset _item
++++ '[' -z '' ']'
++++ '[' -n '' ']'
++++ unset _contained_value
++++ IFS=' 	
+'
++++ unset _colcon_prefix_bash_prepend_unique_value_IFS
++++ eval export 'COLCON_PREFIX_PATH="/tmp/sol/install:/tmp/w/ws/install"'
+++++ export COLCON_PREFIX_PATH=/tmp/sol/install:/tmp/w/ws/install
+++++ COLCON_PREFIX_PATH=/tmp/sol/install:/tmp/w/ws/install
++++ unset _all_values
++++ unset _values
++++ unset _value
++++ unset _listname
++++ unset _colcon_prefix_bash_prepend_unique_value
++++ '[' -n '' ']'
++++ _colcon_python_executable=/tmp/w/mm/envs/ros/bin/python3.11
++++ '[' '!' -f /tmp/w/mm/envs/ros/bin/python3.11 ']'
+++++ /tmp/w/mm/envs/ros/bin/python3.11 /tmp/sol/install/_local_setup_util_sh.py sh bash
++++ _colcon_ordered_commands='export PYTHONPATH="/tmp/sol/install/team048_solution/lib/python3.11/site-packages:$PYTHONPATH"
+export AMENT_PREFIX_PATH="/tmp/sol/install/team048_solution:$AMENT_PREFIX_PATH"'
++++ unset _colcon_python_executable
++++ '[' -n '' ']'
++++ eval 'export PYTHONPATH="/tmp/sol/install/team048_solution/lib/python3.11/site-packages:$PYTHONPATH"
+export AMENT_PREFIX_PATH="/tmp/sol/install/team048_solution:$AMENT_PREFIX_PATH"'
+++++ export PYTHONPATH=/tmp/sol/install/team048_solution/lib/python3.11/site-packages:/tmp/w/ws/install/bodyctrl_msgs/lib/python3.11/site-packages:/tmp/w/mm/envs/ros/lib/python311/site-packages:/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++ PYTHONPATH=/tmp/sol/install/team048_solution/lib/python3.11/site-packages:/tmp/w/ws/install/bodyctrl_msgs/lib/python3.11/site-packages:/tmp/w/mm/envs/ros/lib/python311/site-packages:/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++ export AMENT_PREFIX_PATH=/tmp/sol/install/team048_solution:/tmp/w/ws/install/bodyctrl_msgs:/tmp/w/mm/envs/ros
+++++ AMENT_PREFIX_PATH=/tmp/sol/install/team048_solution:/tmp/w/ws/install/bodyctrl_msgs:/tmp/w/mm/envs/ros
++++ unset _colcon_ordered_commands
++++ unset _colcon_prefix_sh_source_script
++++ unset _colcon_prefix_bash_COLCON_CURRENT_PREFIX
+++ unset COLCON_CURRENT_PREFIX
+++ unset _colcon_prefix_chain_bash_source_script
++ timeout --kill-after=20 900 bash run.sh
+[INFO] [1794210981.120407744] [team048_solution]: task sort3 pool 3
+[INFO] [1794210981.345265762] [team048_solution]: startup 3.2 s of 405.0
+[INFO] [1794210981.763364359] [team048_solution]: head settled 0.402 after 0.11 s
+[INFO] [1794210982.109147810] [team048_solution]: tray tray_left red camera [0.348 0.629]
+[INFO] [1794210982.218543449] [team048_solution]: tray tray_center green camera [0.535 0.003]
+[INFO] [1794210983.028117019] [team048_solution]: observe t 3.5 dets 13 assigned [('Crayola_Bonus_64_C', 4.94, 0.18), ('Utana_5_Porcelain_', 9.88, 0.13), ('Threshold_Ramekin_', 8.35, 0.21), ('Ecoforms_Plant_Con', 5.77, 0.14), ('Crunch_Girl_Scouts', 4.0, 0.26), ('Perricone_MD_AcylG', 0.97, 1.05), ('Hyaluronic_Acid', 0.82, 0.14)]
+[INFO] [1794211031.931469546] [team048_solution]: pick Ecoforms_Plant_Container_B4_Har dish -> tray_left slot 0 arm l rim w 0.025 z 0.055
+[INFO] [1794211031.933014925] [team048_solution]: TRACE {"t": 14.22, "phase": "start", "side": "l", "obj": "Ecoforms_Plant_Container_B4_Har", "F": [0.001, 0.0, -0.005], "dF": null, "fing": [0.989, 0.988, 0.988, 0.991, 1.009, -0.0], "eff": [0.048, 0.054, 0.051, 0.038, 0.026, 0.0], "tcp": [0.5079, 0.3292, 0.1621], "kind": "rim", "center": [0.287, 0.155, -0.102]}
+[INFO] [1794211061.885577471] [team048_solution]: TRACE {"t": 21.02, "phase": "pre", "side": "l", "obj": "Ecoforms_Plant_Container_B4_Har", "F": [0.01, 5.369, 0.828], "dF": null, "fing": [0.975, 0.971, 0.97, 0.973, 1.002, 0.0], "eff": [0.092, 0.114, 0.119, 0.107, 0.009, 0.0], "tcp": [0.2085, 0.1389, 0.1338], "tcp_plan": [0.21, 0.1383, 0.1419], "tcp_err": 0.0082}
+[INFO] [1794211083.058609412] [team048_solution]: TRACE {"t": 25.8, "phase": "at_grasp", "side": "l", "obj": "Ecoforms_Plant_Container_B4_Har", "F": [-0.039, 3.66, -0.109], "dF": null, "fing": [0.987, 1.173, 0.983, 0.985, 1.001, 0.0], "eff": [0.053, 0.371, 0.084, 0.073, 0.019, 0.002], "tcp": [0.2078, 0.1385, 0.0555], "tcp_plan": [0.21, 0.1372, 0.0616], "tcp_err": 0.0067}
+[INFO] [1794211089.929923390] [team048_solution]: TRACE {"t": 27.31, "phase": "closed", "side": "l", "obj": "Ecoforms_Plant_Container_B4_Har", "F": [0.014, 4.093, -0.524], "dF": 0.602, "fing": [0.999, 0.871, 0.838, 0.774, 0.239, 0.007], "eff": [0.514, 0.49, 1.0, 1.0, 0.095, 0.214], "tcp": [0.2103, 0.1384, 0.061], "tcp_plan": [0.21, 0.1372, 0.0616], "tcp_err": 0.0014, "settled": false}
+[INFO] [1794211105.539007065] [team048_solution]: TRACE {"t": 30.81, "phase": "lifted", "side": "l", "obj": "Ecoforms_Plant_Container_B4_Har", "F": [0.12, 6.216, 0.166], "dF": 2.576, "fing": [0.995, 0.993, 0.788, 0.775, 0.192, 0.004], "eff": [0.049, 0.018, 1.0, 1.0, 0.029, 0.281], "tcp": [0.2095, 0.1383, 0.1395], "tcp_plan": [0.21, 0.1383, 0.1419], "tcp_err": 0.0025, "verdict": null, "shadow": true}
+[INFO] [1794211126.459488969] [team048_solution]: TRACE {"t": 35.38, "phase": "over_tray", "side": "l", "obj": "Ecoforms_Plant_Container_B4_Har", "F": [0.513, 6.099, -1.117], "dF": 2.696, "fing": [0.977, 0.976, 0.837, 0.798, -0.699, -0.025], "eff": [0.033, 0.06, 1.0, 1.0, 0.167, 1.0], "tcp": [0.3231, 0.5441, 0.1546], "tcp_plan": [0.3266, 0.5527, 0.1769], "tcp_err": 0.0241, "tray": "tray_left", "tray_xy": [0.348, 0.629]}
+[INFO] [1794211130.953863208] [team048_solution]: TRACE {"t": 36.39, "phase": "released", "side": "l", "obj": "Ecoforms_Plant_Container_B4_Har", "F": [0.001, 5.15, -0.062], "dF": 1.491, "fing": [0.986, 0.984, 0.978, 0.979, 1.001, 0.0], "eff": [0.076, 0.093, 0.096, 0.086, 0.024, 0.0], "tcp": [0.3263, 0.5576, 0.1896], "tcp_plan": [0.3266, 0.5527, 0.1769], "tcp_err": 0.0136}
+[INFO] [1794211158.600386776] [team048_solution]: TRACE {"t": 42.64, "phase": "home", "side": "l", "obj": "Ecoforms_Plant_Container_B4_Har", "F": [0.096, 0.075, -0.064], "dF": 3.588, "fing": [0.99, 0.988, 0.989, 0.992, 1.011, -0.0], "eff": [0.045, 0.051, 0.048, 0.035, 0.028, 0.0], "tcp": [0.5142, 0.3348, 0.1941]}
+[INFO] [1794211158.857983725] [team048_solution]: tray tray_left red camera [0.356 0.69 ]
+[INFO] [1794211158.958923721] [team048_solution]: tray tray_center green camera [0.535 0.003]
+[INFO] [1794211159.735347208] [team048_solution]: observe t 42.9 dets 10 assigned [('Crayola_Bonus_64_C', 5.0, 0.19), ('Utana_5_Porcelain_', 9.85, 0.02), ('Crunch_Girl_Scouts', 3.99, 0.16), ('Perricone_MD_AcylG', 0.95, 1.01), ('Hyaluronic_Acid', 0.82, 0.06)]
+[INFO] [1794211247.820673688] [team048_solution]: pick Perricone_MD_AcylGlutathione_Eye_Lid_Serum box -> tray_right slot 0 arm r side w 0.033 z 0.059
+[INFO] [1794211247.822820157] [team048_solution]: TRACE {"t": 61.87, "phase": "start", "side": "r", "obj": "Perricone_MD_AcylGlutathione_Eye_Lid_Serum", "F": [0.001, -0.0, -0.005], "dF": 3.662, "fing": [0.99, 0.989, 0.986, 0.991, 1.014, 0.0], "eff": [0.044, 0.05, 0.064, 0.039, 0.034, 0.0], "tcp": [0.508, -0.329, 0.1619], "kind": "side", "center": [0.322, -0.395, -0.098]}
+[INFO] [1794211267.925667940] [team048_solution]: TRACE {"t": 66.45, "phase": "pre", "side": "r", "obj": "Perricone_MD_AcylGlutathione_Eye_Lid_Serum", "F": [0.015, -0.323, -0.185], "dF": 3.984, "fing": [0.993, 1.01, 1.006, 0.993, 1.001, -0.0], "eff": [0.025, 0.03, 0.036, 0.024, 0.009, 0.0], "tcp": [0.0819, -0.4565, -0.0414], "tcp_plan": [0.0834, -0.4645, -0.0335], "tcp_err": 0.0114}
+[INFO] [1794211281.640154641] [team048_solution]: TRACE {"t": 69.58, "phase": "at_grasp", "side": "r", "obj": "Perricone_MD_AcylGlutathione_Eye_Lid_Serum", "F": [2.225, -1.224, 1.296], "dF": 5.564, "fing": [1.258, 1.399, 1.39, 1.205, 1.008, -0.0], "eff": [1.0, 1.0, 1.0, 1.0, 0.051, 0.044], "tcp": [0.1463, -0.4203, -0.0632], "tcp_plan": [0.146, -0.4227, -0.0613], "tcp_err": 0.0031}
+[INFO] [1794211288.383605501] [team048_solution]: TRACE {"t": 71.1, "phase": "closed", "side": "r", "obj": "Perricone_MD_AcylGlutathione_Eye_Lid_Serum", "F": [-0.016, -0.113, -0.115], "dF": 2.872, "fing": [0.004, 0.024, 0.073, 0.083, 0.009, 0.0], "eff": [0.01, 0.011, 0.009, 0.334, 0.008, 0.002], "tcp": [0.1409, -0.4141, -0.0708], "tcp_plan": [0.146, -0.4227, -0.0613], "tcp_err": 0.0139, "settled": false}
+[INFO] [1794211303.561231121] [team048_solution]: TRACE {"t": 74.53, "phase": "lifted", "side": "r", "obj": "Perricone_MD_AcylGlutathione_Eye_Lid_Serum", "F": [0.016, -0.151, -0.126], "dF": 2.838, "fing": [0.003, 0.004, 0.004, 0.083, 0.007, 0.0], "eff": [0.009, 0.01, 0.009, 0.334, 0.006, 0.001], "tcp": [0.145, -0.4204, 0.016], "tcp_plan": [0.1459, -0.4222, 0.0189], "tcp_err": 0.0035, "verdict": null, "shadow": true}
+[INFO] [1794211338.637664946] [team048_solution]: TRACE {"t": 82.47, "phase": "over_tray", "side": "r", "obj": "Perricone_MD_AcylGlutathione_Eye_Lid_Serum", "F": [16.759, -82.312, -41.138], "dF": 92.667, "fing": [0.003, 0.003, 0.004, 0.083, 0.009, -0.0], "eff": [0.519, 0.506, 0.497, 0.324, 0.409, 0.103], "tcp": [0.3103, -0.5211, 0.036], "tcp_plan": [0.3197, -0.614, 0.1769], "tcp_err": 0.1691, "tray": "tray_right", "tray_xy": [0.34, -0.69]}
+[INFO] [1794211343.090357818] [team048_solution]: TRACE {"t": 83.49, "phase": "released", "side": "r", "obj": "Perricone_MD_AcylGlutathione_Eye_Lid_Serum", "F": [15.589, -62.151, -36.204], "dF": 72.78, "fing": [0.923, 0.766, 0.746, 0.752, 0.937, -0.001], "eff": [0.259, 1.0, 1.0, 1.0, 0.421, 0.174], "tcp": [0.3106, -0.5214, 0.0398], "tcp_plan": [0.3197, -0.614, 0.1769], "tcp_err": 0.1657}
+[INFO] [1794211385.279498342] [team048_solution]: TRACE {"t": 92.61, "phase": "home", "side": "r", "obj": "Perricone_MD_AcylGlutathione_Eye_Lid_Serum", "F": [0.03, -0.064, -0.032], "dF": 2.816, "fing": [0.995, 0.995, 0.993, 0.996, 1.008, -0.0], "eff": [0.023, 0.027, 0.037, 0.022, 0.022, 0.0], "tcp": [0.5143, -0.3342, 0.1944]}
+[INFO] [1794211385.428271476] [team048_solution]: tray tray_left red camera [0.361 0.69 ]
+[INFO] [1794211385.483264491] [team048_solution]: tray tray_right blue camera [ 0.365 -0.69 ]
+[INFO] [1794211385.523150029] [team048_solution]: tray tray_center green camera [0.535 0.003]
+[INFO] [1794211386.062606065] [team048_solution]: observe t 92.8 dets 10 assigned [('Crayola_Bonus_64_C', 4.99, 0.08), ('Threshold_Ramekin_', 3.58, 1.99), ('Utana_5_Porcelain_', 11.17, 0.04), ('Crunch_Girl_Scouts', 3.99, 0.13), ('Hyaluronic_Acid', 2.42, 0.01)]
+[INFO] [1794211435.750829814] [team048_solution]: pick Hyaluronic_Acid jar -> tray_center slot 0 arm l side w 0.054 z 0.049
+[INFO] [1794211435.753066888] [team048_solution]: TRACE {"t": 103.63, "phase": "start", "side": "l", "obj": "Hyaluronic_Acid", "F": [0.001, 0.001, -0.001], "dF": 2.851, "fing": [0.995, 0.994, 0.995, 0.996, 1.008, -0.0], "eff": [0.027, 0.031, 0.03, 0.022, 0.02, 0.0], "tcp": [0.5216, 0.3355, 0.2329], "kind": "side", "center": [0.336, 0.074, -0.107]}
+[INFO] [1794211446.363481941] [team048_solution]: TRACE {"t": 106.09, "phase": "pre", "side": "l", "obj": "Hyaluronic_Acid", "F": [1.491, 0.751, -0.614], "dF": 2.844, "fing": [1.085, 0.974, 0.975, 0.977, 0.998, -0.0], "eff": [1.0, 0.112, 0.115, 0.116, 0.023, 0.046], "tcp": [0.161, 0.2421, -0.0447], "tcp_plan": [0.1547, 0.2443, -0.0428], "tcp_err": 0.0069}
+[INFO] [1794211473.334004727] [team048_solution]: TRACE {"t": 111.93, "phase": "at_grasp", "side": "l", "obj": "Hyaluronic_Acid", "F": [-2.562, 13.573, 2.186], "dF": 15.578, "fing": [0.546, 0.883, 0.892, 0.9, 0.989, -0.0], "eff": [1.0, 1.0, 1.0, 1.0, 0.654, 0.634], "tcp": [0.1872, 0.1923, -0.0728], "tcp_plan": [0.1912, 0.1785, -0.0702], "tcp_err": 0.0145}
+[INFO] [1794211483.470700928] [team048_solution]: TRACE {"t": 114.13, "phase": "corrected", "side": "l", "obj": "Hyaluronic_Acid", "F": [1.175, 4.599, 4.467], "dF": 6.713, "fing": [0.372, 0.924, 0.93, 0.935, 0.998, -0.0], "eff": [1.0, 0.204, 0.164, 0.127, 0.004, 0.124], "tcp": [0.1916, 0.1936, -0.0747], "tcp_plan": [0.1912, 0.1785, -0.0702], "tcp_err": 0.0157}
+[INFO] [1794211490.199675383] [team048_solution]: TRACE {"t": 115.64, "phase": "closed", "side": "l", "obj": "Hyaluronic_Acid", "F": [-0.598, 4.165, 0.117], "dF": 4.717, "fing": [0.254, 0.355, -0.019, -0.019, 0.005, 0.0], "eff": [1.0, 1.0, 0.222, 0.222, 0.076, 0.18], "tcp": [0.1969, 0.1947, -0.075], "tcp_plan": [0.1912, 0.1785, -0.0702], "tcp_err": 0.0178, "settled": false}
+[INFO] [1794211505.883589349] [team048_solution]: TRACE {"t": 119.13, "phase": "lifted", "side": "l", "obj": "Hyaluronic_Acid", "F": [0.013, -0.034, 0.037], "dF": 6.515, "fing": [0.003, 0.003, 0.003, 0.003, 0.005, 0.0], "eff": [0.003, 0.003, 0.004, 0.004, 0.002, 0.0], "tcp": [0.1903, 0.1786, 0.0079], "tcp_plan": [0.1909, 0.1785, 0.0098], "tcp_err": 0.002, "verdict": null, "shadow": true}
+[INFO] [1794211529.903430638] [team048_solution]: TRACE {"t": 124.56, "phase": "over_tray", "side": "l", "obj": "Hyaluronic_Acid", "F": [0.009, 3.976, -0.238], "dF": 4.887, "fing": [0.006, 0.007, 0.007, 0.007, 0.015, 0.0], "eff": [0.03, 0.034, 0.036, 0.035, 0.026, 0.003], "tcp": [0.453, 0.026, 0.1634], "tcp_plan": [0.4589, 0.024, 0.1789], "tcp_err": 0.0167, "tray": "tray_center", "tray_xy": [0.535, 0.003]}
+[INFO] [1794211534.709165803] [team048_solution]: TRACE {"t": 125.58, "phase": "released", "side": "l", "obj": "Hyaluronic_Acid", "F": [0.0, 3.96, -0.464], "dF": 5.109, "fing": [0.974, 0.972, 0.972, 0.973, 0.987, -0.0], "eff": [0.077, 0.091, 0.093, 0.083, 0.024, 0.0], "tcp": [0.4572, 0.0233, 0.1764], "tcp_plan": [0.4589, 0.024, 0.1789], "tcp_err": 0.0031}
+[INFO] [1794211556.872595195] [team048_solution]: TRACE {"t": 130.6, "phase": "home", "side": "l", "obj": "Hyaluronic_Acid", "F": [-0.021, 0.1, -0.071], "dF": 6.501, "fing": [0.994, 0.994, 0.994, 0.996, 1.006, -0.0], "eff": [0.03, 0.035, 0.033, 0.025, 0.019, 0.0], "tcp": [0.5262, 0.3117, 0.2064]}
+[INFO] [1794211557.051915698] [team048_solution]: tray tray_left red camera [0.356 0.69 ]
+[INFO] [1794211557.139600533] [team048_solution]: tray tray_center green camera [0.522 0.   ]
+[INFO] [1794211557.605175910] [team048_solution]: observe t 130.7 dets 14 assigned [('Utana_5_Porcelain_', 11.17, 0.1), ('Crunch_Girl_Scouts', 4.16, 0.18), ('Threshold_Ramekin_', 4.26, 1.92)]
+[INFO] [1794211557.882024346] [team048_solution]: tray tray_left red camera [0.349 0.632]
+[INFO] [1794211557.970752042] [team048_solution]: tray tray_center green camera [0.522 0.   ]
+[INFO] [1794211558.502931601] [team048_solution]: observe t 130.9 dets 11 assigned [('Utana_5_Porcelain_', 11.18, 0.11), ('Crunch_Girl_Scouts', 4.17, 0.17), ('Threshold_Ramekin_', 4.27, 1.92)]
+[INFO] [1794211569.069278868] [team048_solution]: done at 133.3 handled ['Ecoforms_Plant_Container_B4_Har', 'Hyaluronic_Acid', 'Perricone_MD_AcylGlutathione_Eye_Lid_Serum']
+run rc=0 cap=900

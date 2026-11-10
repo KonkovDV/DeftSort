@@ -1,0 +1,1 @@
+{"id": "dmitrijkv/team048-sim-v9b", "title": "team048-sim-v9b", "code_file": "team048-sim-v9b.py", "language": "python", "kernel_type": "script", "is_private": true, "enable_gpu": true, "enable_internet": true, "dataset_sources": ["dmitrijkv/team048-polygon-assets"], "kernel_sources": [], "competition_sources": [], "machine_shape": "NvidiaTeslaT4"}

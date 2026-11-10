@@ -1,0 +1,65 @@
+06:06:05 MSK +0s GPU GPU 0: Tesla T4 (UUID: GPU-efb89bc0-bc6c-c41c-3551-5e18550b9412)
+GPU 1: Tesla T4 (UUID: GPU-fe74a900-1032-b855-7e8e-f99b14f92e0d) internet 200
+06:06:05 MSK +0s START setup timeout 5400
+06:07:04 MSK +60s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  965G  89% /] last=setup.log ::  for f in *.so.$DRV | + b=libvdpau_nvidia.so | + ln -sf libvdpau_nvidia.so.580.178.04 libvdpau_nvidia.so.1 | + ln -sf libvdpau_nvidia.so.580.178.04 libvdpau_nvidia.so.0 | + ln -sf libvdpau_nvidia.so.580.178.04 libvdpau_nvidia.so | + cd /tmp/w | + cat | + mkdir -p /tmp/w/egl | + cat | + timeout 300 apt-get update -qq | 
+06:08:04 MSK +120s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  963G  89% /] last=setup.log ::  | + mkdir -p /tmp/nssr_sim | + cp -r /kaggle/input/datasets/dmitrijkv/team048-polygon-assets/polygon/. /tmp/nssr_sim/ | + P=/tmp/w/mm/envs/isaac/bin/python | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cu128 | 
+06:09:04 MSK +180s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  955G  89% /] last=progress.log :: -p /tmp/nssr_sim | + cp -r /kaggle/input/datasets/dmitrijkv/team048-polygon-assets/polygon/. /tmp/nssr_sim/ | + P=/tmp/w/mm/envs/isaac/bin/python | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cu128 |  | 
+06:10:04 MSK +240s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  952G  89% /] last=setup.log :: olygon-assets/polygon/. /tmp/nssr_sim/ | + P=/tmp/w/mm/envs/isaac/bin/python | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cu128 | + ln -sfn /tmp/nssr_sim /nssr_sim | + wait 579 | + echo ros_env_rc=0 | + wait 580 | 
+06:11:05 MSK +300s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  951G  89% /] last=setup.log :: /w/mm/envs/isaac/bin/python -m pip install -q torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cu128 | + ln -sfn /tmp/nssr_sim /nssr_sim | + wait 579 | + echo ros_env_rc=0 | + wait 580 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q -U pip 'setuptools<70' wheel | 
+06:12:05 MSK +360s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  950G  89% /] last=setup.log :: /bin/python -m pip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com | 
+06:13:05 MSK +420s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  948G  89% /] last=progress.log :: thon -m pip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  | 
+06:14:05 MSK +480s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  946G  89% /] last=progress.log :: n -m pip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  | 
+06:15:05 MSK +540s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  947G  89% /] last=progress.log :: m pip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  | 
+06:16:05 MSK +600s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  947G  89% /] last=progress.log :: ip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  | 
+06:17:05 MSK +660s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  946G  89% /] last=progress.log :: install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  |  | 
+06:18:05 MSK +720s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  946G  89% /] last=progress.log :: tall -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  |  |  | 
+06:19:05 MSK +780s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  943G  89% /] last=progress.log :: l -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  |  |  |  | 
+06:20:05 MSK +840s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=progress.log :: q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  |  |  |  |  | 
+06:21:05 MSK +900s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  935G  89% /] last=progress.log :: U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  |  |  |  |  |  | 
+06:22:05 MSK +960s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=nssr_pkg.log :: 
+06:22:10 MSK +965s END setup rc 0
+06:22:10 MSK +965s SETUP_CHECK {'ros': True, 'isaac': True, 'bodyctrl': False, 'nssr': True}
+06:22:10 MSK +965s TAIL ros_env.log ros_env_rc=0
+
+06:22:10 MSK +965s TAIL isaac_env.log ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+wheel 0.48.0 requires packaging>=24.0, but you have packaging 23.0 which is incompatible.
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+isaacsim-core 5.0.0.0 requires packaging==23.0, but you have packaging 24.2 which is incompatible.
+isaac_env_rc=0
+
+06:22:10 MSK +965s TAIL bodyctrl_build.log t recent call first):
+  /tmp/w/mm/envs/ros/share/cmake-4.4/Modules/FindPackageHandleStandardArgs.cmake:654 (_FPHSA_FAILURE_MESSAGE)
+  /tmp/w/mm/envs/ros/share/cmake-4.4/Modules/FindPython.cmake:770 (find_package_handle_standard_args)
+  /tmp/w/mm/envs/ros/share/rosidl_generator_py/cmake/rosidl_generator_py_generate_interfaces.cmake:34 (find_package)
+  /tmp/w/mm/envs/ros/share/ament_cmake_core/cmake/core/ament_execute_extensions.cmake:48 (include)
+  /tmp/w/mm/envs/ros/share/rosidl_cmake/cmake/rosidl_generate_interfaces.cmake:286 (ament_execute_extensions)
+  CMakeLists.txt:9 (rosidl_generate_interfaces)
+
+
+---
+Failed   <<< bodyctrl_msgs [12.3s, exited with code 1]
+
+Summary: 0 packages finished [12.5s]
+  1 package failed: bodyctrl_msgs
+  1 package had stderr output: bodyctrl_msgs
+bodyctrl_rc=1
+
+06:22:10 MSK +965s TAIL nssr_pkg.log nssr_sim OK
+
+06:22:10 MSK +965s FAIL-FAST: setup incomplete

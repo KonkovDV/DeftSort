@@ -1,0 +1,13 @@
+Utana_5_Porcelain_Rame 0.3 -0.4 ok_r_yaw2.22_dz0.00 8.6
+Utana_5_Porcelain_Rame 0.3 -0.15 no_ik 2.5
+Utana_5_Porcelain_Rame 0.3 0.15 no_ik 3.1
+Utana_5_Porcelain_Rame 0.3 0.4 ok_l_dz0.00 5.8
+Utana_5_Porcelain_Rame 0.4 -0.4 ok_r_yaw2.22_dz0.00 8.3
+Utana_5_Porcelain_Rame 0.4 -0.15 no_ik 3.0
+Utana_5_Porcelain_Rame 0.4 0.15 no_ik 4.1
+Utana_5_Porcelain_Rame 0.4 0.4 ok_l_dz0.00 4.6
+Utana_5_Porcelain_Rame 0.48 -0.4 ok_r_yaw2.22_dz0.00 7.7
+Utana_5_Porcelain_Rame 0.48 -0.15 no_ik 3.3
+Utana_5_Porcelain_Rame 0.48 0.15 no_ik 3.8
+Utana_5_Porcelain_Rame 0.48 0.4 ok_l_dz0.00 4.4
+Utana_5_Porcelain_Ramekin_Larg {'ok_r_yaw': 3, 'no_ik': 6, 'ok_l': 3}

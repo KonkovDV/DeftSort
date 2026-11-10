@@ -1,0 +1,38 @@
+{
+  "head_K": [
+    343.1635437011719,
+    0.0,
+    320.0,
+    0.0,
+    343.1635437011719,
+    180.0,
+    0.0,
+    0.0,
+    1.0
+  ],
+  "torso_K": [
+    343.1635437011719,
+    0.0,
+    320.0,
+    0.0,
+    343.1635437011719,
+    180.0,
+    0.0,
+    0.0,
+    1.0
+  ],
+  "head_frame": "camera_head_link",
+  "torso_frame": "camera_body_front_link",
+  "resolution": [
+    640,
+    360
+  ],
+  "D_zero": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "note": "caminfo_*.txt/tf_*.txt from v5 logs are shell-hook noise; use frames.json *_info instead. TF pelvis->camera still missing in this artifact."
+}

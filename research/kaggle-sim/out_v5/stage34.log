@@ -1,0 +1,100 @@
++ W=/kaggle/working
++ T=/tmp/w
++ export MAMBA_ROOT_PREFIX=/tmp/w/mm
++ MAMBA_ROOT_PREFIX=/tmp/w/mm
++ MM=/tmp/w/bin/micromamba
++ cd /tmp/nssr_sim
++ export ROS_DOMAIN_ID=146 RMW_IMPLEMENTATION=rmw_fastrtps_cpp ACCEPT_EULA=Y PRIVACY_CONSENT=Y OMNI_KIT_ACCEPT_EULA=YES
++ ROS_DOMAIN_ID=146
++ RMW_IMPLEMENTATION=rmw_fastrtps_cpp
++ ACCEPT_EULA=Y
++ PRIVACY_CONSENT=Y
++ OMNI_KIT_ACCEPT_EULA=YES
++ export FASTRTPS_DEFAULT_PROFILES_FILE=/tmp/nssr_sim/hackathon/docker/fastdds_hack.xml
++ FASTRTPS_DEFAULT_PROFILES_FILE=/tmp/nssr_sim/hackathon/docker/fastdds_hack.xml
++ export HACK_TASK=sort3 HACK_POOL=3 HACK_SEED=1 HACK_HEADLESS=1 HACK_RES=1280x720 HACK_RENDER_INTERVAL=3
++ HACK_TASK=sort3
++ HACK_POOL=3
++ HACK_SEED=1
++ HACK_HEADLESS=1
++ HACK_RES=1280x720
++ HACK_RENDER_INTERVAL=3
++ export VK_ICD_FILENAMES=/tmp/w/nvidia_icd.json VK_DRIVER_FILES=/tmp/w/nvidia_icd.json __EGL_VENDOR_LIBRARY_DIRS=/tmp/w/egl
++ VK_ICD_FILENAMES=/tmp/w/nvidia_icd.json
++ VK_DRIVER_FILES=/tmp/w/nvidia_icd.json
++ __EGL_VENDOR_LIBRARY_DIRS=/tmp/w/egl
++ ISAAC_LD=/tmp/w/nvlib
++ BR=7389
++ sleep 3
++ rosenv python teleoperation/bridges/ros2_zmq_bridge.py
++ KIT='--/rtx/raytracing/fractionalCutoutOpacity=true --/rtx/pathtracing/fractionalCutoutOpacity=true --/rtx/translucency/maxRefractionBounces=4 --/app/runLoops/main/rateLimitEnabled=false --/app/renderer/resolution/width=1280 --/app/renderer/resolution/height=720'
++ export 'HACK_KIT_ARGS=--/rtx/raytracing/fractionalCutoutOpacity=true --/rtx/pathtracing/fractionalCutoutOpacity=true --/rtx/translucency/maxRefractionBounces=4 --/app/runLoops/main/rateLimitEnabled=false --/app/renderer/resolution/width=1280 --/app/renderer/resolution/height=720'
++ HACK_KIT_ARGS='--/rtx/raytracing/fractionalCutoutOpacity=true --/rtx/pathtracing/fractionalCutoutOpacity=true --/rtx/translucency/maxRefractionBounces=4 --/app/runLoops/main/rateLimitEnabled=false --/app/renderer/resolution/width=1280 --/app/renderer/resolution/height=720'
++ SIM=7474
++ D=903
++ LD_LIBRARY_PATH=/tmp/w/nvlib:/usr/local/nvidia/lib64:/usr/local/cuda/lib64:/usr/local/nvidia/lib:/usr/local/nvidia/lib64:/usr/local/cuda/lib64
++ /tmp/w/mm/envs/isaac/bin/python scripts/sim_runner.py --task NSSRSim-TiangongPro-Parlor-v0 --enable_cameras --num_envs 1 --perf_stats --step_hz 100 --headless --device cpu
+++ seq 1 120
++ for i in $(seq 1 120)
++ '[' 3 -gt 903 ']'
++ rosenv timeout 5 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ kill -0 7474
++ sleep 5
++ for i in $(seq 1 120)
++ '[' 14 -gt 903 ']'
++ rosenv timeout 5 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ kill -0 7474
++ sleep 5
++ for i in $(seq 1 120)
++ '[' 25 -gt 903 ']'
++ rosenv timeout 5 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ kill -0 7474
++ sleep 5
++ for i in $(seq 1 120)
++ '[' 35 -gt 903 ']'
++ rosenv timeout 5 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ kill -0 7474
++ sleep 5
++ for i in $(seq 1 120)
++ '[' 47 -gt 903 ']'
++ rosenv timeout 5 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ kill -0 7474
++ sleep 5
++ for i in $(seq 1 120)
++ '[' 58 -gt 903 ']'
++ rosenv timeout 5 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ kill -0 7474
++ sleep 5
++ for i in $(seq 1 120)
++ '[' 69 -gt 903 ']'
++ rosenv timeout 5 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ kill -0 7474
++ sleep 5
++ for i in $(seq 1 120)
++ '[' 80 -gt 903 ']'
++ rosenv timeout 5 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ kill -0 7474
++ sleep 5
++ for i in $(seq 1 120)
++ '[' 1302 -gt 903 ']'
++ break
++ echo 'waited 90s'
+waited 90s
++ cat /kaggle/working/logs/sim_task.txt
++ rosenv timeout 600 python hackathon/tools/check_interfaces.py
++ echo check_rc=0
++ rosenv timeout 20 ros2 topic echo --once /cam_head/color/camera_info
++ rosenv timeout 20 ros2 topic echo --once /cam_head/depth/camera_info
++ rosenv timeout 20 ros2 topic echo --once /cam_torso/color/camera_info
++ rosenv timeout 30 ros2 run tf2_ros tf2_echo pelvis camera_head_link
++ rosenv timeout 20 ros2 topic echo --once /tf_static
++ rosenv timeout 20 ros2 topic list -t
++ rosenv timeout 20 ros2 topic echo --once /joint_states
++ rosenv timeout 60 python /kaggle/working/grab_frames.py
++ kill -INT 7474
++ sleep 10
++ kill 7389
++ pkill -f sim_node.py
++ pkill -f camera_bridge.py
++ pkill -f robot_state_publisher
++ pkill -9 -f sim_runner.py

@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "pool": 6,
+  "n_layouts": 30,
+  "commit_note": "5117bec-local",
+  "rates": {
+    "electronics": {
+      "n": 90,
+      "pick_rate": 0.4333,
+      "place_left_given_pick": 0.5641,
+      "place_right_given_pick": 0.4103,
+      "place_both_given_pick": 0.0,
+      "pick_and_place_left": 0.2444,
+      "pick_and_place_right": 0.1778,
+      "pick_kinds": {
+        "side": 39
+      }
+    },
+    "box": {
+      "n": 90,
+      "pick_rate": 0.4778,
+      "place_left_given_pick": 0.5581,
+      "place_right_given_pick": 0.3953,
+      "place_both_given_pick": 0.0,
+      "pick_and_place_left": 0.2667,
+      "pick_and_place_right": 0.1889,
+      "pick_kinds": {
+        "side": 43
+      }
+    }
+  },
+  "seconds": 2330.01,
+  "hand_open": 0.10498527137704766,
+  "trays": {
+    "tray_left": [
+      0.34,
+      0.69
+    ],
+    "tray_right": [
+      0.34,
+      -0.69
+    ],
+    "tray_center": [
+      0.53,
+      0.0
+    ]
+  }
+}

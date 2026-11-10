@@ -1,0 +1,336 @@
+{
+ "3": [
+  {
+   "category": "jar",
+   "object": "006_mustard_bottle",
+   "min": [
+    0.009298956537495802,
+    0.04230692049561178,
+    0.04287497199893528,
+    0.6754509803921568,
+    0.5865098039215686,
+    0.12501960784313726
+   ],
+   "max": [
+    0.08489314665482214,
+    0.10444516911085053,
+    0.19557056183052296,
+    0.9576470588235294,
+    0.9206274509803922,
+    0.49098039215686284
+   ],
+   "validated_on_sensors": true,
+   "evidence": "Isaac render of organiser USDs, approx camera; NOT yet the real cam_head/cam_torso"
+  },
+  {
+   "category": "box",
+   "object": "Crayola_Bonus_64_Crayons",
+   "min": [
+    0.03354816311056527,
+    0.08445989483389424,
+    0.09751630315341368,
+    0.5010980392156863,
+    0.46760784313725495,
+    0.2747450980392157
+   ],
+   "max": [
+    0.13097856517955192,
+    0.1580996889432834,
+    0.13222280645497228,
+    0.9537254901960784,
+    0.98,
+    0.9432156862745098
+   ],
+   "validated_on_sensors": true,
+   "evidence": "Isaac render of organiser USDs, approx camera; NOT yet the real cam_head/cam_torso"
+  },
+  {
+   "category": "jar",
+   "object": "Saccharomyces_Boulardii_MOS_Value_Size",
+   "min": [
+    0.013671776633949098,
+    0.04968172944026246,
+    0.04554882456562682,
+    0.5099999999999999,
+    0.6709803921568627,
+    0.6788235294117646
+   ],
+   "max": [
+    0.07921029254265469,
+    0.08182469085674399,
+    0.14004589112448884,
+    0.9898039215686275,
+    0.9898039215686275,
+    0.9937254901960785
+   ],
+   "validated_on_sensors": true,
+   "evidence": "Isaac render of organiser USDs, approx camera; NOT yet the real cam_head/cam_torso"
+  },
+  {
+   "category": "box",
+   "object": "Perricone_MD_AcylGlutathione_Eye_Lid_Serum",
+   "min": [
+    0.047203916792045324,
+    0.06842417791754543,
+    0.10225231109179322,
+    0.22988235294117645,
+    0.2370980392156863,
+    0.28878431372549024
+   ],
+   "max": [
+    0.09843594302494751,
+    0.10214593827873725,
+    0.1129497522096972,
+    0.6912941176470588,
+    0.7133333333333334,
+    0.7474509803921568
+   ],
+   "validated_on_sensors": true,
+   "evidence": "Isaac render of organiser USDs, approx camera; NOT yet the real cam_head/cam_torso"
+  },
+  {
+   "category": "jar",
+   "object": "Hyaluronic_Acid",
+   "min": [
+    0.031194283733001177,
+    0.04063293513522382,
+    0.08532994540466306,
+    0.6736274509803921,
+    0.6403921568627451,
+    0.39960784313725495
+   ],
+   "max": [
+    0.05861275657012981,
+    0.061690915406644016,
+    0.10313477251900441,
+    1.0050980392156863,
+    1.0050980392156863,
+    1.0072549019607844
+   ],
+   "validated_on_sensors": true,
+   "evidence": "Isaac render of organiser USDs, approx camera; NOT yet the real cam_head/cam_torso"
+  },
+  {
+   "category": "dish",
+   "object": "Ecoforms_Plant_Container_B4_Har",
+   "min": [
+    0.06840143581303157,
+    0.08316013590159177,
+    0.06586657797898103,
+    0.25572549019607843,
+    0.17729411764705882,
+    -0.02062745098039216
+   ],
+   "max": [
+    0.10855118989196624,
+    0.1089364864202329,
+    0.07650598701255126,
+    0.9126666666666667,
+    0.853843137254902,
+    0.3618823529411766
+   ],
+   "validated_on_sensors": true,
+   "evidence": "Isaac render of organiser USDs, approx camera; NOT yet the real cam_head/cam_torso"
+  },
+  {
+   "category": "dish",
+   "object": "Threshold_Ramekin_White_Porcelain",
+   "min": [
+    0.010884089946431304,
+    0.05502140944003712,
+    0.04553864063137456,
+    0.5541960784313725,
+    0.5457254901960784,
+    0.5254901960784313
+   ],
+   "max": [
+    0.11893413880022949,
+    0.12047445995260286,
+    0.05785334592330509,
+    1.012549019607843,
+    1.012549019607843,
+    1.012549019607843
+   ],
+   "validated_on_sensors": true,
+   "evidence": "Isaac render of organiser USDs, approx camera; NOT yet the real cam_head/cam_torso"
+  },
+  {
+   "category": "dish",
+   "object": "Utana_5_Porcelain_Ramekin_Large",
+   "min": [
+    0.06356024705710439,
+    0.09501802561572886,
+    0.0632458880263202,
+    0.5129411764705882,
+    0.5247058823529411,
+    0.530470588235294
+   ],
+   "max": [
+    0.13906172974483008,
+    0.13947449132759407,
+    0.0743681725604709,
+    0.9793333333333334,
+    0.9814117647058824,
+    0.9832549019607844
+   ],
+   "validated_on_sensors": true,
+   "evidence": "Isaac render of organiser USDs, approx camera; NOT yet the real cam_head/cam_torso"
+  },
+  {
+   "category": "box",
+   "object": "Crunch_Girl_Scouts_Candy_Bars_Peanut_Butter_Creme_78_oz_box",
+   "min": [
+    0.00953435794782356,
+    0.025352529340155243,
+    0.04392874502803973,
+    0.156078431372549,
+    0.16392156862745097,
+    0.5056862745098039
+   ],
+   "max": [
+    0.1375908278910749,
+    0.1549905589130544,
+    0.16877949538113377,
+    0.8696078431372549,
+    0.8792156862745099,
+    0.9619607843137256
+   ],
+   "validated_on_sensors": true,
+   "evidence": "Isaac render of organiser USDs, approx camera; NOT yet the real cam_head/cam_torso"
+  }
+ ],
+ "6": [
+  {
+   "category": "electronics",
+   "object": "Crosley_Alarm_Clock_Vintage_Metal",
+   "min": [
+    0.02079743599236576,
+    0.06411920682708874,
+    0.08348105273132758,
+    0.35105882352941176,
+    0.3272156862745098,
+    0.29411764705882354
+   ],
+   "max": [
+    0.10297553542707488,
+    0.12118248661492223,
+    0.15609780278336177,
+    0.9289411764705882,
+    0.9093333333333332,
+    0.8087843137254902
+   ],
+   "validated_on_sensors": true,
+   "evidence": "Isaac render of organiser USDs, approx camera; NOT yet the real cam_head/cam_torso"
+  },
+  {
+   "category": "box",
+   "object": "Nestle_Nips_Hard_Candy_Peanut_Butter",
+   "min": [
+    0.021238676696360845,
+    0.03591494719897798,
+    0.058455539871769206,
+    0.6349019607843137,
+    0.5684313725490195,
+    0.33039215686274515
+   ],
+   "max": [
+    0.09470300769226689,
+    0.1025055001078454,
+    0.1584980801283467,
+    0.9754901960784315,
+    0.9327450980392157,
+    0.8486274509803922
+   ],
+   "validated_on_sensors": true,
+   "evidence": "Isaac render of organiser USDs, approx camera; NOT yet the real cam_head/cam_torso"
+  },
+  {
+   "category": "electronics",
+   "object": "Razer_Taipan_White_Ambidextrous_Gaming_Mouse",
+   "min": [
+    0.02161886563134858,
+    0.06657655150545008,
+    0.02394103205858824,
+    0.20231372549019608,
+    0.20988235294117646,
+    0.2138039215686274
+   ],
+   "max": [
+    0.11412972537497992,
+    0.12946266287287364,
+    0.04469205298865665,
+    1.008627450980392,
+    1.012549019607843,
+    1.012549019607843
+   ],
+   "validated_on_sensors": true,
+   "evidence": "Isaac render of organiser USDs, approx camera; NOT yet the real cam_head/cam_torso"
+  },
+  {
+   "category": "electronics",
+   "object": "JBL_Charge_Speaker_portable_wireless_wired_Green",
+   "min": [
+    0.03869255231178911,
+    0.072076708861225,
+    0.05803811471456583,
+    0.5992156862745097,
+    0.8384313725490196,
+    0.5556078431372549
+   ],
+   "max": [
+    0.17031000555998,
+    0.19244701103953224,
+    0.08011609952562436,
+    0.9050588235294118,
+    0.9968627450980393,
+    0.861686274509804
+   ],
+   "validated_on_sensors": true,
+   "evidence": "Isaac render of organiser USDs, approx camera; NOT yet the real cam_head/cam_torso"
+  },
+  {
+   "category": "box",
+   "object": "Nips_Hard_Candy_Rich_Creamy_Butter_Rum_4_oz_1133_g",
+   "min": [
+    0.02614727086669598,
+    0.07354707478672581,
+    0.056368111172527595,
+    0.524392156862745,
+    0.3430588235294118,
+    0.24384313725490195
+   ],
+   "max": [
+    0.0957980735609931,
+    0.10359450140819296,
+    0.15777864517725376,
+    0.9341176470588236,
+    0.861921568627451,
+    0.8102549019607843
+   ],
+   "validated_on_sensors": true,
+   "evidence": "Isaac render of organiser USDs, approx camera; NOT yet the real cam_head/cam_torso"
+  },
+  {
+   "category": "box",
+   "object": "009_gelatin_box",
+   "min": [
+    0.03941510652757808,
+    0.0798124459161419,
+    0.02403574873289739,
+    0.7325490196078431,
+    0.4989803921568627,
+    0.4727843137254902
+   ],
+   "max": [
+    0.11708547449019394,
+    0.11916948706756497,
+    0.034547017801274955,
+    0.9811764705882353,
+    0.851764705882353,
+    0.843921568627451
+   ],
+   "validated_on_sensors": true,
+   "evidence": "Isaac render of organiser USDs, approx camera; NOT yet the real cam_head/cam_torso"
+  }
+ ]
+}

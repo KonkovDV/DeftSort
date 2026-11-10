@@ -1,0 +1,29 @@
+[package]
+title = "Neutral minimal Isaac Sim 5 startup and procedural RGB-D test"
+version = "1.0.0"
+[dependencies]
+"isaacsim.simulation_app" = {}
+"isaacsim.core.version" = {}
+"omni.usd" = {}
+"omni.kit.renderer.core" = {}
+"omni.kit.renderer.init" = {}
+"omni.hydra.rtx" = {}
+"omni.physx" = {}
+"omni.replicator.core" = {}
+"isaacsim.ros2.bridge" = {}
+"isaacsim.core.cloner" = {}
+"omni.kit.loop-isaac" = {}
+[settings]
+app.settings.fabricDefaultStageFrameHistoryCount = 3
+[settings.app.renderer]
+skipWhileMinimized = false
+[settings.app]
+name = "Neutral-Isaac-Test"
+version = "5.0.0"
+vulkan = true
+settings.persistent = false
+[settings.exts."omni.kit.registry.nucleus"]
+registries = [
+ { name = "kit/default", url = "https://ovextensionsprod.blob.core.windows.net/exts/kit/prod/107/shared" },
+ { name = "kit/sdk", url = "https://ovextensionsprod.blob.core.windows.net/exts/kit/prod/sdk/${kit_version_short}/${kit_git_hash}" },
+]

@@ -1,0 +1,44 @@
+layout 1/15 elapsed=50.0s
+layout 2/15 elapsed=109.5s
+layout 3/15 elapsed=158.4s
+layout 4/15 elapsed=233.4s
+layout 5/15 elapsed=299.0s
+layout 6/15 elapsed=361.7s
+layout 7/15 elapsed=411.9s
+layout 8/15 elapsed=473.6s
+layout 9/15 elapsed=529.9s
+layout 10/15 elapsed=598.4s
+layout 11/15 elapsed=678.3s
+layout 12/15 elapsed=742.7s
+layout 13/15 elapsed=808.8s
+layout 14/15 elapsed=885.5s
+layout 15/15 elapsed=943.0s
+{
+  "dish": {
+    "n": 45,
+    "pick_rate": 0.7556,
+    "place_left_given_pick": 0.5294,
+    "place_right_given_pick": 0.4706,
+    "place_both_given_pick": 0.0,
+    "pick_and_place_left": 0.4,
+    "pick_and_place_right": 0.3556
+  },
+  "box": {
+    "n": 45,
+    "pick_rate": 0.6889,
+    "place_left_given_pick": 0.5484,
+    "place_right_given_pick": 0.3871,
+    "place_both_given_pick": 0.0,
+    "pick_and_place_left": 0.3778,
+    "pick_and_place_right": 0.2667
+  },
+  "jar": {
+    "n": 45,
+    "pick_rate": 0.9556,
+    "place_left_given_pick": 0.5349,
+    "place_right_given_pick": 0.4651,
+    "place_both_given_pick": 0.0,
+    "pick_and_place_left": 0.5111,
+    "pick_and_place_right": 0.4444
+  }
+}

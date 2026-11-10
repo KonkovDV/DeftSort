@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/tmp/nssr_sim/teleoperation/bridges/ros2_zmq_bridge.py", line 12, in <module>
+    from bodyctrl_msgs.msg import MotorStatusMsg, MotorStatus, CmdSetMotorPosition, CmdMotorCtrl
+ModuleNotFoundError: No module named 'bodyctrl_msgs'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/tmp/nssr_sim/teleoperation/bridges/ros2_zmq_bridge.py", line 14, in <module>
+    raise ImportError(
+ImportError: bodyctrl_msgs not found. source /opt/ros/humble/setup.bash && colcon build --packages-select bodyctrl_msgs

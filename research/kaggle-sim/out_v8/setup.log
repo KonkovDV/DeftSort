@@ -1,0 +1,980 @@
++ W=/kaggle/working
++ T=/tmp/w
++ mkdir -p /tmp/w /kaggle/working/logs
++ cd /tmp/w
++ export MAMBA_ROOT_PREFIX=/tmp/w/mm
++ MAMBA_ROOT_PREFIX=/tmp/w/mm
++ nvidia-smi --query-gpu=name,driver_version --format=csv,noheader
++ tee /kaggle/working/logs/gpu.txt
+Tesla T4, 580.178.04
+Tesla T4, 580.178.04
+++ nvidia-smi --query-gpu=driver_version --format=csv,noheader
+++ head -1
+++ tr -d ' '
++ DRV=580.178.04
++ timeout 600 curl -sfL -o drv.run https://download.nvidia.com/XFree86/Linux-x86_64/580.178.04/NVIDIA-Linux-x86_64-580.178.04.run
++ sh drv.run --extract-only --target /tmp/w/drv
++ mkdir -p /tmp/w/nvlib
++ find /tmp/w/drv -maxdepth 1 -name 'lib*.so*' -exec cp '{}' /tmp/w/nvlib/ ';'
++ cd /tmp/w/nvlib
++ for f in *.so.$DRV
++ b=libcudadebugger.so
++ ln -sf libcudadebugger.so.580.178.04 libcudadebugger.so.1
++ ln -sf libcudadebugger.so.580.178.04 libcudadebugger.so.0
++ ln -sf libcudadebugger.so.580.178.04 libcudadebugger.so
++ for f in *.so.$DRV
++ b=libcuda.so
++ ln -sf libcuda.so.580.178.04 libcuda.so.1
++ ln -sf libcuda.so.580.178.04 libcuda.so.0
++ ln -sf libcuda.so.580.178.04 libcuda.so
++ for f in *.so.$DRV
++ b=libEGL_nvidia.so
++ ln -sf libEGL_nvidia.so.580.178.04 libEGL_nvidia.so.1
++ ln -sf libEGL_nvidia.so.580.178.04 libEGL_nvidia.so.0
++ ln -sf libEGL_nvidia.so.580.178.04 libEGL_nvidia.so
++ for f in *.so.$DRV
++ b=libEGL.so
++ ln -sf libEGL.so.580.178.04 libEGL.so.1
++ ln -sf libEGL.so.580.178.04 libEGL.so.0
++ ln -sf libEGL.so.580.178.04 libEGL.so
++ for f in *.so.$DRV
++ b=libGLESv1_CM_nvidia.so
++ ln -sf libGLESv1_CM_nvidia.so.580.178.04 libGLESv1_CM_nvidia.so.1
++ ln -sf libGLESv1_CM_nvidia.so.580.178.04 libGLESv1_CM_nvidia.so.0
++ ln -sf libGLESv1_CM_nvidia.so.580.178.04 libGLESv1_CM_nvidia.so
++ for f in *.so.$DRV
++ b=libGLESv2_nvidia.so
++ ln -sf libGLESv2_nvidia.so.580.178.04 libGLESv2_nvidia.so.1
++ ln -sf libGLESv2_nvidia.so.580.178.04 libGLESv2_nvidia.so.0
++ ln -sf libGLESv2_nvidia.so.580.178.04 libGLESv2_nvidia.so
++ for f in *.so.$DRV
++ b=libGLX_nvidia.so
++ ln -sf libGLX_nvidia.so.580.178.04 libGLX_nvidia.so.1
++ ln -sf libGLX_nvidia.so.580.178.04 libGLX_nvidia.so.0
++ ln -sf libGLX_nvidia.so.580.178.04 libGLX_nvidia.so
++ for f in *.so.$DRV
++ b=libglxserver_nvidia.so
++ ln -sf libglxserver_nvidia.so.580.178.04 libglxserver_nvidia.so.1
++ ln -sf libglxserver_nvidia.so.580.178.04 libglxserver_nvidia.so.0
++ ln -sf libglxserver_nvidia.so.580.178.04 libglxserver_nvidia.so
++ for f in *.so.$DRV
++ b=libnvcuvid.so
++ ln -sf libnvcuvid.so.580.178.04 libnvcuvid.so.1
++ ln -sf libnvcuvid.so.580.178.04 libnvcuvid.so.0
++ ln -sf libnvcuvid.so.580.178.04 libnvcuvid.so
++ for f in *.so.$DRV
++ b=libnvidia-allocator.so
++ ln -sf libnvidia-allocator.so.580.178.04 libnvidia-allocator.so.1
++ ln -sf libnvidia-allocator.so.580.178.04 libnvidia-allocator.so.0
++ ln -sf libnvidia-allocator.so.580.178.04 libnvidia-allocator.so
++ for f in *.so.$DRV
++ b=libnvidia-cfg.so
++ ln -sf libnvidia-cfg.so.580.178.04 libnvidia-cfg.so.1
++ ln -sf libnvidia-cfg.so.580.178.04 libnvidia-cfg.so.0
++ ln -sf libnvidia-cfg.so.580.178.04 libnvidia-cfg.so
++ for f in *.so.$DRV
++ b=libnvidia-eglcore.so
++ ln -sf libnvidia-eglcore.so.580.178.04 libnvidia-eglcore.so.1
++ ln -sf libnvidia-eglcore.so.580.178.04 libnvidia-eglcore.so.0
++ ln -sf libnvidia-eglcore.so.580.178.04 libnvidia-eglcore.so
++ for f in *.so.$DRV
++ b=libnvidia-encode.so
++ ln -sf libnvidia-encode.so.580.178.04 libnvidia-encode.so.1
++ ln -sf libnvidia-encode.so.580.178.04 libnvidia-encode.so.0
++ ln -sf libnvidia-encode.so.580.178.04 libnvidia-encode.so
++ for f in *.so.$DRV
++ b=libnvidia-fbc.so
++ ln -sf libnvidia-fbc.so.580.178.04 libnvidia-fbc.so.1
++ ln -sf libnvidia-fbc.so.580.178.04 libnvidia-fbc.so.0
++ ln -sf libnvidia-fbc.so.580.178.04 libnvidia-fbc.so
++ for f in *.so.$DRV
++ b=libnvidia-glcore.so
++ ln -sf libnvidia-glcore.so.580.178.04 libnvidia-glcore.so.1
++ ln -sf libnvidia-glcore.so.580.178.04 libnvidia-glcore.so.0
++ ln -sf libnvidia-glcore.so.580.178.04 libnvidia-glcore.so
++ for f in *.so.$DRV
++ b=libnvidia-glsi.so
++ ln -sf libnvidia-glsi.so.580.178.04 libnvidia-glsi.so.1
++ ln -sf libnvidia-glsi.so.580.178.04 libnvidia-glsi.so.0
++ ln -sf libnvidia-glsi.so.580.178.04 libnvidia-glsi.so
++ for f in *.so.$DRV
++ b=libnvidia-glvkspirv.so
++ ln -sf libnvidia-glvkspirv.so.580.178.04 libnvidia-glvkspirv.so.1
++ ln -sf libnvidia-glvkspirv.so.580.178.04 libnvidia-glvkspirv.so.0
++ ln -sf libnvidia-glvkspirv.so.580.178.04 libnvidia-glvkspirv.so
++ for f in *.so.$DRV
++ b=libnvidia-gpucomp.so
++ ln -sf libnvidia-gpucomp.so.580.178.04 libnvidia-gpucomp.so.1
++ ln -sf libnvidia-gpucomp.so.580.178.04 libnvidia-gpucomp.so.0
++ ln -sf libnvidia-gpucomp.so.580.178.04 libnvidia-gpucomp.so
++ for f in *.so.$DRV
++ b=libnvidia-gtk2.so
++ ln -sf libnvidia-gtk2.so.580.178.04 libnvidia-gtk2.so.1
++ ln -sf libnvidia-gtk2.so.580.178.04 libnvidia-gtk2.so.0
++ ln -sf libnvidia-gtk2.so.580.178.04 libnvidia-gtk2.so
++ for f in *.so.$DRV
++ b=libnvidia-gtk3.so
++ ln -sf libnvidia-gtk3.so.580.178.04 libnvidia-gtk3.so.1
++ ln -sf libnvidia-gtk3.so.580.178.04 libnvidia-gtk3.so.0
++ ln -sf libnvidia-gtk3.so.580.178.04 libnvidia-gtk3.so
++ for f in *.so.$DRV
++ b=libnvidia-ml.so
++ ln -sf libnvidia-ml.so.580.178.04 libnvidia-ml.so.1
++ ln -sf libnvidia-ml.so.580.178.04 libnvidia-ml.so.0
++ ln -sf libnvidia-ml.so.580.178.04 libnvidia-ml.so
++ for f in *.so.$DRV
++ b=libnvidia-ngx.so
++ ln -sf libnvidia-ngx.so.580.178.04 libnvidia-ngx.so.1
++ ln -sf libnvidia-ngx.so.580.178.04 libnvidia-ngx.so.0
++ ln -sf libnvidia-ngx.so.580.178.04 libnvidia-ngx.so
++ for f in *.so.$DRV
++ b=libnvidia-nvvm.so
++ ln -sf libnvidia-nvvm.so.580.178.04 libnvidia-nvvm.so.1
++ ln -sf libnvidia-nvvm.so.580.178.04 libnvidia-nvvm.so.0
++ ln -sf libnvidia-nvvm.so.580.178.04 libnvidia-nvvm.so
++ for f in *.so.$DRV
++ b=libnvidia-opencl.so
++ ln -sf libnvidia-opencl.so.580.178.04 libnvidia-opencl.so.1
++ ln -sf libnvidia-opencl.so.580.178.04 libnvidia-opencl.so.0
++ ln -sf libnvidia-opencl.so.580.178.04 libnvidia-opencl.so
++ for f in *.so.$DRV
++ b=libnvidia-opticalflow.so
++ ln -sf libnvidia-opticalflow.so.580.178.04 libnvidia-opticalflow.so.1
++ ln -sf libnvidia-opticalflow.so.580.178.04 libnvidia-opticalflow.so.0
++ ln -sf libnvidia-opticalflow.so.580.178.04 libnvidia-opticalflow.so
++ for f in *.so.$DRV
++ b=libnvidia-pkcs11-openssl3.so
++ ln -sf libnvidia-pkcs11-openssl3.so.580.178.04 libnvidia-pkcs11-openssl3.so.1
++ ln -sf libnvidia-pkcs11-openssl3.so.580.178.04 libnvidia-pkcs11-openssl3.so.0
++ ln -sf libnvidia-pkcs11-openssl3.so.580.178.04 libnvidia-pkcs11-openssl3.so
++ for f in *.so.$DRV
++ b=libnvidia-pkcs11.so
++ ln -sf libnvidia-pkcs11.so.580.178.04 libnvidia-pkcs11.so.1
++ ln -sf libnvidia-pkcs11.so.580.178.04 libnvidia-pkcs11.so.0
++ ln -sf libnvidia-pkcs11.so.580.178.04 libnvidia-pkcs11.so
++ for f in *.so.$DRV
++ b=libnvidia-present.so
++ ln -sf libnvidia-present.so.580.178.04 libnvidia-present.so.1
++ ln -sf libnvidia-present.so.580.178.04 libnvidia-present.so.0
++ ln -sf libnvidia-present.so.580.178.04 libnvidia-present.so
++ for f in *.so.$DRV
++ b=libnvidia-ptxjitcompiler.so
++ ln -sf libnvidia-ptxjitcompiler.so.580.178.04 libnvidia-ptxjitcompiler.so.1
++ ln -sf libnvidia-ptxjitcompiler.so.580.178.04 libnvidia-ptxjitcompiler.so.0
++ ln -sf libnvidia-ptxjitcompiler.so.580.178.04 libnvidia-ptxjitcompiler.so
++ for f in *.so.$DRV
++ b=libnvidia-rtcore.so
++ ln -sf libnvidia-rtcore.so.580.178.04 libnvidia-rtcore.so.1
++ ln -sf libnvidia-rtcore.so.580.178.04 libnvidia-rtcore.so.0
++ ln -sf libnvidia-rtcore.so.580.178.04 libnvidia-rtcore.so
++ for f in *.so.$DRV
++ b=libnvidia-sandboxutils.so
++ ln -sf libnvidia-sandboxutils.so.580.178.04 libnvidia-sandboxutils.so.1
++ ln -sf libnvidia-sandboxutils.so.580.178.04 libnvidia-sandboxutils.so.0
++ ln -sf libnvidia-sandboxutils.so.580.178.04 libnvidia-sandboxutils.so
++ for f in *.so.$DRV
++ b=libnvidia-tls.so
++ ln -sf libnvidia-tls.so.580.178.04 libnvidia-tls.so.1
++ ln -sf libnvidia-tls.so.580.178.04 libnvidia-tls.so.0
++ ln -sf libnvidia-tls.so.580.178.04 libnvidia-tls.so
++ for f in *.so.$DRV
++ b=libnvidia-vksc-core.so
++ ln -sf libnvidia-vksc-core.so.580.178.04 libnvidia-vksc-core.so.1
++ ln -sf libnvidia-vksc-core.so.580.178.04 libnvidia-vksc-core.so.0
++ ln -sf libnvidia-vksc-core.so.580.178.04 libnvidia-vksc-core.so
++ for f in *.so.$DRV
++ b=libnvidia-wayland-client.so
++ ln -sf libnvidia-wayland-client.so.580.178.04 libnvidia-wayland-client.so.1
++ ln -sf libnvidia-wayland-client.so.580.178.04 libnvidia-wayland-client.so.0
++ ln -sf libnvidia-wayland-client.so.580.178.04 libnvidia-wayland-client.so
++ for f in *.so.$DRV
++ b=libnvoptix.so
++ ln -sf libnvoptix.so.580.178.04 libnvoptix.so.1
++ ln -sf libnvoptix.so.580.178.04 libnvoptix.so.0
++ ln -sf libnvoptix.so.580.178.04 libnvoptix.so
++ for f in *.so.$DRV
++ b=libvdpau_nvidia.so
++ ln -sf libvdpau_nvidia.so.580.178.04 libvdpau_nvidia.so.1
++ ln -sf libvdpau_nvidia.so.580.178.04 libvdpau_nvidia.so.0
++ ln -sf libvdpau_nvidia.so.580.178.04 libvdpau_nvidia.so
++ cd /tmp/w
++ cat
++ mkdir -p /tmp/w/egl
++ cat
++ timeout 300 apt-get update -qq
++ DEBIAN_FRONTEND=noninteractive
++ timeout 600 apt-get install -y -qq --no-install-recommends libglu1-mesa libxt6t64 libxrandr2 libxinerama1 libxcursor1 libxi6 libvulkan1 libsm6 libice6 libxkbcommon0 libegl1 libgl1
++ timeout 600 curl -sfL https://micro.mamba.pm/api/micromamba/linux-64/latest
++ tar -xj -C /tmp/w bin/micromamba
++ MM=/tmp/w/bin/micromamba
++ RP=696
++ timeout 2400 /tmp/w/bin/micromamba create -y -q -n ros -c robostack-staging -c conda-forge python=3.11 ros-humble-ros-base ros-humble-robot-state-publisher ros-humble-cv-bridge ros-humble-tf2-ros ros-humble-image-transport ros-humble-rosidl-default-generators colcon-common-extensions cmake make compilers ninja pkg-config yaml-cpp pyzmq pyyaml 'numpy<2' scipy
++ IP=697
++ timeout 2400 /tmp/w/bin/micromamba create -y -q -n isaac -c conda-forge python=3.11 pip
+++ find /kaggle/input -maxdepth 5 -type d -name polygon
+++ head -1
++ SRC=/kaggle/input/datasets/dmitrijkv/team048-polygon-assets/polygon
++ echo SRC=/kaggle/input/datasets/dmitrijkv/team048-polygon-assets/polygon
+SRC=/kaggle/input/datasets/dmitrijkv/team048-polygon-assets/polygon
++ ls /kaggle/input
+datasets
++ mkdir -p /tmp/nssr_sim
++ cp -r /kaggle/input/datasets/dmitrijkv/team048-polygon-assets/polygon/. /tmp/nssr_sim/
++ P=/tmp/w/mm/envs/isaac/bin/python
++ timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cu128
++ ln -sfn /tmp/nssr_sim /nssr_sim
++ wait 696
++ echo ros_env_rc=0
++ wait 697
++ timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q -U pip 'setuptools<70' wheel
++ timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1
++ timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com
++ timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q pyzmq 'numpy<2' packaging==24.2 pyyaml opencv-python-headless
++ echo isaac_env_rc=0
++ mkdir -p /tmp/w/bc /tmp/w/ws/src/bodyctrl_msgs
++ dpkg-deb -x /tmp/nssr_sim/teleoperation/msgs/ros-humble-bodyctrl-msgs_0.0.1-1_amd64.deb /tmp/w/bc
++ S=/tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs
++ D=/tmp/w/ws/src/bodyctrl_msgs
++ mkdir -p /tmp/w/ws/src/bodyctrl_msgs/msg /tmp/w/ws/src/bodyctrl_msgs/srv
++ cp /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/AlarmArray.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/Alarm.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/CmdMotorCtrl.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/CmdSetMotorCurTor.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/CmdSetMotorDistance.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/CmdSetMotorPosition.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/CmdSetMotorSpeed.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/CmdSetTsHandCtrl.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/CmdSetTsHandPosition.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/CmdSetWaistMotorPos.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/Euler.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/ExceptionArray.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/Exception.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/Imu.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/MotorCtrl.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/MotorName.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/MotorStatus1.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/MotorStatus.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/MotorStatusMsg1.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/MotorStatusMsg2.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/MotorStatusMsg.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/MotorStatusMsgPlate.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/NodeState.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/PowerBatteryStatus.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/PowerBoardCtrl.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/PowerBoardKeyStatus.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/PowerLightCtrl.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/PowerStatus.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/SbusData.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/SetMotorCurTor.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/SetMotorDistance.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/SetMotorPosition.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/SetMotorSpeed.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/SetTsHandCtrlItem.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/SetTsHandCtrl.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/SetTsHandPosition.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/Sri.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/SriName.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/TsHandName.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/TsHandStatus.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/TsHandStatusMsg.msg /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/msg/WaistMotorStatus.msg /tmp/w/ws/src/bodyctrl_msgs/msg/
++ cp /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/srv/GetAngleAct.srv /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/srv/GetError.srv /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/srv/GetForceAct.srv /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/srv/GetStatus.srv /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/srv/JointSetZero.srv /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/srv/MotorInit.srv /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/srv/MotorResetPosition.srv /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/srv/MotorStart.srv /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/srv/MotorStop.srv /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/srv/Movement.srv /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/srv/PlanEefLine.srv /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/srv/PlanEefRelLine.srv /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/srv/PlanJointTraj.srv /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/srv/ResetMotorZeroOffset.srv /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/srv/SetAngleFlexible.srv /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/srv/SetAngle.srv /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/srv/SetClearError.srv /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/srv/SetForce.srv /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/srv/SetMotorZeroOffset.srv /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/srv/SetSpeed.srv /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/srv/VersionUpgrade.srv /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/srv/XSensImuInit.srv /tmp/w/ws/src/bodyctrl_msgs/srv/
++ cp /tmp/w/bc/opt/ros/humble/share/bodyctrl_msgs/package.xml /tmp/w/ws/src/bodyctrl_msgs/
++ python3 - /tmp/w/ws/src/bodyctrl_msgs
+++ /tmp/w/bin/micromamba shell hook -s bash
++ eval '
+# Copyright (C) 2012 Anaconda, Inc
+# SPDX-License-Identifier: BSD-3-Clause
+
+__mamba_exe() (
+    "/tmp/w/bin/micromamba" "${@}"
+)
+
+__mamba_hashr() {
+    if [ -n "${ZSH_VERSION:+x}" ]; then
+        \rehash
+    elif [ -n "${POSH_VERSION:+x}" ]; then
+        :  # pass
+    else
+        \hash -r
+    fi
+}
+
+__mamba_xctivate() {
+    \local ask_mamba
+    ask_mamba="$(PS1="${PS1:-}" __mamba_exe shell "${@}" --shell bash)" || \return
+    \eval "${ask_mamba}"
+    __mamba_hashr
+}
+
+__mamba_wrap() {
+    \local cmd="${1-__missing__}"
+    case "${cmd}" in
+        activate|reactivate|deactivate)
+            for arg in "${@}"; do
+                case "${arg}" in
+                    -h|--help)
+                        __mamba_exe "${@}"
+                        return
+                        ;;
+                esac
+            done
+            __mamba_xctivate "${@}"
+            ;;
+        install|update|upgrade|remove|uninstall)
+            __mamba_exe "${@}" || \return
+            __mamba_xctivate reactivate
+            ;;
+        self-update)
+            __mamba_exe "${@}" || \return
+
+            # remove leftover backup file on Windows
+            if [ -f "/tmp/w/bin/micromamba.bkup" ]; then
+                rm -f "/tmp/w/bin/micromamba.bkup"
+            fi
+            ;;
+        *)
+            __mamba_exe "${@}"
+            ;;
+    esac
+}
+
+
+# We need to define a function with the same name as the executable to be called by the user.
+# There is no way to register it dynamically without relying on hacks or eval.
+__exe_name="$(basename "/tmp/w/bin/micromamba")"
+__exe_name="${__exe_name%.*}"
+
+case "${__exe_name}" in
+    micromamba)
+        micromamba() {
+            __mamba_wrap "$@"
+        }
+        ;;
+    mamba)
+        mamba() {
+            __mamba_wrap "$@"
+        }
+        ;;
+    *)
+        echo "Error unknown MAMBA_EXE: \"/tmp/w/bin/micromamba\", filename must be mamba or micromamba" 1>&2
+        ;;
+esac
+
+
+if [ -z "${CONDA_SHLVL+x}" ]; then
+    \export CONDA_SHLVL=0
+    \export PATH="${MAMBA_ROOT_PREFIX}/condabin:${PATH}"
+
+    # We'\''re not allowing PS1 to be unbound. It must at least be set.
+    # However, we'\''re not exporting it, which can cause problems when starting a second shell
+    # via a first shell (i.e. starting zsh from bash).
+    if [ -z "${PS1+x}" ]; then
+        PS1=
+    fi
+fi
+
+if [ -n "${ZSH_VERSION:+x}" ]; then
+  if ! command -v compinit > /dev/null; then
+    autoload -U +X compinit && if [[ "${ZSH_DISABLE_COMPFIX-}" = true ]]; then
+      compinit -u
+    else
+      compinit
+    fi
+  fi
+  autoload -U +X bashcompinit && bashcompinit
+
+  _umamba_zsh_completions()
+  {
+    COMPREPLY=($(__mamba_exe completer "${(@s: :)${(@s: :)COMP_LINE}:1}"))
+  }
+
+  complete -o default -F _umamba_zsh_completions micromamba
+fi
+if [ -n "${BASH_VERSION:+x}" ]; then
+  _umamba_bash_completions()
+  {
+    COMPREPLY=($(__mamba_exe completer "${COMP_WORDS[@]:1}"))
+  }
+  complete -o default -F _umamba_bash_completions micromamba
+fi'
++++ basename /tmp/w/bin/micromamba
+++ __exe_name=micromamba
+++ __exe_name=micromamba
+++ case "${__exe_name}" in
+++ '[' -z '' ']'
+++ export CONDA_SHLVL=0
+++ CONDA_SHLVL=0
+++ export PATH=/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin
+++ PATH=/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin
+++ '[' -z '' ']'
+++ PS1=
+++ '[' -n '' ']'
+++ '[' -n x ']'
+++ complete -o default -F _umamba_bash_completions micromamba
++ micromamba activate ros
++ __mamba_wrap activate ros
++ local cmd=activate
++ case "${cmd}" in
++ for arg in "${@}"
++ case "${arg}" in
++ for arg in "${@}"
++ case "${arg}" in
++ __mamba_xctivate activate ros
++ local ask_mamba
+++ PS1=
+++ __mamba_exe shell activate ros --shell bash
+++ /tmp/w/bin/micromamba shell activate ros --shell bash
++ ask_mamba='PS1='\''(ros) '\''
+export PATH='\''/tmp/w/mm/envs/ros/bin:/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin'\''
+export CONDA_PREFIX='\''/tmp/w/mm/envs/ros'\''
+export CONDA_SHLVL='\''1'\''
+export CONDA_DEFAULT_ENV='\''ros'\''
+export CONDA_PROMPT_MODIFIER='\''(ros) '\''
+. "/tmp/w/mm/envs/ros/etc/conda/activate.d/libglib_activate.sh"
+. "/tmp/w/mm/envs/ros/etc/conda/activate.d/libxml2_activate.sh"
+. "/tmp/w/mm/envs/ros/etc/conda/activate.d/ros-humble-ros-workspace_activate.sh"'
++ eval 'PS1='\''(ros) '\''
+export PATH='\''/tmp/w/mm/envs/ros/bin:/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin'\''
+export CONDA_PREFIX='\''/tmp/w/mm/envs/ros'\''
+export CONDA_SHLVL='\''1'\''
+export CONDA_DEFAULT_ENV='\''ros'\''
+export CONDA_PROMPT_MODIFIER='\''(ros) '\''
+. "/tmp/w/mm/envs/ros/etc/conda/activate.d/libglib_activate.sh"
+. "/tmp/w/mm/envs/ros/etc/conda/activate.d/libxml2_activate.sh"
+. "/tmp/w/mm/envs/ros/etc/conda/activate.d/ros-humble-ros-workspace_activate.sh"'
+++ PS1='(ros) '
+++ export PATH=/tmp/w/mm/envs/ros/bin:/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin
+++ PATH=/tmp/w/mm/envs/ros/bin:/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin
+++ export CONDA_PREFIX=/tmp/w/mm/envs/ros
+++ CONDA_PREFIX=/tmp/w/mm/envs/ros
+++ export CONDA_SHLVL=1
+++ CONDA_SHLVL=1
+++ export CONDA_DEFAULT_ENV=ros
+++ CONDA_DEFAULT_ENV=ros
+++ export 'CONDA_PROMPT_MODIFIER=(ros) '
+++ CONDA_PROMPT_MODIFIER='(ros) '
+++ . /tmp/w/mm/envs/ros/etc/conda/activate.d/libglib_activate.sh
++++ export GSETTINGS_SCHEMA_DIR_CONDA_BACKUP=
++++ GSETTINGS_SCHEMA_DIR_CONDA_BACKUP=
++++ export GSETTINGS_SCHEMA_DIR=/tmp/w/mm/envs/ros/share/glib-2.0/schemas
++++ GSETTINGS_SCHEMA_DIR=/tmp/w/mm/envs/ros/share/glib-2.0/schemas
+++ . /tmp/w/mm/envs/ros/etc/conda/activate.d/libxml2_activate.sh
++++ test -n ''
++++ xml_catalog_files_libxml2=
++++ XML_CATALOG_FILES=
++++ conda_catalog_files=
++++ ifs_libxml2=' 	
+'
++++ IFS=' '
++++ rem=/tmp/w/mm/envs/ros
++++ for pre in ${rem}
++++ test '' = /tmp/w/mm/envs/ros
++++ conda_catalog_files=/tmp/w/mm/envs/ros
++++ rem=
++++ IFS=' 	
+'
++++ conda_catalog_files='file:///tmp/w/mm/envs/ros/etc/xml/catalog file:///etc/xml/catalog'
++++ export 'XML_CATALOG_FILES=file:///tmp/w/mm/envs/ros/etc/xml/catalog file:///etc/xml/catalog'
++++ XML_CATALOG_FILES='file:///tmp/w/mm/envs/ros/etc/xml/catalog file:///etc/xml/catalog'
++++ unset conda_catalog_files ifs_libxml2 rem
+++ . /tmp/w/mm/envs/ros/etc/conda/activate.d/ros-humble-ros-workspace_activate.sh
++++ '[' '' = 1 -a '' '!=' '' ']'
++++ source /tmp/w/mm/envs/ros/setup.sh
+++++ : /tmp/w/mm/envs/ros
+++++ : sh
+++++ _prefix_setup_IFS=' 	
+'
+++++ IFS='
+'
+++++ _UNIQUE_PREFIX_PATH=
+++++ '[' -z SKIP_PARENT_PREFIX_PATH ']'
+++++ ament_append_unique_value _UNIQUE_PREFIX_PATH /tmp/w/mm/envs/ros
+++++ _listname=_UNIQUE_PREFIX_PATH
+++++ _value=/tmp/w/mm/envs/ros
+++++ eval '_values=$_UNIQUE_PREFIX_PATH'
++++++ _values=
+++++ _duplicate=
+++++ _ament_append_unique_value_IFS='
+'
+++++ IFS=:
+++++ '[' sh = zsh ']'
+++++ unset _item
+++++ '[' -z '' ']'
+++++ '[' -z '' ']'
+++++ eval '_UNIQUE_PREFIX_PATH="/tmp/w/mm/envs/ros"'
++++++ _UNIQUE_PREFIX_PATH=/tmp/w/mm/envs/ros
+++++ IFS='
+'
+++++ unset _ament_append_unique_value_IFS
+++++ unset _duplicate
+++++ unset _values
+++++ unset _value
+++++ unset _listname
+++++ unset AMENT_CURRENT_PREFIX
+++++ _prefix_setup_AMENT_SHELL=sh
+++++ IFS=:
+++++ '[' sh = zsh ']'
+++++ for _path in $_UNIQUE_PREFIX_PATH
+++++ '[' -n '' ']'
+++++ '[' -f /tmp/w/mm/envs/ros/local_setup.sh ']'
+++++ '[' sh = sh ']'
+++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++++ IFS=' 	
+'
+++++ . /tmp/w/mm/envs/ros/local_setup.sh
++++++ _ament_prefix_sh_AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ '[' -z /tmp/w/mm/envs/ros ']'
++++++ _ament_prefix_sh_AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ : sh
++++++ _ament_python_executable=/tmp/w/mm/envs/ros/bin/python
++++++ '[' -n '' ']'
++++++ '[' '!' -f /tmp/w/mm/envs/ros/bin/python ']'
++++++ _ament_additional_extension=
++++++ '[' sh '!=' sh ']'
+++++++ /tmp/w/mm/envs/ros/bin/python /tmp/w/mm/envs/ros/_local_setup_util.py sh
++++++ _ament_ordered_commands='export AMENT_PREFIX_PATH="/tmp/w/mm/envs/ros:$AMENT_PREFIX_PATH"
+export PYTHONPATH="/tmp/w/mm/envs/ros/lib/python3.11/site-packages:$PYTHONPATH"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh"
+export ROS_DISTRO="humble"
+export ROS_LOCALHOST_ONLY="0"
+export ROS_PYTHON_VERSION="3"
+export ROS_VERSION="2"
+export PYTHONPATH="/tmp/w/mm/envs/ros/lib/python311/site-packages:$PYTHONPATH"
+export AMENT_PREFIX_PATH=${AMENT_PREFIX_PATH#:}
+export AMENT_PREFIX_PATH=${AMENT_PREFIX_PATH%:}
+export ROS_DISTRO=${ROS_DISTRO#:}
+export ROS_DISTRO=${ROS_DISTRO%:}
+export ROS_PYTHON_VERSION=${ROS_PYTHON_VERSION#:}
+export ROS_PYTHON_VERSION=${ROS_PYTHON_VERSION%:}
+export ROS_VERSION=${ROS_VERSION#:}
+export ROS_VERSION=${ROS_VERSION%:}'
++++++ unset _ament_additional_extension
++++++ unset _ament_python_executable
++++++ '[' -n '' ']'
++++++ eval 'export AMENT_PREFIX_PATH="/tmp/w/mm/envs/ros:$AMENT_PREFIX_PATH"
+export PYTHONPATH="/tmp/w/mm/envs/ros/lib/python3.11/site-packages:$PYTHONPATH"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh"
+export ROS_DISTRO="humble"
+export ROS_LOCALHOST_ONLY="0"
+export ROS_PYTHON_VERSION="3"
+export ROS_VERSION="2"
+export PYTHONPATH="/tmp/w/mm/envs/ros/lib/python311/site-packages:$PYTHONPATH"
+export AMENT_PREFIX_PATH=${AMENT_PREFIX_PATH#:}
+export AMENT_PREFIX_PATH=${AMENT_PREFIX_PATH%:}
+export ROS_DISTRO=${ROS_DISTRO#:}
+export ROS_DISTRO=${ROS_DISTRO%:}
+export ROS_PYTHON_VERSION=${ROS_PYTHON_VERSION#:}
+export ROS_PYTHON_VERSION=${ROS_PYTHON_VERSION%:}
+export ROS_VERSION=${ROS_VERSION#:}
+export ROS_VERSION=${ROS_VERSION%:}'
+++++++ export AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros:
+++++++ AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros:
+++++++ export PYTHONPATH=/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++++ PYTHONPATH=/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++++++ _ament_prefix_sh_source_script /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh
+++++++ '[' -f /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh ']'
+++++++ '[' -n '' ']'
+++++++ . /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh
++++++++ '[' -n '' -a '' '!=' humble ']'
+++++++ export ROS_DISTRO=humble
+++++++ ROS_DISTRO=humble
+++++++ export ROS_LOCALHOST_ONLY=0
+++++++ ROS_LOCALHOST_ONLY=0
+++++++ export ROS_PYTHON_VERSION=3
+++++++ ROS_PYTHON_VERSION=3
+++++++ export ROS_VERSION=2
+++++++ ROS_VERSION=2
+++++++ export PYTHONPATH=/tmp/w/mm/envs/ros/lib/python311/site-packages:/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++++ PYTHONPATH=/tmp/w/mm/envs/ros/lib/python311/site-packages:/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++++ export AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros:
+++++++ AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros:
+++++++ export AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros
+++++++ AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros
+++++++ export ROS_DISTRO=humble
+++++++ ROS_DISTRO=humble
+++++++ export ROS_DISTRO=humble
+++++++ ROS_DISTRO=humble
+++++++ export ROS_PYTHON_VERSION=3
+++++++ ROS_PYTHON_VERSION=3
+++++++ export ROS_PYTHON_VERSION=3
+++++++ ROS_PYTHON_VERSION=3
+++++++ export ROS_VERSION=2
+++++++ ROS_VERSION=2
+++++++ export ROS_VERSION=2
+++++++ ROS_VERSION=2
++++++ unset _ament_ordered_commands
++++++ unset _ament_prefix_sh_source_script
++++++ unset _ament_prefix_sh_AMENT_CURRENT_PREFIX
+++++ AMENT_SHELL=sh
+++++ unset _path
+++++ IFS=' 	
+'
+++++ unset _prefix_setup_IFS
+++++ unset _prefix_setup_AMENT_SHELL
+++++ unset _UNIQUE_PREFIX_PATH
+++++ unset AMENT_SHELL
++++ case "$OSTYPE" in
++++ export ROS_OS_OVERRIDE=conda:linux
++++ ROS_OS_OVERRIDE=conda:linux
++++ export ROS_ETC_DIR=/tmp/w/mm/envs/ros/etc/ros
++++ ROS_ETC_DIR=/tmp/w/mm/envs/ros/etc/ros
++++ export AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros
++++ AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros
++ __mamba_hashr
++ '[' -n '' ']'
++ '[' -n '' ']'
++ hash -r
++ timeout 600 python -m pip install -q empy==3.3.4 lark catkin_pkg numpy
++ cd /tmp/w/ws
+++ which python
+++ which python
++ timeout 900 colcon build --cmake-args -DBUILD_TESTING=OFF -DPython3_EXECUTABLE=/tmp/w/mm/envs/ros/bin/python -DPython_EXECUTABLE=/tmp/w/mm/envs/ros/bin/python -DPython_ROOT_DIR=/tmp/w/mm/envs/ros -DPython3_ROOT_DIR=/tmp/w/mm/envs/ros -DPython_FIND_STRATEGY=LOCATION -DPython3_FIND_STRATEGY=LOCATION -DCMAKE_POLICY_VERSION_MINIMUM=3.5
++ echo bodyctrl_rc=0
++ tee -a /kaggle/working/logs/bodyctrl_build.log
+bodyctrl_rc=0
++ source /tmp/w/ws/install/setup.bash
+++ COLCON_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++ _colcon_prefix_chain_bash_source_script /tmp/w/mm/envs/ros/local_setup.bash
+++ '[' -f /tmp/w/mm/envs/ros/local_setup.bash ']'
+++ '[' -n '' ']'
+++ . /tmp/w/mm/envs/ros/local_setup.bash
++++ AMENT_SHELL=bash
++++++ dirname /tmp/w/mm/envs/ros/local_setup.bash
+++++ builtin cd /tmp/w/mm/envs/ros
+++++ pwd
++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++ '[' -n '' ']'
++++ . /tmp/w/mm/envs/ros/local_setup.sh
+++++ _ament_prefix_sh_AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++++ '[' -z /tmp/w/mm/envs/ros ']'
+++++ _ament_prefix_sh_AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++++ : bash
+++++ _ament_python_executable=/tmp/w/mm/envs/ros/bin/python
+++++ '[' -n '' ']'
+++++ '[' '!' -f /tmp/w/mm/envs/ros/bin/python ']'
+++++ _ament_additional_extension=
+++++ '[' bash '!=' sh ']'
+++++ _ament_additional_extension=bash
++++++ /tmp/w/mm/envs/ros/bin/python /tmp/w/mm/envs/ros/_local_setup_util.py sh bash
+++++ _ament_ordered_commands='AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh"
+export ROS_DISTRO="humble"
+# export ROS_LOCALHOST_ONLY="0"
+export ROS_PYTHON_VERSION="3"
+export ROS_VERSION="2"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash"'
+++++ unset _ament_additional_extension
+++++ unset _ament_python_executable
+++++ '[' -n '' ']'
+++++ eval 'AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh"
+export ROS_DISTRO="humble"
+# export ROS_LOCALHOST_ONLY="0"
+export ROS_PYTHON_VERSION="3"
+export ROS_VERSION="2"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash"'
++++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ _ament_prefix_sh_source_script /tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash
++++++ '[' -f /tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash ']'
++++++ '[' -n '' ']'
++++++ . /tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash
+++++++ type register-python-argcomplete
++++++++ register-python-argcomplete ros2
+++++++ eval '#compdef ros2
+# Run something, muting output or redirecting it to the debug stream
+# depending on the value of _ARC_DEBUG.
+# If ARGCOMPLETE_USE_TEMPFILES is set, use tempfiles for IPC.
+__python_argcomplete_run() {
+    if [[ -z "${ARGCOMPLETE_USE_TEMPFILES-}" ]]; then
+        __python_argcomplete_run_inner "$@"
+        return
+    fi
+    local tmpfile="$(mktemp)"
+    _ARGCOMPLETE_STDOUT_FILENAME="$tmpfile" __python_argcomplete_run_inner "$@"
+    local code=$?
+    cat "$tmpfile"
+    rm "$tmpfile"
+    return $code
+}
+
+__python_argcomplete_run_inner() {
+    if [[ -z "${_ARC_DEBUG-}" ]]; then
+        "$@" 8>&1 9>&2 1>/dev/null 2>&1 </dev/null
+    else
+        "$@" 8>&1 9>&2 1>&9 2>&1 </dev/null
+    fi
+}
+
+_python_argcomplete() {
+    local IFS=$'\''\013'\''
+    local script=""
+    if [[ -n "${ZSH_VERSION-}" ]]; then
+        local completions
+        completions=($(IFS="$IFS" \
+            COMP_LINE="$BUFFER" \
+            COMP_POINT="$CURSOR" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="zsh" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=1 \
+            __python_argcomplete_run ${script:-${words[1]}}))
+        local nosort=()
+        local nospace=()
+        if is-at-least 5.8; then
+            nosort=(-o nosort)
+        fi
+        if [[ "${completions-}" =~ ([^\\\\]): && "${match[1]}" =~ [=/:] ]]; then
+            nospace=(-S '\'''\'')
+        fi
+        _describe "${words[1]}" completions "${nosort[@]}" "${nospace[@]}"
+    else
+        local SUPPRESS_SPACE=0
+        if compopt +o nospace 2> /dev/null; then
+            SUPPRESS_SPACE=1
+        fi
+        COMPREPLY=($(IFS="$IFS" \
+            COMP_LINE="$COMP_LINE" \
+            COMP_POINT="$COMP_POINT" \
+            COMP_TYPE="$COMP_TYPE" \
+            _ARGCOMPLETE_COMP_WORDBREAKS="$COMP_WORDBREAKS" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="bash" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=$SUPPRESS_SPACE \
+            __python_argcomplete_run ${script:-$1}))
+        if [[ $? != 0 ]]; then
+            unset COMPREPLY
+        elif [[ $SUPPRESS_SPACE == 1 ]] && [[ "${COMPREPLY-}" =~ [=/:]$ ]]; then
+            compopt -o nospace
+        fi
+    fi
+}
+if [[ -z "${ZSH_VERSION-}" ]]; then
+    complete -o nospace -o default -o bashdefault -F _python_argcomplete ros2
+else
+    # When called by the Zsh completion system, this will end with
+    # "loadautofunc" when initially autoloaded and "shfunc" later on, otherwise,
+    # the script was "eval"-ed so use "compdef" to register it with the
+    # completion system
+    autoload is-at-least
+    if [[ $zsh_eval_context == *func ]]; then
+        _python_argcomplete "$@"
+    else
+        compdef _python_argcomplete ros2
+    fi
+fi'
++++++++ [[ -z '' ]]
++++++++ complete -o nospace -o default -o bashdefault -F _python_argcomplete ros2
++++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ _ament_prefix_sh_source_script /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh
++++++ '[' -f /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh ']'
++++++ '[' -n '' ']'
++++++ . /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh
+++++++ '[' -n humble -a humble '!=' humble ']'
++++++ export ROS_DISTRO=humble
++++++ ROS_DISTRO=humble
++++++ export ROS_PYTHON_VERSION=3
++++++ ROS_PYTHON_VERSION=3
++++++ export ROS_VERSION=2
++++++ ROS_VERSION=2
++++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ _ament_prefix_sh_source_script /tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash
++++++ '[' -f /tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash ']'
++++++ '[' -n '' ']'
++++++ . /tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash
+++++++ type register-python-argcomplete3
+++++++ type register-python-argcomplete
++++++++ register-python-argcomplete rosidl
+++++++ eval '#compdef rosidl
+# Run something, muting output or redirecting it to the debug stream
+# depending on the value of _ARC_DEBUG.
+# If ARGCOMPLETE_USE_TEMPFILES is set, use tempfiles for IPC.
+__python_argcomplete_run() {
+    if [[ -z "${ARGCOMPLETE_USE_TEMPFILES-}" ]]; then
+        __python_argcomplete_run_inner "$@"
+        return
+    fi
+    local tmpfile="$(mktemp)"
+    _ARGCOMPLETE_STDOUT_FILENAME="$tmpfile" __python_argcomplete_run_inner "$@"
+    local code=$?
+    cat "$tmpfile"
+    rm "$tmpfile"
+    return $code
+}
+
+__python_argcomplete_run_inner() {
+    if [[ -z "${_ARC_DEBUG-}" ]]; then
+        "$@" 8>&1 9>&2 1>/dev/null 2>&1 </dev/null
+    else
+        "$@" 8>&1 9>&2 1>&9 2>&1 </dev/null
+    fi
+}
+
+_python_argcomplete() {
+    local IFS=$'\''\013'\''
+    local script=""
+    if [[ -n "${ZSH_VERSION-}" ]]; then
+        local completions
+        completions=($(IFS="$IFS" \
+            COMP_LINE="$BUFFER" \
+            COMP_POINT="$CURSOR" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="zsh" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=1 \
+            __python_argcomplete_run ${script:-${words[1]}}))
+        local nosort=()
+        local nospace=()
+        if is-at-least 5.8; then
+            nosort=(-o nosort)
+        fi
+        if [[ "${completions-}" =~ ([^\\\\]): && "${match[1]}" =~ [=/:] ]]; then
+            nospace=(-S '\'''\'')
+        fi
+        _describe "${words[1]}" completions "${nosort[@]}" "${nospace[@]}"
+    else
+        local SUPPRESS_SPACE=0
+        if compopt +o nospace 2> /dev/null; then
+            SUPPRESS_SPACE=1
+        fi
+        COMPREPLY=($(IFS="$IFS" \
+            COMP_LINE="$COMP_LINE" \
+            COMP_POINT="$COMP_POINT" \
+            COMP_TYPE="$COMP_TYPE" \
+            _ARGCOMPLETE_COMP_WORDBREAKS="$COMP_WORDBREAKS" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="bash" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=$SUPPRESS_SPACE \
+            __python_argcomplete_run ${script:-$1}))
+        if [[ $? != 0 ]]; then
+            unset COMPREPLY
+        elif [[ $SUPPRESS_SPACE == 1 ]] && [[ "${COMPREPLY-}" =~ [=/:]$ ]]; then
+            compopt -o nospace
+        fi
+    fi
+}
+if [[ -z "${ZSH_VERSION-}" ]]; then
+    complete -o nospace -o default -o bashdefault -F _python_argcomplete rosidl
+else
+    # When called by the Zsh completion system, this will end with
+    # "loadautofunc" when initially autoloaded and "shfunc" later on, otherwise,
+    # the script was "eval"-ed so use "compdef" to register it with the
+    # completion system
+    autoload is-at-least
+    if [[ $zsh_eval_context == *func ]]; then
+        _python_argcomplete "$@"
+    else
+        compdef _python_argcomplete rosidl
+    fi
+fi'
++++++++ [[ -z '' ]]
++++++++ complete -o nospace -o default -o bashdefault -F _python_argcomplete rosidl
+++++ unset _ament_ordered_commands
+++++ unset _ament_prefix_sh_source_script
+++++ unset _ament_prefix_sh_AMENT_CURRENT_PREFIX
+++++ dirname /tmp/w/ws/install/setup.bash
++++ builtin cd /tmp/w/ws/install
++++ pwd
+++ COLCON_CURRENT_PREFIX=/tmp/w/ws/install
+++ _colcon_prefix_chain_bash_source_script /tmp/w/ws/install/local_setup.bash
+++ '[' -f /tmp/w/ws/install/local_setup.bash ']'
+++ '[' -n '' ']'
+++ . /tmp/w/ws/install/local_setup.bash
++++ '[' -z /tmp/w/ws/install ']'
++++ _colcon_prefix_bash_COLCON_CURRENT_PREFIX=/tmp/w/ws/install
++++ _colcon_prefix_bash_prepend_unique_value COLCON_PREFIX_PATH /tmp/w/ws/install
++++ _listname=COLCON_PREFIX_PATH
++++ _value=/tmp/w/ws/install
++++ eval '_values="$COLCON_PREFIX_PATH"'
+++++ _values=
++++ _colcon_prefix_bash_prepend_unique_value_IFS=' 	
+'
++++ IFS=:
++++ _all_values=/tmp/w/ws/install
++++ _contained_value=
++++ unset _item
++++ '[' -z '' ']'
++++ '[' -n '' ']'
++++ unset _contained_value
++++ IFS=' 	
+'
++++ unset _colcon_prefix_bash_prepend_unique_value_IFS
++++ eval export 'COLCON_PREFIX_PATH="/tmp/w/ws/install"'
+++++ export COLCON_PREFIX_PATH=/tmp/w/ws/install
+++++ COLCON_PREFIX_PATH=/tmp/w/ws/install
++++ unset _all_values
++++ unset _values
++++ unset _value
++++ unset _listname
++++ unset _colcon_prefix_bash_prepend_unique_value
++++ '[' -n '' ']'
++++ _colcon_python_executable=/tmp/w/mm/envs/ros/bin/python3.11
++++ '[' '!' -f /tmp/w/mm/envs/ros/bin/python3.11 ']'
+++++ /tmp/w/mm/envs/ros/bin/python3.11 /tmp/w/ws/install/_local_setup_util_sh.py sh bash
++++ _colcon_ordered_commands='export CMAKE_PREFIX_PATH="/tmp/w/ws/install/bodyctrl_msgs:$CMAKE_PREFIX_PATH"
+export LD_LIBRARY_PATH="/tmp/w/ws/install/bodyctrl_msgs/lib:$LD_LIBRARY_PATH"
+export PYTHONPATH="/tmp/w/ws/install/bodyctrl_msgs/lib/python3.11/site-packages:$PYTHONPATH"
+export AMENT_PREFIX_PATH="/tmp/w/ws/install/bodyctrl_msgs:$AMENT_PREFIX_PATH"
+if [ "$(echo -n $CMAKE_PREFIX_PATH | head -c 1)" = ":" ]; then export CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH#?} ; fi
+if [ "$(echo -n $CMAKE_PREFIX_PATH | tail -c 1)" = ":" ]; then export CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH%?} ; fi'
++++ unset _colcon_python_executable
++++ '[' -n '' ']'
++++ eval 'export CMAKE_PREFIX_PATH="/tmp/w/ws/install/bodyctrl_msgs:$CMAKE_PREFIX_PATH"
+export LD_LIBRARY_PATH="/tmp/w/ws/install/bodyctrl_msgs/lib:$LD_LIBRARY_PATH"
+export PYTHONPATH="/tmp/w/ws/install/bodyctrl_msgs/lib/python3.11/site-packages:$PYTHONPATH"
+export AMENT_PREFIX_PATH="/tmp/w/ws/install/bodyctrl_msgs:$AMENT_PREFIX_PATH"
+if [ "$(echo -n $CMAKE_PREFIX_PATH | head -c 1)" = ":" ]; then export CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH#?} ; fi
+if [ "$(echo -n $CMAKE_PREFIX_PATH | tail -c 1)" = ":" ]; then export CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH%?} ; fi'
+++++ export CMAKE_PREFIX_PATH=/tmp/w/ws/install/bodyctrl_msgs:
+++++ CMAKE_PREFIX_PATH=/tmp/w/ws/install/bodyctrl_msgs:
+++++ export LD_LIBRARY_PATH=/tmp/w/ws/install/bodyctrl_msgs/lib:/usr/local/nvidia/lib64:/usr/local/cuda/lib64:/usr/local/nvidia/lib:/usr/local/nvidia/lib64:/usr/local/cuda/lib64
+++++ LD_LIBRARY_PATH=/tmp/w/ws/install/bodyctrl_msgs/lib:/usr/local/nvidia/lib64:/usr/local/cuda/lib64:/usr/local/nvidia/lib:/usr/local/nvidia/lib64:/usr/local/cuda/lib64
+++++ export PYTHONPATH=/tmp/w/ws/install/bodyctrl_msgs/lib/python3.11/site-packages:/tmp/w/mm/envs/ros/lib/python311/site-packages:/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++ PYTHONPATH=/tmp/w/ws/install/bodyctrl_msgs/lib/python3.11/site-packages:/tmp/w/mm/envs/ros/lib/python311/site-packages:/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++ export AMENT_PREFIX_PATH=/tmp/w/ws/install/bodyctrl_msgs:/tmp/w/mm/envs/ros
+++++ AMENT_PREFIX_PATH=/tmp/w/ws/install/bodyctrl_msgs:/tmp/w/mm/envs/ros
++++++ echo -n /tmp/w/ws/install/bodyctrl_msgs:
++++++ head -c 1
+++++ '[' / = : ']'
++++++ echo -n /tmp/w/ws/install/bodyctrl_msgs:
++++++ tail -c 1
+++++ '[' : = : ']'
+++++ export CMAKE_PREFIX_PATH=/tmp/w/ws/install/bodyctrl_msgs
+++++ CMAKE_PREFIX_PATH=/tmp/w/ws/install/bodyctrl_msgs
++++ unset _colcon_ordered_commands
++++ unset _colcon_prefix_sh_source_script
++++ unset _colcon_prefix_bash_COLCON_CURRENT_PREFIX
+++ unset COLCON_CURRENT_PREFIX
+++ unset _colcon_prefix_chain_bash_source_script
++ python -c 'from bodyctrl_msgs.msg import CmdSetMotorPosition, MotorStatusMsg; from bodyctrl_msgs.srv import SetSpeed; print('\''bodyctrl import OK'\'')'
++ tee -a /kaggle/working/logs/bodyctrl_build.log
+bodyctrl import OK
++ micromamba deactivate
++ __mamba_wrap deactivate
++ local cmd=deactivate
++ case "${cmd}" in
++ for arg in "${@}"
++ case "${arg}" in
++ __mamba_xctivate deactivate
++ local ask_mamba
+++ PS1='(ros) '
+++ __mamba_exe shell deactivate --shell bash
+++ /tmp/w/bin/micromamba shell deactivate --shell bash
++ ask_mamba='export PATH='\''/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin'\''
+. "/tmp/w/mm/envs/ros/etc/conda/deactivate.d/ros-humble-ros-workspace_deactivate.sh"
+. "/tmp/w/mm/envs/ros/etc/conda/deactivate.d/libxml2_deactivate.sh"
+. "/tmp/w/mm/envs/ros/etc/conda/deactivate.d/libglib_deactivate.sh"
+unset CONDA_PREFIX
+unset CONDA_DEFAULT_ENV
+unset CONDA_PROMPT_MODIFIER
+PS1='\'''\''
+export CONDA_SHLVL='\''0'\'''
++ eval 'export PATH='\''/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin'\''
+. "/tmp/w/mm/envs/ros/etc/conda/deactivate.d/ros-humble-ros-workspace_deactivate.sh"
+. "/tmp/w/mm/envs/ros/etc/conda/deactivate.d/libxml2_deactivate.sh"
+. "/tmp/w/mm/envs/ros/etc/conda/deactivate.d/libglib_deactivate.sh"
+unset CONDA_PREFIX
+unset CONDA_DEFAULT_ENV
+unset CONDA_PROMPT_MODIFIER
+PS1='\'''\''
+export CONDA_SHLVL='\''0'\'''
+++ export PATH=/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin
+++ PATH=/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin
+++ . /tmp/w/mm/envs/ros/etc/conda/deactivate.d/ros-humble-ros-workspace_deactivate.sh
++++ '[' -z /tmp/w/mm/envs/ros ']'
++++ unset ROS_DISTRO
++++ unset ROS_ETC_DIR
++++ unset ROS_PACKAGE_PATH
++++ unset ROS_PYTHON_VERSION
++++ unset CMAKE_PREFIX_PATH
++++ unset AMENT_PREFIX_PATH
++++ unset COLCON_PREFIX_PATH
++++ unset ROS_VERSION
++++ unset ROS_OS_OVERRIDE
++++ unset ROS_LOCALHOST_ONLY
++++ unset ament_python_executable
++++ unset RMW_IMPLEMENTATION
+++ . /tmp/w/mm/envs/ros/etc/conda/deactivate.d/libxml2_deactivate.sh
++++ test -n ''
++++ unset XML_CATALOG_FILES
++++ unset xml_catalog_files_libxml2
+++ . /tmp/w/mm/envs/ros/etc/conda/deactivate.d/libglib_deactivate.sh
++++ export GSETTINGS_SCHEMA_DIR=
++++ GSETTINGS_SCHEMA_DIR=
++++ unset GSETTINGS_SCHEMA_DIR_CONDA_BACKUP
++++ '[' -z ']'
++++ unset GSETTINGS_SCHEMA_DIR
+++ unset CONDA_PREFIX
+++ unset CONDA_DEFAULT_ENV
+++ unset CONDA_PROMPT_MODIFIER
+++ PS1=
+++ export CONDA_SHLVL=0
+++ CONDA_SHLVL=0
++ __mamba_hashr
++ '[' -n '' ']'
++ '[' -n '' ']'
++ hash -r
++ P=/tmp/w/mm/envs/isaac/bin/python
++ cd /tmp/nssr_sim/source
++ timeout 600 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-deps -e .
++ /tmp/w/mm/envs/isaac/bin/python -c 'import nssr_sim; print("nssr_sim OK")'
++ df -h /tmp
++ tail -1

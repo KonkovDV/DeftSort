@@ -1,0 +1,42 @@
+[{"stream_name":"stdout","time":1.95835027,"data":"2026-11-09T07:11:14Z IN=/kaggle/input/datasets/dmitrijkv/team048-tpu-cpu-inputs\n"}
+,{"stream_name":"stdout","time":4.753864193,"data":"2026-11-09T07:11:17Z pool_objs=[('Razer_Taipan_White_Ambidextrous_Gaming_Mouse', 'electronics'), ('JBL_Charge_Speaker_portable_wireless_wired_Green', 'electronics'), ('Crosley_Alarm_Clock_Vintage_Metal', 'electronics'), ('Nestle_Nips_Hard_Candy_Peanut_Butter', 'box'), ('Nips_Hard_Candy_Rich_Creamy_Butter_Rum_4_oz_1133_g', 'box'), ('009_gelatin_box', 'box')]\n"}
+,{"stream_name":"stdout","time":375.891104118,"data":"2026-11-09T07:17:28Z layout 5/30 elapsed=370.2s\n"}
+,{"stream_name":"stdout","time":781.421196981,"data":"2026-11-09T07:24:13Z layout 10/30 elapsed=775.7s\n"}
+,{"stream_name":"stdout","time":1227.75344228,"data":"2026-11-09T07:31:40Z layout 15/30 elapsed=1222.0s\n"}
+,{"stream_name":"stdout","time":1549.043844054,"data":"2026-11-09T07:37:01Z layout 20/30 elapsed=1543.3s\n"}
+,{"stream_name":"stdout","time":2011.420926589,"data":"2026-11-09T07:44:43Z layout 25/30 elapsed=2005.7s\n"}
+,{"stream_name":"stdout","time":2335.742302725,"data":"2026-11-09T07:50:08Z layout 30/30 elapsed=2330.0s\n"}
+,{"stream_name":"stdout","time":2335.742696673,"data":"2026-11-09T07:50:08Z {\n"}
+,{"stream_name":"stdout","time":2335.742723053,"data":"  \"electronics\": {\n"}
+,{"stream_name":"stdout","time":2335.74272991,"data":"    \"n\": 90,\n"}
+,{"stream_name":"stdout","time":2335.74277228,"data":"    \"pick_rate\": 0.4333,\n"}
+,{"stream_name":"stdout","time":2335.742776401,"data":"    \"place_left_given_pick\": 0.5641,\n"}
+,{"stream_name":"stdout","time":2335.742780201,"data":"    \"place_right_given_pick\": 0.4103,\n"}
+,{"stream_name":"stdout","time":2335.742783967,"data":"    \"place_both_given_pick\": 0.0,\n"}
+,{"stream_name":"stdout","time":2335.742787647,"data":"    \"pick_and_place_left\": 0.2444,\n"}
+,{"stream_name":"stdout","time":2335.742791301,"data":"    \"pick_and_place_right\": 0.1778,\n"}
+,{"stream_name":"stdout","time":2335.742794986,"data":"    \"pick_kinds\": {\n"}
+,{"stream_name":"stdout","time":2335.742798649,"data":"      \"side\": 39\n"}
+,{"stream_name":"stdout","time":2335.742802311,"data":"    }\n"}
+,{"stream_name":"stdout","time":2335.742805884,"data":"  },\n"}
+,{"stream_name":"stdout","time":2335.74280934,"data":"  \"box\": {\n"}
+,{"stream_name":"stdout","time":2335.742813012,"data":"    \"n\": 90,\n"}
+,{"stream_name":"stdout","time":2335.742816577,"data":"    \"pick_rate\": 0.4778,\n"}
+,{"stream_name":"stdout","time":2335.742820218,"data":"    \"place_left_given_pick\": 0.5581,\n"}
+,{"stream_name":"stdout","time":2335.742824041,"data":"    \"place_right_given_pick\": 0.3953,\n"}
+,{"stream_name":"stdout","time":2335.742827814,"data":"    \"place_both_given_pick\": 0.0,\n"}
+,{"stream_name":"stdout","time":2335.742831981,"data":"    \"pick_and_place_left\": 0.2667,\n"}
+,{"stream_name":"stdout","time":2335.742835617,"data":"    \"pick_and_place_right\": 0.1889,\n"}
+,{"stream_name":"stdout","time":2335.742839282,"data":"    \"pick_kinds\": {\n"}
+,{"stream_name":"stdout","time":2335.742842889,"data":"      \"side\": 43\n"}
+,{"stream_name":"stdout","time":2335.742846475,"data":"    }\n"}
+,{"stream_name":"stdout","time":2335.742849894,"data":"  }\n"}
+,{"stream_name":"stdout","time":2335.742853368,"data":"}\n"}
+,{"stream_name":"stdout","time":2335.742857004,"data":"2026-11-09T07:50:08Z ALL OK\n"}
+,{"stream_name":"stderr","time":2339.795098843,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":2339.795149428,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":2340.276543864,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":2340.27657163,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":2342.76374227,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":2344.158480103,"data":"[NbConvertApp] Writing 344173 bytes to __results__.html\n"}
+]

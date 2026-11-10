@@ -1,0 +1,54 @@
+[{"stream_name":"stdout","time":1.905562076,"data":"2026-11-09T07:11:18Z IN=/kaggle/input/datasets/dmitrijkv/team048-tpu-cpu-inputs\n"}
+,{"stream_name":"stdout","time":3.236322266,"data":"2026-11-09T07:11:20Z pool_objs=[('Utana_5_Porcelain_Ramekin_Large', 'dish'), ('Threshold_Ramekin_White_Porcelain', 'dish'), ('Ecoforms_Plant_Container_B4_Har', 'dish'), ('Crunch_Girl_Scouts_Candy_Bars_Peanut_Butter_Creme_78_oz_box', 'box'), ('Crayola_Bonus_64_Crayons', 'box'), ('Perricone_MD_AcylGlutathione_Eye_Lid_Serum', 'box'), ('006_mustard_bottle', 'jar'), ('Saccharomyces_Boulardii_MOS_Value_Size', 'jar'), ('Hyaluronic_Acid', 'jar')]\n"}
+,{"stream_name":"stdout","time":854.583778767,"data":"2026-11-09T07:25:31Z layout 5/30 elapsed=850.3s\n"}
+,{"stream_name":"stdout","time":1769.660374883,"data":"2026-11-09T07:40:46Z layout 10/30 elapsed=1765.3s\n"}
+,{"stream_name":"stdout","time":2738.717431905,"data":"2026-11-09T07:56:55Z layout 15/30 elapsed=2734.4s\n"}
+,{"stream_name":"stdout","time":3659.041816847,"data":"2026-11-09T08:12:16Z layout 20/30 elapsed=3654.7s\n"}
+,{"stream_name":"stdout","time":4576.454872529,"data":"2026-11-09T08:27:33Z layout 25/30 elapsed=4572.1s\n"}
+,{"stream_name":"stdout","time":5483.814903048,"data":"2026-11-09T08:42:40Z layout 30/30 elapsed=5479.5s\n"}
+,{"stream_name":"stdout","time":5483.815427842,"data":"2026-11-09T08:42:40Z {\n"}
+,{"stream_name":"stdout","time":5483.815453705,"data":"  \"dish\": {\n"}
+,{"stream_name":"stdout","time":5483.815460738,"data":"    \"n\": 90,\n"}
+,{"stream_name":"stdout","time":5483.815466187,"data":"    \"pick_rate\": 0.7444,\n"}
+,{"stream_name":"stdout","time":5483.815471214,"data":"    \"place_left_given_pick\": 0.5075,\n"}
+,{"stream_name":"stdout","time":5483.815476209,"data":"    \"place_right_given_pick\": 0.4925,\n"}
+,{"stream_name":"stdout","time":5483.815481077,"data":"    \"place_both_given_pick\": 0.0,\n"}
+,{"stream_name":"stdout","time":5483.815484514,"data":"    \"pick_and_place_left\": 0.3778,\n"}
+,{"stream_name":"stdout","time":5483.815487828,"data":"    \"pick_and_place_right\": 0.3667,\n"}
+,{"stream_name":"stdout","time":5483.8154915,"data":"    \"pick_kinds\": {\n"}
+,{"stream_name":"stdout","time":5483.815494676,"data":"      \"rim\": 67\n"}
+,{"stream_name":"stdout","time":5483.815498042,"data":"    }\n"}
+,{"stream_name":"stdout","time":5483.815501122,"data":"  },\n"}
+,{"stream_name":"stdout","time":5483.815504026,"data":"  \"box\": {\n"}
+,{"stream_name":"stdout","time":5483.815506979,"data":"    \"n\": 90,\n"}
+,{"stream_name":"stdout","time":5483.815510201,"data":"    \"pick_rate\": 0.6667,\n"}
+,{"stream_name":"stdout","time":5483.815518006,"data":"    \"place_left_given_pick\": 0.5667,\n"}
+,{"stream_name":"stdout","time":5483.815521199,"data":"    \"place_right_given_pick\": 0.3833,\n"}
+,{"stream_name":"stdout","time":5483.815525717,"data":"    \"place_both_given_pick\": 0.0,\n"}
+,{"stream_name":"stdout","time":5483.815528901,"data":"    \"pick_and_place_left\": 0.3778,\n"}
+,{"stream_name":"stdout","time":5483.815532175,"data":"    \"pick_and_place_right\": 0.2556,\n"}
+,{"stream_name":"stdout","time":5483.815535295,"data":"    \"pick_kinds\": {\n"}
+,{"stream_name":"stdout","time":5483.815538333,"data":"      \"side\": 60\n"}
+,{"stream_name":"stdout","time":5483.815541445,"data":"    }\n"}
+,{"stream_name":"stdout","time":5483.815544299,"data":"  },\n"}
+,{"stream_name":"stdout","time":5483.815547152,"data":"  \"jar\": {\n"}
+,{"stream_name":"stdout","time":5483.815550138,"data":"    \"n\": 90,\n"}
+,{"stream_name":"stdout","time":5483.815553263,"data":"    \"pick_rate\": 0.9111,\n"}
+,{"stream_name":"stdout","time":5483.815556277,"data":"    \"place_left_given_pick\": 0.5244,\n"}
+,{"stream_name":"stdout","time":5483.815575043,"data":"    \"place_right_given_pick\": 0.4512,\n"}
+,{"stream_name":"stdout","time":5483.815577909,"data":"    \"place_both_given_pick\": 0.0,\n"}
+,{"stream_name":"stdout","time":5483.815580379,"data":"    \"pick_and_place_left\": 0.4778,\n"}
+,{"stream_name":"stdout","time":5483.815582892,"data":"    \"pick_and_place_right\": 0.4111,\n"}
+,{"stream_name":"stdout","time":5483.815585361,"data":"    \"pick_kinds\": {\n"}
+,{"stream_name":"stdout","time":5483.815587769,"data":"      \"side\": 82\n"}
+,{"stream_name":"stdout","time":5483.815590377,"data":"    }\n"}
+,{"stream_name":"stdout","time":5483.81559271,"data":"  }\n"}
+,{"stream_name":"stdout","time":5483.815595125,"data":"}\n"}
+,{"stream_name":"stdout","time":5483.815597538,"data":"2026-11-09T08:42:40Z ALL OK\n"}
+,{"stream_name":"stderr","time":5487.133721192,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":5487.133801639,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":5487.692898712,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":5487.692961293,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":5490.120605865,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":5491.679991154,"data":"[NbConvertApp] Writing 344173 bytes to __results__.html\n"}
+]

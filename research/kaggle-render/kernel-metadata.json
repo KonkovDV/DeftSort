@@ -1,0 +1,17 @@
+{
+ "language": "python",
+ "kernel_type": "script",
+ "is_private": true,
+ "enable_gpu": true,
+ "enable_internet": true,
+ "dataset_sources": [
+  "dmitrijkv/team048-organiser-objects"
+ ],
+ "kernel_sources": [],
+ "competition_sources": [],
+ "machine_shape": "NvidiaTeslaT4",
+ "id": "dmitrijkv/team048-render-hard",
+ "title": "team048 render hard",
+ "code_file": "team048-render-set.py",
+ "docker_image": "gcr.io/kaggle-private-byod/python@sha256:de153e6d303881930c51286216393d56f56b26458d0661350305a1e8144eea01"
+}

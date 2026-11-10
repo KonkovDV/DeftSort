@@ -1,0 +1,17 @@
+{
+ "id": "dmitrijkv/team048-cpu-s-r3s3-3",
+ "title": "team048-cpu-s-r3s3-3",
+ "code_file": "team048-cpu-s-r3s3-3.py",
+ "language": "python",
+ "kernel_type": "script",
+ "is_private": true,
+ "enable_gpu": false,
+ "enable_tpu": false,
+ "enable_internet": false,
+ "dataset_sources": [
+  "dmitrijkv/team048-tpu-cpu-inputs"
+ ],
+ "kernel_sources": [],
+ "competition_sources": [],
+ "model_sources": []
+}

@@ -1,0 +1,46 @@
+[package]
+name = "team048_accel"
+version = "0.2.0"
+edition = "2021"
+rust-version = "1.89"
+description = "Team 048: Rust kernels (FK/Jacobian/DLS-IK, sphere collision sweeps, RANSAC inlier counting, depth flood fill) with a bit-faithful Python reference"
+license = "Apache-2.0"
+publish = false
+
+[lib]
+name = "team048_accel"
+crate-type = ["cdylib", "rlib"]
+bench = false
+
+[features]
+default = []
+python = ["dep:pyo3", "dep:numpy"]
+
+[dependencies]
+nalgebra = { version = "0.35", default-features = false, features = ["std"] }
+rayon = "1.10"
+pyo3 = { version = "0.30", features = ["abi3-py310"], optional = true }
+numpy = { version = "0.30", optional = true }
+
+[dev-dependencies]
+serde_json = "1"
+proptest = "1.5"
+criterion = { version = "0.8", default-features = false, features = ["cargo_bench_support"] }
+
+[[bench]]
+name = "kernels"
+harness = false
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+# panic = "unwind" on purpose: PyO3 converts a Rust panic into a Python exception, which the Python glue catches
+# and then switches to the NumPy reference. With "abort" any unforeseen panic would kill the ROS node mid-task.
+panic = "unwind"
+debug = false
+strip = "symbols"
+
+[profile.bench]
+inherits = "release"
+strip = "none"

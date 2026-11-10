@@ -1,0 +1,582 @@
+[Warning] [simulation_app.simulation_app] Modules: ['omni.kit_app'] were loaded before SimulationApp was started and might not be loaded correctly.
+[Warning] [simulation_app.simulation_app] Please check to make sure no extra omniverse or pxr modules are imported before the call to SimulationApp(...)
+2026-11-09T10:21:08Z [0ms] [Error] [carb.glinterop.plugin] GLInteropContext::init: carb::windowing is not available
+cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or directory
+Warp CUDA error: Failed to get driver entry point 'cuDeviceGetUuid' (CUDA error 1)
+Warp CUDA error: Function cuDeviceGetUuid_f: a suitable driver entry point was not found
+Warp CUDA error 36: API call is not supported in the installed CUDA driver (in function cuda_init, /builds/omniverse/warp/warp/native/warp.cu:277)
+Warp CUDA error: Function cuDeviceGetUuid_f: a suitable driver entry point was not found
+Warp CUDA error 36: API call is not supported in the installed CUDA driver (in function cuda_init, /builds/omniverse/warp/warp/native/warp.cu:277)
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 580.178.04    | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | Tesla T4                         | Yes: 0 |     | 15606   MB | 10de      | 0          |
+|     |                                  |        |     |            | 1eb8      | 52945135.. |
+|     |                                  |        |     |            | 0         |            |
+|---------------------------------------------------------------------------------------------|
+| 1   | Tesla T4                         |        |     | 15606   MB | 10de      | 0          |
+|     |                                  |        |     |            | 1eb8      | bb5bb61a.. |
+|     |                                  |        |     |            | 0         |            |
+|=============================================================================================|
+| OS: 24.04.4 LTS (Noble Numbat) ubuntu, Version: 24.04.4, Kernel: 6.18.55+
+| Processor: Intel(R) Xeon(R) CPU @ 2.00GHz
+| Bare Metal Cores: 2 | Bare Metal Logical Cores: 4
+| Core Usage Quota: 4
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 30720 | Free Memory: 9776
+| Total Page/Swap (MB): 0 | Free Page/Swap: 0
+|---------------------------------------------------------------------------------------------|
+[INFO][AppLauncher]: Using device: cpu
+[INFO][AppLauncher]: Loading experience file: /tmp/w/mm/envs/isaac/lib/python3.11/site-packages/isaaclab/apps/isaaclab.python.headless.rendering.kit
+[hack] robot USD default prim /World; links: ['L_tcp_link', 'R_tcp_link', 'ankle_pitch_l_link', 'ankle_pitch_r_link', 'ankle_roll_l_link', 'ankle_roll_r_link', 'base_link', 'body_yaw_link', 'elbow_pitch_l_link', 'elbow_pitch_r_link', 'elbow_yaw_l_link', 'elbow_yaw_r_link', 'head_pitch_link', 'head_roll_link', 'head_yaw_link', 'hip_pitch_l_link', 'hip_pitch_r_link', 'hip_roll_l_link', 'hip_roll_r_link', 'hip_yaw_l_link', 'hip_yaw_r_link', 'humanoid', 'knee_pitch_l_link', 'knee_pitch_r_link', 'pelvis', 'shoulder_pitch_l_link', 'shoulder_pitch_r_link', 'shoulder_roll_l_link', 'shoulder_roll_r_link', 'shoulder_yaw_l_link', 'shoulder_yaw_r_link', 'wrist_pitch_l_link', 'wrist_pitch_r_link', 'wrist_roll_l_link', 'wrist_roll_r_link']
+[hack] torso camera parent: humanoid/body_yaw_link
+[INFO]: Parsing configuration from: nssr_sim.task.tiangong_parlor.tiangong_parlor_env_cfg:TiangongParlorEnvCfg
+[hack] polygon: pelvis world (7.869,6.083,1.006) [offset in USD (0.0, 0.0, 0.988)], floor z 0.126, table top z 0.826 (0.70 m above floor, -0.180 m vs pelvis)
+[hack] environment: hackathon/assets/scenes/nssr-polygon/env_base.usd
+[hack] task sort3: Сортировка: 3 категории по 3 объекта, 3 лотка
+[hack] table 2.44x0.76 m at x+0.22 m, top 0.700 m, visual packing_table.usd; trays: ['tray_left', 'tray_right', 'tray_center']
+[hack] back bins: 2 pallets, 4 open boxes, 15 static objects from 9 (random)
+[hack] warehouse: 1096 instanced props, 12 lamp lights from https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.0
+[hack] decor: 0 Isaac props, 0 lamp lights, from https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.0, units by metrics assembler
+[hack] objects (pool 3, seed 100): dish: 3, box: 3, jar: 3
+Setting seed: 1794220309
+[INFO]: Base environment:
+	Environment device    : cpu
+	Environment seed      : 1794220309
+	Physics step-size     : 0.01
+	Rendering step-size   : 0.03
+	Environment step-size : 0.01
+[INFO]: Time taken for scene creation : 2.560635 seconds
+[INFO]: Scene manager:  <class InteractiveScene>
+	Number of environments: 1
+	Environment spacing   : 5.0
+	Source prim name      : /World/envs/env_0
+	Global prim paths     : []
+	Replicate physics     : True
+[INFO]: Starting the simulation. This may take a few seconds. Please wait...
+[INFO]: Time taken for simulation start : 656.627665 seconds
+[INFO] Command Manager:  <CommandManager> contains 0 active terms.
++------------------------+
+|  Active Command Terms  |
++--------+-------+-------+
+| Index  | Name  |  Type |
++--------+-------+-------+
++--------+-------+-------+
+
+[INFO] Event Manager:  <EventManager> contains 0 active terms.
+
+[INFO] Recorder Manager:  <RecorderManager> contains 0 active terms.
++---------------------+
+| Active Recorder Terms |
++-----------+---------+
+|   Index   | Name    |
++-----------+---------+
++-----------+---------+
+
+[INFO] Action Manager:  <ActionManager> contains 8 active terms.
++---------------------------------------+
+|    Active Action Terms (shape: 54)    |
++-------+-------------------+-----------+
+| Index | Name              | Dimension |
++-------+-------------------+-----------+
+|   0   | left_arm_action   |         7 |
+|   1   | right_arm_action  |         7 |
+|   2   | left_hand_action  |        12 |
+|   3   | right_hand_action |        12 |
+|   4   | head_action       |         3 |
+|   5   | waist_action      |         1 |
+|   6   | left_leg_action   |         6 |
+|   7   | right_leg_action  |         6 |
++-------+-------------------+-----------+
+
+[INFO] Observation Manager: <ObservationManager> contains 1 groups.
++-----------------------------------------------------+
+| Active Observation Terms in Group: 'policy' (shape: (108,)) |
++--------------+-----------------------+--------------+
+|    Index     | Name                  |    Shape     |
++--------------+-----------------------+--------------+
+|      0       | joint_pos             |    (54,)     |
+|      1       | joint_vel             |    (54,)     |
++--------------+-----------------------+--------------+
+
+[INFO] Termination Manager:  <TerminationManager> contains 0 active terms.
++----------------------------+
+|  Active Termination Terms  |
++--------+-------+-----------+
+| Index  | Name  |  Time Out |
++--------+-------+-----------+
++--------+-------+-----------+
+
+[INFO] Reward Manager:  <RewardManager> contains 0 active terms.
++-----------------------+
+|  Active Reward Terms  |
++-------+------+--------+
+| Index | Name | Weight |
++-------+------+--------+
++-------+------+--------+
+
+[INFO] Curriculum Manager:  <CurriculumManager> contains 0 active terms.
++----------------------+
+| Active Curriculum Terms |
++-----------+----------+
+|   Index   | Name     |
++-----------+----------+
++-----------+----------+
+
+[INFO]: Completed setting up the environment...
+[WARNING] Prim not found at /World/envs/env_0/Scene/apple
+[WARNING] Prim not found at /World/envs/env_0/Scene/plate
+[INFO] ZMQ Subscriber connected to tcp://127.0.0.1:5555
+[INFO] ZMQ Publisher bound to tcp://*:5556
+[INFO] ZMQ Image Publisher bound to tcp://*:5557
+Tiangong Pro Controller: Full ROS Interface enabled via ZMQ Bridge
+  - Command Sub: tcp://127.0.0.1:5555
+  - Status Pub:  tcp://127.0.0.1:5556
+[INFO] RateLimiter sleep_duration=0.010000s
+[hack] depth fix: TiledCamera numpy buffers keep their dtype (float depth with the sim on the CPU)
+[hack] wrist F/T on: hand mass from URDF {'left': 0.889167, 'right': 0.889167}, COM in wrist_roll frame [0.004, 0.004, -0.122]
+[hack] camera period 0.0300 s sim, render_interval 3
+Action Term: left_arm_action
+Action Term: right_arm_action
+Action Term: left_hand_action
+Action Term: right_hand_action
+Action Term: head_action
+Action Term: waist_action
+Action Term: left_leg_action
+Action Term: right_leg_action
+indices : [3, 8, 13, 18, 22, 26, 28, 4, 9, 14, 19, 23, 27, 29, 30, 31, 32, 33, 34, 40, 41, 42, 43, 44, 50, 52, 35, 36, 37, 38, 39, 45, 46, 47, 48, 49, 51, 53, 5, 10, 15, 0, 1, 6, 11, 16, 20, 24, 2, 7, 12, 17, 21, 25]
+[PERF] Hz: 0.23 | Advance: 3611.37ms | Preprocess: 0.02ms | EnvStep: 11.94ms | Total: 3623.33ms
+[PERF] Hz: 0.58 | Advance: 1.44ms | Preprocess: 0.01ms | EnvStep: 1734.74ms | Total: 1736.19ms
+[hack] obj Utana_5_Porcelain_Ramekin_Large          mass 0.350 kg (cfg 0.35), height 7.0 cm (file 7.0)
+[hack] obj Threshold_Ramekin_White_Porcelain        mass 0.200 kg (cfg 0.20), height 5.3 cm (file 5.3)
+[hack] obj Ecoforms_Plant_Container_B4_Har          mass 0.100 kg (cfg 0.10), height 7.2 cm (file 7.2)
+[hack] obj Crunch_Girl_Scouts_Candy_Bars_Peanut_But mass 0.220 kg (cfg 0.22), height 16.4 cm (file 16.4)
+[hack] obj Crayola_Bonus_64_Crayons                 mass 0.350 kg (cfg 0.35), height 12.7 cm (file 12.7)
+[hack] obj Perricone_MD_AcylGlutathione_Eye_Lid_Ser mass 0.080 kg (cfg 0.08), height 10.8 cm (file 10.8)
+[hack] obj 006_mustard_bottle                       mass 0.430 kg (cfg 0.43), height 19.1 cm (file 19.1)
+[hack] obj Saccharomyces_Boulardii_MOS_Value_Size   mass 0.150 kg (cfg 0.15), height 13.5 cm (file 13.5)
+[hack] obj Hyaluronic_Acid                          mass 0.120 kg (cfg 0.12), height 9.8 cm (file 9.8)
+[PERF] Hz: 13.81 | Advance: 20.24ms | Preprocess: 0.01ms | EnvStep: 51.79ms | Total: 72.04ms
+[hack] wrist F/T left calibrated: sign +1, hand mass 0.387 kg measured (URDF 0.889, using 0.387), residual 0.02 N / 0.015 Nm
+[hack] wrist F/T right calibrated: sign +1, hand mass 0.387 kg measured (URDF 0.889, using 0.387), residual 0.02 N / 0.016 Nm
+[PERF] Hz: 20.54 | Advance: 19.00ms | Preprocess: 0.02ms | EnvStep: 29.22ms | Total: 48.23ms
+[hack] right hand force limits: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+[PERF] Hz: 21.48 | Advance: 20.05ms | Preprocess: 0.02ms | EnvStep: 25.93ms | Total: 46.00ms
+[PERF] Hz: 21.38 | Advance: 18.97ms | Preprocess: 0.01ms | EnvStep: 27.20ms | Total: 46.19ms
+[PERF] Hz: 22.05 | Advance: 19.02ms | Preprocess: 0.02ms | EnvStep: 25.86ms | Total: 44.91ms
+[PERF] Hz: 20.42 | Advance: 22.73ms | Preprocess: 0.02ms | EnvStep: 25.73ms | Total: 48.47ms
+[PERF] Hz: 20.94 | Advance: 20.05ms | Preprocess: 0.01ms | EnvStep: 27.20ms | Total: 47.27ms
+[PERF] Hz: 20.45 | Advance: 21.78ms | Preprocess: 0.02ms | EnvStep: 26.74ms | Total: 48.54ms
+[PERF] Hz: 19.93 | Advance: 20.58ms | Preprocess: 0.02ms | EnvStep: 29.27ms | Total: 49.87ms
+[PERF] Hz: 20.45 | Advance: 21.12ms | Preprocess: 0.02ms | EnvStep: 27.24ms | Total: 48.38ms
+[PERF] Hz: 20.62 | Advance: 21.09ms | Preprocess: 0.04ms | EnvStep: 26.87ms | Total: 48.00ms
+[PERF] Hz: 20.55 | Advance: 21.33ms | Preprocess: 0.02ms | EnvStep: 26.79ms | Total: 48.13ms
+[PERF] Hz: 20.45 | Advance: 21.90ms | Preprocess: 0.02ms | EnvStep: 26.42ms | Total: 48.33ms
+[PERF] Hz: 20.80 | Advance: 20.96ms | Preprocess: 0.02ms | EnvStep: 26.65ms | Total: 47.63ms
+[PERF] Hz: 20.92 | Advance: 20.58ms | Preprocess: 0.01ms | EnvStep: 26.71ms | Total: 47.31ms
+[PERF] Hz: 20.68 | Advance: 20.73ms | Preprocess: 0.04ms | EnvStep: 27.07ms | Total: 47.85ms
+[PERF] Hz: 20.84 | Advance: 21.14ms | Preprocess: 0.01ms | EnvStep: 26.44ms | Total: 47.59ms
+[PERF] Hz: 20.37 | Advance: 20.98ms | Preprocess: 0.02ms | EnvStep: 27.63ms | Total: 48.62ms
+[PERF] Hz: 19.56 | Advance: 22.20ms | Preprocess: 0.02ms | EnvStep: 28.59ms | Total: 50.81ms
+[PERF] Hz: 20.48 | Advance: 21.22ms | Preprocess: 0.02ms | EnvStep: 27.17ms | Total: 48.41ms
+[PERF] Hz: 20.77 | Advance: 21.12ms | Preprocess: 0.05ms | EnvStep: 26.52ms | Total: 47.70ms
+[PERF] Hz: 20.62 | Advance: 21.30ms | Preprocess: 0.02ms | EnvStep: 26.74ms | Total: 48.06ms
+[PERF] Hz: 20.65 | Advance: 20.80ms | Preprocess: 0.02ms | EnvStep: 27.09ms | Total: 47.91ms
+[PERF] Hz: 21.59 | Advance: 19.05ms | Preprocess: 0.02ms | EnvStep: 26.54ms | Total: 45.61ms
+[PERF] Hz: 20.49 | Advance: 20.73ms | Preprocess: 0.02ms | EnvStep: 27.45ms | Total: 48.19ms
+[PERF] Hz: 20.96 | Advance: 20.35ms | Preprocess: 0.02ms | EnvStep: 27.00ms | Total: 47.37ms
+[PERF] Hz: 19.79 | Advance: 22.14ms | Preprocess: 0.02ms | EnvStep: 27.87ms | Total: 50.04ms
+[PERF] Hz: 20.47 | Advance: 20.17ms | Preprocess: 0.03ms | EnvStep: 28.04ms | Total: 48.23ms
+[PERF] Hz: 20.54 | Advance: 20.35ms | Preprocess: 0.02ms | EnvStep: 27.69ms | Total: 48.05ms
+[PERF] Hz: 20.72 | Advance: 21.07ms | Preprocess: 0.02ms | EnvStep: 26.60ms | Total: 47.68ms
+[PERF] Hz: 20.96 | Advance: 20.81ms | Preprocess: 0.02ms | EnvStep: 26.37ms | Total: 47.20ms
+[PERF] Hz: 20.33 | Advance: 21.03ms | Preprocess: 0.02ms | EnvStep: 27.59ms | Total: 48.64ms
+[PERF] Hz: 20.97 | Advance: 19.69ms | Preprocess: 0.02ms | EnvStep: 27.45ms | Total: 47.15ms
+[PERF] Hz: 21.46 | Advance: 20.52ms | Preprocess: 0.02ms | EnvStep: 25.68ms | Total: 46.22ms
+[PERF] Hz: 21.88 | Advance: 19.37ms | Preprocess: 0.02ms | EnvStep: 25.90ms | Total: 45.28ms
+[PERF] Hz: 21.76 | Advance: 18.82ms | Preprocess: 0.01ms | EnvStep: 26.51ms | Total: 45.35ms
+[PERF] Hz: 21.92 | Advance: 19.23ms | Preprocess: 0.01ms | EnvStep: 25.94ms | Total: 45.18ms
+[PERF] Hz: 21.95 | Advance: 19.68ms | Preprocess: 0.02ms | EnvStep: 25.52ms | Total: 45.21ms
+[PERF] Hz: 21.03 | Advance: 19.14ms | Preprocess: 0.02ms | EnvStep: 28.07ms | Total: 47.22ms
+[PERF] Hz: 21.44 | Advance: 19.75ms | Preprocess: 0.02ms | EnvStep: 26.57ms | Total: 46.34ms
+[PERF] Hz: 20.89 | Advance: 19.18ms | Preprocess: 0.02ms | EnvStep: 28.49ms | Total: 47.69ms
+[PERF] Hz: 20.86 | Advance: 19.56ms | Preprocess: 0.01ms | EnvStep: 28.16ms | Total: 47.73ms
+[PERF] Hz: 20.61 | Advance: 19.90ms | Preprocess: 0.02ms | EnvStep: 28.40ms | Total: 48.31ms
+[PERF] Hz: 20.99 | Advance: 18.91ms | Preprocess: 0.02ms | EnvStep: 28.53ms | Total: 47.45ms
+[PERF] Hz: 20.80 | Advance: 19.70ms | Preprocess: 0.02ms | EnvStep: 28.19ms | Total: 47.90ms
+[PERF] Hz: 20.78 | Advance: 19.95ms | Preprocess: 0.02ms | EnvStep: 28.00ms | Total: 47.97ms
+[PERF] Hz: 20.80 | Advance: 19.73ms | Preprocess: 0.01ms | EnvStep: 28.15ms | Total: 47.90ms
+[PERF] Hz: 20.66 | Advance: 19.78ms | Preprocess: 0.02ms | EnvStep: 28.44ms | Total: 48.24ms
+[PERF] Hz: 20.80 | Advance: 19.36ms | Preprocess: 0.02ms | EnvStep: 28.52ms | Total: 47.90ms
+[PERF] Hz: 20.53 | Advance: 19.70ms | Preprocess: 0.02ms | EnvStep: 28.84ms | Total: 48.55ms
+[PERF] Hz: 21.45 | Advance: 19.10ms | Preprocess: 0.02ms | EnvStep: 27.23ms | Total: 46.35ms
+[PERF] Hz: 19.63 | Advance: 19.96ms | Preprocess: 0.02ms | EnvStep: 30.79ms | Total: 50.77ms
+[PERF] Hz: 20.36 | Advance: 19.83ms | Preprocess: 0.01ms | EnvStep: 29.10ms | Total: 48.94ms
+[PERF] Hz: 20.92 | Advance: 18.75ms | Preprocess: 0.02ms | EnvStep: 28.86ms | Total: 47.63ms
+[PERF] Hz: 20.90 | Advance: 18.71ms | Preprocess: 0.02ms | EnvStep: 28.96ms | Total: 47.68ms
+[PERF] Hz: 20.96 | Advance: 18.09ms | Preprocess: 0.02ms | EnvStep: 29.42ms | Total: 47.53ms
+[PERF] Hz: 20.87 | Advance: 19.20ms | Preprocess: 0.02ms | EnvStep: 28.55ms | Total: 47.77ms
+[PERF] Hz: 20.43 | Advance: 20.12ms | Preprocess: 0.02ms | EnvStep: 28.62ms | Total: 48.76ms
+[PERF] Hz: 20.90 | Advance: 19.38ms | Preprocess: 0.02ms | EnvStep: 28.29ms | Total: 47.69ms
+[PERF] Hz: 19.96 | Advance: 19.97ms | Preprocess: 0.02ms | EnvStep: 29.94ms | Total: 49.93ms
+[PERF] Hz: 20.23 | Advance: 19.07ms | Preprocess: 0.02ms | EnvStep: 30.18ms | Total: 49.27ms
+[PERF] Hz: 19.83 | Advance: 21.05ms | Preprocess: 0.02ms | EnvStep: 29.19ms | Total: 50.25ms
+[PERF] Hz: 20.49 | Advance: 19.62ms | Preprocess: 0.02ms | EnvStep: 29.00ms | Total: 48.64ms
+[PERF] Hz: 20.47 | Advance: 19.54ms | Preprocess: 0.02ms | EnvStep: 29.12ms | Total: 48.68ms
+[PERF] Hz: 21.36 | Advance: 18.64ms | Preprocess: 0.02ms | EnvStep: 27.95ms | Total: 46.61ms
+[PERF] Hz: 21.14 | Advance: 20.16ms | Preprocess: 0.01ms | EnvStep: 26.83ms | Total: 47.00ms
+[PERF] Hz: 20.79 | Advance: 20.09ms | Preprocess: 0.02ms | EnvStep: 27.82ms | Total: 47.92ms
+[PERF] Hz: 21.34 | Advance: 18.86ms | Preprocess: 0.02ms | EnvStep: 27.80ms | Total: 46.67ms
+[PERF] Hz: 21.10 | Advance: 20.48ms | Preprocess: 0.02ms | EnvStep: 26.60ms | Total: 47.10ms
+[PERF] Hz: 20.79 | Advance: 19.17ms | Preprocess: 0.02ms | EnvStep: 28.72ms | Total: 47.91ms
+[PERF] Hz: 20.86 | Advance: 19.54ms | Preprocess: 0.02ms | EnvStep: 28.17ms | Total: 47.74ms
+[PERF] Hz: 20.58 | Advance: 19.41ms | Preprocess: 0.02ms | EnvStep: 28.98ms | Total: 48.41ms
+[PERF] Hz: 20.81 | Advance: 19.64ms | Preprocess: 0.02ms | EnvStep: 28.22ms | Total: 47.87ms
+[PERF] Hz: 20.73 | Advance: 18.98ms | Preprocess: 0.02ms | EnvStep: 29.06ms | Total: 48.06ms
+[PERF] Hz: 20.99 | Advance: 19.68ms | Preprocess: 0.02ms | EnvStep: 27.72ms | Total: 47.42ms
+[PERF] Hz: 20.72 | Advance: 19.89ms | Preprocess: 0.02ms | EnvStep: 28.08ms | Total: 47.98ms
+[PERF] Hz: 21.72 | Advance: 18.11ms | Preprocess: 0.01ms | EnvStep: 27.69ms | Total: 45.81ms
+[PERF] Hz: 21.32 | Advance: 19.76ms | Preprocess: 0.02ms | EnvStep: 26.95ms | Total: 46.73ms
+[PERF] Hz: 21.82 | Advance: 18.53ms | Preprocess: 0.01ms | EnvStep: 27.07ms | Total: 45.62ms
+[PERF] Hz: 20.86 | Advance: 19.80ms | Preprocess: 0.02ms | EnvStep: 27.94ms | Total: 47.76ms
+[PERF] Hz: 20.99 | Advance: 19.91ms | Preprocess: 0.02ms | EnvStep: 27.50ms | Total: 47.43ms
+[PERF] Hz: 21.46 | Advance: 19.06ms | Preprocess: 0.02ms | EnvStep: 27.34ms | Total: 46.42ms
+[PERF] Hz: 21.17 | Advance: 18.76ms | Preprocess: 0.02ms | EnvStep: 28.15ms | Total: 46.93ms
+[PERF] Hz: 20.97 | Advance: 19.84ms | Preprocess: 0.02ms | EnvStep: 27.59ms | Total: 47.45ms
+[PERF] Hz: 21.67 | Advance: 18.22ms | Preprocess: 0.02ms | EnvStep: 27.73ms | Total: 45.96ms
+[PERF] Hz: 20.31 | Advance: 20.86ms | Preprocess: 0.02ms | EnvStep: 28.06ms | Total: 48.94ms
+[PERF] Hz: 19.00 | Advance: 21.37ms | Preprocess: 0.02ms | EnvStep: 31.02ms | Total: 52.41ms
+[PERF] Hz: 20.41 | Advance: 20.70ms | Preprocess: 0.01ms | EnvStep: 27.99ms | Total: 48.70ms
+[PERF] Hz: 20.30 | Advance: 20.76ms | Preprocess: 0.02ms | EnvStep: 28.18ms | Total: 48.95ms
+[PERF] Hz: 20.48 | Advance: 20.69ms | Preprocess: 0.02ms | EnvStep: 27.82ms | Total: 48.53ms
+[PERF] Hz: 19.72 | Advance: 22.30ms | Preprocess: 0.02ms | EnvStep: 28.16ms | Total: 50.48ms
+[PERF] Hz: 20.13 | Advance: 20.04ms | Preprocess: 0.02ms | EnvStep: 29.30ms | Total: 49.35ms
+[PERF] Hz: 20.28 | Advance: 20.66ms | Preprocess: 0.05ms | EnvStep: 28.27ms | Total: 48.97ms
+[PERF] Hz: 20.69 | Advance: 20.24ms | Preprocess: 0.02ms | EnvStep: 27.87ms | Total: 48.13ms
+[PERF] Hz: 19.50 | Advance: 21.47ms | Preprocess: 0.02ms | EnvStep: 29.57ms | Total: 51.06ms
+[PERF] Hz: 19.71 | Advance: 22.06ms | Preprocess: 0.01ms | EnvStep: 28.34ms | Total: 50.42ms
+[PERF] Hz: 20.32 | Advance: 20.53ms | Preprocess: 0.02ms | EnvStep: 28.44ms | Total: 48.99ms
+[PERF] Hz: 21.46 | Advance: 18.65ms | Preprocess: 0.02ms | EnvStep: 27.75ms | Total: 46.42ms
+[PERF] Hz: 20.89 | Advance: 19.36ms | Preprocess: 0.02ms | EnvStep: 28.19ms | Total: 47.57ms
+[PERF] Hz: 20.95 | Advance: 19.48ms | Preprocess: 0.02ms | EnvStep: 28.02ms | Total: 47.52ms
+[PERF] Hz: 21.13 | Advance: 19.07ms | Preprocess: 0.02ms | EnvStep: 27.99ms | Total: 47.08ms
+[PERF] Hz: 21.21 | Advance: 19.83ms | Preprocess: 0.02ms | EnvStep: 27.07ms | Total: 46.92ms
+[PERF] Hz: 21.42 | Advance: 18.84ms | Preprocess: 0.01ms | EnvStep: 27.61ms | Total: 46.46ms
+[PERF] Hz: 19.88 | Advance: 20.91ms | Preprocess: 0.02ms | EnvStep: 29.16ms | Total: 50.09ms
+[PERF] Hz: 21.46 | Advance: 18.85ms | Preprocess: 0.02ms | EnvStep: 27.51ms | Total: 46.38ms
+[PERF] Hz: 21.24 | Advance: 18.38ms | Preprocess: 0.04ms | EnvStep: 28.47ms | Total: 46.89ms
+[PERF] Hz: 21.11 | Advance: 19.83ms | Preprocess: 0.01ms | EnvStep: 27.27ms | Total: 47.12ms
+[PERF] Hz: 20.85 | Advance: 19.80ms | Preprocess: 0.01ms | EnvStep: 27.91ms | Total: 47.72ms
+[PERF] Hz: 21.49 | Advance: 18.09ms | Preprocess: 0.02ms | EnvStep: 28.21ms | Total: 46.32ms
+[PERF] Hz: 21.45 | Advance: 19.46ms | Preprocess: 0.02ms | EnvStep: 26.97ms | Total: 46.44ms
+[PERF] Hz: 21.72 | Advance: 17.97ms | Preprocess: 0.02ms | EnvStep: 27.80ms | Total: 45.78ms
+[PERF] Hz: 20.92 | Advance: 19.32ms | Preprocess: 0.02ms | EnvStep: 28.21ms | Total: 47.55ms
+[PERF] Hz: 20.97 | Advance: 20.59ms | Preprocess: 0.02ms | EnvStep: 26.86ms | Total: 47.47ms
+[PERF] Hz: 21.50 | Advance: 18.75ms | Preprocess: 0.02ms | EnvStep: 27.52ms | Total: 46.29ms
+[PERF] Hz: 21.31 | Advance: 19.31ms | Preprocess: 0.02ms | EnvStep: 27.30ms | Total: 46.62ms
+[PERF] Hz: 21.33 | Advance: 18.53ms | Preprocess: 0.02ms | EnvStep: 28.08ms | Total: 46.63ms
+[PERF] Hz: 20.88 | Advance: 20.05ms | Preprocess: 0.01ms | EnvStep: 27.59ms | Total: 47.65ms
+[PERF] Hz: 21.70 | Advance: 18.05ms | Preprocess: 0.02ms | EnvStep: 27.77ms | Total: 45.83ms
+[PERF] Hz: 21.43 | Advance: 20.04ms | Preprocess: 0.02ms | EnvStep: 26.29ms | Total: 46.34ms
+[PERF] Hz: 21.47 | Advance: 18.35ms | Preprocess: 0.02ms | EnvStep: 27.94ms | Total: 46.31ms
+[PERF] Hz: 21.27 | Advance: 19.70ms | Preprocess: 0.02ms | EnvStep: 27.11ms | Total: 46.83ms
+[PERF] Hz: 21.59 | Advance: 18.14ms | Preprocess: 0.01ms | EnvStep: 27.81ms | Total: 45.96ms
+[PERF] Hz: 21.29 | Advance: 19.66ms | Preprocess: 0.02ms | EnvStep: 27.02ms | Total: 46.70ms
+[PERF] Hz: 21.44 | Advance: 18.56ms | Preprocess: 0.01ms | EnvStep: 27.83ms | Total: 46.39ms
+[PERF] Hz: 21.96 | Advance: 18.72ms | Preprocess: 0.01ms | EnvStep: 26.53ms | Total: 45.26ms
+[PERF] Hz: 20.90 | Advance: 19.55ms | Preprocess: 0.02ms | EnvStep: 28.07ms | Total: 47.64ms
+[PERF] Hz: 21.90 | Advance: 18.83ms | Preprocess: 0.02ms | EnvStep: 26.54ms | Total: 45.39ms
+[PERF] Hz: 21.21 | Advance: 20.28ms | Preprocess: 0.02ms | EnvStep: 26.63ms | Total: 46.93ms
+[PERF] Hz: 20.88 | Advance: 19.87ms | Preprocess: 0.02ms | EnvStep: 27.73ms | Total: 47.62ms
+[PERF] Hz: 21.64 | Advance: 18.31ms | Preprocess: 0.02ms | EnvStep: 27.67ms | Total: 46.00ms
+[PERF] Hz: 20.95 | Advance: 19.87ms | Preprocess: 0.02ms | EnvStep: 27.65ms | Total: 47.54ms
+[PERF] Hz: 21.96 | Advance: 17.80ms | Preprocess: 0.01ms | EnvStep: 27.50ms | Total: 45.31ms
+[PERF] Hz: 21.97 | Advance: 18.15ms | Preprocess: 0.01ms | EnvStep: 27.07ms | Total: 45.24ms
+[PERF] Hz: 20.94 | Advance: 19.56ms | Preprocess: 0.01ms | EnvStep: 27.96ms | Total: 47.53ms
+[PERF] Hz: 22.21 | Advance: 18.09ms | Preprocess: 0.01ms | EnvStep: 26.54ms | Total: 44.65ms
+[PERF] Hz: 20.96 | Advance: 19.58ms | Preprocess: 0.02ms | EnvStep: 27.88ms | Total: 47.48ms
+[PERF] Hz: 21.76 | Advance: 17.26ms | Preprocess: 0.01ms | EnvStep: 28.44ms | Total: 45.72ms
+[PERF] Hz: 21.38 | Advance: 19.94ms | Preprocess: 0.02ms | EnvStep: 26.50ms | Total: 46.46ms
+[PERF] Hz: 21.44 | Advance: 19.41ms | Preprocess: 0.02ms | EnvStep: 26.99ms | Total: 46.41ms
+[PERF] Hz: 21.29 | Advance: 18.71ms | Preprocess: 0.01ms | EnvStep: 27.92ms | Total: 46.64ms
+[PERF] Hz: 21.46 | Advance: 20.25ms | Preprocess: 0.02ms | EnvStep: 25.92ms | Total: 46.19ms
+[PERF] Hz: 21.39 | Advance: 19.14ms | Preprocess: 0.02ms | EnvStep: 27.28ms | Total: 46.43ms
+[PERF] Hz: 20.93 | Advance: 20.82ms | Preprocess: 0.02ms | EnvStep: 26.45ms | Total: 47.29ms
+[PERF] Hz: 22.11 | Advance: 18.88ms | Preprocess: 0.02ms | EnvStep: 25.98ms | Total: 44.88ms
+[PERF] Hz: 21.64 | Advance: 18.99ms | Preprocess: 0.02ms | EnvStep: 26.81ms | Total: 45.81ms
+[PERF] Hz: 21.07 | Advance: 20.47ms | Preprocess: 0.02ms | EnvStep: 26.54ms | Total: 47.03ms
+[PERF] Hz: 21.84 | Advance: 18.64ms | Preprocess: 0.01ms | EnvStep: 26.69ms | Total: 45.35ms
+[PERF] Hz: 21.50 | Advance: 18.35ms | Preprocess: 0.02ms | EnvStep: 27.76ms | Total: 46.13ms
+[PERF] Hz: 22.10 | Advance: 19.02ms | Preprocess: 0.02ms | EnvStep: 25.87ms | Total: 44.92ms
+[PERF] Hz: 21.79 | Advance: 18.97ms | Preprocess: 0.02ms | EnvStep: 26.45ms | Total: 45.44ms
+[PERF] Hz: 21.06 | Advance: 21.20ms | Preprocess: 0.02ms | EnvStep: 26.03ms | Total: 47.25ms
+[PERF] Hz: 21.83 | Advance: 18.58ms | Preprocess: 0.01ms | EnvStep: 26.85ms | Total: 45.44ms
+[PERF] Hz: 20.74 | Advance: 20.69ms | Preprocess: 0.02ms | EnvStep: 27.16ms | Total: 47.87ms
+[PERF] Hz: 19.63 | Advance: 22.43ms | Preprocess: 0.02ms | EnvStep: 27.94ms | Total: 50.40ms
+[PERF] Hz: 20.40 | Advance: 20.57ms | Preprocess: 0.02ms | EnvStep: 28.00ms | Total: 48.58ms
+[PERF] Hz: 20.42 | Advance: 20.68ms | Preprocess: 0.02ms | EnvStep: 27.93ms | Total: 48.63ms
+[PERF] Hz: 20.69 | Advance: 20.70ms | Preprocess: 0.03ms | EnvStep: 27.12ms | Total: 47.85ms
+[PERF] Hz: 20.87 | Advance: 20.48ms | Preprocess: 0.02ms | EnvStep: 26.86ms | Total: 47.36ms
+[PERF] Hz: 20.48 | Advance: 20.46ms | Preprocess: 0.02ms | EnvStep: 27.99ms | Total: 48.46ms
+[PERF] Hz: 20.48 | Advance: 20.46ms | Preprocess: 0.02ms | EnvStep: 27.80ms | Total: 48.27ms
+[PERF] Hz: 20.43 | Advance: 21.72ms | Preprocess: 0.02ms | EnvStep: 26.83ms | Total: 48.57ms
+[PERF] Hz: 20.04 | Advance: 21.20ms | Preprocess: 0.02ms | EnvStep: 28.28ms | Total: 49.51ms
+[PERF] Hz: 20.47 | Advance: 20.25ms | Preprocess: 0.02ms | EnvStep: 28.12ms | Total: 48.39ms
+[PERF] Hz: 20.92 | Advance: 20.81ms | Preprocess: 0.02ms | EnvStep: 26.53ms | Total: 47.35ms
+[PERF] Hz: 20.43 | Advance: 21.72ms | Preprocess: 0.02ms | EnvStep: 26.72ms | Total: 48.45ms
+[PERF] Hz: 19.49 | Advance: 21.59ms | Preprocess: 0.03ms | EnvStep: 29.29ms | Total: 50.90ms
+[PERF] Hz: 19.96 | Advance: 22.17ms | Preprocess: 0.01ms | EnvStep: 27.47ms | Total: 49.65ms
+[PERF] Hz: 20.61 | Advance: 20.33ms | Preprocess: 0.01ms | EnvStep: 27.83ms | Total: 48.17ms
+[PERF] Hz: 20.18 | Advance: 20.76ms | Preprocess: 0.02ms | EnvStep: 28.48ms | Total: 49.25ms
+[PERF] Hz: 20.85 | Advance: 20.53ms | Preprocess: 0.03ms | EnvStep: 26.97ms | Total: 47.53ms
+[PERF] Hz: 19.67 | Advance: 22.96ms | Preprocess: 0.02ms | EnvStep: 27.50ms | Total: 50.48ms
+[PERF] Hz: 20.53 | Advance: 21.13ms | Preprocess: 0.02ms | EnvStep: 27.16ms | Total: 48.31ms
+[PERF] Hz: 20.39 | Advance: 20.05ms | Preprocess: 0.02ms | EnvStep: 28.66ms | Total: 48.73ms
+[PERF] Hz: 20.38 | Advance: 21.23ms | Preprocess: 0.01ms | EnvStep: 27.36ms | Total: 48.60ms
+[PERF] Hz: 19.77 | Advance: 21.70ms | Preprocess: 0.02ms | EnvStep: 28.47ms | Total: 50.19ms
+[PERF] Hz: 20.24 | Advance: 20.14ms | Preprocess: 0.02ms | EnvStep: 28.74ms | Total: 48.89ms
+[PERF] Hz: 20.58 | Advance: 20.27ms | Preprocess: 0.08ms | EnvStep: 27.84ms | Total: 48.18ms
+[PERF] Hz: 20.75 | Advance: 21.17ms | Preprocess: 0.02ms | EnvStep: 26.72ms | Total: 47.91ms
+[PERF] Hz: 20.61 | Advance: 20.71ms | Preprocess: 0.06ms | EnvStep: 27.43ms | Total: 48.20ms
+[PERF] Hz: 20.68 | Advance: 20.70ms | Preprocess: 0.02ms | EnvStep: 27.27ms | Total: 47.99ms
+[PERF] Hz: 20.42 | Advance: 20.82ms | Preprocess: 0.02ms | EnvStep: 27.66ms | Total: 48.50ms
+[PERF] Hz: 20.37 | Advance: 21.59ms | Preprocess: 0.02ms | EnvStep: 27.23ms | Total: 48.84ms
+[PERF] Hz: 20.82 | Advance: 21.34ms | Preprocess: 0.01ms | EnvStep: 26.01ms | Total: 47.36ms
+[PERF] Hz: 20.32 | Advance: 20.96ms | Preprocess: 0.02ms | EnvStep: 27.95ms | Total: 48.93ms
+[PERF] Hz: 20.39 | Advance: 20.20ms | Preprocess: 0.02ms | EnvStep: 28.39ms | Total: 48.61ms
+[PERF] Hz: 20.41 | Advance: 21.24ms | Preprocess: 0.02ms | EnvStep: 27.28ms | Total: 48.53ms
+[PERF] Hz: 20.29 | Advance: 21.26ms | Preprocess: 0.09ms | EnvStep: 27.46ms | Total: 48.81ms
+[PERF] Hz: 19.97 | Advance: 22.74ms | Preprocess: 0.02ms | EnvStep: 26.87ms | Total: 49.63ms
+[PERF] Hz: 20.69 | Advance: 21.28ms | Preprocess: 0.02ms | EnvStep: 26.61ms | Total: 47.90ms
+[PERF] Hz: 20.46 | Advance: 20.96ms | Preprocess: 0.01ms | EnvStep: 27.33ms | Total: 48.30ms
+[PERF] Hz: 21.45 | Advance: 19.33ms | Preprocess: 0.02ms | EnvStep: 26.43ms | Total: 45.78ms
+[PERF] Hz: 20.60 | Advance: 20.14ms | Preprocess: 0.02ms | EnvStep: 27.96ms | Total: 48.11ms
+[PERF] Hz: 19.67 | Advance: 22.42ms | Preprocess: 0.02ms | EnvStep: 27.94ms | Total: 50.38ms
+[PERF] Hz: 20.10 | Advance: 20.77ms | Preprocess: 0.02ms | EnvStep: 28.49ms | Total: 49.28ms
+[PERF] Hz: 20.42 | Advance: 21.45ms | Preprocess: 0.02ms | EnvStep: 27.07ms | Total: 48.54ms
+[PERF] Hz: 20.35 | Advance: 20.44ms | Preprocess: 0.02ms | EnvStep: 28.19ms | Total: 48.65ms
+[PERF] Hz: 20.39 | Advance: 21.28ms | Preprocess: 0.02ms | EnvStep: 27.25ms | Total: 48.55ms
+[PERF] Hz: 20.43 | Advance: 20.42ms | Preprocess: 0.02ms | EnvStep: 28.08ms | Total: 48.52ms
+[PERF] Hz: 20.45 | Advance: 19.73ms | Preprocess: 0.01ms | EnvStep: 28.45ms | Total: 48.20ms
+[PERF] Hz: 19.49 | Advance: 22.68ms | Preprocess: 0.01ms | EnvStep: 28.11ms | Total: 50.80ms
+[PERF] Hz: 20.23 | Advance: 19.97ms | Preprocess: 0.04ms | EnvStep: 28.80ms | Total: 48.81ms
+[PERF] Hz: 20.79 | Advance: 19.82ms | Preprocess: 0.01ms | EnvStep: 27.83ms | Total: 47.67ms
+[PERF] Hz: 20.44 | Advance: 21.92ms | Preprocess: 0.02ms | EnvStep: 26.63ms | Total: 48.57ms
+[PERF] Hz: 19.92 | Advance: 21.03ms | Preprocess: 0.02ms | EnvStep: 28.73ms | Total: 49.78ms
+[PERF] Hz: 19.94 | Advance: 21.79ms | Preprocess: 0.02ms | EnvStep: 27.81ms | Total: 49.62ms
+[PERF] Hz: 20.00 | Advance: 19.84ms | Preprocess: 0.02ms | EnvStep: 29.72ms | Total: 49.58ms
+[PERF] Hz: 19.79 | Advance: 22.12ms | Preprocess: 0.02ms | EnvStep: 27.96ms | Total: 50.10ms
+[PERF] Hz: 19.92 | Advance: 20.40ms | Preprocess: 0.02ms | EnvStep: 29.38ms | Total: 49.80ms
+[PERF] Hz: 20.67 | Advance: 20.88ms | Preprocess: 0.02ms | EnvStep: 27.09ms | Total: 47.99ms
+[PERF] Hz: 20.39 | Advance: 21.14ms | Preprocess: 0.02ms | EnvStep: 27.48ms | Total: 48.63ms
+[PERF] Hz: 20.82 | Advance: 19.81ms | Preprocess: 0.01ms | EnvStep: 27.63ms | Total: 47.46ms
+[PERF] Hz: 20.37 | Advance: 21.37ms | Preprocess: 0.02ms | EnvStep: 27.34ms | Total: 48.72ms
+[PERF] Hz: 20.86 | Advance: 20.79ms | Preprocess: 0.02ms | EnvStep: 26.48ms | Total: 47.28ms
+[PERF] Hz: 20.42 | Advance: 20.63ms | Preprocess: 0.04ms | EnvStep: 27.93ms | Total: 48.60ms
+[PERF] Hz: 19.34 | Advance: 21.79ms | Preprocess: 0.02ms | EnvStep: 29.62ms | Total: 51.44ms
+[PERF] Hz: 19.18 | Advance: 21.86ms | Preprocess: 0.02ms | EnvStep: 29.76ms | Total: 51.64ms
+[PERF] Hz: 19.44 | Advance: 22.51ms | Preprocess: 0.03ms | EnvStep: 28.58ms | Total: 51.12ms
+[PERF] Hz: 20.09 | Advance: 20.33ms | Preprocess: 0.02ms | EnvStep: 29.04ms | Total: 49.38ms
+[PERF] Hz: 20.64 | Advance: 20.41ms | Preprocess: 0.02ms | EnvStep: 27.43ms | Total: 47.86ms
+[PERF] Hz: 20.41 | Advance: 21.34ms | Preprocess: 0.02ms | EnvStep: 27.23ms | Total: 48.59ms
+[PERF] Hz: 20.63 | Advance: 21.02ms | Preprocess: 0.01ms | EnvStep: 26.93ms | Total: 47.96ms
+[PERF] Hz: 21.26 | Advance: 19.58ms | Preprocess: 0.02ms | EnvStep: 27.12ms | Total: 46.72ms
+[PERF] Hz: 21.84 | Advance: 18.39ms | Preprocess: 0.02ms | EnvStep: 26.90ms | Total: 45.31ms
+[PERF] Hz: 21.98 | Advance: 19.40ms | Preprocess: 0.02ms | EnvStep: 25.62ms | Total: 45.04ms
+[PERF] Hz: 21.06 | Advance: 18.84ms | Preprocess: 0.02ms | EnvStep: 28.42ms | Total: 47.28ms
+[PERF] Hz: 21.97 | Advance: 18.99ms | Preprocess: 0.03ms | EnvStep: 26.29ms | Total: 45.32ms
+[PERF] Hz: 21.46 | Advance: 17.75ms | Preprocess: 0.03ms | EnvStep: 28.62ms | Total: 46.40ms
+[PERF] Hz: 20.92 | Advance: 20.33ms | Preprocess: 0.02ms | EnvStep: 27.28ms | Total: 47.63ms
+[PERF] Hz: 21.47 | Advance: 19.32ms | Preprocess: 0.02ms | EnvStep: 27.08ms | Total: 46.41ms
+[PERF] Hz: 20.47 | Advance: 20.53ms | Preprocess: 0.02ms | EnvStep: 28.13ms | Total: 48.68ms
+[PERF] Hz: 21.57 | Advance: 17.64ms | Preprocess: 0.02ms | EnvStep: 28.50ms | Total: 46.16ms
+[PERF] Hz: 20.49 | Advance: 20.12ms | Preprocess: 0.02ms | EnvStep: 28.50ms | Total: 48.63ms
+[PERF] Hz: 20.40 | Advance: 19.34ms | Preprocess: 0.01ms | EnvStep: 29.49ms | Total: 48.85ms
+[PERF] Hz: 20.95 | Advance: 19.22ms | Preprocess: 0.02ms | EnvStep: 28.33ms | Total: 47.56ms
+[PERF] Hz: 20.69 | Advance: 19.71ms | Preprocess: 0.02ms | EnvStep: 28.42ms | Total: 48.15ms
+[PERF] Hz: 21.46 | Advance: 17.37ms | Preprocess: 0.02ms | EnvStep: 29.06ms | Total: 46.45ms
+[PERF] Hz: 21.03 | Advance: 19.53ms | Preprocess: 0.01ms | EnvStep: 27.84ms | Total: 47.39ms
+[PERF] Hz: 20.55 | Advance: 19.31ms | Preprocess: 0.02ms | EnvStep: 29.19ms | Total: 48.52ms
+[PERF] Hz: 21.58 | Advance: 17.23ms | Preprocess: 0.01ms | EnvStep: 28.95ms | Total: 46.19ms
+[PERF] Hz: 20.99 | Advance: 18.94ms | Preprocess: 0.02ms | EnvStep: 28.53ms | Total: 47.48ms
+[PERF] Hz: 20.88 | Advance: 19.02ms | Preprocess: 0.01ms | EnvStep: 28.71ms | Total: 47.74ms
+[PERF] Hz: 20.79 | Advance: 19.36ms | Preprocess: 0.02ms | EnvStep: 28.55ms | Total: 47.93ms
+[PERF] Hz: 20.62 | Advance: 19.23ms | Preprocess: 0.04ms | EnvStep: 29.07ms | Total: 48.34ms
+[PERF] Hz: 20.53 | Advance: 19.41ms | Preprocess: 0.02ms | EnvStep: 29.12ms | Total: 48.55ms
+[PERF] Hz: 20.90 | Advance: 19.50ms | Preprocess: 0.01ms | EnvStep: 28.15ms | Total: 47.66ms
+[PERF] Hz: 20.68 | Advance: 18.61ms | Preprocess: 0.01ms | EnvStep: 29.59ms | Total: 48.22ms
+[PERF] Hz: 20.71 | Advance: 19.12ms | Preprocess: 0.01ms | EnvStep: 28.98ms | Total: 48.12ms
+[PERF] Hz: 20.52 | Advance: 18.50ms | Preprocess: 0.01ms | EnvStep: 30.06ms | Total: 48.57ms
+[PERF] Hz: 20.77 | Advance: 19.11ms | Preprocess: 0.02ms | EnvStep: 28.85ms | Total: 47.98ms
+[PERF] Hz: 20.83 | Advance: 18.72ms | Preprocess: 0.02ms | EnvStep: 29.09ms | Total: 47.82ms
+[PERF] Hz: 21.36 | Advance: 19.64ms | Preprocess: 0.02ms | EnvStep: 26.95ms | Total: 46.60ms
+[PERF] Hz: 21.40 | Advance: 18.83ms | Preprocess: 0.02ms | EnvStep: 27.71ms | Total: 46.55ms
+[PERF] Hz: 21.30 | Advance: 18.49ms | Preprocess: 0.02ms | EnvStep: 28.27ms | Total: 46.78ms
+[PERF] Hz: 21.44 | Advance: 19.85ms | Preprocess: 0.02ms | EnvStep: 26.54ms | Total: 46.40ms
+[PERF] Hz: 21.36 | Advance: 18.51ms | Preprocess: 0.02ms | EnvStep: 28.04ms | Total: 46.56ms
+[PERF] Hz: 21.34 | Advance: 19.97ms | Preprocess: 0.01ms | EnvStep: 26.60ms | Total: 46.58ms
+[PERF] Hz: 21.89 | Advance: 18.58ms | Preprocess: 0.02ms | EnvStep: 26.67ms | Total: 45.26ms
+[PERF] Hz: 20.93 | Advance: 20.64ms | Preprocess: 0.01ms | EnvStep: 26.80ms | Total: 47.46ms
+[PERF] Hz: 21.52 | Advance: 18.57ms | Preprocess: 0.02ms | EnvStep: 27.46ms | Total: 46.05ms
+[PERF] Hz: 21.32 | Advance: 20.23ms | Preprocess: 0.02ms | EnvStep: 26.33ms | Total: 46.58ms
+[PERF] Hz: 21.97 | Advance: 18.14ms | Preprocess: 0.02ms | EnvStep: 26.95ms | Total: 45.11ms
+[PERF] Hz: 21.89 | Advance: 19.41ms | Preprocess: 0.02ms | EnvStep: 25.79ms | Total: 45.21ms
+[PERF] Hz: 21.36 | Advance: 18.90ms | Preprocess: 0.02ms | EnvStep: 27.28ms | Total: 46.20ms
+[PERF] Hz: 21.39 | Advance: 20.19ms | Preprocess: 0.02ms | EnvStep: 26.23ms | Total: 46.44ms
+[PERF] Hz: 20.55 | Advance: 20.54ms | Preprocess: 0.02ms | EnvStep: 27.74ms | Total: 48.30ms
+[PERF] Hz: 19.94 | Advance: 19.72ms | Preprocess: 0.02ms | EnvStep: 30.09ms | Total: 49.83ms
+[PERF] Hz: 19.83 | Advance: 22.59ms | Preprocess: 0.02ms | EnvStep: 27.53ms | Total: 50.13ms
+[PERF] Hz: 20.95 | Advance: 20.22ms | Preprocess: 0.02ms | EnvStep: 26.88ms | Total: 47.11ms
+[PERF] Hz: 20.37 | Advance: 20.29ms | Preprocess: 0.02ms | EnvStep: 28.34ms | Total: 48.64ms
+[PERF] Hz: 20.43 | Advance: 20.68ms | Preprocess: 0.02ms | EnvStep: 27.64ms | Total: 48.34ms
+[PERF] Hz: 20.51 | Advance: 21.24ms | Preprocess: 0.02ms | EnvStep: 27.15ms | Total: 48.40ms
+[PERF] Hz: 19.72 | Advance: 22.58ms | Preprocess: 0.02ms | EnvStep: 27.52ms | Total: 50.12ms
+[PERF] Hz: 20.03 | Advance: 20.62ms | Preprocess: 0.02ms | EnvStep: 29.01ms | Total: 49.64ms
+[PERF] Hz: 19.78 | Advance: 22.31ms | Preprocess: 0.02ms | EnvStep: 27.78ms | Total: 50.11ms
+[PERF] Hz: 20.27 | Advance: 19.48ms | Preprocess: 0.02ms | EnvStep: 29.43ms | Total: 48.93ms
+[PERF] Hz: 19.16 | Advance: 21.93ms | Preprocess: 0.04ms | EnvStep: 29.71ms | Total: 51.68ms
+[PERF] Hz: 19.13 | Advance: 22.90ms | Preprocess: 0.02ms | EnvStep: 29.03ms | Total: 51.95ms
+[PERF] Hz: 19.96 | Advance: 22.14ms | Preprocess: 0.02ms | EnvStep: 27.45ms | Total: 49.60ms
+[PERF] Hz: 20.52 | Advance: 21.04ms | Preprocess: 0.01ms | EnvStep: 27.19ms | Total: 48.24ms
+[PERF] Hz: 19.43 | Advance: 22.02ms | Preprocess: 0.02ms | EnvStep: 29.13ms | Total: 51.17ms
+[PERF] Hz: 20.03 | Advance: 19.51ms | Preprocess: 0.02ms | EnvStep: 30.00ms | Total: 49.52ms
+[PERF] Hz: 20.35 | Advance: 20.80ms | Preprocess: 0.02ms | EnvStep: 27.78ms | Total: 48.59ms
+[PERF] Hz: 20.58 | Advance: 20.78ms | Preprocess: 0.05ms | EnvStep: 27.25ms | Total: 48.08ms
+[PERF] Hz: 20.46 | Advance: 22.07ms | Preprocess: 0.02ms | EnvStep: 26.30ms | Total: 48.39ms
+[PERF] Hz: 20.05 | Advance: 20.81ms | Preprocess: 0.02ms | EnvStep: 28.82ms | Total: 49.65ms
+[PERF] Hz: 20.60 | Advance: 20.92ms | Preprocess: 0.02ms | EnvStep: 27.12ms | Total: 48.06ms
+[PERF] Hz: 20.86 | Advance: 20.62ms | Preprocess: 0.02ms | EnvStep: 26.99ms | Total: 47.63ms
+[PERF] Hz: 21.67 | Advance: 18.60ms | Preprocess: 0.02ms | EnvStep: 27.15ms | Total: 45.77ms
+[PERF] Hz: 21.39 | Advance: 19.80ms | Preprocess: 0.02ms | EnvStep: 26.56ms | Total: 46.37ms
+[PERF] Hz: 21.74 | Advance: 18.08ms | Preprocess: 0.01ms | EnvStep: 27.48ms | Total: 45.58ms
+[PERF] Hz: 21.38 | Advance: 19.48ms | Preprocess: 0.02ms | EnvStep: 26.97ms | Total: 46.47ms
+[PERF] Hz: 21.86 | Advance: 18.17ms | Preprocess: 0.01ms | EnvStep: 27.30ms | Total: 45.49ms
+[PERF] Hz: 21.91 | Advance: 18.15ms | Preprocess: 0.02ms | EnvStep: 27.24ms | Total: 45.41ms
+[PERF] Hz: 21.17 | Advance: 18.76ms | Preprocess: 0.02ms | EnvStep: 28.25ms | Total: 47.02ms
+[PERF] Hz: 21.38 | Advance: 19.79ms | Preprocess: 0.02ms | EnvStep: 26.80ms | Total: 46.60ms
+[PERF] Hz: 22.02 | Advance: 18.47ms | Preprocess: 0.01ms | EnvStep: 26.68ms | Total: 45.16ms
+[PERF] Hz: 21.48 | Advance: 18.44ms | Preprocess: 0.02ms | EnvStep: 27.92ms | Total: 46.37ms
+[PERF] Hz: 21.10 | Advance: 19.81ms | Preprocess: 0.02ms | EnvStep: 27.39ms | Total: 47.22ms
+[PERF] Hz: 20.95 | Advance: 19.58ms | Preprocess: 0.02ms | EnvStep: 27.97ms | Total: 47.56ms
+[PERF] Hz: 21.77 | Advance: 17.26ms | Preprocess: 0.01ms | EnvStep: 28.50ms | Total: 45.77ms
+[PERF] Hz: 20.89 | Advance: 19.49ms | Preprocess: 0.02ms | EnvStep: 28.22ms | Total: 47.73ms
+[PERF] Hz: 21.46 | Advance: 17.96ms | Preprocess: 0.01ms | EnvStep: 28.44ms | Total: 46.41ms
+[PERF] Hz: 20.70 | Advance: 19.26ms | Preprocess: 0.01ms | EnvStep: 28.87ms | Total: 48.15ms
+[PERF] Hz: 20.91 | Advance: 19.31ms | Preprocess: 0.01ms | EnvStep: 28.32ms | Total: 47.65ms
+[PERF] Hz: 21.12 | Advance: 19.87ms | Preprocess: 0.02ms | EnvStep: 27.28ms | Total: 47.17ms
+[PERF] Hz: 21.39 | Advance: 18.47ms | Preprocess: 0.02ms | EnvStep: 28.03ms | Total: 46.52ms
+[PERF] Hz: 21.40 | Advance: 19.46ms | Preprocess: 0.01ms | EnvStep: 27.06ms | Total: 46.53ms
+[PERF] Hz: 21.58 | Advance: 17.84ms | Preprocess: 0.02ms | EnvStep: 28.29ms | Total: 46.14ms
+[PERF] Hz: 20.70 | Advance: 19.59ms | Preprocess: 0.02ms | EnvStep: 28.47ms | Total: 48.08ms
+[PERF] Hz: 21.98 | Advance: 18.67ms | Preprocess: 0.02ms | EnvStep: 26.60ms | Total: 45.29ms
+[PERF] Hz: 21.36 | Advance: 18.85ms | Preprocess: 0.02ms | EnvStep: 27.69ms | Total: 46.55ms
+[PERF] Hz: 21.00 | Advance: 20.47ms | Preprocess: 0.02ms | EnvStep: 26.78ms | Total: 47.26ms
+[PERF] Hz: 21.88 | Advance: 18.46ms | Preprocess: 0.01ms | EnvStep: 26.75ms | Total: 45.23ms
+[PERF] Hz: 21.24 | Advance: 20.23ms | Preprocess: 0.01ms | EnvStep: 26.27ms | Total: 46.52ms
+[PERF] Hz: 21.66 | Advance: 18.40ms | Preprocess: 0.02ms | EnvStep: 27.24ms | Total: 45.66ms
+[PERF] Hz: 22.00 | Advance: 18.26ms | Preprocess: 0.01ms | EnvStep: 26.72ms | Total: 45.00ms
+[PERF] Hz: 21.99 | Advance: 19.56ms | Preprocess: 0.01ms | EnvStep: 25.42ms | Total: 44.99ms
+[PERF] Hz: 21.74 | Advance: 19.03ms | Preprocess: 0.02ms | EnvStep: 26.58ms | Total: 45.63ms
+[PERF] Hz: 22.12 | Advance: 18.61ms | Preprocess: 0.02ms | EnvStep: 26.17ms | Total: 44.80ms
+[PERF] Hz: 20.71 | Advance: 20.66ms | Preprocess: 0.01ms | EnvStep: 27.19ms | Total: 47.86ms
+[PERF] Hz: 20.32 | Advance: 21.13ms | Preprocess: 0.02ms | EnvStep: 27.64ms | Total: 48.79ms
+[PERF] Hz: 20.25 | Advance: 20.56ms | Preprocess: 0.02ms | EnvStep: 28.36ms | Total: 48.94ms
+[PERF] Hz: 20.60 | Advance: 21.83ms | Preprocess: 0.02ms | EnvStep: 26.15ms | Total: 48.00ms
+[PERF] Hz: 20.34 | Advance: 20.65ms | Preprocess: 0.02ms | EnvStep: 28.17ms | Total: 48.84ms
+[PERF] Hz: 20.57 | Advance: 21.58ms | Preprocess: 0.02ms | EnvStep: 26.46ms | Total: 48.05ms
+[PERF] Hz: 20.33 | Advance: 20.88ms | Preprocess: 0.02ms | EnvStep: 27.84ms | Total: 48.74ms
+[PERF] Hz: 20.35 | Advance: 20.60ms | Preprocess: 0.02ms | EnvStep: 28.10ms | Total: 48.72ms
+[PERF] Hz: 20.30 | Advance: 20.95ms | Preprocess: 0.02ms | EnvStep: 27.82ms | Total: 48.79ms
+[PERF] Hz: 19.65 | Advance: 22.41ms | Preprocess: 0.02ms | EnvStep: 28.10ms | Total: 50.53ms
+[PERF] Hz: 20.28 | Advance: 19.92ms | Preprocess: 0.02ms | EnvStep: 28.95ms | Total: 48.89ms
+[PERF] Hz: 20.41 | Advance: 21.93ms | Preprocess: 0.04ms | EnvStep: 26.58ms | Total: 48.55ms
+[PERF] Hz: 20.15 | Advance: 21.32ms | Preprocess: 0.02ms | EnvStep: 27.86ms | Total: 49.20ms
+[PERF] Hz: 19.24 | Advance: 22.48ms | Preprocess: 0.02ms | EnvStep: 29.12ms | Total: 51.61ms
+[PERF] Hz: 19.19 | Advance: 21.86ms | Preprocess: 0.02ms | EnvStep: 29.73ms | Total: 51.61ms
+[PERF] Hz: 20.21 | Advance: 20.37ms | Preprocess: 0.01ms | EnvStep: 28.66ms | Total: 49.05ms
+[PERF] Hz: 20.41 | Advance: 20.80ms | Preprocess: 0.02ms | EnvStep: 27.83ms | Total: 48.64ms
+[PERF] Hz: 20.89 | Advance: 20.86ms | Preprocess: 0.02ms | EnvStep: 26.46ms | Total: 47.33ms
+[PERF] Hz: 21.88 | Advance: 19.01ms | Preprocess: 0.01ms | EnvStep: 26.21ms | Total: 45.23ms
+[PERF] Hz: 22.36 | Advance: 18.43ms | Preprocess: 0.02ms | EnvStep: 25.84ms | Total: 44.28ms
+[PERF] Hz: 21.28 | Advance: 20.42ms | Preprocess: 0.02ms | EnvStep: 26.23ms | Total: 46.67ms
+[PERF] Hz: 21.89 | Advance: 19.33ms | Preprocess: 0.01ms | EnvStep: 25.97ms | Total: 45.31ms
+[PERF] Hz: 22.03 | Advance: 18.69ms | Preprocess: 0.01ms | EnvStep: 26.26ms | Total: 44.97ms
+[PERF] Hz: 20.98 | Advance: 20.02ms | Preprocess: 0.02ms | EnvStep: 27.34ms | Total: 47.38ms
+[PERF] Hz: 21.63 | Advance: 18.43ms | Preprocess: 0.02ms | EnvStep: 27.44ms | Total: 45.89ms
+[PERF] Hz: 21.06 | Advance: 20.09ms | Preprocess: 0.02ms | EnvStep: 27.10ms | Total: 47.21ms
+[PERF] Hz: 21.49 | Advance: 19.42ms | Preprocess: 0.01ms | EnvStep: 26.80ms | Total: 46.24ms
+[PERF] Hz: 20.98 | Advance: 19.05ms | Preprocess: 0.02ms | EnvStep: 28.33ms | Total: 47.39ms
+[PERF] Hz: 20.94 | Advance: 20.47ms | Preprocess: 0.02ms | EnvStep: 27.01ms | Total: 47.49ms
+[PERF] Hz: 20.81 | Advance: 18.98ms | Preprocess: 0.02ms | EnvStep: 28.83ms | Total: 47.82ms
+[PERF] Hz: 21.53 | Advance: 18.56ms | Preprocess: 0.02ms | EnvStep: 27.61ms | Total: 46.19ms
+[PERF] Hz: 21.15 | Advance: 19.76ms | Preprocess: 0.02ms | EnvStep: 27.25ms | Total: 47.03ms
+[PERF] Hz: 21.69 | Advance: 18.41ms | Preprocess: 0.02ms | EnvStep: 27.42ms | Total: 45.84ms
+[PERF] Hz: 20.95 | Advance: 19.69ms | Preprocess: 0.02ms | EnvStep: 27.77ms | Total: 47.48ms
+[PERF] Hz: 21.20 | Advance: 19.89ms | Preprocess: 0.02ms | EnvStep: 27.00ms | Total: 46.91ms
+[PERF] Hz: 21.47 | Advance: 18.73ms | Preprocess: 0.01ms | EnvStep: 27.63ms | Total: 46.38ms
+[PERF] Hz: 21.46 | Advance: 19.50ms | Preprocess: 0.01ms | EnvStep: 26.82ms | Total: 46.34ms
+[PERF] Hz: 21.48 | Advance: 18.57ms | Preprocess: 0.02ms | EnvStep: 27.77ms | Total: 46.35ms
+[PERF] Hz: 21.91 | Advance: 19.29ms | Preprocess: 0.01ms | EnvStep: 26.02ms | Total: 45.32ms
+[PERF] Hz: 20.89 | Advance: 18.86ms | Preprocess: 0.02ms | EnvStep: 28.80ms | Total: 47.67ms
+[PERF] Hz: 21.40 | Advance: 19.54ms | Preprocess: 0.02ms | EnvStep: 27.02ms | Total: 46.57ms
+[PERF] Hz: 21.27 | Advance: 18.85ms | Preprocess: 0.02ms | EnvStep: 27.87ms | Total: 46.74ms
+[PERF] Hz: 20.54 | Advance: 20.34ms | Preprocess: 0.02ms | EnvStep: 28.13ms | Total: 48.48ms
+[PERF] Hz: 21.40 | Advance: 19.34ms | Preprocess: 0.01ms | EnvStep: 27.13ms | Total: 46.49ms
+[PERF] Hz: 21.72 | Advance: 17.95ms | Preprocess: 0.01ms | EnvStep: 27.86ms | Total: 45.82ms
+[PERF] Hz: 20.83 | Advance: 19.58ms | Preprocess: 0.01ms | EnvStep: 28.20ms | Total: 47.79ms
+[PERF] Hz: 20.73 | Advance: 18.98ms | Preprocess: 0.02ms | EnvStep: 29.09ms | Total: 48.08ms
+[PERF] Hz: 20.81 | Advance: 19.26ms | Preprocess: 0.02ms | EnvStep: 28.61ms | Total: 47.89ms
+[PERF] Hz: 21.44 | Advance: 17.86ms | Preprocess: 0.02ms | EnvStep: 28.59ms | Total: 46.46ms
+[PERF] Hz: 20.77 | Advance: 19.96ms | Preprocess: 0.02ms | EnvStep: 28.00ms | Total: 47.97ms
+[PERF] Hz: 21.03 | Advance: 19.35ms | Preprocess: 0.01ms | EnvStep: 27.99ms | Total: 47.35ms
+[PERF] Hz: 21.46 | Advance: 17.69ms | Preprocess: 0.01ms | EnvStep: 28.73ms | Total: 46.43ms
+[PERF] Hz: 20.46 | Advance: 19.28ms | Preprocess: 0.02ms | EnvStep: 29.42ms | Total: 48.71ms
+[PERF] Hz: 20.66 | Advance: 19.47ms | Preprocess: 0.02ms | EnvStep: 28.71ms | Total: 48.20ms
+[PERF] Hz: 21.00 | Advance: 19.01ms | Preprocess: 0.02ms | EnvStep: 28.39ms | Total: 47.42ms
+[PERF] Hz: 20.73 | Advance: 19.33ms | Preprocess: 0.02ms | EnvStep: 28.71ms | Total: 48.05ms
+[PERF] Hz: 20.92 | Advance: 19.79ms | Preprocess: 0.02ms | EnvStep: 27.83ms | Total: 47.64ms
+[PERF] Hz: 20.76 | Advance: 19.24ms | Preprocess: 0.02ms | EnvStep: 28.73ms | Total: 47.99ms
+[PERF] Hz: 20.69 | Advance: 18.88ms | Preprocess: 0.02ms | EnvStep: 29.26ms | Total: 48.15ms
+[PERF] Hz: 21.39 | Advance: 18.35ms | Preprocess: 0.02ms | EnvStep: 28.21ms | Total: 46.58ms
+[PERF] Hz: 20.40 | Advance: 19.67ms | Preprocess: 0.02ms | EnvStep: 29.12ms | Total: 48.81ms
+[PERF] Hz: 20.76 | Advance: 19.26ms | Preprocess: 0.02ms | EnvStep: 28.73ms | Total: 48.01ms
+[PERF] Hz: 21.49 | Advance: 18.11ms | Preprocess: 0.01ms | EnvStep: 28.24ms | Total: 46.37ms
+[PERF] Hz: 20.46 | Advance: 19.62ms | Preprocess: 0.02ms | EnvStep: 29.05ms | Total: 48.69ms
+[PERF] Hz: 17.55 | Advance: 23.93ms | Preprocess: 0.02ms | EnvStep: 32.83ms | Total: 56.79ms
+[PERF] Hz: 16.54 | Advance: 25.26ms | Preprocess: 0.10ms | EnvStep: 34.93ms | Total: 60.29ms
+[PERF] Hz: 16.49 | Advance: 24.23ms | Preprocess: 0.02ms | EnvStep: 36.21ms | Total: 60.46ms
+[PERF] Hz: 16.95 | Advance: 22.09ms | Preprocess: 0.02ms | EnvStep: 36.70ms | Total: 58.80ms
+[PERF] Hz: 19.01 | Advance: 21.01ms | Preprocess: 0.02ms | EnvStep: 31.39ms | Total: 52.42ms
+[PERF] Hz: 18.10 | Advance: 24.13ms | Preprocess: 0.02ms | EnvStep: 30.90ms | Total: 55.05ms
+[PERF] Hz: 17.89 | Advance: 23.14ms | Preprocess: 0.02ms | EnvStep: 32.51ms | Total: 55.66ms
+[PERF] Hz: 18.86 | Advance: 20.94ms | Preprocess: 0.04ms | EnvStep: 31.81ms | Total: 52.80ms
+[PERF] Hz: 17.50 | Advance: 23.36ms | Preprocess: 0.02ms | EnvStep: 33.58ms | Total: 56.96ms
+[PERF] Hz: 17.35 | Advance: 22.95ms | Preprocess: 0.02ms | EnvStep: 34.48ms | Total: 57.45ms
+[PERF] Hz: 18.46 | Advance: 20.93ms | Preprocess: 0.03ms | EnvStep: 33.03ms | Total: 53.99ms
+[PERF] Hz: 19.47 | Advance: 21.46ms | Preprocess: 0.02ms | EnvStep: 29.72ms | Total: 51.19ms
+[PERF] Hz: 20.31 | Advance: 19.55ms | Preprocess: 0.02ms | EnvStep: 29.47ms | Total: 49.04ms
+[PERF] Hz: 17.97 | Advance: 23.35ms | Preprocess: 0.02ms | EnvStep: 32.09ms | Total: 55.46ms
+[PERF] Hz: 19.52 | Advance: 21.78ms | Preprocess: 0.02ms | EnvStep: 29.25ms | Total: 51.05ms
+[PERF] Hz: 21.61 | Advance: 18.70ms | Preprocess: 0.01ms | EnvStep: 27.27ms | Total: 45.98ms
+[PERF] Hz: 20.75 | Advance: 20.29ms | Preprocess: 0.02ms | EnvStep: 27.68ms | Total: 47.98ms
+[PERF] Hz: 20.54 | Advance: 19.48ms | Preprocess: 0.02ms | EnvStep: 28.95ms | Total: 48.45ms
+[PERF] Hz: 19.85 | Advance: 22.06ms | Preprocess: 0.02ms | EnvStep: 28.09ms | Total: 50.16ms
+[PERF] Hz: 19.05 | Advance: 21.72ms | Preprocess: 0.02ms | EnvStep: 30.53ms | Total: 52.27ms
+[PERF] Hz: 20.32 | Advance: 19.88ms | Preprocess: 0.02ms | EnvStep: 29.07ms | Total: 48.96ms
+[PERF] Hz: 20.70 | Advance: 19.77ms | Preprocess: 0.02ms | EnvStep: 28.36ms | Total: 48.15ms
+[PERF] Hz: 21.96 | Advance: 18.78ms | Preprocess: 0.02ms | EnvStep: 26.39ms | Total: 45.19ms
+[PERF] Hz: 20.87 | Advance: 19.76ms | Preprocess: 0.02ms | EnvStep: 27.79ms | Total: 47.57ms
+[PERF] Hz: 20.76 | Advance: 21.17ms | Preprocess: 0.02ms | EnvStep: 26.64ms | Total: 47.83ms
+[PERF] Hz: 19.16 | Advance: 22.53ms | Preprocess: 0.02ms | EnvStep: 29.39ms | Total: 51.94ms
+[PERF] Hz: 20.80 | Advance: 18.90ms | Preprocess: 0.02ms | EnvStep: 28.89ms | Total: 47.81ms
+[PERF] Hz: 21.91 | Advance: 17.72ms | Preprocess: 0.02ms | EnvStep: 27.36ms | Total: 45.10ms
+[PERF] Hz: 21.19 | Advance: 20.37ms | Preprocess: 0.02ms | EnvStep: 26.31ms | Total: 46.69ms
+[PERF] Hz: 21.92 | Advance: 18.49ms | Preprocess: 0.02ms | EnvStep: 26.62ms | Total: 45.13ms
+[PERF] Hz: 21.91 | Advance: 19.48ms | Preprocess: 0.02ms | EnvStep: 25.81ms | Total: 45.31ms
+[hack] task check: in_right_tray 1, in_wrong_tray 0, not_in_tray 8, total 9, task sort3, sim_step 17478
+[PERF] Hz: 20.00 | Advance: 21.25ms | Preprocess: 0.02ms | EnvStep: 28.26ms | Total: 49.53ms

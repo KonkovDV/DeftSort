@@ -1,0 +1,32 @@
+class feasibility prior {'electronics': 0.597, 'box': 0.577}
+layouts 100 limit 270.0
+plan x1 | pessimistic(v7-like) | P0 node as is (confidence order, tail 12 s)    | E   6.8+-0.2 ok 1.20 bad 0.52 (timeout-in-hand 0.02) p10  -10
+plan x1 | pessimistic(v7-like) | P1 calibrated budget (1.7x planned + p90 tail) | E   6.5+-0.2 ok 1.16 bad 0.51 (timeout-in-hand 0.00) p10  -10
+plan x1 | pessimistic(v7-like) | P2 P1 + EV/time order                          | E   6.5+-0.2 ok 1.15 bad 0.50 (timeout-in-hand 0.00) p10  -10
+plan x1 | pessimistic(v7-like) | P3 P2 + infeasible cache                       | E   6.3+-0.2 ok 1.14 bad 0.51 (timeout-in-hand 0.00) p10  -10
+plan x1 | pessimistic(v7-like) | P4 P1 + infeasible cache                       | E   6.5+-0.2 ok 1.17 bad 0.52 (timeout-in-hand 0.00) p10  -10
+plan x1 | mid                  | P0 node as is (confidence order, tail 12 s)    | E  19.3+-0.2 ok 2.38 bad 0.45 (timeout-in-hand 0.02) p10    0
+plan x1 | mid                  | P1 calibrated budget (1.7x planned + p90 tail) | E  19.3+-0.2 ok 2.33 bad 0.40 (timeout-in-hand 0.00) p10    0
+plan x1 | mid                  | P2 P1 + EV/time order                          | E  18.8+-0.2 ok 2.29 bad 0.41 (timeout-in-hand 0.00) p10    0
+plan x1 | mid                  | P3 P2 + infeasible cache                       | E  19.0+-0.2 ok 2.32 bad 0.42 (timeout-in-hand 0.00) p10    0
+plan x1 | mid                  | P4 P1 + infeasible cache                       | E  18.9+-0.2 ok 2.31 bad 0.42 (timeout-in-hand 0.00) p10    0
+plan x1 | optimistic           | P0 node as is (confidence order, tail 12 s)    | E  29.4+-0.2 ok 3.13 bad 0.18 (timeout-in-hand 0.02) p10   20
+plan x1 | optimistic           | P1 calibrated budget (1.7x planned + p90 tail) | E  29.2+-0.2 ok 3.09 bad 0.17 (timeout-in-hand 0.00) p10   20
+plan x1 | optimistic           | P2 P1 + EV/time order                          | E  29.1+-0.2 ok 3.07 bad 0.16 (timeout-in-hand 0.00) p10   20
+plan x1 | optimistic           | P3 P2 + infeasible cache                       | E  29.0+-0.2 ok 3.06 bad 0.16 (timeout-in-hand 0.00) p10   20
+plan x1 | optimistic           | P4 P1 + infeasible cache                       | E  29.2+-0.2 ok 3.08 bad 0.16 (timeout-in-hand 0.00) p10   20
+plan x2 | pessimistic(v7-like) | P0 node as is (confidence order, tail 12 s)    | E   4.7+-0.2 ok 0.83 bad 0.36 (timeout-in-hand 0.02) p10  -10
+plan x2 | pessimistic(v7-like) | P1 calibrated budget (1.7x planned + p90 tail) | E   4.7+-0.2 ok 0.82 bad 0.35 (timeout-in-hand 0.00) p10  -10
+plan x2 | pessimistic(v7-like) | P2 P1 + EV/time order                          | E   4.5+-0.2 ok 0.79 bad 0.34 (timeout-in-hand 0.00) p10  -10
+plan x2 | pessimistic(v7-like) | P3 P2 + infeasible cache                       | E   4.7+-0.2 ok 0.79 bad 0.32 (timeout-in-hand 0.00) p10  -10
+plan x2 | pessimistic(v7-like) | P4 P1 + infeasible cache                       | E   4.7+-0.2 ok 0.81 bad 0.34 (timeout-in-hand 0.00) p10  -10
+plan x2 | mid                  | P0 node as is (confidence order, tail 12 s)    | E  13.9+-0.2 ok 1.72 bad 0.32 (timeout-in-hand 0.02) p10    0
+plan x2 | mid                  | P1 calibrated budget (1.7x planned + p90 tail) | E  13.7+-0.2 ok 1.65 bad 0.28 (timeout-in-hand 0.00) p10    0
+plan x2 | mid                  | P2 P1 + EV/time order                          | E  13.1+-0.2 ok 1.60 bad 0.29 (timeout-in-hand 0.00) p10    0
+plan x2 | mid                  | P3 P2 + infeasible cache                       | E  13.4+-0.2 ok 1.62 bad 0.28 (timeout-in-hand 0.00) p10    0
+plan x2 | mid                  | P4 P1 + infeasible cache                       | E  13.4+-0.2 ok 1.65 bad 0.31 (timeout-in-hand 0.00) p10    0
+plan x2 | optimistic           | P0 node as is (confidence order, tail 12 s)    | E  22.0+-0.2 ok 2.36 bad 0.16 (timeout-in-hand 0.03) p10   10
+plan x2 | optimistic           | P1 calibrated budget (1.7x planned + p90 tail) | E  21.8+-0.2 ok 2.29 bad 0.11 (timeout-in-hand 0.00) p10   10
+plan x2 | optimistic           | P2 P1 + EV/time order                          | E  20.7+-0.2 ok 2.19 bad 0.12 (timeout-in-hand 0.00) p10   10
+plan x2 | optimistic           | P3 P2 + infeasible cache                       | E  20.8+-0.2 ok 2.21 bad 0.13 (timeout-in-hand 0.00) p10   10
+plan x2 | optimistic           | P4 P1 + infeasible cache                       | E  21.7+-0.2 ok 2.29 bad 0.12 (timeout-in-hand 0.00) p10   10

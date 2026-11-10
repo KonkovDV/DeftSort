@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+build/
+install/
+log/
+rust/team048_accel/target/
+__pycache__/
+*.pyc
+benches/data/*.f64
+benches/data/*.u8

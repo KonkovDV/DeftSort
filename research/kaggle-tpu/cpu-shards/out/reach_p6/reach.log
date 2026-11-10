@@ -1,0 +1,35 @@
+2026-11-09T07:11:14Z IN=/kaggle/input/datasets/dmitrijkv/team048-tpu-cpu-inputs
+2026-11-09T07:11:17Z pool_objs=[('Razer_Taipan_White_Ambidextrous_Gaming_Mouse', 'electronics'), ('JBL_Charge_Speaker_portable_wireless_wired_Green', 'electronics'), ('Crosley_Alarm_Clock_Vintage_Metal', 'electronics'), ('Nestle_Nips_Hard_Candy_Peanut_Butter', 'box'), ('Nips_Hard_Candy_Rich_Creamy_Butter_Rum_4_oz_1133_g', 'box'), ('009_gelatin_box', 'box')]
+2026-11-09T07:17:28Z layout 5/30 elapsed=370.2s
+2026-11-09T07:24:13Z layout 10/30 elapsed=775.7s
+2026-11-09T07:31:40Z layout 15/30 elapsed=1222.0s
+2026-11-09T07:37:01Z layout 20/30 elapsed=1543.3s
+2026-11-09T07:44:43Z layout 25/30 elapsed=2005.7s
+2026-11-09T07:50:08Z layout 30/30 elapsed=2330.0s
+2026-11-09T07:50:08Z {
+  "electronics": {
+    "n": 90,
+    "pick_rate": 0.4333,
+    "place_left_given_pick": 0.5641,
+    "place_right_given_pick": 0.4103,
+    "place_both_given_pick": 0.0,
+    "pick_and_place_left": 0.2444,
+    "pick_and_place_right": 0.1778,
+    "pick_kinds": {
+      "side": 39
+    }
+  },
+  "box": {
+    "n": 90,
+    "pick_rate": 0.4778,
+    "place_left_given_pick": 0.5581,
+    "place_right_given_pick": 0.3953,
+    "place_both_given_pick": 0.0,
+    "pick_and_place_left": 0.2667,
+    "pick_and_place_right": 0.1889,
+    "pick_kinds": {
+      "side": 43
+    }
+  }
+}
+2026-11-09T07:50:08Z ALL OK

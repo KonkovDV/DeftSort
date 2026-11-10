@@ -1,0 +1,36 @@
+{
+  "ok": true,
+  "pool": 3,
+  "n_layouts": 15,
+  "rates": {
+    "dish": {
+      "n": 45,
+      "pick_rate": 0.7556,
+      "place_left_given_pick": 0.5294,
+      "place_right_given_pick": 0.4706,
+      "place_both_given_pick": 0.0,
+      "pick_and_place_left": 0.4,
+      "pick_and_place_right": 0.3556
+    },
+    "box": {
+      "n": 45,
+      "pick_rate": 0.6889,
+      "place_left_given_pick": 0.5484,
+      "place_right_given_pick": 0.3871,
+      "place_both_given_pick": 0.0,
+      "pick_and_place_left": 0.3778,
+      "pick_and_place_right": 0.2667
+    },
+    "jar": {
+      "n": 45,
+      "pick_rate": 0.9556,
+      "place_left_given_pick": 0.5349,
+      "place_right_given_pick": 0.4651,
+      "place_both_given_pick": 0.0,
+      "pick_and_place_left": 0.5111,
+      "pick_and_place_right": 0.4444
+    }
+  },
+  "seconds": 943.05,
+  "source": "box_local_5117bec"
+}

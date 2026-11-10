@@ -1,0 +1,311 @@
+06:24:33 MSK +0s GPU GPU 0: Tesla T4 (UUID: GPU-741bf767-4941-0092-3027-008772056c62)
+GPU 1: Tesla T4 (UUID: GPU-31273bc7-a846-0fad-7ea8-73141e8f91ca) internet 200
+06:24:33 MSK +0s START setup timeout 5400
+06:25:35 MSK +62s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  963G  89% /] last=setup.log ::  | + mkdir -p /tmp/nssr_sim | + cp -r /kaggle/input/datasets/dmitrijkv/team048-polygon-assets/polygon/. /tmp/nssr_sim/ | + P=/tmp/w/mm/envs/isaac/bin/python | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cu128 | 
+06:26:35 MSK +122s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  956G  89% /] last=progress.log :: -p /tmp/nssr_sim | + cp -r /kaggle/input/datasets/dmitrijkv/team048-polygon-assets/polygon/. /tmp/nssr_sim/ | + P=/tmp/w/mm/envs/isaac/bin/python | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cu128 |  | 
+06:27:35 MSK +182s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  951G  89% /] last=setup.log :: olygon-assets/polygon/. /tmp/nssr_sim/ | + P=/tmp/w/mm/envs/isaac/bin/python | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cu128 | + ln -sfn /tmp/nssr_sim /nssr_sim | + wait 701 | + echo ros_env_rc=0 | + wait 702 | 
+06:28:35 MSK +242s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  951G  89% /] last=setup.log :: /bin/python -m pip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com | 
+06:29:35 MSK +302s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  948G  89% /] last=progress.log :: thon -m pip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  | 
+06:30:35 MSK +362s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  947G  89% /] last=progress.log :: n -m pip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  | 
+06:31:35 MSK +422s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  943G  89% /] last=progress.log :: m pip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  | 
+06:32:35 MSK +483s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=progress.log :: ip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  | 
+06:33:35 MSK +543s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  935G  89% /] last=progress.log :: install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  |  | 
+06:34:35 MSK +603s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bodyctrl_build.log :: Starting >>> bodyctrl_msgs | 
+06:35:35 MSK +663s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=progress.log :: mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  |  |  | 06:34:35 MSK +603s HB step=setup gpu=[0 %, 0 MiB | 0 %, 0 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bodyctrl_build.log :: Starting >>> bodyctrl_msgs |  | 
+06:36:22 MSK +710s END setup rc 0
+06:36:22 MSK +710s SETUP_CHECK {'ros': True, 'isaac': True, 'bodyctrl': True, 'nssr': True}
+06:36:22 MSK +710s TAIL ros_env.log ros_env_rc=0
+
+06:36:22 MSK +710s TAIL isaac_env.log ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+wheel 0.48.0 requires packaging>=24.0, but you have packaging 23.0 which is incompatible.
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+isaacsim-core 5.0.0.0 requires packaging==23.0, but you have packaging 24.2 which is incompatible.
+isaac_env_rc=0
+
+06:36:22 MSK +710s TAIL bodyctrl_build.log emoved.  Run "cmake --help-policy CMP0148" for policy details.  Use
+  the cmake_policy command to set the policy and suppress this warning.
+Call Stack (most recent call first):
+  /tmp/w/mm/envs/ros/share/rosidl_generator_py/cmake/rosidl_generator_py_generate_interfaces.cmake:33 (find_package)
+  /tmp/w/mm/envs/ros/share/ament_cmake_core/cmake/core/ament_execute_extensions.cmake:48 (include)
+  /tmp/w/mm/envs/ros/share/rosidl_cmake/cmake/rosidl_generate_interfaces.cmake:286 (ament_execute_extensions)
+  CMakeLists.txt:9 (rosidl_generate_interfaces)
+This warning is for project developers.  Use -Wno-author or -Wno-policy to
+suppress it.
+
+---
+Finished <<< bodyctrl_msgs [1min 57s]
+
+Summary: 1 package finished [1min 57s]
+  1 package had stderr output: bodyctrl_msgs
+bodyctrl_rc=0
+bodyctrl import OK
+
+06:36:22 MSK +710s TAIL nssr_pkg.log nssr_sim OK
+
+06:36:22 MSK +710s START stage34 timeout 2700
+06:36:35 MSK +723s HB step=stage34 gpu=[0 %, 228 MiB
+0 %, 105 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bridge.log :: got segment wrist_roll_r_link | [INFO] [1794195384.715486962] [hack_camera_bridge]: camera bridge up: ['cam_head', 'cam_torso'] | [INFO] [1794195389.684236432] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195394.684052929] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+06:37:36 MSK +783s HB step=stage34 gpu=[0 %, 317 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195444.684825878] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195449.684040585] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195454.683907764] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+06:38:36 MSK +843s HB step=stage34 gpu=[0 %, 333 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195504.685724389] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195509.684033670] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195514.684439818] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+06:39:36 MSK +903s HB step=stage34 gpu=[4 %, 333 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195564.684579892] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195569.685411095] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195574.684098497] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+06:40:36 MSK +963s HB step=stage34 gpu=[4 %, 333 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195624.683934872] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195629.684005368] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195634.683953269] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+06:41:36 MSK +1023s HB step=stage34 gpu=[4 %, 365 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195684.684930383] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195689.683969931] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195694.684793110] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+06:42:36 MSK +1083s HB step=stage34 gpu=[4 %, 365 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195744.683998963] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195749.684879765] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195754.684594837] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+06:43:36 MSK +1143s HB step=stage34 gpu=[4 %, 365 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195804.685005629] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195809.683937176] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195814.683991976] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+06:44:36 MSK +1203s HB step=stage34 gpu=[4 %, 365 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195864.685312958] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195869.684443812] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195874.684361071] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+06:45:36 MSK +1263s HB step=stage34 gpu=[4 %, 365 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195924.685581462] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195929.683910838] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195934.684000034] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+06:46:36 MSK +1323s HB step=stage34 gpu=[4 %, 876 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195984.683983286] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195989.683961815] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794195994.683665935] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+06:47:36 MSK +1384s HB step=stage34 gpu=[4 %, 886 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196044.684004263] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196049.683986703] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196054.683588872] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+06:48:36 MSK +1444s HB step=stage34 gpu=[4 %, 886 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196104.684271106] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196109.684058923] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196114.683652132] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+06:49:36 MSK +1504s HB step=stage34 gpu=[4 %, 905 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  939G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196164.684075681] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196169.683993016] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196174.684081433] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+06:50:36 MSK +1564s HB step=stage34 gpu=[0 %, 905 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  938G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196224.685828180] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196229.683666224] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196234.685706882] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+06:51:36 MSK +1624s HB step=stage34 gpu=[4 %, 906 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  938G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196284.686433932] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196289.683997137] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196294.683856381] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+06:52:36 MSK +1684s HB step=stage34 gpu=[4 %, 906 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  938G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196344.684000488] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196349.683951878] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196354.684834723] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+06:53:37 MSK +1744s HB step=stage34 gpu=[0 %, 906 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196404.684742949] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196409.683979718] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196414.683938428] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+06:54:37 MSK +1804s HB step=stage34 gpu=[4 %, 906 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196464.683947742] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196469.683627071] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196474.683975140] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+06:55:37 MSK +1864s HB step=stage34 gpu=[4 %, 1344 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196524.684143503] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196529.684160442] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196534.685173923] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+06:56:37 MSK +1924s HB step=stage34 gpu=[4 %, 1344 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196584.683898892] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196589.683947866] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196594.683912467] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+06:57:37 MSK +1984s HB step=stage34 gpu=[4 %, 1344 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=bridge.log :: e]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196644.684051467] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196649.684335679] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | [INFO] [1794196654.684005384] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0 | 
+06:58:37 MSK +2044s HB step=stage34 gpu=[22 %, 3326 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3_p3_s1.log :: 2ms | Total: 46.72ms | [PERF] Hz: 21.30 | Advance: 19.16ms | Preprocess: 0.02ms | EnvStep: 27.28ms | Total: 46.46ms | [PERF] Hz: 20.89 | Advance: 21.31ms | Preprocess: 0.02ms | EnvStep: 26.09ms | Total: 47.42ms | [PERF] Hz: 21.91 | Advance: 18.16ms | Preprocess: 0.02ms | EnvStep: 26.85ms | Total: 45.03ms | 
+06:59:37 MSK +2104s HB step=stage34 gpu=[23 %, 3326 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3_p3_s1.log :: 5ms | Total: 46.84ms | [PERF] Hz: 21.43 | Advance: 19.02ms | Preprocess: 0.02ms | EnvStep: 27.08ms | Total: 46.12ms | [PERF] Hz: 20.20 | Advance: 20.59ms | Preprocess: 0.01ms | EnvStep: 28.42ms | Total: 49.02ms | [PERF] Hz: 21.39 | Advance: 19.02ms | Preprocess: 0.02ms | EnvStep: 27.17ms | Total: 46.21ms | 
+07:00:37 MSK +2164s HB step=stage34 gpu=[32 %, 3326 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3_p3_s1.log :: 0ms | Total: 47.41ms | [PERF] Hz: 21.47 | Advance: 19.10ms | Preprocess: 0.02ms | EnvStep: 26.98ms | Total: 46.10ms | [PERF] Hz: 20.83 | Advance: 20.77ms | Preprocess: 0.02ms | EnvStep: 26.72ms | Total: 47.51ms | [PERF] Hz: 21.68 | Advance: 18.52ms | Preprocess: 0.02ms | EnvStep: 27.06ms | Total: 45.60ms | 
+07:01:37 MSK +2224s HB step=stage34 gpu=[32 %, 3326 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=check_interfaces.log :: pd 0.25 rad/s: after 1.0 s +0.223 (expect ~+0.25) |   OK   cmd_vel -0.30 rad/s for 1.0 s: -0.268 (expect ~-0.30) |   OK   set_speed 0.25, index 1 -> 0: after 0.8 s at 0.79 (expect ~0.75) | == 4. fingers: each finger to 0.3 (0 = closed, 1 = open) and back == |   OK   left  1 little_1_joint   moved 0.874 rad | 
+07:02:37 MSK +2284s HB step=stage34 gpu=[22 %, 3326 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3_p3_s1.log :: 5ms | Total: 44.93ms | [PERF] Hz: 21.78 | Advance: 19.30ms | Preprocess: 0.02ms | EnvStep: 26.07ms | Total: 45.38ms | [PERF] Hz: 21.30 | Advance: 20.44ms | Preprocess: 0.02ms | EnvStep: 26.11ms | Total: 46.57ms | [PERF] Hz: 21.77 | Advance: 18.40ms | Preprocess: 0.02ms | EnvStep: 27.13ms | Total: 45.54ms | 
+07:03:37 MSK +2344s HB step=stage34 gpu=[0 %, 0 MiB
+0 %, 0 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=bridge.log :: es/5s: cam_head=37, cam_torso=36 | [INFO] [1794197004.686733594] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=39 | [INFO] [1794197009.685790688] [hack_camera_bridge]: frames/5s: cam_head=35, cam_torso=35 | [INFO] [1794197014.683705583] [hack_camera_bridge]: frames/5s: cam_head=14, cam_torso=14 | 
+07:03:41 MSK +2349s END stage34 rc 1
+07:03:41 MSK +2349s SIM_TASK 
+07:03:41 MSK +2349s CHECK        subscribers 1
+  OK   /inspire_hand/set_angle_flexible/left_hand service
+  OK   /inspire_hand/set_angle_flexible/right_hand service
+  OK   /inspire_hand/set_speed/left_hand          service
+  OK   /inspire_hand/set_speed/right_hand         service
+  OK   /inspire_hand/set_force/left_hand          service
+  OK   /inspire_hand/set_force/right_hand         service
+  OK   /inspire_hand/set_clear_error/left_hand    service
+  OK   /inspire_hand/set_clear_error/right_hand   service
+  n/a  /hric/robot/float_base_rpyz_cmd (torso pitch/roll/height: real robot only, sim torso = yaw 31)
+  n/a  /leg/* (legs are fixed in the sim)
+  OK   hand state has position/velocity/effort x6
+  info /arm_6dof_left: |F| = 0.00 N, frame wrist_roll_l_link (empty hand: should be ~0)
+  info /arm_6dof_right: |F| = 0.00 N, frame wrist_roll_r_link (empty hand: should be ~0)
+== 3. motion: each motor +delta and back (sim time 1.0 s each way) ==
+  OK    1 head_roll_joint            cmd +0.20  got +0.200 rad
+  OK    2 head_pitch_joint           cmd +0.20  got +0.202 rad
+  OK    3 head_yaw_joint             cmd +0.30  got +0.300 rad
+  OK   31 body_yaw_joint             cmd +0.25  got +0.250 rad
+  OK   11 shoulder_pitch_l_joint     cmd +0.20  got +0.165 rad
+  OK   12 shoulder_roll_l_joint      cmd +0.20  got +0.170 rad
+  OK   13 shoulder_yaw_l_joint       cmd +0.30  got +0.287 rad
+  OK   14 elbow_pitch_l_joint        cmd -0.30  got -0.279 rad
+  OK   15 elbow_yaw_l_joint          cmd +0.30  got +0.286 rad
+  OK   16 wrist_pitch_l_joint        cmd +0.20  got +0.193 rad
+  OK   17 wrist_roll_l_joint         cmd +0.30  got +0.284 rad
+  OK   21 shoulder_pitch_r_joint     cmd +0.20  got +0.164 rad
+  OK   22 shoulder_roll_r_joint      cmd -0.20  got -0.170 rad
+  OK   23 shoulder_yaw_r_joint       cmd -0.30  got -0.287 rad
+  OK   24 elbow_pitch_r_joint        cmd -0.30  got -0.279 rad
+  OK   25 elbow_yaw_r_joint          cmd -0.30  got -0.286 rad
+  OK   26 wrist_pitch_r_joint        cmd +0.20  got +0.193 rad
+  OK   27 wrist_roll_r_joint         cmd -0.30  got -0.284 rad
+== 3b. SDK semantics: spd, cmd_vel, hand set_speed ==
+  OK   cmd_pos +0.50 at spd 0.25 rad/s: after 1.0 s +0.223 (expect ~+0.25)
+  OK   cmd_vel -0.30 rad/s for 1.0 s: -0.268 (expect ~-0.30)
+  OK   set_speed 0.25, index 1 -> 0: after 0.8 s at 0.79 (expect ~0.75)
+== 4. fingers: each finger to 0.3 (0 = closed, 1 = open) and back ==
+  OK   left  1 little_1_joint   moved 0.874 rad
+  OK   left  2 ring_1_joint     moved 0.868 rad
+  OK   left  3 middle_1_joint   moved 0.867 rad
+  OK   left  4 index_1_joint    moved 0.867 rad
+  OK   left  5 thumb_2_joint    moved 0.312 rad
+  OK   left  6 thumb_1_joint    moved 0.855 rad
+  OK   right 1 little_1_joint   moved 0.874 rad
+  OK   right 2 ring_1_joint     moved 0.868 rad
+  OK   right 3 middle_1_joint   moved 0.866 rad
+  OK   right 4 index_1_joint    moved 0.867 rad
+  OK   right 5 thumb_2_joint    moved 0.312 rad
+  OK   right 6 thumb_1_joint    moved 0.855 rad
+== RESULT: ALL OK ==
+check_rc=0
+
+07:03:41 MSK +2349s START sort timeout 4200
+07:04:37 MSK +2405s HB step=sort gpu=[4 %, 902 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: m https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.0 | [hack] decor: 0 Isaac props, 0 lamp lights, from https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.0, units by metrics assembler | [hack] objects (pool 3, seed 100): dish: 3, box: 3, jar: 3 | 
+07:05:37 MSK +2465s HB step=sort gpu=[23 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 1ms | Total: 41.40ms | [PERF] Hz: 23.49 | Advance: 17.19ms | Preprocess: 0.01ms | EnvStep: 24.45ms | Total: 41.65ms | [PERF] Hz: 23.45 | Advance: 16.94ms | Preprocess: 0.02ms | EnvStep: 24.73ms | Total: 41.68ms | [PERF] Hz: 23.72 | Advance: 17.03ms | Preprocess: 0.01ms | EnvStep: 24.32ms | Total: 41.36ms | 
+07:06:37 MSK +2525s HB step=sort gpu=[40 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 2ms | Total: 41.59ms | [PERF] Hz: 23.97 | Advance: 16.44ms | Preprocess: 0.02ms | EnvStep: 24.53ms | Total: 40.98ms | [PERF] Hz: 23.58 | Advance: 16.90ms | Preprocess: 0.02ms | EnvStep: 24.64ms | Total: 41.56ms | [PERF] Hz: 23.70 | Advance: 17.01ms | Preprocess: 0.01ms | EnvStep: 24.29ms | Total: 41.31ms | 
+07:07:37 MSK +2585s HB step=sort gpu=[41 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 3ms | Total: 42.10ms | [PERF] Hz: 22.54 | Advance: 18.75ms | Preprocess: 0.02ms | EnvStep: 25.03ms | Total: 43.79ms | [PERF] Hz: 22.23 | Advance: 17.72ms | Preprocess: 0.02ms | EnvStep: 26.61ms | Total: 44.35ms | [PERF] Hz: 23.03 | Advance: 16.53ms | Preprocess: 0.02ms | EnvStep: 26.09ms | Total: 42.64ms | 
+07:08:37 MSK +2645s HB step=sort gpu=[27 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 0ms | Total: 41.07ms | [PERF] Hz: 23.49 | Advance: 16.72ms | Preprocess: 0.01ms | EnvStep: 25.03ms | Total: 41.76ms | [PERF] Hz: 22.81 | Advance: 18.59ms | Preprocess: 0.02ms | EnvStep: 24.32ms | Total: 42.93ms | [PERF] Hz: 23.39 | Advance: 17.17ms | Preprocess: 0.02ms | EnvStep: 24.65ms | Total: 41.84ms | 
+07:09:37 MSK +2705s HB step=sort gpu=[41 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 7ms | Total: 41.52ms | [PERF] Hz: 23.83 | Advance: 16.81ms | Preprocess: 0.01ms | EnvStep: 24.16ms | Total: 40.99ms | [PERF] Hz: 23.49 | Advance: 17.56ms | Preprocess: 0.01ms | EnvStep: 24.04ms | Total: 41.61ms | [PERF] Hz: 23.13 | Advance: 17.31ms | Preprocess: 0.01ms | EnvStep: 25.15ms | Total: 42.48ms | 
+07:10:37 MSK +2765s HB step=sort gpu=[40 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 1ms | Total: 41.58ms | [PERF] Hz: 22.88 | Advance: 17.46ms | Preprocess: 0.01ms | EnvStep: 25.35ms | Total: 42.82ms | [PERF] Hz: 23.35 | Advance: 16.99ms | Preprocess: 0.02ms | EnvStep: 25.13ms | Total: 42.13ms | [PERF] Hz: 22.96 | Advance: 18.33ms | Preprocess: 0.02ms | EnvStep: 24.42ms | Total: 42.76ms | 
+07:11:38 MSK +2825s HB step=sort gpu=[40 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 2ms | Total: 41.09ms | [PERF] Hz: 23.61 | Advance: 17.71ms | Preprocess: 0.01ms | EnvStep: 23.79ms | Total: 41.51ms | [PERF] Hz: 22.79 | Advance: 17.24ms | Preprocess: 0.02ms | EnvStep: 25.89ms | Total: 43.15ms | [PERF] Hz: 23.89 | Advance: 16.65ms | Preprocess: 0.01ms | EnvStep: 24.32ms | Total: 40.99ms | 
+07:12:38 MSK +2885s HB step=sort gpu=[36 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 7ms | Total: 44.26ms | [PERF] Hz: 22.96 | Advance: 17.13ms | Preprocess: 0.02ms | EnvStep: 25.47ms | Total: 42.62ms | [PERF] Hz: 22.85 | Advance: 18.44ms | Preprocess: 0.01ms | EnvStep: 24.44ms | Total: 42.90ms | [PERF] Hz: 23.73 | Advance: 16.81ms | Preprocess: 0.01ms | EnvStep: 24.34ms | Total: 41.17ms | 
+07:13:38 MSK +2945s HB step=sort gpu=[40 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 0ms | Total: 41.54ms | [PERF] Hz: 23.74 | Advance: 16.83ms | Preprocess: 0.01ms | EnvStep: 24.41ms | Total: 41.25ms | [PERF] Hz: 23.47 | Advance: 17.36ms | Preprocess: 0.02ms | EnvStep: 24.31ms | Total: 41.68ms | [PERF] Hz: 23.74 | Advance: 16.94ms | Preprocess: 0.01ms | EnvStep: 24.31ms | Total: 41.26ms | 
+07:14:38 MSK +3005s HB step=sort gpu=[29 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 9ms | Total: 41.52ms | [PERF] Hz: 22.34 | Advance: 19.28ms | Preprocess: 0.02ms | EnvStep: 24.68ms | Total: 43.98ms | [PERF] Hz: 23.09 | Advance: 16.91ms | Preprocess: 0.02ms | EnvStep: 25.61ms | Total: 42.54ms | [PERF] Hz: 23.35 | Advance: 17.05ms | Preprocess: 0.02ms | EnvStep: 24.97ms | Total: 42.03ms | 
+07:15:38 MSK +3065s HB step=sort gpu=[32 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 1ms | Total: 41.47ms | [PERF] Hz: 23.53 | Advance: 17.08ms | Preprocess: 0.01ms | EnvStep: 24.53ms | Total: 41.62ms | [PERF] Hz: 23.22 | Advance: 16.79ms | Preprocess: 0.02ms | EnvStep: 25.38ms | Total: 42.19ms | [PERF] Hz: 23.70 | Advance: 16.90ms | Preprocess: 0.01ms | EnvStep: 24.36ms | Total: 41.27ms | 
+07:16:38 MSK +3125s HB step=sort gpu=[22 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 3ms | Total: 41.67ms | [PERF] Hz: 22.42 | Advance: 18.68ms | Preprocess: 0.02ms | EnvStep: 25.28ms | Total: 43.98ms | [PERF] Hz: 23.28 | Advance: 17.19ms | Preprocess: 0.02ms | EnvStep: 24.90ms | Total: 42.10ms | [PERF] Hz: 22.74 | Advance: 18.70ms | Preprocess: 0.01ms | EnvStep: 24.49ms | Total: 43.21ms | 
+07:17:38 MSK +3185s HB step=sort gpu=[29 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 6ms | Total: 41.63ms | [PERF] Hz: 22.68 | Advance: 18.76ms | Preprocess: 0.02ms | EnvStep: 24.47ms | Total: 43.24ms | [PERF] Hz: 23.11 | Advance: 16.96ms | Preprocess: 0.02ms | EnvStep: 25.53ms | Total: 42.50ms | [PERF] Hz: 22.83 | Advance: 18.51ms | Preprocess: 0.02ms | EnvStep: 24.57ms | Total: 43.09ms | 
+07:18:38 MSK +3245s HB step=sort gpu=[40 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 5ms | Total: 40.85ms | [PERF] Hz: 23.96 | Advance: 16.52ms | Preprocess: 0.01ms | EnvStep: 24.24ms | Total: 40.77ms | [PERF] Hz: 23.85 | Advance: 17.07ms | Preprocess: 0.01ms | EnvStep: 23.87ms | Total: 40.96ms | [PERF] Hz: 24.35 | Advance: 16.07ms | Preprocess: 0.01ms | EnvStep: 24.05ms | Total: 40.14ms | 
+07:19:38 MSK +3305s HB step=sort gpu=[38 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 2ms | Total: 41.29ms | [PERF] Hz: 23.27 | Advance: 17.15ms | Preprocess: 0.02ms | EnvStep: 24.91ms | Total: 42.07ms | [PERF] Hz: 23.55 | Advance: 16.99ms | Preprocess: 0.02ms | EnvStep: 24.54ms | Total: 41.55ms | [PERF] Hz: 23.45 | Advance: 16.80ms | Preprocess: 0.02ms | EnvStep: 25.18ms | Total: 42.00ms | 
+07:20:38 MSK +3365s HB step=sort gpu=[28 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 9ms | Total: 42.07ms | [PERF] Hz: 23.95 | Advance: 16.46ms | Preprocess: 0.01ms | EnvStep: 24.37ms | Total: 40.85ms | [PERF] Hz: 23.54 | Advance: 17.55ms | Preprocess: 0.01ms | EnvStep: 24.02ms | Total: 41.59ms | [PERF] Hz: 23.87 | Advance: 17.21ms | Preprocess: 0.01ms | EnvStep: 23.86ms | Total: 41.08ms | 
+07:21:38 MSK +3425s HB step=sort gpu=[26 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 2ms | Total: 41.46ms | [PERF] Hz: 23.93 | Advance: 16.55ms | Preprocess: 0.01ms | EnvStep: 24.16ms | Total: 40.73ms | [PERF] Hz: 23.90 | Advance: 16.77ms | Preprocess: 0.01ms | EnvStep: 24.03ms | Total: 40.82ms | [PERF] Hz: 23.66 | Advance: 17.10ms | Preprocess: 0.01ms | EnvStep: 24.30ms | Total: 41.42ms | 
+07:22:38 MSK +3485s HB step=sort gpu=[26 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 9ms | Total: 41.88ms | [PERF] Hz: 23.49 | Advance: 17.22ms | Preprocess: 0.01ms | EnvStep: 24.59ms | Total: 41.82ms | [PERF] Hz: 23.40 | Advance: 16.73ms | Preprocess: 0.02ms | EnvStep: 25.20ms | Total: 41.95ms | [PERF] Hz: 23.28 | Advance: 17.29ms | Preprocess: 0.02ms | EnvStep: 24.75ms | Total: 42.06ms | 
+07:23:38 MSK +3546s HB step=sort gpu=[40 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 8ms | Total: 41.77ms | [PERF] Hz: 22.51 | Advance: 18.73ms | Preprocess: 0.02ms | EnvStep: 24.92ms | Total: 43.66ms | [PERF] Hz: 23.27 | Advance: 16.93ms | Preprocess: 0.02ms | EnvStep: 25.40ms | Total: 42.34ms | [PERF] Hz: 23.26 | Advance: 17.38ms | Preprocess: 0.02ms | EnvStep: 24.92ms | Total: 42.32ms | 
+07:24:38 MSK +3606s HB step=sort gpu=[34 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 6ms | Total: 40.19ms | [PERF] Hz: 23.87 | Advance: 16.60ms | Preprocess: 0.02ms | EnvStep: 24.27ms | Total: 40.88ms | [PERF] Hz: 23.75 | Advance: 17.18ms | Preprocess: 0.01ms | EnvStep: 24.07ms | Total: 41.27ms | [PERF] Hz: 24.12 | Advance: 16.85ms | Preprocess: 0.01ms | EnvStep: 23.65ms | Total: 40.51ms | 
+07:25:38 MSK +3666s HB step=sort gpu=[40 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 5ms | Total: 41.40ms | [PERF] Hz: 23.50 | Advance: 17.12ms | Preprocess: 0.02ms | EnvStep: 24.65ms | Total: 41.78ms | [PERF] Hz: 23.54 | Advance: 17.01ms | Preprocess: 0.02ms | EnvStep: 24.74ms | Total: 41.77ms | [PERF] Hz: 23.12 | Advance: 17.34ms | Preprocess: 0.01ms | EnvStep: 25.10ms | Total: 42.45ms | 
+07:26:38 MSK +3726s HB step=sort gpu=[22 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 2ms | Total: 41.63ms | [PERF] Hz: 23.36 | Advance: 17.16ms | Preprocess: 0.01ms | EnvStep: 24.85ms | Total: 42.02ms | [PERF] Hz: 23.34 | Advance: 17.42ms | Preprocess: 0.01ms | EnvStep: 24.60ms | Total: 42.03ms | [PERF] Hz: 23.90 | Advance: 17.26ms | Preprocess: 0.01ms | EnvStep: 23.70ms | Total: 40.98ms | 
+07:27:38 MSK +3786s HB step=sort gpu=[23 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 3ms | Total: 41.84ms | [PERF] Hz: 23.42 | Advance: 17.17ms | Preprocess: 0.02ms | EnvStep: 24.80ms | Total: 41.99ms | [PERF] Hz: 23.39 | Advance: 16.93ms | Preprocess: 0.01ms | EnvStep: 25.15ms | Total: 42.09ms | [PERF] Hz: 23.45 | Advance: 16.90ms | Preprocess: 0.02ms | EnvStep: 24.76ms | Total: 41.67ms | 
+07:28:38 MSK +3846s HB step=sort gpu=[28 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 2ms | Total: 40.36ms | [PERF] Hz: 23.64 | Advance: 16.99ms | Preprocess: 0.01ms | EnvStep: 24.28ms | Total: 41.28ms | [PERF] Hz: 23.96 | Advance: 16.98ms | Preprocess: 0.01ms | EnvStep: 23.71ms | Total: 40.70ms | [PERF] Hz: 24.88 | Advance: 15.09ms | Preprocess: 0.01ms | EnvStep: 24.00ms | Total: 39.10ms | 
+07:29:38 MSK +3906s HB step=sort gpu=[36 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 3ms | Total: 40.79ms | [PERF] Hz: 24.25 | Advance: 15.81ms | Preprocess: 0.01ms | EnvStep: 24.51ms | Total: 40.34ms | [PERF] Hz: 23.97 | Advance: 17.00ms | Preprocess: 0.01ms | EnvStep: 23.79ms | Total: 40.81ms | [PERF] Hz: 24.28 | Advance: 15.85ms | Preprocess: 0.01ms | EnvStep: 24.28ms | Total: 40.15ms | 
+07:30:38 MSK +3966s HB step=sort gpu=[32 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 0ms | Total: 41.22ms | [PERF] Hz: 23.75 | Advance: 16.67ms | Preprocess: 0.02ms | EnvStep: 24.48ms | Total: 41.17ms | [PERF] Hz: 23.66 | Advance: 17.01ms | Preprocess: 0.02ms | EnvStep: 24.58ms | Total: 41.60ms | [PERF] Hz: 23.48 | Advance: 17.01ms | Preprocess: 0.01ms | EnvStep: 24.72ms | Total: 41.75ms | 
+07:31:39 MSK +4026s HB step=sort gpu=[27 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 0ms | Total: 42.20ms | [PERF] Hz: 22.43 | Advance: 19.25ms | Preprocess: 0.02ms | EnvStep: 24.56ms | Total: 43.83ms | [PERF] Hz: 23.18 | Advance: 17.17ms | Preprocess: 0.02ms | EnvStep: 25.28ms | Total: 42.46ms | [PERF] Hz: 23.50 | Advance: 17.27ms | Preprocess: 0.02ms | EnvStep: 24.48ms | Total: 41.77ms | 
+07:32:39 MSK +4086s HB step=sort gpu=[36 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 6ms | Total: 40.62ms | [PERF] Hz: 23.52 | Advance: 17.16ms | Preprocess: 0.01ms | EnvStep: 24.36ms | Total: 41.54ms | [PERF] Hz: 24.00 | Advance: 16.67ms | Preprocess: 0.01ms | EnvStep: 24.06ms | Total: 40.75ms | [PERF] Hz: 23.87 | Advance: 16.70ms | Preprocess: 0.01ms | EnvStep: 24.25ms | Total: 40.96ms | 
+07:33:39 MSK +4146s HB step=sort gpu=[22 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 7ms | Total: 40.87ms | [PERF] Hz: 23.78 | Advance: 16.71ms | Preprocess: 0.02ms | EnvStep: 24.45ms | Total: 41.17ms | [PERF] Hz: 23.83 | Advance: 16.60ms | Preprocess: 0.01ms | EnvStep: 24.46ms | Total: 41.08ms | [PERF] Hz: 23.44 | Advance: 17.14ms | Preprocess: 0.01ms | EnvStep: 24.57ms | Total: 41.72ms | 
+07:34:39 MSK +4206s HB step=sort gpu=[42 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 9ms | Total: 41.21ms | [PERF] Hz: 23.57 | Advance: 16.99ms | Preprocess: 0.01ms | EnvStep: 24.66ms | Total: 41.66ms | [PERF] Hz: 24.45 | Advance: 16.76ms | Preprocess: 0.01ms | EnvStep: 23.05ms | Total: 39.82ms | [PERF] Hz: 23.75 | Advance: 16.98ms | Preprocess: 0.01ms | EnvStep: 24.11ms | Total: 41.11ms | 
+07:35:39 MSK +4266s HB step=sort gpu=[40 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 3ms | Total: 41.35ms | [PERF] Hz: 23.66 | Advance: 17.01ms | Preprocess: 0.02ms | EnvStep: 24.43ms | Total: 41.46ms | [PERF] Hz: 23.91 | Advance: 16.43ms | Preprocess: 0.02ms | EnvStep: 24.53ms | Total: 40.97ms | [PERF] Hz: 23.81 | Advance: 17.03ms | Preprocess: 0.02ms | EnvStep: 24.18ms | Total: 41.22ms | 
+07:36:39 MSK +4326s HB step=sort gpu=[23 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 7ms | Total: 41.12ms | [PERF] Hz: 23.98 | Advance: 16.36ms | Preprocess: 0.01ms | EnvStep: 24.28ms | Total: 40.65ms | [PERF] Hz: 23.99 | Advance: 16.83ms | Preprocess: 0.01ms | EnvStep: 23.98ms | Total: 40.82ms | [PERF] Hz: 24.32 | Advance: 16.60ms | Preprocess: 0.01ms | EnvStep: 23.56ms | Total: 40.18ms | 
+07:37:39 MSK +4386s HB step=sort gpu=[41 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 3ms | Total: 42.09ms | [PERF] Hz: 23.39 | Advance: 17.29ms | Preprocess: 0.02ms | EnvStep: 24.58ms | Total: 41.88ms | [PERF] Hz: 23.24 | Advance: 16.85ms | Preprocess: 0.01ms | EnvStep: 25.31ms | Total: 42.17ms | [PERF] Hz: 23.84 | Advance: 16.90ms | Preprocess: 0.01ms | EnvStep: 24.07ms | Total: 40.99ms | 
+07:38:39 MSK +4446s HB step=sort gpu=[40 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 7ms | Total: 41.67ms | [PERF] Hz: 22.51 | Advance: 18.42ms | Preprocess: 0.01ms | EnvStep: 25.04ms | Total: 43.47ms | [PERF] Hz: 23.35 | Advance: 16.77ms | Preprocess: 0.01ms | EnvStep: 25.13ms | Total: 41.91ms | [PERF] Hz: 23.35 | Advance: 17.16ms | Preprocess: 0.02ms | EnvStep: 24.89ms | Total: 42.07ms | 
+07:39:39 MSK +4506s HB step=sort gpu=[24 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 5ms | Total: 40.73ms | [PERF] Hz: 23.94 | Advance: 17.31ms | Preprocess: 0.01ms | EnvStep: 23.44ms | Total: 40.77ms | [PERF] Hz: 24.52 | Advance: 15.58ms | Preprocess: 0.01ms | EnvStep: 24.20ms | Total: 39.80ms | [PERF] Hz: 24.40 | Advance: 16.59ms | Preprocess: 0.01ms | EnvStep: 23.51ms | Total: 40.11ms | 
+07:40:39 MSK +4566s HB step=sort gpu=[40 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 3ms | Total: 40.77ms | [PERF] Hz: 23.45 | Advance: 17.46ms | Preprocess: 0.01ms | EnvStep: 24.31ms | Total: 41.79ms | [PERF] Hz: 23.82 | Advance: 16.58ms | Preprocess: 0.01ms | EnvStep: 24.44ms | Total: 41.04ms | [PERF] Hz: 23.68 | Advance: 17.00ms | Preprocess: 0.01ms | EnvStep: 24.45ms | Total: 41.46ms | 
+07:41:39 MSK +4626s HB step=sort gpu=[40 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 2ms | Total: 40.30ms | [PERF] Hz: 23.59 | Advance: 16.81ms | Preprocess: 0.02ms | EnvStep: 24.73ms | Total: 41.56ms | [PERF] Hz: 23.70 | Advance: 17.08ms | Preprocess: 0.02ms | EnvStep: 24.34ms | Total: 41.44ms | [PERF] Hz: 24.00 | Advance: 16.58ms | Preprocess: 0.02ms | EnvStep: 24.02ms | Total: 40.61ms | 
+07:42:39 MSK +4687s HB step=sort gpu=[30 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 8ms | Total: 42.00ms | [PERF] Hz: 23.11 | Advance: 16.57ms | Preprocess: 0.02ms | EnvStep: 25.88ms | Total: 42.46ms | [PERF] Hz: 23.74 | Advance: 17.08ms | Preprocess: 0.01ms | EnvStep: 24.09ms | Total: 41.18ms | [PERF] Hz: 23.42 | Advance: 17.13ms | Preprocess: 0.01ms | EnvStep: 24.88ms | Total: 42.02ms | 
+07:43:39 MSK +4747s HB step=sort gpu=[40 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 3ms | Total: 39.62ms | [PERF] Hz: 23.42 | Advance: 18.12ms | Preprocess: 0.01ms | EnvStep: 23.68ms | Total: 41.81ms | [PERF] Hz: 23.92 | Advance: 16.57ms | Preprocess: 0.01ms | EnvStep: 24.19ms | Total: 40.78ms | [PERF] Hz: 23.80 | Advance: 16.07ms | Preprocess: 0.01ms | EnvStep: 25.05ms | Total: 41.13ms | 
+07:44:39 MSK +4807s HB step=sort gpu=[40 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 5ms | Total: 40.86ms | [PERF] Hz: 23.46 | Advance: 17.30ms | Preprocess: 0.01ms | EnvStep: 24.55ms | Total: 41.86ms | [PERF] Hz: 23.06 | Advance: 17.49ms | Preprocess: 0.01ms | EnvStep: 24.94ms | Total: 42.44ms | [PERF] Hz: 23.38 | Advance: 16.79ms | Preprocess: 0.01ms | EnvStep: 25.05ms | Total: 41.85ms | 
+07:45:39 MSK +4867s HB step=sort gpu=[40 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 3ms | Total: 41.51ms | [PERF] Hz: 23.85 | Advance: 16.73ms | Preprocess: 0.01ms | EnvStep: 24.21ms | Total: 40.96ms | [PERF] Hz: 23.90 | Advance: 17.24ms | Preprocess: 0.01ms | EnvStep: 23.67ms | Total: 40.93ms | [PERF] Hz: 24.29 | Advance: 15.65ms | Preprocess: 0.01ms | EnvStep: 24.66ms | Total: 40.32ms | 
+07:46:39 MSK +4927s HB step=sort gpu=[28 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 7ms | Total: 40.08ms | [PERF] Hz: 23.53 | Advance: 17.15ms | Preprocess: 0.02ms | EnvStep: 24.48ms | Total: 41.64ms | [PERF] Hz: 23.75 | Advance: 16.93ms | Preprocess: 0.01ms | EnvStep: 24.10ms | Total: 41.05ms | [PERF] Hz: 23.87 | Advance: 16.83ms | Preprocess: 0.02ms | EnvStep: 23.97ms | Total: 40.81ms | 
+07:47:39 MSK +4987s HB step=sort gpu=[38 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 7ms | Total: 41.04ms | [PERF] Hz: 23.55 | Advance: 17.19ms | Preprocess: 0.02ms | EnvStep: 24.43ms | Total: 41.63ms | [PERF] Hz: 24.67 | Advance: 15.30ms | Preprocess: 0.01ms | EnvStep: 24.23ms | Total: 39.54ms | [PERF] Hz: 24.07 | Advance: 16.74ms | Preprocess: 0.01ms | EnvStep: 23.92ms | Total: 40.67ms | 
+07:48:39 MSK +5047s HB step=sort gpu=[36 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 6ms | Total: 41.15ms | [PERF] Hz: 23.39 | Advance: 17.35ms | Preprocess: 0.01ms | EnvStep: 24.57ms | Total: 41.93ms | [PERF] Hz: 23.94 | Advance: 16.53ms | Preprocess: 0.01ms | EnvStep: 24.20ms | Total: 40.75ms | [PERF] Hz: 23.82 | Advance: 17.34ms | Preprocess: 0.01ms | EnvStep: 23.67ms | Total: 41.02ms | 
+07:49:39 MSK +5107s HB step=sort gpu=[38 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 1ms | Total: 41.51ms | [PERF] Hz: 23.31 | Advance: 17.28ms | Preprocess: 0.01ms | EnvStep: 24.60ms | Total: 41.89ms | [PERF] Hz: 23.44 | Advance: 17.94ms | Preprocess: 0.02ms | EnvStep: 23.92ms | Total: 41.88ms | [PERF] Hz: 23.14 | Advance: 17.62ms | Preprocess: 0.01ms | EnvStep: 24.68ms | Total: 42.31ms | 
+07:50:40 MSK +5167s HB step=sort gpu=[33 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 9ms | Total: 43.03ms | [PERF] Hz: 23.21 | Advance: 17.06ms | Preprocess: 0.01ms | EnvStep: 25.13ms | Total: 42.20ms | [PERF] Hz: 23.29 | Advance: 17.46ms | Preprocess: 0.01ms | EnvStep: 24.49ms | Total: 41.97ms | [PERF] Hz: 22.34 | Advance: 18.15ms | Preprocess: 0.01ms | EnvStep: 25.88ms | Total: 44.05ms | 
+07:51:40 MSK +5227s HB step=sort gpu=[32 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 5ms | Total: 40.98ms | [PERF] Hz: 23.80 | Advance: 17.06ms | Preprocess: 0.01ms | EnvStep: 24.08ms | Total: 41.16ms | [PERF] Hz: 24.34 | Advance: 15.92ms | Preprocess: 0.01ms | EnvStep: 24.27ms | Total: 40.21ms | [PERF] Hz: 23.76 | Advance: 16.95ms | Preprocess: 0.01ms | EnvStep: 24.16ms | Total: 41.12ms | 
+07:52:40 MSK +5287s HB step=sort gpu=[24 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 2ms | Total: 40.93ms | [PERF] Hz: 23.50 | Advance: 17.26ms | Preprocess: 0.01ms | EnvStep: 24.47ms | Total: 41.75ms | [PERF] Hz: 24.35 | Advance: 15.68ms | Preprocess: 0.03ms | EnvStep: 24.37ms | Total: 40.08ms | [PERF] Hz: 23.52 | Advance: 17.31ms | Preprocess: 0.01ms | EnvStep: 24.39ms | Total: 41.72ms | 
+07:53:40 MSK +5347s HB step=sort gpu=[27 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 9ms | Total: 41.17ms | [PERF] Hz: 24.41 | Advance: 15.98ms | Preprocess: 0.01ms | EnvStep: 24.13ms | Total: 40.12ms | [PERF] Hz: 23.43 | Advance: 17.08ms | Preprocess: 0.02ms | EnvStep: 24.82ms | Total: 41.92ms | [PERF] Hz: 24.26 | Advance: 15.61ms | Preprocess: 0.02ms | EnvStep: 24.70ms | Total: 40.33ms | 
+07:54:40 MSK +5407s HB step=sort gpu=[37 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 2ms | Total: 41.89ms | [PERF] Hz: 23.29 | Advance: 17.10ms | Preprocess: 0.02ms | EnvStep: 25.01ms | Total: 42.12ms | [PERF] Hz: 23.81 | Advance: 16.88ms | Preprocess: 0.02ms | EnvStep: 24.10ms | Total: 41.00ms | [PERF] Hz: 23.88 | Advance: 17.00ms | Preprocess: 0.01ms | EnvStep: 23.92ms | Total: 40.93ms | 
+07:55:40 MSK +5467s HB step=sort gpu=[35 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 4ms | Total: 39.96ms | [PERF] Hz: 23.99 | Advance: 16.98ms | Preprocess: 0.01ms | EnvStep: 23.69ms | Total: 40.68ms | [PERF] Hz: 24.51 | Advance: 15.63ms | Preprocess: 0.01ms | EnvStep: 24.14ms | Total: 39.79ms | [PERF] Hz: 24.02 | Advance: 17.07ms | Preprocess: 0.01ms | EnvStep: 23.45ms | Total: 40.53ms | 
+07:56:40 MSK +5527s HB step=sort gpu=[40 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 6ms | Total: 40.89ms | [PERF] Hz: 24.46 | Advance: 16.15ms | Preprocess: 0.01ms | EnvStep: 23.70ms | Total: 39.86ms | [PERF] Hz: 24.70 | Advance: 15.51ms | Preprocess: 0.02ms | EnvStep: 24.01ms | Total: 39.54ms | [PERF] Hz: 23.88 | Advance: 16.66ms | Preprocess: 0.01ms | EnvStep: 24.34ms | Total: 41.01ms | 
+07:57:40 MSK +5587s HB step=sort gpu=[38 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 4ms | Total: 41.29ms | [PERF] Hz: 23.50 | Advance: 17.16ms | Preprocess: 0.01ms | EnvStep: 24.46ms | Total: 41.63ms | [PERF] Hz: 24.45 | Advance: 15.93ms | Preprocess: 0.01ms | EnvStep: 24.08ms | Total: 40.03ms | [PERF] Hz: 23.12 | Advance: 17.26ms | Preprocess: 0.01ms | EnvStep: 25.12ms | Total: 42.39ms | 
+07:58:40 MSK +5647s HB step=sort gpu=[23 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 3ms | Total: 42.48ms | [PERF] Hz: 24.41 | Advance: 15.85ms | Preprocess: 0.01ms | EnvStep: 24.16ms | Total: 40.03ms | [PERF] Hz: 23.96 | Advance: 17.22ms | Preprocess: 0.01ms | EnvStep: 23.68ms | Total: 40.91ms | [PERF] Hz: 24.66 | Advance: 15.51ms | Preprocess: 0.01ms | EnvStep: 24.04ms | Total: 39.56ms | 
+07:59:40 MSK +5707s HB step=sort gpu=[35 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 3ms | Total: 41.28ms | [PERF] Hz: 24.46 | Advance: 16.35ms | Preprocess: 0.01ms | EnvStep: 23.57ms | Total: 39.93ms | [PERF] Hz: 23.78 | Advance: 16.36ms | Preprocess: 0.01ms | EnvStep: 24.77ms | Total: 41.14ms | [PERF] Hz: 23.44 | Advance: 17.84ms | Preprocess: 0.02ms | EnvStep: 24.08ms | Total: 41.94ms | 
+08:00:40 MSK +5767s HB step=sort gpu=[21 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 6ms | Total: 41.07ms | [PERF] Hz: 24.30 | Advance: 15.96ms | Preprocess: 0.01ms | EnvStep: 24.36ms | Total: 40.33ms | [PERF] Hz: 23.99 | Advance: 16.90ms | Preprocess: 0.01ms | EnvStep: 23.90ms | Total: 40.81ms | [PERF] Hz: 23.72 | Advance: 17.19ms | Preprocess: 0.02ms | EnvStep: 24.09ms | Total: 41.29ms | 
+08:01:40 MSK +5827s HB step=sort gpu=[40 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 7ms | Total: 41.12ms | [PERF] Hz: 24.34 | Advance: 16.89ms | Preprocess: 0.01ms | EnvStep: 23.30ms | Total: 40.20ms | [PERF] Hz: 24.46 | Advance: 15.71ms | Preprocess: 0.01ms | EnvStep: 24.10ms | Total: 39.82ms | [PERF] Hz: 23.99 | Advance: 16.89ms | Preprocess: 0.01ms | EnvStep: 23.89ms | Total: 40.80ms | 
+08:02:40 MSK +5888s HB step=sort gpu=[29 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 8ms | Total: 42.00ms | [PERF] Hz: 23.67 | Advance: 17.24ms | Preprocess: 0.02ms | EnvStep: 24.29ms | Total: 41.54ms | [PERF] Hz: 23.79 | Advance: 16.84ms | Preprocess: 0.01ms | EnvStep: 24.35ms | Total: 41.20ms | [PERF] Hz: 24.38 | Advance: 15.64ms | Preprocess: 0.01ms | EnvStep: 24.35ms | Total: 40.01ms | 
+08:03:40 MSK +5948s HB step=sort gpu=[41 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 1ms | Total: 39.62ms | [PERF] Hz: 24.92 | Advance: 15.45ms | Preprocess: 0.01ms | EnvStep: 23.63ms | Total: 39.09ms | [PERF] Hz: 24.27 | Advance: 16.53ms | Preprocess: 0.01ms | EnvStep: 23.71ms | Total: 40.25ms | [PERF] Hz: 24.61 | Advance: 15.44ms | Preprocess: 0.02ms | EnvStep: 24.22ms | Total: 39.68ms | 
+08:04:40 MSK +6008s HB step=sort gpu=[30 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 1ms | Total: 40.29ms | [PERF] Hz: 24.45 | Advance: 16.37ms | Preprocess: 0.01ms | EnvStep: 23.54ms | Total: 39.93ms | [PERF] Hz: 24.15 | Advance: 15.62ms | Preprocess: 0.02ms | EnvStep: 24.85ms | Total: 40.48ms | [PERF] Hz: 23.89 | Advance: 17.22ms | Preprocess: 0.01ms | EnvStep: 23.64ms | Total: 40.87ms | 
+08:05:40 MSK +6068s HB step=sort gpu=[25 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 3ms | Total: 40.80ms | [PERF] Hz: 23.71 | Advance: 16.67ms | Preprocess: 0.02ms | EnvStep: 24.68ms | Total: 41.36ms | [PERF] Hz: 23.87 | Advance: 16.41ms | Preprocess: 0.01ms | EnvStep: 24.76ms | Total: 41.18ms | [PERF] Hz: 23.92 | Advance: 16.61ms | Preprocess: 0.01ms | EnvStep: 24.17ms | Total: 40.79ms | 
+08:06:40 MSK +6128s HB step=sort gpu=[22 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 2ms | Total: 40.09ms | [PERF] Hz: 24.94 | Advance: 15.94ms | Preprocess: 0.02ms | EnvStep: 23.15ms | Total: 39.11ms | [PERF] Hz: 23.87 | Advance: 15.97ms | Preprocess: 0.01ms | EnvStep: 24.97ms | Total: 40.95ms | [PERF] Hz: 23.80 | Advance: 17.31ms | Preprocess: 0.02ms | EnvStep: 23.76ms | Total: 41.08ms | 
+08:07:40 MSK +6188s HB step=sort gpu=[22 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 7ms | Total: 40.77ms | [PERF] Hz: 24.12 | Advance: 15.85ms | Preprocess: 0.01ms | EnvStep: 24.64ms | Total: 40.51ms | [PERF] Hz: 23.89 | Advance: 16.91ms | Preprocess: 0.01ms | EnvStep: 24.05ms | Total: 40.97ms | [PERF] Hz: 23.93 | Advance: 17.06ms | Preprocess: 0.01ms | EnvStep: 23.77ms | Total: 40.83ms | 
+08:08:40 MSK +6248s HB step=sort gpu=[40 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 8ms | Total: 41.93ms | [PERF] Hz: 23.40 | Advance: 16.92ms | Preprocess: 0.02ms | EnvStep: 24.85ms | Total: 41.78ms | [PERF] Hz: 24.42 | Advance: 16.08ms | Preprocess: 0.01ms | EnvStep: 23.92ms | Total: 40.01ms | [PERF] Hz: 23.93 | Advance: 16.52ms | Preprocess: 0.01ms | EnvStep: 24.29ms | Total: 40.83ms | 
+08:09:40 MSK +6308s HB step=sort gpu=[27 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 8ms | Total: 41.86ms | [PERF] Hz: 23.95 | Advance: 16.54ms | Preprocess: 0.01ms | EnvStep: 24.24ms | Total: 40.80ms | [PERF] Hz: 23.60 | Advance: 17.16ms | Preprocess: 0.01ms | EnvStep: 24.41ms | Total: 41.59ms | [PERF] Hz: 23.89 | Advance: 16.91ms | Preprocess: 0.01ms | EnvStep: 23.97ms | Total: 40.89ms | 
+08:10:41 MSK +6368s HB step=sort gpu=[40 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 0ms | Total: 40.11ms | [PERF] Hz: 23.91 | Advance: 17.15ms | Preprocess: 0.01ms | EnvStep: 23.74ms | Total: 40.91ms | [PERF] Hz: 24.32 | Advance: 15.91ms | Preprocess: 0.01ms | EnvStep: 24.16ms | Total: 40.09ms | [PERF] Hz: 24.15 | Advance: 16.87ms | Preprocess: 0.01ms | EnvStep: 23.51ms | Total: 40.39ms | 
+08:11:41 MSK +6428s HB step=sort gpu=[26 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 9ms | Total: 40.54ms | [PERF] Hz: 24.49 | Advance: 15.54ms | Preprocess: 0.02ms | EnvStep: 24.20ms | Total: 39.76ms | [PERF] Hz: 23.93 | Advance: 16.74ms | Preprocess: 0.01ms | EnvStep: 24.03ms | Total: 40.79ms | [PERF] Hz: 23.81 | Advance: 17.13ms | Preprocess: 0.01ms | EnvStep: 23.88ms | Total: 41.02ms | 
+08:12:41 MSK +6488s HB step=sort gpu=[40 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 8ms | Total: 42.89ms | [PERF] Hz: 23.45 | Advance: 17.30ms | Preprocess: 0.01ms | EnvStep: 24.47ms | Total: 41.78ms | [PERF] Hz: 23.48 | Advance: 17.01ms | Preprocess: 0.01ms | EnvStep: 24.63ms | Total: 41.66ms | [PERF] Hz: 23.48 | Advance: 16.93ms | Preprocess: 0.02ms | EnvStep: 24.89ms | Total: 41.84ms | 
+08:13:41 MSK +6548s HB step=sort gpu=[38 %, 3322 MiB
+0 %, 65 MiB] disk=[overlay         8.0T  7.1T  937G  89% /] last=sim_sort3.log :: 5ms | Total: 41.62ms | [PERF] Hz: 23.37 | Advance: 17.32ms | Preprocess: 0.02ms | EnvStep: 24.71ms | Total: 42.05ms | [PERF] Hz: 23.81 | Advance: 16.64ms | Preprocess: 0.01ms | EnvStep: 24.51ms | Total: 41.16ms | [PERF] Hz: 22.84 | Advance: 18.17ms | Preprocess: 0.02ms | EnvStep: 24.71ms | Total: 42.90ms | 
+08:13:41 MSK +6549s END sort rc TIMEOUT
+08:13:41 MSK +6549s RESULTS missing [Errno 2] No such file or directory: '/kaggle/working/results.jsonl'
+08:13:41 MSK +6549s DONE

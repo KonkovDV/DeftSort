@@ -1,0 +1,22 @@
+09:58:04Z +     0s src=/workspace/fixes/kaggle-tpu/study/ds/sol_src cfg={"mode": "grasp", "task": "sort2", "pool": {"electronics": ["Razer_Taipan_White_Ambidextrous_Gaming_Mouse", "JBL_Charge_Speaker_portable_wireless_wired_Green", "Crosley_Alarm_Clock_Vintage_Metal"], "box": ["Nestle_Nips_Hard_Candy_Peanut_Butter", "Nips_Hard_Candy_Rich_Creamy_Butter_Rum_4_oz_1133_g", "009_gelatin_box"]}, "cats": ["electronics", "box"], "l0": 0, "l1": 32, "meta": {"Razer_Taipan_White_Ambidextrous_Gaming_Mouse": ["electronics", [0.1, 0.182, 0.04]], "JBL_Charge_Speaker_portable_wireless_wired_Green": ["electronics", [0.17600000000000002, 0.073, 0.075]], "Crosley_Alarm_Clock_Vintage_Metal": ["electronics", [0.109, 0.054000000000000006, 0.162]], "Nestle_Nips_Hard_Candy_Peanut_Butter": ["box", [0.08800000000000001, 0.042, 0.153]], "Nips_Hard_Candy_Rich_Creamy_Butter_Rum_4_oz_1133_g": ["box", [0.08900000000000001, 0.043, 0.153]], "009_gelatin_box": ["box", [0.08900000000000001, 0.10099999999999999, 0.03]]}, "seed_base": 76500, "grasp_cats": ["electronics", "box"], "out": "/workspace/fixes/kaggle-tpu/study/out/local-g6", "src": "/workspace/fixes/kaggle-tpu/study/ds", "procs": 7, "deadline_s": 10800}
+09:58:04Z +     0s 192 jobs, 8 cpus
+09:58:05Z +     1s 10/192 done
+09:58:05Z +     2s 20/192 done
+09:58:06Z +     3s 30/192 done
+09:58:07Z +     4s 40/192 done
+09:58:08Z +     4s 50/192 done
+09:58:09Z +     5s 60/192 done
+09:58:10Z +     6s 70/192 done
+09:58:10Z +     6s 80/192 done
+09:58:11Z +     7s 90/192 done
+09:58:12Z +     8s 100/192 done
+09:58:12Z +     9s 110/192 done
+09:58:13Z +    10s 120/192 done
+09:58:14Z +    10s 130/192 done
+09:58:14Z +    11s 140/192 done
+09:58:15Z +    12s 150/192 done
+09:58:16Z +    12s 160/192 done
+09:58:17Z +    13s 170/192 done
+09:58:18Z +    14s 180/192 done
+09:58:19Z +    15s 190/192 done
+09:58:19Z +    15s END done=192/192

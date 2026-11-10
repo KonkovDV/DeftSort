@@ -1,0 +1,22 @@
+{
+ "cam_head_color": {
+  "enc": "rgb8",
+  "frame": "camera_head_link",
+  "stamp": 158.35999646
+ },
+ "cam_head_depth": {
+  "enc": "16UC1",
+  "frame": "camera_head_link",
+  "stamp": 158.35999646
+ },
+ "cam_torso_color": {
+  "enc": "rgb8",
+  "frame": "camera_body_front_link",
+  "stamp": 158.35999646
+ },
+ "cam_torso_depth": {
+  "enc": "16UC1",
+  "frame": "camera_body_front_link",
+  "stamp": 158.35999646
+ }
+}

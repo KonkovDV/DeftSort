@@ -1,0 +1,60 @@
+{
+  "ok": true,
+  "pool": 3,
+  "n_layouts": 30,
+  "commit_note": "5117bec-local",
+  "rates": {
+    "dish": {
+      "n": 90,
+      "pick_rate": 0.7444,
+      "place_left_given_pick": 0.5075,
+      "place_right_given_pick": 0.4925,
+      "place_both_given_pick": 0.0,
+      "pick_and_place_left": 0.3778,
+      "pick_and_place_right": 0.3667,
+      "pick_kinds": {
+        "rim": 67
+      }
+    },
+    "box": {
+      "n": 90,
+      "pick_rate": 0.6667,
+      "place_left_given_pick": 0.5667,
+      "place_right_given_pick": 0.3833,
+      "place_both_given_pick": 0.0,
+      "pick_and_place_left": 0.3778,
+      "pick_and_place_right": 0.2556,
+      "pick_kinds": {
+        "side": 60
+      }
+    },
+    "jar": {
+      "n": 90,
+      "pick_rate": 0.9111,
+      "place_left_given_pick": 0.5244,
+      "place_right_given_pick": 0.4512,
+      "place_both_given_pick": 0.0,
+      "pick_and_place_left": 0.4778,
+      "pick_and_place_right": 0.4111,
+      "pick_kinds": {
+        "side": 82
+      }
+    }
+  },
+  "seconds": 5479.48,
+  "hand_open": 0.10498527137704766,
+  "trays": {
+    "tray_left": [
+      0.34,
+      0.69
+    ],
+    "tray_right": [
+      0.34,
+      -0.69
+    ],
+    "tray_center": [
+      0.53,
+      0.0
+    ]
+  }
+}

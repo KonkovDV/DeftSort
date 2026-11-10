@@ -1,0 +1,10 @@
+09:58:19Z +     0s src=/workspace/fixes/kaggle-tpu/study/ds/sol_src cfg={"mode": "grasp", "task": "sort3", "pool": {"dish": ["Utana_5_Porcelain_Ramekin_Large", "Threshold_Ramekin_White_Porcelain", "Ecoforms_Plant_Container_B4_Har"], "box": ["Crunch_Girl_Scouts_Candy_Bars_Peanut_Butter_Creme_78_oz_box", "Crayola_Bonus_64_Crayons", "Perricone_MD_AcylGlutathione_Eye_Lid_Serum"], "jar": ["006_mustard_bottle", "Saccharomyces_Boulardii_MOS_Value_Size", "Hyaluronic_Acid"]}, "cats": ["dish", "box", "jar"], "l0": 0, "l1": 24, "meta": {"Utana_5_Porcelain_Ramekin_Large": ["dish", [0.132, 0.132, 0.07]], "Threshold_Ramekin_White_Porcelain": ["dish", [0.11199999999999999, 0.11199999999999999, 0.053]], "Ecoforms_Plant_Container_B4_Har": ["dish", [0.10099999999999999, 0.10099999999999999, 0.07200000000000001]], "Crunch_Girl_Scouts_Candy_Bars_Peanut_Butter_Creme_78_oz_box": ["box", [0.139, 0.063, 0.16399999999999998]], "Crayola_Bonus_64_Crayons": ["box", [0.147, 0.043, 0.127]], "Perricone_MD_AcylGlutathione_Eye_Lid_Serum": ["box", [0.08, 0.055999999999999994, 0.10800000000000001]], "006_mustard_bottle": ["jar", [0.09699999999999999, 0.067, 0.191]], "Saccharomyces_Boulardii_MOS_Value_Size": ["jar", [0.075, 0.07400000000000001, 0.135]], "Hyaluronic_Acid": ["jar", [0.054000000000000006, 0.054000000000000006, 0.098]]}, "seed_base": 73000, "grasp_cats": ["box"], "out": "/workspace/fixes/kaggle-tpu/study/out/local-g3b", "src": "/workspace/fixes/kaggle-tpu/study/ds", "procs": 7, "deadline_s": 10800}
+09:58:26Z +     7s 72 jobs, 8 cpus
+09:58:28Z +     9s 10/72 done
+09:58:29Z +    10s 20/72 done
+09:58:30Z +    11s 30/72 done
+09:58:32Z +    12s 40/72 done
+09:58:33Z +    14s 50/72 done
+09:58:34Z +    15s 60/72 done
+09:58:35Z +    16s 70/72 done
+09:58:36Z +    17s END done=72/72

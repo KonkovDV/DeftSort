@@ -1,0 +1,20 @@
+{
+  "checks": {
+    "native_child_exit_0": false,
+    "no_installer_exception": false,
+    "startup": true,
+    "physical_cube_fell": true,
+    "real_render": true,
+    "depth_valid": true,
+    "depth_mm_quantization": true,
+    "depth_mm_range": true,
+    "annotators_detached": true,
+    "render_product_destroyed": true,
+    "replicator_stopped": true,
+    "native_close_returned": false,
+    "own_scratch_removed": true,
+    "pngs_saved": true
+  },
+  "passed": false,
+  "scope": "NEUTRAL INFRASTRUCTURE ONLY; not hackathon sorting, real robot, CUDA training or final container acceptance"
+}

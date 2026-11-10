@@ -1,0 +1,65 @@
+14:54:04 MSK +0s SESSION B {'TASK': 'sort2', 'SEEDS': '101', 'RUNTO': '1600', 'HACK_SELF_COLLISION': '0', 'HACK_POOL': '3', 'SEED0': '100'} solution d96da87fc1
+14:54:04 MSK +0s GPU GPU 0: Tesla T4 (UUID: GPU-a4e83ccf-70cb-bdae-d349-1d99f60d1deb)
+GPU 1: Tesla T4 (UUID: GPU-66ddd38d-3511-41de-c1e2-4b05f1b96db1)
+14:54:04 MSK +0s START setup timeout 1500
+14:55:04 MSK +60s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=setup.log :: assets/polygon | + echo SRC=/kaggle/input/datasets/dmitrijkv/team048-polygon-assets/polygon | SRC=/kaggle/input/datasets/dmitrijkv/team048-polygon-assets/polygon | + ls /kaggle/input | datasets | + mkdir -p /tmp/nssr_sim | + cp -r /kaggle/input/datasets/dmitrijkv/team048-polygon-assets/polygon/. /tmp/nssr_sim/ | 
+14:56:04 MSK +120s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=setup.log ::  | + mkdir -p /tmp/nssr_sim | + cp -r /kaggle/input/datasets/dmitrijkv/team048-polygon-assets/polygon/. /tmp/nssr_sim/ | + P=/tmp/w/mm/envs/isaac/bin/python | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cu128 | 
+14:57:04 MSK +180s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=setup.log :: olygon-assets/polygon/. /tmp/nssr_sim/ | + P=/tmp/w/mm/envs/isaac/bin/python | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cu128 | + ln -sfn /tmp/nssr_sim /nssr_sim | + wait 696 | + echo ros_env_rc=0 | + wait 697 | 
+14:58:04 MSK +240s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=setup.log :: /bin/python -m pip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com | 
+14:59:04 MSK +300s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: thon -m pip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  | 
+15:00:04 MSK +360s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: n -m pip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  | 
+15:01:04 MSK +420s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: m pip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  | 
+15:02:04 MSK +480s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: ip install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  | 
+15:03:04 MSK +540s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: install -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  |  | 
+15:04:04 MSK +600s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: tall -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  |  |  | 
+15:05:04 MSK +660s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: l -q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  |  |  |  | 
+15:06:04 MSK +720s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: q -U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  |  |  |  |  | 
+15:07:04 MSK +780s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: U pip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  |  |  |  |  |  | 
+15:08:04 MSK +840s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: ip 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  |  |  |  |  |  |  | 
+15:09:04 MSK +900s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: 'setuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  |  |  |  |  |  |  |  | 
+15:10:04 MSK +960s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: tuptools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  |  |  |  |  |  |  |  |  | 
+15:11:04 MSK +1020s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: tools<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+15:12:04 MSK +1080s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: ls<70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+15:13:04 MSK +1140s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: 70' wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+15:14:04 MSK +1200s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log ::  wheel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+15:15:04 MSK +1260s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: eel | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+15:16:05 MSK +1321s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log ::  | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+15:17:05 MSK +1381s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+15:18:05 MSK +1441s HB step=setup gpu=[0 %, 0 MiB
+0 %, 0 MiB] last=progress.log :: imeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q --no-build-isolation flatdict==4.0.1 | + timeout 1800 /tmp/w/mm/envs/isaac/bin/python -m pip install -q 'isaaclab[isaacsim,all]==2.2.0' --extra-index-url https://pypi.nvidia.com |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+15:19:04 MSK +1500s END setup rc TIMEOUT
+15:19:04 MSK +1500s SETUP_CHECK {'ros': True, 'isaac': True, 'bodyctrl': False, 'nssr': False}
+15:19:04 MSK +1500s TAIL ros_env.log ros_env_rc=0
+
+15:19:04 MSK +1500s TAIL isaac_env.log ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+wheel 0.48.0 requires packaging>=24.0, but you have packaging 23.0 which is incompatible.
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+isaacsim-core 5.0.0.0 requires packaging==23.0, but you have packaging 24.2 which is incompatible.
+isaac_env_rc=0
+
+15:19:04 MSK +1500s TAIL bodyctrl_build.log 
+15:19:04 MSK +1500s TAIL nssr_pkg.log 
+15:19:04 MSK +1500s FAIL-FAST: setup incomplete

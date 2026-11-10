@@ -1,0 +1,30 @@
+{
+  "ok": true,
+  "fk_ik": {
+    "n": 40,
+    "ok_lt_3mm": 39,
+    "ok_frac": 0.975,
+    "err_median_m": 0.0008499846214706465,
+    "seconds": 0.502,
+    "dof": 7,
+    "vmax_max": 0.8
+  },
+  "rf_preview": {
+    "3": {
+      "fit_s": 0.523,
+      "n_train": 1161,
+      "n_test": 916,
+      "cov": 0.7402,
+      "err": 0.0,
+      "n_kept": 678
+    },
+    "6": {
+      "fit_s": 0.473,
+      "n_train": 951,
+      "n_test": 824,
+      "cov": 0.9053,
+      "err": 0.0,
+      "n_kept": 746
+    }
+  }
+}

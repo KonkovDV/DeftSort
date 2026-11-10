@@ -1,0 +1,73 @@
+Starting >>> bodyctrl_msgs
+--- stderr: bodyctrl_msgs
+CMake Warning (deprecated) at CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Error at /tmp/w/mm/envs/ros/share/rosidl_adapter/cmake/rosidl_adapt_interfaces.cmake:59 (message):
+  execute_process(/tmp/w/mm/envs/ros/bin/python -m rosidl_adapter
+  --package-name bodyctrl_msgs --arguments-file
+  /tmp/w/ws/build/bodyctrl_msgs/rosidl_adapter__arguments__bodyctrl_msgs.json
+  --output-dir /tmp/w/ws/build/bodyctrl_msgs/rosidl_adapter/bodyctrl_msgs
+  --output-file
+  /tmp/w/ws/build/bodyctrl_msgs/rosidl_adapter/bodyctrl_msgs.idls) returned
+  error code 1:
+
+  AttributeError processing template 'msg.idl.em'
+
+  Traceback (most recent call last):
+
+    File "/tmp/w/mm/envs/ros/lib/python3.11/site-packages/rosidl_adapter/resource/__init__.py", line 51, in evaluate_template
+      em.BUFFERED_OPT: True,
+      ^^^^^^^^^^^^^^^
+
+  AttributeError: module 'em' has no attribute 'BUFFERED_OPT'
+
+
+
+  During handling of the above exception, another exception occurred:
+
+
+
+  Traceback (most recent call last):
+
+    File "<frozen runpy>", line 198, in _run_module_as_main
+    File "<frozen runpy>", line 88, in _run_code
+    File "/tmp/w/mm/envs/ros/lib/python3.11/site-packages/rosidl_adapter/__main__.py", line 19, in <module>
+      sys.exit(main())
+               ^^^^^^
+    File "/tmp/w/mm/envs/ros/lib/python3.11/site-packages/rosidl_adapter/main.py", line 53, in main
+      abs_idl_file = convert_to_idl(
+                     ^^^^^^^^^^^^^^^
+    File "/tmp/w/mm/envs/ros/lib/python3.11/site-packages/rosidl_adapter/__init__.py", line 19, in convert_to_idl
+      return convert_msg_to_idl(
+             ^^^^^^^^^^^^^^^^^^^
+    File "/tmp/w/mm/envs/ros/lib/python3.11/site-packages/rosidl_adapter/msg/__init__.py", line 39, in convert_msg_to_idl
+      expand_template('msg.idl.em', data, output_file, encoding='iso-8859-1')
+    File "/tmp/w/mm/envs/ros/lib/python3.11/site-packages/rosidl_adapter/resource/__init__.py", line 23, in expand_template
+      content = evaluate_template(template_name, data)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/tmp/w/mm/envs/ros/lib/python3.11/site-packages/rosidl_adapter/resource/__init__.py", line 69, in evaluate_template
+      _interpreter.shutdown()
+      ^^^^^^^^^^^^^^^^^^^^^
+
+  AttributeError: 'NoneType' object has no attribute 'shutdown'
+
+Call Stack (most recent call first):
+  /tmp/w/mm/envs/ros/share/rosidl_cmake/cmake/rosidl_generate_interfaces.cmake:130 (rosidl_adapt_interfaces)
+  CMakeLists.txt:9 (rosidl_generate_interfaces)
+
+
+---
+Failed   <<< bodyctrl_msgs [2.58s, exited with code 1]
+
+Summary: 0 packages finished [2.82s]
+  1 package failed: bodyctrl_msgs
+  1 package had stderr output: bodyctrl_msgs
+bodyctrl_rc=1

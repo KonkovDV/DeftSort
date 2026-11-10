@@ -1,0 +1,537 @@
++ W=/kaggle/working
++ T=/tmp/w
++ export MAMBA_ROOT_PREFIX=/tmp/w/mm
++ MAMBA_ROOT_PREFIX=/tmp/w/mm
++ MM=/tmp/w/bin/micromamba
++ cd /tmp/nssr_sim
++ export ROS_DOMAIN_ID=146 RMW_IMPLEMENTATION=rmw_fastrtps_cpp ACCEPT_EULA=Y PRIVACY_CONSENT=Y OMNI_KIT_ACCEPT_EULA=YES
++ ROS_DOMAIN_ID=146
++ RMW_IMPLEMENTATION=rmw_fastrtps_cpp
++ ACCEPT_EULA=Y
++ PRIVACY_CONSENT=Y
++ OMNI_KIT_ACCEPT_EULA=YES
++ export FASTRTPS_DEFAULT_PROFILES_FILE=/tmp/nssr_sim/hackathon/docker/fastdds_hack.xml
++ FASTRTPS_DEFAULT_PROFILES_FILE=/tmp/nssr_sim/hackathon/docker/fastdds_hack.xml
++ export HACK_TASK=sort3 HACK_POOL=3 HACK_SEED=1 HACK_HEADLESS=1 HACK_RES=1280x720 HACK_RENDER_INTERVAL=3
++ HACK_TASK=sort3
++ HACK_POOL=3
++ HACK_SEED=1
++ HACK_HEADLESS=1
++ HACK_RES=1280x720
++ HACK_RENDER_INTERVAL=3
++ export VK_ICD_FILENAMES=/tmp/w/nvidia_icd.json VK_DRIVER_FILES=/tmp/w/nvidia_icd.json __EGL_VENDOR_LIBRARY_DIRS=/tmp/w/egl
++ VK_ICD_FILENAMES=/tmp/w/nvidia_icd.json
++ VK_DRIVER_FILES=/tmp/w/nvidia_icd.json
++ __EGL_VENDOR_LIBRARY_DIRS=/tmp/w/egl
++ ISAAC_LD=/tmp/w/nvlib
++ BR=2993
++ rosenv python teleoperation/bridges/ros2_zmq_bridge.py
++ sleep 3
++ KIT='--/rtx/raytracing/fractionalCutoutOpacity=true --/rtx/pathtracing/fractionalCutoutOpacity=true --/rtx/translucency/maxRefractionBounces=4 --/app/runLoops/main/rateLimitEnabled=false --/app/renderer/resolution/width=1280 --/app/renderer/resolution/height=720'
++ export 'HACK_KIT_ARGS=--/rtx/raytracing/fractionalCutoutOpacity=true --/rtx/pathtracing/fractionalCutoutOpacity=true --/rtx/translucency/maxRefractionBounces=4 --/app/runLoops/main/rateLimitEnabled=false --/app/renderer/resolution/width=1280 --/app/renderer/resolution/height=720'
++ HACK_KIT_ARGS='--/rtx/raytracing/fractionalCutoutOpacity=true --/rtx/pathtracing/fractionalCutoutOpacity=true --/rtx/translucency/maxRefractionBounces=4 --/app/runLoops/main/rateLimitEnabled=false --/app/renderer/resolution/width=1280 --/app/renderer/resolution/height=720'
++ SIM=3014
++ LD_LIBRARY_PATH=/tmp/w/nvlib:/usr/local/nvidia/lib64:/usr/local/cuda/lib64:/usr/local/nvidia/lib:/usr/local/nvidia/lib64:/usr/local/cuda/lib64
++ /tmp/w/mm/envs/isaac/bin/python scripts/sim_runner.py --task NSSRSim-TiangongPro-Parlor-v0 --enable_cameras --num_envs 1 --perf_stats --step_hz 100 --headless --device cpu
+++ seq 1 120
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ for i in $(seq 1 120)
++ rosenv timeout 5 ros2 topic echo --once /sim/task std_msgs/msg/String
++ kill -0 3014
++ sleep 5
++ echo 'waited 1200s'
+waited 1200s
++ cat /kaggle/working/logs/sim_task.txt
++ rosenv timeout 600 python hackathon/tools/check_interfaces.py
++ echo check_rc=1
++ rosenv timeout 20 ros2 topic echo --once /cam_head/color/camera_info
++ rosenv timeout 20 ros2 topic echo --once /cam_head/depth/camera_info
++ rosenv timeout 20 ros2 topic echo --once /cam_torso/color/camera_info
++ rosenv timeout 30 ros2 run tf2_ros tf2_echo pelvis camera_head_link
++ rosenv timeout 20 ros2 topic echo --once /tf_static
++ rosenv timeout 20 ros2 topic list -t
++ rosenv timeout 20 ros2 topic echo --once /joint_states
++ rosenv timeout 60 python /kaggle/working/grab_frames.py
++ kill -INT 3014
++ sleep 10
++ kill 2993
+/kaggle/working/run_stage34.sh: line 34: kill: (2993) - No such process
++ pkill -f sim_node.py
++ pkill -f camera_bridge.py
++ pkill -f robot_state_publisher
++ pkill -9 -f sim_runner.py

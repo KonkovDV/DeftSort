@@ -1,0 +1,18 @@
+{
+  "id": "dmitrijkv/team048-cpu-calib",
+  "title": "team048-cpu-calib",
+  "code_file": "team048-cpu-calib.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": false,
+  "enable_tpu": false,
+  "enable_internet": false,
+  "machine_shape": "",
+  "dataset_sources": [
+    "dmitrijkv/team048-tpu-cpu-inputs"
+  ],
+  "kernel_sources": [],
+  "competition_sources": [],
+  "model_sources": []
+}

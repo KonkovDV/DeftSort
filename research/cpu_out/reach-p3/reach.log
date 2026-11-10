@@ -1,0 +1,47 @@
+2026-11-09T07:11:18Z IN=/kaggle/input/datasets/dmitrijkv/team048-tpu-cpu-inputs
+2026-11-09T07:11:20Z pool_objs=[('Utana_5_Porcelain_Ramekin_Large', 'dish'), ('Threshold_Ramekin_White_Porcelain', 'dish'), ('Ecoforms_Plant_Container_B4_Har', 'dish'), ('Crunch_Girl_Scouts_Candy_Bars_Peanut_Butter_Creme_78_oz_box', 'box'), ('Crayola_Bonus_64_Crayons', 'box'), ('Perricone_MD_AcylGlutathione_Eye_Lid_Serum', 'box'), ('006_mustard_bottle', 'jar'), ('Saccharomyces_Boulardii_MOS_Value_Size', 'jar'), ('Hyaluronic_Acid', 'jar')]
+2026-11-09T07:25:31Z layout 5/30 elapsed=850.3s
+2026-11-09T07:40:46Z layout 10/30 elapsed=1765.3s
+2026-11-09T07:56:55Z layout 15/30 elapsed=2734.4s
+2026-11-09T08:12:16Z layout 20/30 elapsed=3654.7s
+2026-11-09T08:27:33Z layout 25/30 elapsed=4572.1s
+2026-11-09T08:42:40Z layout 30/30 elapsed=5479.5s
+2026-11-09T08:42:40Z {
+  "dish": {
+    "n": 90,
+    "pick_rate": 0.7444,
+    "place_left_given_pick": 0.5075,
+    "place_right_given_pick": 0.4925,
+    "place_both_given_pick": 0.0,
+    "pick_and_place_left": 0.3778,
+    "pick_and_place_right": 0.3667,
+    "pick_kinds": {
+      "rim": 67
+    }
+  },
+  "box": {
+    "n": 90,
+    "pick_rate": 0.6667,
+    "place_left_given_pick": 0.5667,
+    "place_right_given_pick": 0.3833,
+    "place_both_given_pick": 0.0,
+    "pick_and_place_left": 0.3778,
+    "pick_and_place_right": 0.2556,
+    "pick_kinds": {
+      "side": 60
+    }
+  },
+  "jar": {
+    "n": 90,
+    "pick_rate": 0.9111,
+    "place_left_given_pick": 0.5244,
+    "place_right_given_pick": 0.4512,
+    "place_both_given_pick": 0.0,
+    "pick_and_place_left": 0.4778,
+    "pick_and_place_right": 0.4111,
+    "pick_kinds": {
+      "side": 82
+    }
+  }
+}
+2026-11-09T08:42:40Z ALL OK

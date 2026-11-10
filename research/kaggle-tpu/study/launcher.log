@@ -1,0 +1,172 @@
+12:14:04 МСК push g3d-0 OK
+12:14:10 МСК push g3d-1 OK
+12:14:17 МСК push g3d-2 OK
+12:14:24 МСК push g6-0 OK
+12:14:30 МСК push g6-1 OK
+12:14:36 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:14:41 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:14:47 МСК push r3s2-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:14:53 МСК push r3s2-1 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:14:59 МСК push r3s2-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:15:04 МСК push r3s3-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:15:10 МСК push r3s3-1 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:15:16 МСК push r3s3-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:15:23 МСК push r3s3-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:15:29 МСК push r3s3-4 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:15:35 МСК push r6s2-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:15:40 МСК push r6s2-1 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:15:46 МСК push r6s2-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:15:51 МСК local r3s3 start
+12:15:52 МСК push tubes FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:17:08 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:17:14 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:18:32 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:18:38 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:19:56 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:20:02 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:21:18 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:21:23 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:22:40 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:22:46 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:24:02 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:24:08 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:25:25 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:25:31 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:26:49 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:26:55 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:28:01 МСК push g3b-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:28:07 МСК push g3b-1 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:28:26 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:28:32 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:28:38 МСК push r6x-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:29:44 МСК push g3b-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:29:50 МСК push g3b-1 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:30:06 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:30:11 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:30:17 МСК push r6x-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:31:24 МСК push g3b-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:31:30 МСК push g3b-1 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:31:46 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:31:52 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:31:58 МСК push r6x-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:32:48 МСК local r3s3 end: 09:32:48Z +  1017s END done=899/899
+12:32:48 МСК local r6s2 start
+12:33:04 МСК push g3b-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:33:10 МСК push g3b-1 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:33:27 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:33:33 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:33:39 МСК push r6x-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:34:45 МСК push g3b-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:34:51 МСК push g3b-1 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:35:08 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:35:14 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:35:21 МСК push r6x-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:36:27 МСК push g3b-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:36:32 МСК push g3b-1 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:36:50 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:36:56 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:37:02 МСК push r6x-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:38:08 МСК push g3b-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:38:14 МСК push g3b-1 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:38:31 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:38:38 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:38:43 МСК push r6x-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:39:50 МСК push g3b-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:39:56 МСК push g3b-1 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:40:14 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:40:20 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:40:25 МСК push r6x-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:40:55 МСК local r6s2 end: 09:40:54Z +   486s END done=600/600
+12:40:55 МСК local r3s2 start
+12:41:31 МСК push g3b-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:41:37 МСК push g3b-1 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:41:54 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:41:59 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:42:05 МСК push r6x-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:43:11 МСК push g3b-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:43:16 МСК push g3b-1 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:43:31 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:43:38 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:43:44 МСК push r6x-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:44:50 МСК push g3b-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:44:57 МСК push g3b-1 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:45:16 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:45:22 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:45:28 МСК push r6x-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:46:34 МСК push g3b-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:46:41 МСК push g3b-1 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:46:58 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:47:03 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:47:10 МСК push r6x-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:48:16 МСК push g3b-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:48:22 МСК push g3b-1 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:48:37 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:48:43 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:48:49 МСК push r6x-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:49:55 МСК push g3b-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:50:01 МСК push g3b-1 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:50:19 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:50:24 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:50:30 МСК push r6x-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:51:25 МСК local r3s2 end: 09:51:24Z +   630s END done=600/600
+12:51:25 МСК local tubes start
+12:51:37 МСК push g3b-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:51:42 МСК push g3b-1 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:51:58 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:52:04 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:52:10 МСК push r6x-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:52:44 МСК local tubes end: 09:52:44Z +    79s END done=3/3
+12:53:16 МСК push g3b-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:53:21 МСК push g3b-1 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:53:38 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:53:43 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:53:49 МСК push r6x-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:54:55 МСК push g3b-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:55:00 МСК push g3b-1 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:55:16 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:55:22 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:55:28 МСК push r6x-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:56:34 МСК push g3b-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:56:39 МСК push g3b-1 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:56:55 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:57:00 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:57:06 МСК push r6x-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:57:38 МСК local grasp g3d start (l0-45 cats=dish)
+12:58:04 МСК local grasp g3d end: 09:58:04Z +    26s END done=135/135
+12:58:04 МСК local grasp g6 start (l0-32 cats=electronics,box)
+12:58:12 МСК push g3b-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:58:18 МСК push g3b-1 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:58:19 МСК local grasp g6 end: 09:58:19Z +    15s END done=192/192
+12:58:19 МСК local grasp g3b start (l0-24 cats=box)
+12:58:34 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:58:36 МСК local grasp g3b end: 09:58:36Z +    17s END done=72/72
+12:58:36 МСК local grasp g6x start (l0-100 cats=electronics,box)
+12:58:40 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:58:46 МСК push r6x-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:59:22 МСК local grasp g6x end: 09:59:22Z +    46s END done=600/600
+12:59:22 МСК local grasp g3dx start (l0-100 cats=dish)
+12:59:51 МСК push g3b-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+12:59:57 МСК push g3b-1 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+13:00:13 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+13:00:18 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+13:00:22 МСК local grasp g3dx end: 10:00:22Z +    60s END done=300/300
+13:00:22 МСК local grasp g3bx start (l0-100 cats=box)
+13:00:24 МСК push r6x-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+13:01:30 МСК push g3b-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+13:01:31 МСК local grasp g3bx end: 10:01:31Z +    69s END done=299/299
+13:01:35 МСК push g3b-1 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+13:01:52 МСК push g6-2 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+13:01:58 МСК push g6-3 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+13:02:03 МСК push r6x-0 FAIL: Kernel push error: Maximum batch CPU session count of 5 reached. 
+13:03:13 МСК g3d-0 COMPLETE, 304 rows; {"done": 16, "total": 45, "seconds": 2909.7, "complete": false}
+13:03:21 МСК g3d-1 COMPLETE, 456 rows; {"done": 24, "total": 45, "seconds": 2907.0, "complete": false}
+13:03:28 МСК g3d-2 COMPLETE, 304 rows; {"done": 16, "total": 45, "seconds": 2907.0, "complete": false}
+13:03:36 МСК g6-0 COMPLETE, 560 rows; {"done": 35, "total": 48, "seconds": 2905.7, "complete": false}
+13:03:43 МСК g6-1 COMPLETE, 368 rows; {"done": 23, "total": 48, "seconds": 2898.5, "complete": false}
+13:03:43 МСК ALL SHARDS FINISHED
+13:09:14 МСК local reach r3s3-v2 start
+13:09:52 МСК local reach r3s3-v2 end: 10:09:52Z +    38s END done=899/899
+13:09:52 МСК local reach r6s2-v2 start
+13:09:56 МСК local reach r6s2-v2 end: 10:09:56Z +     4s END done=600/600
+13:09:56 МСК local reach r3s2-v2 start
+13:10:01 МСК local reach r3s2-v2 end: 10:10:01Z +     5s END done=600/600

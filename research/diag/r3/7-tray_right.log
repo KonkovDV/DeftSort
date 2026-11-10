@@ -1,0 +1,13 @@
+Saccharomyces_Boulardi 0.3 -0.4 ok_r_dz0.00 7.1
+Saccharomyces_Boulardi 0.3 -0.15 ok_r_dz0.00 9.8
+Saccharomyces_Boulardi 0.3 0.15 ok_r_dz0.00 10.5
+Saccharomyces_Boulardi 0.3 0.4 ok_l_yaw-2.22_dz0.00 14.9
+Saccharomyces_Boulardi 0.4 -0.4 ok_r_dz0.00 6.9
+Saccharomyces_Boulardi 0.4 -0.15 ok_r_dz0.02 8.1
+Saccharomyces_Boulardi 0.4 0.15 ok_r_dz0.04 10.1
+Saccharomyces_Boulardi 0.4 0.4 ok_l_yaw-2.22_dz0.00 14.8
+Saccharomyces_Boulardi 0.48 -0.4 ok_r_dz0.00 5.6
+Saccharomyces_Boulardi 0.48 -0.15 ok_r_dz0.02 7.3
+Saccharomyces_Boulardi 0.48 0.15 ok_r_dz0.02 6.8
+Saccharomyces_Boulardi 0.48 0.4 ok_l_yaw-2.22_dz0.00 15.4
+Saccharomyces_Boulardii_MOS_Va {'ok_r': 9, 'ok_l_yaw': 3}

@@ -1,0 +1,16 @@
+run seed obj kind | held@lift | C:mean_dev contact_empty(0.10) jammed(p>1.02) maxdev_rule | t2(0.15) | L:pc->lift travel  past_verdict(sim) finger_verdict(eff_thr=0.92) maxdev_eff_rule
+v7 101 Threshold_Rameki rim  | empty |  0.93 False jam[3, 4] maxdev_empty=False | t2max=1.34 | travel[1.37, 1.36, -0.02] past=False past_sim=False fv=False prop=False
+v7 101 Ecoforms_Plant_C rim  | HELD |  0.49 False jam[] maxdev_empty=False | t2max=1.00 | travel[0.06, 0.02, 0.04] past=True past_sim=True fv=True prop=True
+v7 101 006_mustard_bott side | empty |  1.09 False jam[1, 2, 3, 4] maxdev_empty=False | t2max=1.24 | travel[1.13, 1.23, 1.33, 1.31, 0.35] past=False past_sim=False fv=False prop=False
+v7 102 Utana_5_Porcelai rim  | empty |  0.60 False jam[3] maxdev_empty=False | t2max=1.00 | travel[0.91, 0.84, -0.02] past=False past_sim=False fv=False prop=False
+v7 102 Crayola_Bonus_64 side | empty |  0.70 False jam[3, 4] maxdev_empty=False | t2max=0.88 | travel[0.01, 0.98, 1.03, 0.94, 0.46] past=False past_sim=False fv=False prop=False
+v7 102 Threshold_Rameki rim  | HELD |  0.72 False jam[3, 4] maxdev_empty=False | t2max=1.06 | travel[0.11, 0.08, 0.0] past=False past_sim=False fv=True prop=True
+v7 102 Hyaluronic_Acid  side | empty |  0.00 True  jam[] maxdev_empty=True | t2max=0.00 | travel[0.0, 0.0, 0.0, 0.0, -0.0] past=None past_sim=None fv=False prop=False
+v7 103 Ecoforms_Plant_C rim  | HELD |  0.48 False jam[] maxdev_empty=False | t2max=1.00 | travel[0.05, -0.0, 0.05] past=True past_sim=True fv=True prop=True
+v7 103 Perricone_MD_Acy side | empty |  0.04 True  jam[] maxdev_empty=True | t2max=0.00 | travel[0.0, 0.02, 0.07, 0.0, 0.0] past=None past_sim=None fv=False prop=False
+v7 103 Hyaluronic_Acid  side | empty |  0.12 False jam[] maxdev_empty=False | t2max=0.20 | travel[0.25, 0.35, -0.02, -0.02, 0.0] past=False past_sim=False fv=False prop=False
+v8 103 Utana_5_Porcelai rim  | empty |  0.14 False jam[] maxdev_empty=False | t2max=1.00 | travel[-0.01, 0.24, 0.13] past=False past_sim=False fv=False prop=False
+v8 103 Threshold_Rameki rim  | empty |  0.56 False jam[3] maxdev_empty=False | t2max=1.59 | travel[1.62, 0.0, -0.02] past=False past_sim=False fv=False prop=False
+v8 103 Crunch_Girl_Scou side | empty |  0.30 False jam[3] maxdev_empty=False | t2max=1.31 | travel[-0.01, 0.06, 1.45, -0.03, 0.0] past=False past_sim=False fv=False prop=False
+v8 103 006_mustard_bott side | empty |  1.01 False jam[1, 5] maxdev_empty=False | t2max=1.66 | travel[1.8, 0.58, 0.68, 0.58, 1.29] past=False past_sim=False fv=False prop=False
+v8 103 Perricone_MD_Acy side | HELD |  0.73 False jam[5] maxdev_empty=False | t2max=1.64 | travel[0.01, 0.46, 0.64, 0.76, 0.57] past=False past_sim=False fv=None prop=True

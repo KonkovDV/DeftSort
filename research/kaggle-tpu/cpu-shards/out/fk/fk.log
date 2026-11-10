@@ -1,0 +1,4 @@
+2026-11-09T06:43:13Z IN=/kaggle/input/datasets/dmitrijkv/team048-tpu-cpu-inputs
+2026-11-09T06:43:15Z dof=7 vmax=[0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8]
+2026-11-09T06:44:30Z {'n': 2000, 'ok_lt_3mm': 1995, 'ok_frac': 0.9975, 'fail_exceptions': 5, 'err_median_m': 0.000750576355389661, 'err_p95_m': 0.001683349024551676, 'err_max_m': 0.0019983071950325226, 'seconds': 74.718}
+2026-11-09T06:44:30Z ALL OK

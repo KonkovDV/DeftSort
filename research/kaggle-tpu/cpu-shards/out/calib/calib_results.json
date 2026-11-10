@@ -1,0 +1,184 @@
+{
+  "ok": true,
+  "shapes": {
+    "cam_head_color": {
+      "shape": [
+        360,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "min": 0.0,
+      "max": 253.0,
+      "mean": 159.5281495949074
+    },
+    "cam_head_depth": {
+      "shape": [
+        360,
+        640,
+        1
+      ],
+      "dtype": "uint16",
+      "min": 0.0,
+      "max": 5999.0,
+      "mean": 2639.7902690972223
+    },
+    "cam_torso_color": {
+      "shape": [
+        360,
+        640,
+        3
+      ],
+      "dtype": "uint8",
+      "min": 2.0,
+      "max": 253.0,
+      "mean": 159.2100462962963
+    },
+    "cam_torso_depth": {
+      "shape": [
+        360,
+        640,
+        1
+      ],
+      "dtype": "uint16",
+      "min": 180.0,
+      "max": 4955.0,
+      "mean": 557.1944401041667
+    }
+  },
+  "frames_meta_type": "dict",
+  "frames_keys": [
+    "cam_head_color",
+    "cam_head_depth",
+    "cam_head_color_info",
+    "cam_head_depth_info",
+    "cam_torso_color_info",
+    "cam_torso_depth_info",
+    "cam_torso_color",
+    "cam_torso_depth"
+  ],
+  "log_files": [
+    "caminfo_head_color.txt",
+    "caminfo_head_depth.txt",
+    "caminfo_torso_color.txt",
+    "tf_pelvis_camhead.txt",
+    "tf_static.txt"
+  ],
+  "parsed": {
+    "caminfo_head_color.txt": {
+      "n_numbers": 17,
+      "head_numbers": [
+        2012.0,
+        -3.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        2.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0
+      ],
+      "text_head": "++ /tmp/w/bin/micromamba shell hook -s bash\n+ eval '\n# Copyright (C) 2012 Anaconda, Inc\n# SPDX-License-Identifier: BSD-3-Clause\n\n__mamba_exe() (\n    \"/tmp/w/bin/micromamba\" \"${@}\"\n)\n\n__mamba_hashr() {\n    if [ -n \"${ZSH_VERSION:+x}\" ]; then\n        \\rehash\n    elif [ -n \"${POSH_VERSION:+x}\" ]; then\n        :  # pass\n    else\n        \\hash -r\n    fi\n}\n\n__mamba_xctivate() {\n    \\local ask_mamba\n    ask_mamba=\"$(PS1=\"${PS1:-}\" __mamba_exe shell \"${@}\" --shell bash)\" || \\return\n    \\eval \"${ask_mamb"
+    },
+    "caminfo_head_depth.txt": {
+      "n_numbers": 17,
+      "head_numbers": [
+        2012.0,
+        -3.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        2.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0
+      ],
+      "text_head": "++ /tmp/w/bin/micromamba shell hook -s bash\n+ eval '\n# Copyright (C) 2012 Anaconda, Inc\n# SPDX-License-Identifier: BSD-3-Clause\n\n__mamba_exe() (\n    \"/tmp/w/bin/micromamba\" \"${@}\"\n)\n\n__mamba_hashr() {\n    if [ -n \"${ZSH_VERSION:+x}\" ]; then\n        \\rehash\n    elif [ -n \"${POSH_VERSION:+x}\" ]; then\n        :  # pass\n    else\n        \\hash -r\n    fi\n}\n\n__mamba_xctivate() {\n    \\local ask_mamba\n    ask_mamba=\"$(PS1=\"${PS1:-}\" __mamba_exe shell \"${@}\" --shell bash)\" || \\return\n    \\eval \"${ask_mamb"
+    },
+    "caminfo_torso_color.txt": {
+      "n_numbers": 17,
+      "head_numbers": [
+        2012.0,
+        -3.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        2.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0
+      ],
+      "text_head": "++ /tmp/w/bin/micromamba shell hook -s bash\n+ eval '\n# Copyright (C) 2012 Anaconda, Inc\n# SPDX-License-Identifier: BSD-3-Clause\n\n__mamba_exe() (\n    \"/tmp/w/bin/micromamba\" \"${@}\"\n)\n\n__mamba_hashr() {\n    if [ -n \"${ZSH_VERSION:+x}\" ]; then\n        \\rehash\n    elif [ -n \"${POSH_VERSION:+x}\" ]; then\n        :  # pass\n    else\n        \\hash -r\n    fi\n}\n\n__mamba_xctivate() {\n    \\local ask_mamba\n    ask_mamba=\"$(PS1=\"${PS1:-}\" __mamba_exe shell \"${@}\" --shell bash)\" || \\return\n    \\eval \"${ask_mamb"
+    },
+    "tf_pelvis_camhead.txt": {
+      "n_numbers": 17,
+      "head_numbers": [
+        2012.0,
+        -3.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        2.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0
+      ],
+      "text_head": "++ /tmp/w/bin/micromamba shell hook -s bash\n+ eval '\n# Copyright (C) 2012 Anaconda, Inc\n# SPDX-License-Identifier: BSD-3-Clause\n\n__mamba_exe() (\n    \"/tmp/w/bin/micromamba\" \"${@}\"\n)\n\n__mamba_hashr() {\n    if [ -n \"${ZSH_VERSION:+x}\" ]; then\n        \\rehash\n    elif [ -n \"${POSH_VERSION:+x}\" ]; then\n        :  # pass\n    else\n        \\hash -r\n    fi\n}\n\n__mamba_xctivate() {\n    \\local ask_mamba\n    ask_mamba=\"$(PS1=\"${PS1:-}\" __mamba_exe shell \"${@}\" --shell bash)\" || \\return\n    \\eval \"${ask_mamb"
+    },
+    "tf_static.txt": {
+      "n_numbers": 17,
+      "head_numbers": [
+        2012.0,
+        -3.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        2.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0
+      ],
+      "text_head": "++ /tmp/w/bin/micromamba shell hook -s bash\n+ eval '\n# Copyright (C) 2012 Anaconda, Inc\n# SPDX-License-Identifier: BSD-3-Clause\n\n__mamba_exe() (\n    \"/tmp/w/bin/micromamba\" \"${@}\"\n)\n\n__mamba_hashr() {\n    if [ -n \"${ZSH_VERSION:+x}\" ]; then\n        \\rehash\n    elif [ -n \"${POSH_VERSION:+x}\" ]; then\n        :  # pass\n    else\n        \\hash -r\n    fi\n}\n\n__mamba_xctivate() {\n    \\local ask_mamba\n    ask_mamba=\"$(PS1=\"${PS1:-}\" __mamba_exe shell \"${@}\" --shell bash)\" || \\return\n    \\eval \"${ask_mamb"
+    }
+  }
+}

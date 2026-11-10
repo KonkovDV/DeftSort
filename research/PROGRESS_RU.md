@@ -1,0 +1,183 @@
+2026-11-08 17:16 МСК старт журнала; safe-close v2 в очереди Kaggle; загрузка Drive per-file идёт
+2026-11-08 17:36 МСК Drive троттлит box ("many accesses"); запущен CPU-ноутбук kaggle team048-drive-mirror для зеркала обеих папок. safe-close v2 всё ещё QUEUED. project=311, project2=215 файлов. Найдено: папка 2 = репо организаторов (hack_sim, nssr_polygon sim_node, tools, docker, bodyctrl deb); USD робота в Drive нет (get_assets.sh).
+2026-11-08 17:59 МСК Drive обойдён через curl drive.usercontent (gdown троттлится). Репо организаторов почти целиком. Блокер: USD робота+склада только в GitHub release nssr-polygon-assets.tar (get_assets.sh, нужен gh с доступом). spd: по robot_commands.py симулятор трактует spd как рад/с, cap 0.8 (HACK_MAX_JOINT_SPEED) — конфликт rpm закрыт по исходнику.
+2026-11-08 18:08 МСК safe-close v2: extension-disable НЕ помогает — joint снова SIGSEGV в simulation_manager.plugin→carb.events при unload_all_plugins (carb-плагин остаётся загружен после disable расширения). Все 17 функциональных проверок joint = true, падают только graceful_return/native_exit0. Официальный scripts/sim_runner.py использует AppLauncher без fast_shutdown → дефолт SimulationApp fast_shutdown=True. Решение fix3: паритет с организаторами (fast_shutdown=True); строгий graceful-критерий был самоналоженным, не из ТЗ. Решению (ROS-узлу) закрытие симулятора не нужно. Папка 2 скачана полностью (347/347).
+2026-11-08 18:08 МСК milestone: этапы 1–2 закрыты; 3–4 ждут ассетов (GH_TOKEN не задан). Идёт докачка team048-standalone (v4) и папки 1 через curl.
+2026-11-08 18:10 МСК Критерий закрытия = fast_shutdown (как sim_runner). Создан приватный датасет dmitrijkv/team048-organiser-objects (объекты+конфиги, 768 МБ). Запущен GPU-ноутбук team048-render-set: пулы 3 и 6, 40 раскладок×2 вида, RGB/depth мм/маски, 640x360 HFOV86 (камера приближённая — поза head-cam неизвестна без USD робота).
+2026-11-08 18:14 МСК v4 (team048-standalone) скачан 167/167; bash test.sh: 185 тестов OK локально. Классификатор в v4 по умолчанию abstain ('no calibrated classifier') — render-set нужен именно для его калибровки.
+2026-11-08 18:44 МСК render-set готов: 160 кадров за 210 с. Оценка восприятия (v4 plane+segment + RF+abstain): пул3 cov 0.896 / sel.err 0.000 @0.8; пул6 0.940/0.000. Подробно fixes/perception/README_RU.md. GH_TOKEN не задан.
+2026-11-08 18:44 МСК План запуска симулятора организаторов (после ассетов): Kaggle GPU, apt ros-humble-ros-base + bodyctrl deb (root есть), Isaac Lab 2.2 pip (python3.11) вместо nvcr-образа; scripts/sim_runner.py через hackathon/tools/run_sim.sh-эквивалент headless --cams; затем tools/check_interfaces.py (этап 3) и tf2_echo pelvis→camera_*_link + camera_info (этап 4). Папка 1: 1508/2279, докачивается.
+2026-11-08 18:48 МСК Фрагменты: 77/80 — мышь Razer White (пул 6) со свёрнутым кабелем отдельно; правило склейки по перекрытию/высоте не срабатывает без ложных склеек → склейка выключена, кабель допустим как цель (подъём за кабель — риск, отметить). v4 RangeClassifier (6 признаков, огибающие по объектам): пул3 cov .777 err .005; пул6 cov .553 err .017 — хуже RF+гистограмма (0.896/0 и 0.940/0). Запущен team048-render-hard (60 раскладок×3 вида, теснее, низкие ракурсы, слабый свет).
+2026-11-08 19:45 МСК Папка 1 докачана полностью (2279/2279). Hard-набор оценён: RF+MERGED @0.8 — пул3 85.9% одиночных, 0 слипшихся принято, 0 ошибок; пул6 92.6%/0/0. GH_TOKEN не задан.
+- 2026-11-08 20:24 MSK: академический этап: decision.py (оптимальный порог), подгонка окружности для банок (медиана −1.1→−0.1 см), FMEA, REPORT_RU.md. GH_TOKEN не задан.
+- 2026-11-08 20:34 MSK: папка 3 скачана в /workspace/project3 (354/354, 859 МБ). Это репозиторий организаторов + README/LICENSE + URDF tiangong_pro_with_hands.urdf (62 сустава, без STL-мешей). nssr-polygon-assets.tar и USD робота/склада ОТСУТСТВУЮТ → этапы 3-4 и сортировка в симе по-прежнему заблокированы. URDF даёт реальную кинематику для IK (скорость рук в URDF 4–10 рад/с, лимит хакатона 0.8).
+- 2026-11-08 21:02 MSK: ассеты получены (gh, read-only), приватный датасет team048-polygon-assets; ИК из URDF + сферы (тесты 7/7); кисть ≈10.5 см; пакет решения /workspace/solution/nssr-sol-team-048; ядро team048-sim-stage34 v3 (setup+check_interfaces+sort3×3) запущено.
+- 2026-11-08 21:51 MSK: возобновлено; ядро team048-sim-stage34 v3 всё ещё RUNNING (~50 мин; лимиты: setup ≤90 мин, stage34 ≤50 мин, затем sort3×3).
+- 2026-11-08 23:06 MSK: диагностика v3 (RUNNING ~2ч). Kaggle CLI 2.2.5 не отдаёт ни логов, ни output у работающего script-ядра (kernels logs/output пусты) — 'нет вывода' это свойство Kaggle, не доказательство зависания. Push v4 отклонён: 'Maximum batch GPU session count of 2 reached' → занято 2 GPU-сессии (вероятно, старая версия того же ядра ещё идёт параллельно). Риски v3: таймаут sort 30000 с (до 8.3 ч), ожидание /sim/task без transient_local QoS (до ~25 мин впустую), нет таймаутов на pip/mamba внутри setup, не убивается группа процессов. v4 подготовлен (fixes/kaggle-sim/v4): таймауты на каждый шаг, killpg, transient_local, общий дедлайн 4 ч, sort3×3 RUNTO 600, progress.log с MSK-метками и heartbeat каждые 60 с (GPU/диск/хвост лога), fail-fast после setup и check_interfaces. Отмены ядра в CLI нет; watcher watch_v3_v4.sh: ждёт конца v3 → out_v3 → push v4 (ретрай) → out_v4.
+- 2026-11-09 00:23 MSK: v3 всё ещё RUNNING (output/logs недоступны), watcher жив; собран /workspace/team048-audit-inputs.zip для аудита.
+- 2026-11-09 00:25 MSK: ACCEPTANCE_PLAN_RU.md (22 ограничения, 18 приёмочных тестов), REPORT_RU.md §9 (TRAC-IK, conformal, slip). v3 RUNNING, watcher жив.
+- 2026-11-09 06:07 MSK: v3 завершился ERROR: sim работает (~24 Гц), но check_interfaces упал — bodyctrl_msgs не собрался (empy>=4: 'em has no BUFFERED_OPT'), sort не шёл. Исправлено (empy==3.3.4), v4 запущен на Kaggle, watch_v4.sh следит.
+- 2026-11-09 06:25 МСК: v4 FAIL-FAST: empy исправлен, но CMake не нашёл Python для bodyctrl_msgs; добавлены Python_EXECUTABLE/ROOT_DIR, numpy; запущена следующая версия ядра.
+- 2026-11-09 08:35 МСК: v5: setup OK, check_interfaces = ALL OK (все 18 моторов, пальцы, spd/cmd_vel, ~24 Гц сима), tf/camera_info сохранены. sort не дал результатов: старый ros2_zmq_bridge держал порт 5555 и 'ros2 topic echo' с timeout без -k мог зависнуть. Исправлено, запущена v6 (sort3×3).
+- 2026-11-09 09:15 МСК: разведка конкурентов: публичных репо других команд нет (решения в приватных nssr-sol-team-NNN; форков у полигона 0; kittvnebluda/nssr-polygon пуст). Склонированы прототипы UBTECH tk_sdk_demo, tiangong2pro_tf (STL-меши), GHRC baseline/eval, RoboMIND-Sim, walker-viz → /workspace/competitors; разбор и 15 идей в COMPETITORS_RU.md.
+- 2026-11-09 09:25 МСК: внедрены идеи из COMPETITORS_RU.md локально (git init в /workspace/solution/nssr-sol-team-048, коммиты 9abd410 baseline → 5f42f66 + package.xml; push НЕТ, remote нет). Новые модули budget.py (лимит от старта процесса, не начинать недоделуемый захват), grip.py (проверка захвата по F/T+кисти — пороги TODO, SetForce/SetSpeed, ожидание остановки пальцев), trays.py (места в ящике, ящики по цвету; порог хромы по кадру v5), sensing.py (пара RGB-D по stamp); arm.py (нуль-пространство ИК, lift, коррекция TCP, загрузчик mesh-сфер выкл.), node.py (проводка), tools/fit_spheres.py. Тесты: 41/41 pytest (вкл. IK 7/7, FK головы vs TF v5 <5 мм, observe на реальном кадре v5), fixes/ik 7/7, test_json_value ok. Ждут данных sim: пороги захвата, время цикла, сферы (validated=false), красный/синий цвет ящиков, высота отпускания.
+2026-11-09 09:52 МСК TPU: probe dmitrijkv/team048-tpu-probe QUEUED (TpuV5E8, слот 1/1; очереди TPU на Kaggle бывают часами). GPU квота ~24.4/30 ч (ост. ~5.6), TPU 0/20. Параллельно без ожидания TPU: private dataset dmitrijkv/team048-tpu-cpu-inputs; CPU-шарды: rf COMPLETE (pool3 thr0.8 cov=0.756 err=0; pool6 cov=0.911 err=0; shipped models cov 0.838/0.971); fk COMPLETE (2000 раундов FK/IK: 1995/2000 <3мм, 74.7с, hand_open≈10.5см); calib COMPLETE (K fx=fy=343.16 cx=320 cy=180, 640x360, frames camera_head_link / camera_body_front_link; txt-логи v5 — шум shell); ik-p3 и ik-p6 RUNNING (~30+ мин, plan_pick ≈1.2с/вызов). Box: лёгкий FK/IK 39/40. Heavy TPU cpuwork подготовлен, не запущён (ждёт слот после probe). GPU v6 не трогал.
+- 2026-11-09 10:05 МСК: разбор v6 (старый код, sort3 пул 3: 0/10/0). По объектам: s101 — 0 попыток (первое наблюдение снято, пока голова поднималась с 0 до 0.4 рад после рестарта сима; TF брался «последний», не на момент кадра) → цикл закончился за 14.9 с; s102 — Utana (rim) не в лотке, Saccharomyces (side, левая) в лотке +10, коробки 0 попыток; s103 — Threshold и Ecoforms (rim) не в лотке, Saccharomyces (side, правая → центр) не в лотке. Коробки не брались ни разу: офлайн-проверка нашим планировщиком — у tray_right нет позы отпускания (ось закрытия кисти перебиралась одного знака; правой руке нужна зеркальная −y): 0/36 → 19/36 после фикса. Rim 0/3: хват на кромке (центр захвата = верх борта). Порогов силы/пальцев из v6 откалибровать нельзя: старый код не писал F/T и кисть — оставлены TODO, добавлено логирование. Фиксы (коммит 5117bec, локально, без push): look() ждёт голову по /joint_states, TF на stamp кадра, повторное наблюдение при пустом виде, ±оси при отпускании + откат слота к центру лотка, rim на 1.5 см ниже кромки (не проверено), порог уверенности 1.0→0.7 (render-набор: 498→599 принято, ошибок 3→7 из 625), все сегменты = препятствия, TRACE по фазам (время, F, пальцы, план/факт TCP, кадры). Тесты 48/48. Kaggle v7 запушен 09:59 МСК (sort3×3 + sort2×2, новый код через colcon, жёсткий дедлайн 85 мин, кап на прогон 900/600 с wall ≈ 200/140 с сим-времени при RTF≈0.23), квота GPU 5.58 ч до пуша; watch_v7.sh → out_v7.
+2026-11-09 10:29 МСК TPU probe всё ещё QUEUED (TpuV5E8, 0/20 ч). Старые CPU ik-p3/ik-p6 — CANCEL_ACKNOWLEDGED (результатов нет). Dataset team048-tpu-cpu-inputs обновлён кодом 5117bec. Запущены CPU reach-p3/p6 v2 (30 раскладок, pick+place left/right по классам). Локальный preview 8×8 раскладок (5117bec): pool3 dish pick=0.71 placeL|R|both=0.65/0.35/0.0; box 0.75 / 0.61/0.39/0.0; jar 0.92 / 0.46/0.55/0.0. pool6 electronics pick=0.50 placeL|R=0.33/0.67; box 0.58 / 0.64/0.29. place_both=0 ожидаемо (одна рука не достаёт оба лотка). GPU v7 не трогал; квота GPU ~5.2 ч, TPU 20 ч.
+2026-11-09 10:54 МСК reach-p6 COMPLETE (30 раскладок, 2330с, код 5117bec): electronics n=90 pick=0.433 placeL|R|both=0.564/0.410/0.0; box n=90 pick=0.478 placeL|R|both=0.558/0.395/0.0. reach-p3 RUNNING. TPU probe QUEUED. GPU ост. ~4.7ч, TPU 20ч. GPU sim-stage34 не трогал.
+2026-11-09 11:03 МСК reach-p3 ещё RUNNING (~52 мин); TPU probe QUEUED; квота GPU 4.51ч / TPU 20ч.
+2026-11-09 11:17 МСК reach-p3 RUNNING >66 мин (p6 был 39 мин; p3 тяжелее из‑за dish/rim). TPU probe QUEUED. GPU ост. 4.28ч.
+- 2026-11-09 12:05 МСК (чекпойнт): разбор v7 (sort3 0/0/10; sort2 не успел — дедлайн). TRACE+кадры: стол в СК pelvis наклонён 4.0° (n_x=−0.070 на всех 31 кадре; лоток-центр по краям стенок x .427–.645 = номинал → камера верна, наклонён таз), плоская модель стола ниже реального на 1.2–3.8 см; боковые захваты 0/6: при закрытии сила вверх +11…+32 Н (pelvis z) = кисть давит в стол, FK-кончик большого пальца −0.7…1.6 см от плоскости; большой палец не был в коллизионной модели. Перенос: s103 Perricone 82 Н, TCP на 14 см ниже плана (рука в стенке tray_right); s101 Ecoforms отпущен в 13.7 см от цели (дальний слот y .77). rim 5: 2 пусты (пальцы 3–4 отжаты >1 при опускании), Threshold s102 поднят и потерян при переносе, Ecoforms ×2 удержан (1 в лотке +10, 1 мимо из-за недоезда). F/T для проверки захвата непригоден (пустая кисть 0.05–5.5 Н в зависимости от позы/пальцев); калибровка по пальцам: dev≥0.35 и effort≥0.67 (нагруж. 0.67–0.98/1.0 vs пуст. ≤0.02/≤0.334). s101: старт насчитал 206.9 с ожидания /clock. Фиксы в работе: стол по измеренной плоскости + стенки лотков в коллизиях, сферы большого пальца из STL (UBTECH, Apache-2.0), точка щипка из мешей (на 1.8 см глубже), подъём перед переносом, проверки недоезда pre/над лотком, внутренний слот первым, max_shift лотка 0.03, старт без ожидания часов. Тесты 54/54.
+2026-11-09 11:42 МСК reach pool3 LOCAL 15 раскладок (5117bec): dish pick=0.756 placeL|R|both=0.529/0.471/0.0; box 0.689 / 0.548/0.387/0.0; jar 0.956 / 0.535/0.465/0.0. Kaggle reach-p3 всё ещё RUNNING (>90 мин). reach-p6 Kaggle уже сохранён. TPU probe QUEUED. GPU ост. 4.24ч / TPU 20ч.
+2026-11-09 11:46 МСК reach-p3 COMPLETE (30 раскладок, 5479с, код 5117bec): dish n=90 pick=0.744 placeL|R|both=0.507/0.493/0.0; box n=90 pick=0.667 placeL|R|both=0.567/0.383/0.0; jar n=90 pick=0.911 placeL|R|both=0.524/0.451/0.0. Вывод → /workspace/fixes/cpu_out/reach-p3. TPU probe QUEUED. GPU ост. 4.24ч / TPU 20.00ч. Ничего нового не запускал.
+
+## 2026-11-09 12:00 МСК — чекпойнт (v7 разбор, продолжение)
+- Семантика пальцев проверена: INTERFACES.md — 1.0 раскрыт, 0.0 сжат. v7 s103 Hyaluronic: lifted пальцы 0.003 / усилие 0.004 (сжаты до упора = пустая рука), released 0.97, home 0.99 (раскрыты). |F| на home 0.12 Н (банка 0.12 кг дала бы ≈1.2 Н). Не застрял, не держится: выронен при закрытии (мизинец/безымянный упёрлись eff 1.0, указат./средний прошли до 0). dF=6.5 — относительно базы при захвате, ничего не значит (F/T зависит от позы).
+- В v7 вердикт шёл по F/T → пустую руку везли к лотку. Новый finger_verdict даёт False на этих кадрах (тесты test_yaw_release.py).
+- Добавлено: проверка раскрытия после release (среднее пальцев 1-4 ≥ 0.8, иначе повторное открытие).
+- Добавлено: укладка с поворотом корпуса body_yaw (мотор 31, разрешён INTERFACES.md, ±1.6 рад), сцена в повернутом кадре, проверка позы удержания на 5 промежуточных углах.
+- Офлайн (reach3, 3 объекта × 12 позиций × 2 лотка, наклонный стол + стенки лотков): с поворотом корпуса каждый взятый объект ставится в ОБА лотка (yaw ±2.22 рад для «чужого» лотка). Utana 3→6/12 на лоток (остальные 6 — no_ik на взятии), Crunch 6-7→11-12/12, Saccharomyces 9→12/12.
+- Коммиты 9387441, fe0a4d2. Тесты 61/61.
+- v8 отправлен 12:00 МСК (sort3 s103 + sort2 s101, дедлайн 50 мин). Watcher watch_v8.sh → out_v8. GPU осталось 4.24 ч до запуска.
+- 2026-11-09 12:20 МСК (чекпойнт, CPU/TPU-исследование нового кода fe0a4d2): датасет team048-tpu-cpu-inputs обновлён (sol_src = HEAD fe0a4d2). Харнес /workspace/fixes/kaggle-tpu/study/study_core.py (режимы reach/grasp/tubes, раскладки = порт генератора организаторов objects.py::_sample_once, наклонный стол v7, стенки лотков, yaw-укладка как в node.py; чекпойнт results.jsonl построчно). Лимит Kaggle: 5 параллельных CPU-сессий ("Maximum batch CPU session count of 5"). На Kaggle: grasp-шарды g3d-0..2 (посуда, 19 вариантов хвата), g6-0..3 (пул 6) — launcher.sh пушит по мере освобождения слотов. На box (8 ядер): reach p3 sort3/p6 sort2/p3 sort2 по 100 раскладок + tubes (run_local.sh). TPU: исследование — у Kaggle 1 TPU-сессия, TpuV5E1/V5E4/V6E1 молча переписываются в TpuV5E8, V6E8/v3-8 тоже в очереди; очереди 11–24 ч (октябрь 2026). Пробу не перепушиваю (сброс места в очереди). Сим v8 (GPU) в статусе QUEUED, не трогал. Квота: GPU 25.76/30 (ост. 4.24), TPU 0/20.
+- Находка smoke-теста: Razer Taipan White (мин. ширина 10.0 см) и 009_gelatin_box (8.9 см) не имеют НИ ОДНОГО кандидата хвата: W_MAX = раскрытие 10.5 см − 1 см, side требует w+2 см ≤ W_MAX → 2 из 6 объектов пула 6 недоступны при текущем хвате.
+
+## 2026-11-09 12:21 МСК — Rust-ускорение (ветка rust-accel, локально)
+- Профиль (cProfile, py3.10/numpy 1.21.5 как в Humble): планирование ~10 с/объект; CollisionModel.valid/certify ≈64%, Chain.ik ≈35% (FK/rotation/Jacobian), восприятие 0.3 с/кадр (table_plane 0.16, segment 0.12).
+- Крейт rust/team048_accel (PyO3 0.30 abi3-py310, nalgebra, rayon): FK/Якобиан/DLS-ИК (SVD Якоби), точная broad-phase сфер + certify (coarse-to-fine, rayon), подсчёт инлайеров RANSAC, flood fill. Python-эталон сохранён (*_py), фолбэк автоматический.
+- Полный цикл (6 кадров + 10 объектов): 103 с → 2.8 с; результаты бит-в-бит совпадают с master. 61/61 тест (4 с вместо 36 с).
+- 2026-11-09 12:35 МСК: локальный коммит fc25772 (без push): plan_place_yaw не ищет укладку без поворота в «дальний» лоток (0/450 Kaggle reach-p3/p6 + 103/103 r3s3 нового кода — дальний лоток только с yaw); экономия ~1.7 с wall планирования на такую укладку (бенчмарк 4 случая). Тесты 63 passed (+8 skipped — test_accel_equivalence, team048_accel не установлен; этот файл и rust/ — работа другого агента, коммит 7cbde79, я их не трогал). v7 фазы (sim s): plan 12.0 ср/19.0 p90, pick 17.0/24.7, place 13.8/16.4. Сетка: mesh pad_gap_open=7.8 см (а не 10.5 по FK-оценке) → Razer мышь (10 см) и gelatin (8.9) физически не берутся щипком.
+
+## 2026-11-09 12:50 МСК — Rust-ускорение завершено (master fast-forward до rust-accel, только локально, remote нет)
+- Планирование: около 10 с → около 0.06 с на объект (≈170×); полный цикл (6 кадров + 10 объектов): 103 с → около 1.2 с; reach3, 12 раскладок: 161 с → 1.1 с. Результаты совпадают с эталоном.
+- Rust: FK/якобиан/ИК (SVD Якоби), valid/certify (точная сеточная broad-phase), подсчёт инлайеров RANSAC, flood fill. NumPy: trays.locate 1.7×, мемоизация сфер сцены. Остальное оставлено (таблица в fixes/rust/RUST_ACCEL_RU.md).
+- Развёртывание: vendor/ manylinux2014 abi3 wheel (glibc 2.14, без AVX) + setup.sh (wheel → сборка rustup/maturin → NumPy), COLCON_IGNORE.
+- Тесты: 72/72 (61 старых + 3 от параллельного работника + 8 эквивалентности); с TEAM048_ACCEL=0 проходят 64, 8 пропущены. Rust: 10 proptest. Отчёт: fixes/rust/RUST_ACCEL_RU.md.
+
+## 2026-11-09 12:57 МСК — CPU/TPU v2 recovery (executor)
+- Восстановлено: local reach COMPLETE (r3s3 899/899, r3s2 600/600, r6s2 600/600), tubes COMPLETE (3/3), budget MC уже в fixes/budget/mc_*.txt.
+- Kaggle: g3d-0..2 + g6-0..1 RUNNING (5 CPU-слотов); g6-2/3/g3b/r6x ещё не запушены; TPU probe QUEUED (TpuV5E8); GPU v8 QUEUED (не трогаю).
+- Reach+yaw (локально, код с body_yaw, 100 раскладок):
+  - pool3 sort3: dish ok=0.880, jar=0.873, box=0.639; mean 7.17/9 объектов; place_both через yaw (yaw доля 0.45–0.57 у dish/box).
+  - pool3 sort2: dish 0.960, box 0.880; mean 5.52/6.
+  - pool6 sort2: electronics 0.597, box 0.577; Razer и gelatin 0.0 (no_cand — ширина > pad_gap); mean 3.52/6.
+- Tubes: все table_slot и hood_slot достижимы L и R (side_hi/top_cap; hood yaw≈1.57).
+- Budget MC (100 раскладок, 24 Гц / RTF≈0.23 фазы из v7): P3 (EV/time + infeasible cache) лучше P0; при mid plan×1 pool3s3 E≈32.7, pool6s2 E≈19.0.
+- Grasp: smoke с team048_accel (venv310) 6 jobs/114 rows за 2.6 с; полный локальный прогон g3d/g6/g3b (+x до 100) ЗАПУЩЕН.
+- sol_src синхронизирован с master (bc4414c + accel). Reach/tubes шарды помечены done в state/, чтобы launcher не жрал слоты.
+- Alt-TPU: прошлый вывод подтверждён (1 слот, мелкие типы → V5E8); новый push НЕ делаю, пока probe в очереди (не сбрасывать место).
+
+## 2026-11-09 13:14 МСК — CPU/TPU v2 завершён (локально + Rust accel)
+### 1. Досягаемость + body_yaw (100 раскладок, master 76aea22)
+| сценарий | до (fe0a4d2 side/rim) | после (multi-rim + top) |
+|---|---|---|
+| pool3 sort3 dish/jar/box | 0.880 / 0.873 / 0.639 | **1.000 / 0.873 / 0.916** |
+| mean feasible / layout (max 9) | 7.17 (score≤72) | **8.36 (score≤84)** |
+| pool3 sort2 dish/box | 0.960 / 0.880 | **1.000 / 0.957** (mean 5.87/6) |
+| pool6 sort2 elec/box | 0.597 / 0.577 | 0.627 / 0.653 (mean 3.84/6) |
+| Razer / gelatin | 0 / 0 | **0 / 0** (Razer шире pad_gap 7.8 см и W_MAX; gelatin topdown_wide 0.84 был на старом sol_src, на master не воспроизводится) |
+Yaw доля у успешных: dish/box ~0.23–0.36; place_both через yaw работает.
+
+### 2. Поиск хватов (local-g3dx/g3bx/g6x, 19/16 вариантов)
+- dish: base 0.880; UNION rim_ang → **1.000** (Ecoforms 0.69→1.00). Внедрено: RIM_ANGLE_DEG 0±30±60±90.
+- pool3 box: topdown_pinch 0.913 (+104). Внедрено: kind=top (pinch) если ось ≤ W_MAX.
+- pool6 box: topdown_wide 0.947 на старом коде; на master gelatin IK не проходит — не опираемся.
+- electronics: union 0.667; Razer 0 везде.
+
+### 3. Бюджет / порядок (episode_mc, фазы v7, 100 раскладок)
+- sort3 405 с / sort2 270 с. P0=confidence; P1=1.7×pick+p90 place; P2=EV/time; P3=P2+infeas cache; P4=P1+cache.
+- pool3 sort3 mid plan×1: P0 E=31.4 → **P3 E=32.7** (ok 4.15, bad 0.88, timeout-in-hand 0).
+- pool6 sort2 mid: P0≈19.3, политики близки; EV не даёт выигрыша (мало классов).
+- Уже в коде (6168c3e): infeasible cache. PLACE_TAIL=12 с / FIRST_CYCLE=35 с. EV-порядок **не коммитил** (выигрыш мал на pool6; на pool3 +1.3 при mid).
+
+### 4. Tubes
+Все table_slot и hood_slot достижимы L и R (side_hi/top_cap; hood yaw≈1.57). 3/3 job, 26+17 слотов.
+
+### 5. TPU alternate
+probe всё ещё QUEUED (TpuV5E8, слот 1/1, ~6+ ч). Alt-типы TpuV5E1/V5E4/V6E1 молча → V5E8; V6E8/v3-8 отдельные пулы тоже в очереди 11–24 ч (окт 2026 + форум). Новый push НЕ делал (сброс очереди). Квота TPU 0/20 ч.
+
+### Прочее
+- Kaggle CPU: g3d-0..2, g6-0..1 всё ещё RUNNING (без accel, медленно); локально уже есть полные результаты. GPU v8 QUEUED — не трогал.
+- Коммит локально **76aea22** (remote нет, push нет). Тесты **75/75**.
+- Артефакты: fixes/kaggle-tpu/study/out/local-{r3s3,r3s2,r6s2,r*-v2,r6s2-v3,g3d*,g3b*,g6*,tubes}/; ANALYZE.txt; budget/mc_*_v2.txt.
+- 2026-11-09 13:43 MSK — комплаенс-аудит (#645/#648/#625 + все ответы оргов) начат: worktree /workspace/solution/wt-compliance, ветка compliance от 76aea22; базовые тесты 75/75 (Rust, venv310), 67+8 skip без Rust.
+
+## 2026-11-09 13:47 MSK — Rust, фаза 2 (ветка rust-accel2, локально)
+- Профиль master 76aea22 (cycle2.py, 6 кадров v7 + 10 объектов): восприятие 67 мс/кадр (trays.locate ×3 19 мс, table_plane 17, segment 10, deproject 7, маски 4, identify 5); планирование 0.75 с, из них ≈0.35 с — Python-обвязка вокруг IK (проверки check_transform/validate_q на каждый seed).
+- Перенесено на Rust: поток ГСЧ NumPy PCG64 + choice (бит-в-бит, 520 случаев), RANSAC-кандидаты, депроекция, выбор пикселей лотка, маска+заливка+статистики сегментов, caliper-развёртка footprint, клиренс пальцев, Arm.solve одним вызовом, кэш сцен + FastEnv.
+- Промежуточно: восприятие 30 мс/кадр, планирование 0.57 с; отпечатки (perception+planning) совпадают с master точно в режимах Rust и NumPy.
+- 2026-11-09 14:10 MSK — коммит 06ff3f8 (ветка compliance): сцена камерами (#645), хват (#648), политика дедлайна (#595), /robot_description, другая рука + сертифицированный путь домой (#625). Тесты: 86+8skip без Rust, 94/94 с Rust.
+- 2026-11-09 14:16 MSK — документация: docs/{ARCHITECTURE,COMPLIANCE,PARAMETERS,ORG_ANSWERS,PREPUSH_CHECKLIST}.md, README; /workspace/fixes/COMPLIANCE_RU.md и ORG_ANSWERS_RU.md. Коммиты 06ff3f8, 2c0c0b8, a400955, 4cb594b на ветке compliance (от 76aea22). master НЕ перемотан: его держит рабочая копия /tmp/wt_master (другой исполнитель). Нужен локальный merge compliance + rust-accel2 в master. Remote нет, push не было.
+
+## 2026-11-09 14:40 MSK — разбор v8 (sort3 s103 = 10 очков)
+- Остановка на 174,8 с: харнесс `timeout 840` (rc=124, RTF 0,21), а не EMPTY_OBS_MAX, не бюджет и не падение. sort2 s101 пропущен из-за общего дедлайна ядра 50 мин (setup 12 мин + запуск Isaac 22 мин).
+- 5 попыток, 1 успех (Perricone). В 4 из 5 пальцы задели объект на подходе; Utana и горчица выскользнули при подъёме (сила 1,0). Около 69 с sim ушло на планирование (до Rust).
+- Пороги compliance на v7+v8 (15 пар): EMPTY_CONTACT_MAX 0,10 не противоречит. У CLOSE_PAST/contact_target есть баг t2 > 1 (7/15). past_verdict бросил бы 2 из 4 удержаний, в том числе Perricone v8. Правило «отклонение ≥ 0,10 и eff ≥ 0,9» даёт 15/15.
+- Отчёт: fixes/V8_ANALYSIS_RU.md, проверка: fixes/diag/v8_threshold_check.txt. Kaggle и git не трогал. GPU 3,43 ч.
+
+## 2026-11-09 14:52 MSK — исправления v8 (ветка v8fixes от compliance 4cb594b, worktree /workspace/solution/wt-v8fixes)
+- 959edcf grip: правило удержания (откл. ≥ 0,10 и eff ≥ 0,9), заклиненные пальцы, t2 ≤ 1, отклонение на подходе, остановка пальцев по положению; past_verdict только в лог. Фикстура v7v8_grasp_traces.json (16 попыток).
+- d5eef56 node: решение по новому правилу (старые критерии в лог), охраняемый подход (стоп, без закрытия, повторное наблюдение), лог кисти 10 Гц, повторное наблюдение после контакта, «no plan» с причиной, источники лотков, accel on/off.
+- Охрана только сжимающих пальцев: с охраной всех пальцев по данным v7 прерывались бы оба удачных хвата Ecoforms (безымянный 1,14/1,17). Со сжимающими: 0 из 4 удержаний, 11 из 12 неудач.
+- Тесты: 115/115 с Rust, 107 + 8 skip без Rust (было 96 / 88+8).
+- Kaggle: v9/run_sort.sh (одна задача, RUNTO 2400/1600, ожидание Isaac до 30 мин, wheel через setup.sh), v9/make_v9.py A|B (только из ref, содержащего все три ветки), v9/CHECKLIST_RU.md. Ничего не отправлено, git push нет.
+
+## 2026-11-09 14:52 MSK — Rust фаза 2 + слияние в master (локально)
+- Коммиты: 68d6b61 (rust-accel2, фаза 2), fadcc69 (merge compliance: сцена камерами сохранена; trays.detect на Rust), d96da87 (merge v8fixes). master перемотан fast-forward на d96da87; /tmp/wt_master удалён, worktree prune. Remote нет, push не было.
+- Тесты на master: с Rust 129/129, без Rust 107 + 22 skip (тесты эквивалентности). До v8fixes: 110/110 на numpy 1.21.5, 1.26.4 и 2.5.1 (py3.13).
+- Вендорный wheel 0.2.0, SHA256 cae734f9…a010, sha256sum --strict OK.
+- Восприятие 146.7 → 47.9 мс/кадр, планирование 10 объектов 0.672 → 0.374 с; отпечатки compliance±Rust и слияния±Rust совпадают (md5 46b2ff62…).
+- make_v9.py A/B --ref master: missing [] (kA, kB собраны локально, на Kaggle не отправлялись).
+
+## 2026-11-09 18:05 MSK — v9a (0 очков) разобран, v9fix влит в master, v9b-таймаут исправлен
+- **Причина 0 в v9a.** `go_home` выполнялся до обзора; путь не сертифицирован (`WARNING uncertified path home l/r` ×4). Прямой путь q=0 → home проходил сквозь кромку стола:
+  - |F| 258 и 938 Н на старте;
+  - ошибки pre 0,449, 0,218 и 0,092 м.
+- **Дополнительно:**
+  - контакт руки с торсом при pre (581 Н, 1,3–7,8 мм до меша);
+  - ложная охрана подхода (dev 0,103 и 0,105);
+  - ранний выход в 124,1 с.
+- Подробно: V9_ANALYSIS_RU.md.
+- **Коммиты v9fix:** ca04463, 16c8e9a, 25aec89.
+  - Тесты: с Rust 142/142; без Rust 120 + 22 skip.
+  - master перемотан fast-forward d96da87 → **25aec89**.
+- **Охват** (100 раскладок): 8,31 → 7,33 объекта на раскладку, это цена торса. Стол не влияет.
+- **Бюджет:**
+  - setup cap 1500 → 2400 с (B: isaac pip почти 1500 с, A: 648 с);
+  - SIMBOOT 1500;
+  - RUNTO A 2000, B 1400;
+  - сессия 100 мин.
+- kA, kB собраны из master 25aec89: `missing []`. НЕ отправлены. push нет, remote нет.
+
+## 2026-11-09 18:30 MSK — аудит физики хвата и бюджета (ветка audit), master → bb5060b
+- kA (v9a, версия 2, master 25aec89) отправлен родителем в 18:07 MSK. В 18:14 MSK стоял в очереди (QUEUED). Квота GPU: осталось 2.38 ч, сброс 14.11 03:00 MSK.
+- Коммиты ветки audit:
+  - a48f235 — place_time с учётом самого подъёма и измеренной доводки 2.6 с на движение (v8 Perricone: старая модель 6.6 с против 12.0 с); сначала лёгкие объекты (≥ 0.22 кг удержано 0 из 6 в v7+v8); массы из objects.yaml в priors;
+  - bb5060b — тесты и фикстура v8_perricone_place.json.
+- Тесты:
+  - с Rust: 147/147;
+  - без Rust: 125 passed + 22 skip.
+- master перемотан fast-forward: 25aec89 → bb5060b. push нет, remote нет.
+- Аудит (V9_ANALYSIS_RU.md, раздел 8):
+  - трение не ограничивает (нужно μ ≈ 0.03);
+  - момент бортика Utana 0.23 Н·м против ≤ 0.11 Н·м у удержанных;
+  - боковые хваты на высоте центра масс (z/h 0.50);
+  - ускорение подъёма 0.6 % g;
+  - бёдра: минимум ровно в стартовой позе, дальше путь только удаляется от бедра.
+- Пакеты B из master bb5060b, в обоих `missing []`, не отправлены:
+
+| пакет | сессия | setup cap |
+|---|---|---|
+| kB_s75 | 75 мин | 2100 с |
+| kB_s55 | 55 мин | 1200 с |
+
+  - Старый kB (25aec89, 100 мин) устарел, его не использовать.
+  - Отличие кода B от A: diff 25aec89..bb5060b (node.py +24/−7, priors.json, тесты).
+
+- 2026-11-10 01:20 МСК: v10, CPU-улучшения без GPU (локальные ветки, master перемотан fast-forward, push нет).
+  - P1 тяжёлые хваты (≥ 0.22 кг удержано 0/6). Причина по логам v7/v8: в 5 из 6 попыток кисть касалась объекта ещё ДО закрытия (|F| запястья в позе хвата 15.5–18.2 Н у mustard/Crayola/Crunch, пальцы заклинены 1.26–1.6 у Crunch/mustard/Perricone; Hyaluronic — ошибка TCP 1.5–4.4 см). По мешам UBTECH: подушечки y ≥ +0.028, большой палец y ≤ −0.046 (зазор несимметричен), проксимальные фаланги и ладонь выступают внутрь. Фикс 750de79: облако точек открытой кисти (data/hand_open_points.json, из мешей), grasp_clear_shift — минимальный сдвиг/отвод центра хвата, чтобы открытая кисть не пересекала измеренный бокс объекта в позе хвата и на подходе, а подушечки проецировались на объект. Исследование 100 раскладок пул 3 sort3: пересечение открытой кисти с объектом в side/top планах 235/433 → 17/448, reach 7.33 → 7.48 объекта на раскладку, +0.14 с планирования на объект. Сила кисти не менялась (0.3–0.5, #648): трение не ограничивает.
+  - Replay реальных стартовых кадров v7 s102 (diag/v10_replay_v7.py): Crunch — было NO PLAN, стало боковой хват с отводом 4.5 см; остальные объекты без изменений (Perricone/Hyaluronic без плана в обоих вариантах — нет допустимых кандидатов/частичный вид).
+  - P3 бюджет (#595) 9fa5441: перед подъёмом требуется remaining ≥ max(need+8, худшее время удержания + 1 с); худшее время = подъём+перенос+укладка с паддингами + доводка + поворот корпуса + ожидания отпускания. v8 Perricone при yaw 1.1: старое правило пропускало подъём с риском ~1.5 с; закрыто.
+  - P4 f525ed9: tray_env_build — лоток без измеренной высоты больше не наследует высоту предыдущего лотка (в продовом пути _tray_entry нормализует заранее, так что эффект был только при прямом вызове) + регрессионный тест.
+  - P2 торс НЕ менялся. USD организаторов: у body_yaw_link (торс) collisionEnabled=False, self-collisions выключены → 581 Н в v9a скорее всего дрожание convex-hull звеньев руки при HACK_SELF_COLLISION=1, а не торс. Но правило #625 (визуальная траектория) остаётся: по всем планам минимальная дистанция мешей рука↔торс сейчас 1.9 мм (39/748 планов < 10 мм), при сжатии на 10 мм — 0.7 мм (58/759 < 10 мм) при выигрыше всего +0.11 объекта/раскладку.
+  - Тесты: Rust 162 passed; без Rust 140 passed + 22 skip (до f525ed9; после — см. итог).

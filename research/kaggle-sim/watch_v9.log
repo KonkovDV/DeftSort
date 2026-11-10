@@ -1,0 +1,461 @@
+14:53:47 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.RUNNING"
+14:53:49 v9b dmitrijkv/team048-sim-v9b has status "KernelWorkerStatus.RUNNING"
+14:56:00 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.RUNNING"
+14:56:02 v9b dmitrijkv/team048-sim-v9b has status "KernelWorkerStatus.RUNNING"
+15:05:10 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.RUNNING"
+15:05:12 v9b dmitrijkv/team048-sim-v9b has status "KernelWorkerStatus.RUNNING"
+15:28:58 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.RUNNING"
+15:31:00 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.RUNNING"
+15:33:01 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.COMPLETE"
+Downloading cam_head_color.npy to out_v9a/frames_end/sort3_103_end
+  0%|          | 0.00/675k [00:00<?, ?B/s]100%|██████████| 675k/675k [00:00<00:00, 1.27MB/s]100%|██████████| 675k/675k [00:00<00:00, 1.27MB/s]
+
+Output file downloaded to out_v9a/frames_end/sort3_103_end/cam_head_color.npy
+Downloading cam_head_depth.npy to out_v9a/frames_end/sort3_103_end
+  0%|          | 0.00/450k [00:00<?, ?B/s]100%|██████████| 450k/450k [00:00<00:00, 1.05MB/s]100%|██████████| 450k/450k [00:00<00:00, 1.05MB/s]
+
+Output file downloaded to out_v9a/frames_end/sort3_103_end/cam_head_depth.npy
+Downloading cam_torso_color.npy to out_v9a/frames_end/sort3_103_end
+  0%|          | 0.00/675k [00:00<?, ?B/s]100%|██████████| 675k/675k [00:00<00:00, 1.47MB/s]100%|██████████| 675k/675k [00:00<00:00, 1.47MB/s]
+
+Output file downloaded to out_v9a/frames_end/sort3_103_end/cam_torso_color.npy
+Downloading cam_torso_depth.npy to out_v9a/frames_end/sort3_103_end
+  0%|          | 0.00/450k [00:00<?, ?B/s]100%|██████████| 450k/450k [00:00<00:00, 900kB/s]100%|██████████| 450k/450k [00:00<00:00, 899kB/s]
+
+Output file downloaded to out_v9a/frames_end/sort3_103_end/cam_torso_depth.npy
+Downloading frames.json to out_v9a/frames_end/sort3_103_end
+  0%|          | 0.00/410 [00:00<?, ?B/s]100%|██████████| 410/410 [00:00<00:00, 1.76MB/s]
+
+Output file downloaded to out_v9a/frames_end/sort3_103_end/frames.json
+Downloading cam_head_color.npy to out_v9a/frames_end/sort3_103_start
+  0%|          | 0.00/675k [00:00<?, ?B/s]100%|██████████| 675k/675k [00:00<00:00, 1.16MB/s]100%|██████████| 675k/675k [00:00<00:00, 1.16MB/s]
+
+Output file downloaded to out_v9a/frames_end/sort3_103_start/cam_head_color.npy
+Downloading cam_head_depth.npy to out_v9a/frames_end/sort3_103_start
+  0%|          | 0.00/450k [00:00<?, ?B/s]100%|██████████| 450k/450k [00:00<00:00, 1.36MB/s]100%|██████████| 450k/450k [00:00<00:00, 1.36MB/s]
+
+Output file downloaded to out_v9a/frames_end/sort3_103_start/cam_head_depth.npy
+Downloading cam_torso_color.npy to out_v9a/frames_end/sort3_103_start
+  0%|          | 0.00/675k [00:00<?, ?B/s]100%|██████████| 675k/675k [00:00<00:00, 1.11MB/s]100%|██████████| 675k/675k [00:00<00:00, 1.11MB/s]
+
+Output file downloaded to out_v9a/frames_end/sort3_103_start/cam_torso_color.npy
+Downloading cam_torso_depth.npy to out_v9a/frames_end/sort3_103_start
+  0%|          | 0.00/450k [00:00<?, ?B/s]100%|██████████| 450k/450k [00:00<00:00, 984kB/s]100%|██████████| 450k/450k [00:00<00:00, 983kB/s]
+
+Output file downloaded to out_v9a/frames_end/sort3_103_start/cam_torso_depth.npy
+Downloading frames.json to out_v9a/frames_end/sort3_103_start
+  0%|          | 0.00/430 [00:00<?, ?B/s]100%|██████████| 430/430 [00:00<00:00, 3.23MB/s]
+
+Output file downloaded to out_v9a/frames_end/sort3_103_start/frames.json
+Downloading grab_frames.py to out_v9a
+  0%|          | 0.00/1.04k [00:00<?, ?B/s]100%|██████████| 1.04k/1.04k [00:00<00:00, 5.28MB/s]
+
+Output file downloaded to out_v9a/grab_frames.py
+Downloading accel_setup.log to out_v9a/logs
+  0%|          | 0.00/175 [00:00<?, ?B/s]100%|██████████| 175/175 [00:00<00:00, 1.20MB/s]
+
+Output file downloaded to out_v9a/logs/accel_setup.log
+Downloading apt.log to out_v9a/logs
+  0%|          | 0.00/2.00k [00:00<?, ?B/s]100%|██████████| 2.00k/2.00k [00:00<00:00, 10.2MB/s]
+
+Output file downloaded to out_v9a/logs/apt.log
+Downloading bodyctrl_build.log to out_v9a/logs
+  0%|          | 0.00/2.32k [00:00<?, ?B/s]100%|██████████| 2.32k/2.32k [00:00<00:00, 11.4MB/s]
+
+Output file downloaded to out_v9a/logs/bodyctrl_build.log
+Downloading bridge_sort3.log to out_v9a/logs
+  0%|          | 0.00/75.7k [00:00<?, ?B/s]100%|██████████| 75.7k/75.7k [00:00<00:00, 455kB/s]100%|██████████| 75.7k/75.7k [00:00<00:00, 455kB/s]
+
+Output file downloaded to out_v9a/logs/bridge_sort3.log
+Downloading gpu.txt to out_v9a/logs
+  0%|          | 0.00/82.0 [00:00<?, ?B/s]100%|██████████| 82.0/82.0 [00:00<00:00, 497kB/s]
+
+Output file downloaded to out_v9a/logs/gpu.txt
+Downloading isaac_env.log to out_v9a/logs
+  0%|          | 0.00/554 [00:00<?, ?B/s]100%|██████████| 554/554 [00:00<00:00, 4.21MB/s]
+
+Output file downloaded to out_v9a/logs/isaac_env.log
+Downloading nssr_pkg.log to out_v9a/logs
+  0%|          | 0.00/12.0 [00:00<?, ?B/s]100%|██████████| 12.0/12.0 [00:00<00:00, 79.5kB/s]
+
+Output file downloaded to out_v9a/logs/nssr_pkg.log
+Downloading ros_env.log to out_v9a/logs
+  0%|          | 0.00/13.0 [00:00<?, ?B/s]100%|██████████| 13.0/13.0 [00:00<00:00, 86.5kB/s]
+
+Output file downloaded to out_v9a/logs/ros_env.log
+Downloading run_sort3_103.log to out_v9a/logs
+  0%|          | 0.00/58.7k [00:00<?, ?B/s]100%|██████████| 58.7k/58.7k [00:00<00:00, 1.20MB/s]
+
+Output file downloaded to out_v9a/logs/run_sort3_103.log
+Downloading run_sort_trace.log to out_v9a/logs
+  0%|          | 0.00/18.1k [00:00<?, ?B/s]100%|██████████| 18.1k/18.1k [00:00<00:00, 983kB/s]
+
+Output file downloaded to out_v9a/logs/run_sort_trace.log
+Downloading score_err.log to out_v9a/logs
+  0%|          | 0.00/39.4k [00:00<?, ?B/s]100%|██████████| 39.4k/39.4k [00:00<00:00, 682kB/s]
+
+Output file downloaded to out_v9a/logs/score_err.log
+Downloading sim_sort3.log to out_v9a/logs
+  0%|          | 0.00/34.3k [00:00<?, ?B/s]100%|██████████| 34.3k/34.3k [00:00<00:00, 675kB/s]
+
+Output file downloaded to out_v9a/logs/sim_sort3.log
+Downloading sim_task_sort3.txt to out_v9a/logs
+  0%|          | 0.00/39.6k [00:00<?, ?B/s]100%|██████████| 39.6k/39.6k [00:00<00:00, 735kB/s]
+
+Output file downloaded to out_v9a/logs/sim_task_sort3.txt
+Downloading sol_build.log to out_v9a/logs
+  0%|          | 0.00/25.8k [00:00<?, ?B/s]100%|██████████| 25.8k/25.8k [00:00<00:00, 2.00MB/s]
+
+Output file downloaded to out_v9a/logs/sol_build.log
+Downloading t0_sort3_103.txt to out_v9a/logs
+  0%|          | 0.00/39.4k [00:00<?, ?B/s]100%|██████████| 39.4k/39.4k [00:00<00:00, 611kB/s]
+
+Output file downloaded to out_v9a/logs/t0_sort3_103.txt
+Downloading progress.log to out_v9a
+  0%|          | 0.00/18.7k [00:00<?, ?B/s]100%|██████████| 18.7k/18.7k [00:00<00:00, 1.23MB/s]
+
+Output file downloaded to out_v9a/progress.log
+Downloading results.jsonl to out_v9a
+  0%|          | 0.00/745 [00:00<?, ?B/s]100%|██████████| 745/745 [00:00<00:00, 4.00MB/s]
+
+Output file downloaded to out_v9a/results.jsonl
+Downloading run_sort.sh to out_v9a
+  0%|          | 0.00/5.12k [00:00<?, ?B/s]100%|██████████| 5.12k/5.12k [00:00<00:00, 22.8MB/s]
+
+Output file downloaded to out_v9a/run_sort.sh
+Downloading score.py to out_v9a
+  0%|          | 0.00/1.02k [00:00<?, ?B/s]100%|██████████| 1.02k/1.02k [00:00<00:00, 4.84MB/s]
+
+Output file downloaded to out_v9a/score.py
+Downloading setup.log to out_v9a
+  0%|          | 0.00/44.6k [00:00<?, ?B/s]100%|██████████| 44.6k/44.6k [00:00<00:00, 1.43MB/s]
+
+Output file downloaded to out_v9a/setup.log
+Downloading setup_env.sh to out_v9a
+  0%|          | 0.00/5.55k [00:00<?, ?B/s]100%|██████████| 5.55k/5.55k [00:00<00:00, 26.4MB/s]
+
+Output file downloaded to out_v9a/setup_env.sh
+Downloading .gitignore to out_v9a/solution
+  0%|          | 0.00/123 [00:00<?, ?B/s]100%|██████████| 123/123 [00:00<00:00, 782kB/s]
+
+Output file downloaded to out_v9a/solution/.gitignore
+Downloading README.md to out_v9a/solution
+  0%|          | 0.00/11.5k [00:00<?, ?B/s]100%|██████████| 11.5k/11.5k [00:00<00:00, 3.55MB/s]
+
+Output file downloaded to out_v9a/solution/README.md
+Downloading ARCHITECTURE.md to out_v9a/solution/docs
+  0%|          | 0.00/4.92k [00:00<?, ?B/s]100%|██████████| 4.92k/4.92k [00:00<00:00, 3.08MB/s]
+
+Output file downloaded to out_v9a/solution/docs/ARCHITECTURE.md
+Downloading COMPLIANCE.md to out_v9a/solution/docs
+  0%|          | 0.00/17.1k [00:00<?, ?B/s]100%|██████████| 17.1k/17.1k [00:00<00:00, 1.06MB/s]
+
+Output file downloaded to out_v9a/solution/docs/COMPLIANCE.md
+Downloading ORG_ANSWERS.md to out_v9a/solution/docs
+  0%|          | 0.00/10.3k [00:00<?, ?B/s]100%|██████████| 10.3k/10.3k [00:00<00:00, 2.77MB/s]
+
+Output file downloaded to out_v9a/solution/docs/ORG_ANSWERS.md
+Downloading PARAMETERS.md to out_v9a/solution/docs
+  0%|          | 0.00/4.99k [00:00<?, ?B/s]100%|██████████| 4.99k/4.99k [00:00<00:00, 20.4MB/s]
+
+Output file downloaded to out_v9a/solution/docs/PARAMETERS.md
+Downloading PREPUSH_CHECKLIST.md to out_v9a/solution/docs
+  0%|          | 0.00/2.38k [00:00<?, ?B/s]100%|██████████| 2.38k/2.38k [00:00<00:00, 12.3MB/s]
+
+Output file downloaded to out_v9a/solution/docs/PREPUSH_CHECKLIST.md
+Downloading requirements.txt to out_v9a/solution
+  0%|          | 0.00/14.0 [00:00<?, ?B/s]100%|██████████| 14.0/14.0 [00:00<00:00, 81.6kB/s]
+
+Output file downloaded to out_v9a/solution/requirements.txt
+Downloading run.sh to out_v9a/solution
+  0%|          | 0.00/184 [00:00<?, ?B/s]100%|██████████| 184/184 [00:00<00:00, 1.28MB/s]
+
+Output file downloaded to out_v9a/solution/run.sh
+Downloading COLCON_IGNORE to out_v9a/solution/rust
+0.00B [00:00, ?B/s]0.00B [00:00, ?B/s]
+
+Output file downloaded to out_v9a/solution/rust/COLCON_IGNORE
+Downloading Cargo.lock to out_v9a/solution/rust/team048_accel
+  0%|          | 0.00/27.4k [00:00<?, ?B/s]100%|██████████| 27.4k/27.4k [00:00<00:00, 1.25MB/s]
+
+Output file downloaded to out_v9a/solution/rust/team048_accel/Cargo.lock
+Downloading Cargo.toml to out_v9a/solution/rust/team048_accel
+  0%|          | 0.00/1.21k [00:00<?, ?B/s]100%|██████████| 1.21k/1.21k [00:00<00:00, 6.15MB/s]
+
+Output file downloaded to out_v9a/solution/rust/team048_accel/Cargo.toml
+Downloading export_model.py to out_v9a/solution/rust/team048_accel/benches
+  0%|          | 0.00/2.54k [00:00<?, ?B/s]100%|██████████| 2.54k/2.54k [00:00<00:00, 12.5MB/s]
+
+Output file downloaded to out_v9a/solution/rust/team048_accel/benches/export_model.py
+Downloading kernels.rs to out_v9a/solution/rust/team048_accel/benches
+  0%|          | 0.00/5.88k [00:00<?, ?B/s]100%|██████████| 5.88k/5.88k [00:00<00:00, 5.22MB/s]
+
+Output file downloaded to out_v9a/solution/rust/team048_accel/benches/kernels.rs
+Downloading grasp.txt to out_v9a/solution/rust/team048_accel/proptest-regressions
+  0%|          | 0.00/410 [00:00<?, ?B/s]100%|██████████| 410/410 [00:00<00:00, 2.36MB/s]
+
+Output file downloaded to out_v9a/solution/rust/team048_accel/proptest-regressions/grasp.txt
+Downloading kin.txt to out_v9a/solution/rust/team048_accel/proptest-regressions
+  0%|          | 0.00/506 [00:00<?, ?B/s]100%|██████████| 506/506 [00:00<00:00, 3.41MB/s]
+
+Output file downloaded to out_v9a/solution/rust/team048_accel/proptest-regressions/kin.txt
+Downloading pyproject.toml to out_v9a/solution/rust/team048_accel
+  0%|          | 0.00/257 [00:00<?, ?B/s]100%|██████████| 257/257 [00:00<00:00, 1.59MB/s]
+
+Output file downloaded to out_v9a/solution/rust/team048_accel/pyproject.toml
+Downloading col.rs to out_v9a/solution/rust/team048_accel/src
+  0%|          | 0.00/26.9k [00:00<?, ?B/s]100%|██████████| 26.9k/26.9k [00:00<00:00, 1.66MB/s]
+
+Output file downloaded to out_v9a/solution/rust/team048_accel/src/col.rs
+Downloading grasp.rs to out_v9a/solution/rust/team048_accel/src
+  0%|          | 0.00/5.25k [00:00<?, ?B/s]100%|██████████| 5.25k/5.25k [00:00<00:00, 22.2MB/s]
+
+Output file downloaded to out_v9a/solution/rust/team048_accel/src/grasp.rs
+Downloading kin.rs to out_v9a/solution/rust/team048_accel/src
+  0%|          | 0.00/18.4k [00:00<?, ?B/s]100%|██████████| 18.4k/18.4k [00:00<00:00, 1.97MB/s]
+
+Output file downloaded to out_v9a/solution/rust/team048_accel/src/kin.rs
+Downloading lib.rs to out_v9a/solution/rust/team048_accel/src
+  0%|          | 0.00/416 [00:00<?, ?B/s]100%|██████████| 416/416 [00:00<00:00, 2.61MB/s]
+
+Output file downloaded to out_v9a/solution/rust/team048_accel/src/lib.rs
+Downloading perc.rs to out_v9a/solution/rust/team048_accel/src
+  0%|          | 0.00/19.9k [00:00<?, ?B/s]100%|██████████| 19.9k/19.9k [00:00<00:00, 870kB/s]
+
+Output file downloaded to out_v9a/solution/rust/team048_accel/src/perc.rs
+Downloading py.rs to out_v9a/solution/rust/team048_accel/src
+  0%|          | 0.00/25.9k [00:00<?, ?B/s]100%|██████████| 25.9k/25.9k [00:00<00:00, 742kB/s]
+
+Output file downloaded to out_v9a/solution/rust/team048_accel/src/py.rs
+Downloading rng.rs to out_v9a/solution/rust/team048_accel/src
+  0%|          | 0.00/5.50k [00:00<?, ?B/s]100%|██████████| 5.50k/5.50k [00:00<00:00, 3.33MB/s]
+
+Output file downloaded to out_v9a/solution/rust/team048_accel/src/rng.rs
+Downloading setup.sh to out_v9a/solution
+  0%|          | 0.00/2.73k [00:00<?, ?B/s]100%|██████████| 2.73k/2.73k [00:00<00:00, 12.8MB/s]
+
+Output file downloaded to out_v9a/solution/setup.sh
+Downloading package.xml to out_v9a/solution/src/team048_solution
+  0%|          | 0.00/546 [00:00<?, ?B/s]100%|██████████| 546/546 [00:00<00:00, 2.64MB/s]
+
+Output file downloaded to out_v9a/solution/src/team048_solution/package.xml
+Downloading team048_solution to out_v9a/solution/src/team048_solution/resource
+0.00B [00:00, ?B/s]0.00B [00:00, ?B/s]
+
+Output file downloaded to out_v9a/solution/src/team048_solution/resource/team048_solution
+Downloading setup.cfg to out_v9a/solution/src/team048_solution
+  0%|          | 0.00/101 [00:00<?, ?B/s]100%|██████████| 101/101 [00:00<00:00, 566kB/s]
+
+Output file downloaded to out_v9a/solution/src/team048_solution/setup.cfg
+Downloading setup.py to out_v9a/solution/src/team048_solution
+  0%|          | 0.00/431 [00:00<?, ?B/s]100%|██████████| 431/431 [00:00<00:00, 3.35MB/s]
+
+Output file downloaded to out_v9a/solution/src/team048_solution/setup.py
+Downloading __init__.py to out_v9a/solution/src/team048_solution/team048_solution
+0.00B [00:00, ?B/s]0.00B [00:00, ?B/s]
+
+Output file downloaded to out_v9a/solution/src/team048_solution/team048_solution/__init__.py
+Downloading _accel.py to out_v9a/solution/src/team048_solution/team048_solution
+  0%|          | 0.00/6.99k [00:00<?, ?B/s]100%|██████████| 6.99k/6.99k [00:00<00:00, 29.9MB/s]
+
+Output file downloaded to out_v9a/solution/src/team048_solution/team048_solution/_accel.py
+Downloading arm.py to out_v9a/solution/src/team048_solution/team048_solution
+  0%|          | 0.00/27.0k [00:00<?, ?B/s]100%|██████████| 27.0k/27.0k [00:00<00:00, 652kB/s]
+
+Output file downloaded to out_v9a/solution/src/team048_solution/team048_solution/arm.py
+Downloading budget.py to out_v9a/solution/src/team048_solution/team048_solution
+  0%|          | 0.00/3.84k [00:00<?, ?B/s]100%|██████████| 3.84k/3.84k [00:00<00:00, 15.5MB/s]
+
+Output file downloaded to out_v9a/solution/src/team048_solution/team048_solution/budget.py
+Downloading hand_mesh_geometry.json to out_v9a/solution/src/team048_solution/team048_solution/data
+  0%|          | 0.00/1.61k [00:00<?, ?B/s]100%|██████████| 1.61k/1.61k [00:00<00:00, 7.14MB/s]
+
+Output file downloaded to out_v9a/solution/src/team048_solution/team048_solution/data/hand_mesh_geometry.json
+Downloading priors.json to out_v9a/solution/src/team048_solution/team048_solution/data
+  0%|          | 0.00/7.48k [00:00<?, ?B/s]100%|██████████| 7.48k/7.48k [00:00<00:00, 34.7MB/s]
+
+Output file downloaded to out_v9a/solution/src/team048_solution/team048_solution/data/priors.json
+Downloading tiangong_pro_with_hands.urdf to out_v9a/solution/src/team048_solution/team048_solution/data
+  0%|          | 0.00/65.5k [00:00<?, ?B/s]100%|██████████| 65.5k/65.5k [00:00<00:00, 441kB/s]100%|██████████| 65.5k/65.5k [00:00<00:00, 440kB/s]
+
+Output file downloaded to out_v9a/solution/src/team048_solution/team048_solution/data/tiangong_pro_with_hands.urdf
+Downloading geometry.py to out_v9a/solution/src/team048_solution/team048_solution
+  0%|          | 0.00/3.45k [00:00<?, ?B/s]100%|██████████| 3.45k/3.45k [00:00<00:00, 20.5MB/s]
+
+Output file downloaded to out_v9a/solution/src/team048_solution/team048_solution/geometry.py
+Downloading grasp.py to out_v9a/solution/src/team048_solution/team048_solution
+  0%|          | 0.00/6.76k [00:00<?, ?B/s]100%|██████████| 6.76k/6.76k [00:00<00:00, 27.6MB/s]
+
+Output file downloaded to out_v9a/solution/src/team048_solution/team048_solution/grasp.py
+Downloading grip.py to out_v9a/solution/src/team048_solution/team048_solution
+  0%|          | 0.00/15.2k [00:00<?, ?B/s]100%|██████████| 15.2k/15.2k [00:00<00:00, 1.31MB/s]
+
+Output file downloaded to out_v9a/solution/src/team048_solution/team048_solution/grip.py
+Downloading kinematics.py to out_v9a/solution/src/team048_solution/team048_solution
+  0%|          | 0.00/11.5k [00:00<?, ?B/s]100%|██████████| 11.5k/11.5k [00:00<00:00, 48.0MB/s]
+
+Output file downloaded to out_v9a/solution/src/team048_solution/team048_solution/kinematics.py
+Downloading node.py to out_v9a/solution/src/team048_solution/team048_solution
+  0%|          | 0.00/49.3k [00:00<?, ?B/s]100%|██████████| 49.3k/49.3k [00:00<00:00, 1.41MB/s]
+
+Output file downloaded to out_v9a/solution/src/team048_solution/team048_solution/node.py
+Downloading perception.py to out_v9a/solution/src/team048_solution/team048_solution
+  0%|          | 0.00/16.0k [00:00<?, ?B/s]100%|██████████| 16.0k/16.0k [00:00<00:00, 2.56MB/s]
+
+Output file downloaded to out_v9a/solution/src/team048_solution/team048_solution/perception.py
+Downloading planning.py to out_v9a/solution/src/team048_solution/team048_solution
+  0%|          | 0.00/11.4k [00:00<?, ?B/s]100%|██████████| 11.4k/11.4k [00:00<00:00, 1.81MB/s]
+
+Output file downloaded to out_v9a/solution/src/team048_solution/team048_solution/planning.py
+Downloading sensing.py to out_v9a/solution/src/team048_solution/team048_solution
+  0%|          | 0.00/1.15k [00:00<?, ?B/s]100%|██████████| 1.15k/1.15k [00:00<00:00, 4.66MB/s]
+
+Output file downloaded to out_v9a/solution/src/team048_solution/team048_solution/sensing.py
+Downloading trays.py to out_v9a/solution/src/team048_solution/team048_solution
+  0%|          | 0.00/9.10k [00:00<?, ?B/s]100%|██████████| 9.10k/9.10k [00:00<00:00, 2.50MB/s]
+
+Output file downloaded to out_v9a/solution/src/team048_solution/team048_solution/trays.py
+Downloading scene_fixture.py to out_v9a/solution/src/team048_solution/test
+  0%|          | 0.00/590 [00:00<?, ?B/s]100%|██████████| 590/590 [00:00<00:00, 2.77MB/s]
+
+Output file downloaded to out_v9a/solution/src/team048_solution/test/scene_fixture.py
+Downloading test_accel_equivalence.py to out_v9a/solution/src/team048_solution/test
+  0%|          | 0.00/6.91k [00:00<?, ?B/s]100%|██████████| 6.91k/6.91k [00:00<00:00, 32.0MB/s]
+
+Output file downloaded to out_v9a/solution/src/team048_solution/test/test_accel_equivalence.py
+Downloading test_accel_phase2.py to out_v9a/solution/src/team048_solution/test
+  0%|          | 0.00/17.3k [00:00<?, ?B/s]100%|██████████| 17.3k/17.3k [00:00<00:00, 830kB/s]
+('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+Output file downloaded to out_v9a/solution/src/team048_solution/test/test_accel_phase2.py
+ALLDONE
+18:05:47 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+18:07:49 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+18:09:51 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+18:11:53 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+18:13:55 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+18:15:57 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+18:17:59 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+18:20:01 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+18:22:04 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+18:24:06 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+18:26:49 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+18:31:43 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+18:33:45 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+18:35:47 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+18:38:55 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+18:44:53 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+19:04:13 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+19:08:00 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+19:28:38 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+19:42:48 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+19:44:50 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+20:11:59 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+20:15:57 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+20:32:48 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+20:49:04 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+21:10:18 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+21:12:20 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+21:15:06 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+21:27:36 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+21:42:39 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+21:44:41 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+21:46:43 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+21:48:45 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+22:04:26 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+22:31:24 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+22:33:54 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+22:46:18 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+23:07:36 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+23:09:39 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+23:11:41 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+23:13:44 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+23:15:46 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+23:17:47 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+23:19:49 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+23:21:51 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+23:24:37 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+23:28:07 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+23:30:09 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+23:32:11 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+23:34:12 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+23:36:14 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+23:38:16 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+23:40:18 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+23:42:20 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+23:47:00 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+23:49:12 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+00:06:07 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+00:29:49 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+00:31:51 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+00:33:52 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+00:35:54 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+00:37:56 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+00:39:58 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+00:42:00 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+00:44:02 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+00:46:04 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+00:48:06 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+00:50:08 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+00:52:09 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+00:54:11 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+00:56:14 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+00:58:16 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+01:00:17 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+01:02:19 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+01:04:22 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+01:06:24 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+01:08:25 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+01:10:27 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+01:12:29 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+01:14:32 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+01:16:33 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+01:21:12 v9a HTTPSConnectionPool(host='api.kaggle.com', port=443): Max retries exceeded with url: /v1/kernels.KernelsApiService/GetKernelSessionStatus (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)')))
+01:23:13 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+01:25:16 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+01:27:18 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+01:46:08 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+02:05:16 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+02:26:52 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+02:28:54 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+02:43:31 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+02:46:09 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+03:10:00 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+03:26:54 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+03:28:56 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+03:49:40 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+04:03:10 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+04:28:25 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+04:43:36 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+04:45:38 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+05:06:36 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+05:26:39 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+05:49:45 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+05:51:48 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+06:10:21 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+06:29:47 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+06:50:45 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+06:52:48 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+07:05:00 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+07:15:02 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+07:17:04 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+07:19:06 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+07:23:57 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+07:25:59 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+07:50:07 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+08:01:57 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+08:03:59 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+08:06:02 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+08:08:04 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+08:25:04 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+08:51:07 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+08:53:09 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+09:09:35 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+09:11:37 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+09:13:39 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+09:16:38 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+09:30:53 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+09:39:54 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+09:41:55 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+09:43:58 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"
+09:46:00 v9a dmitrijkv/team048-sim-v9a has status "KernelWorkerStatus.QUEUED"

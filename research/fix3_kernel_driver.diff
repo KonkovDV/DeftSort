@@ -1,0 +1,20 @@
+--- orig/kernel.py
++++ fixed/kernel.py
+@@ -193,7 +193,7 @@
+  sources=OUT/'installed_dependency_sources';sources.mkdir(exist_ok=True)
+  for p in [deps/'isaacsim/exts/isaacsim.simulation_app/isaacsim/simulation_app/simulation_app.py',deps/'isaaclab/source/isaaclab/isaaclab/app/app_launcher.py',deps/'isaaclab/source/isaaclab/isaaclab/sim/simulation_context.py']:shutil.copyfile(p,sources/p.name)
+  (OUT/'executed_native_probe.py').write_text(SCENE);(OUT/'executed_receiver.py').write_text(RECEIVER);(OUT/'requirements.lock').write_text(LOCK);(OUT/'neutral.kit').write_text(KIT);capture=ROOT/'gdb_capture.py';capture.write_text(GDB_CAPTURE);(OUT/'executed_gdb_capture.py').write_text(GDB_CAPTURE)
+- report['cases']=[];all_clean=True;modes=['bridge_inactive','clock_only','rclpy_only','both']
++ report['cases']=[];all_clean=True;modes=['clock_only','both']
+  for mode in modes:
+   remaining=1730-(time.monotonic()-started)
+   if remaining<210:report['budget_stop_before']=mode;break
+@@ -206,7 +206,7 @@
+   rec=report['commands'][-1];native0=any(x.get('kind')=='exited' and x.get('exit_code')==0 for x in events) and rec.get('returncode')==0 and not rec.get('diagnostic_interrupt')
+   item={'mode':mode,'close_returned':sr.get('closed',False),'native_exit0':native0,'gdb_returncode':rec.get('returncode'),'native_events':events,'seconds':rec['seconds'],'backtrace_saved':(case/'native_backtrace.txt').is_file(),'timeout_or_interrupt':bool(rec.get('diagnostic_interrupt') or rec.get('wait_exception'))}
+   all_clean=all_clean and item['close_returned'] and native0;report['cases'].append(item);atomic_report(OUT/'case_summary.json',report['cases']);save()
+-  if mode=='both' and all_clean and (1730-(time.monotonic()-started))>260:modes.append('joint')
++  if mode=='both' and (1730-(time.monotonic()-started))>260:modes.append('joint')
+   if mode=='joint':
+    report['scene']=sr;strict=full_acceptance(sr,0 if native0 else None,(sr.get('ros_bridge') or {}).get('receiver',{}));report['joint_acceptance']=strict;atomic_report(OUT/'acceptance.json',strict)
+  if not report.get('joint_acceptance'):atomic_report(OUT/'acceptance.json',{'passed':False,'joint_retested':False,'checker_exit_code':1,'reason':'minimal native lifecycle not clean; no full joint success claimed','previous_17_positive_predicates':'not retested in this cycle; previous immutable evidence only'})

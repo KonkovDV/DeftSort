@@ -1,0 +1,114 @@
+{
+ "cam_head_color": {
+  "enc": "rgb8",
+  "frame": "camera_head_link",
+  "stamp": 70.66999842
+ },
+ "cam_head_depth": {
+  "enc": "16UC1",
+  "frame": "camera_head_link",
+  "stamp": 70.66999842
+ },
+ "cam_head_color_info": {
+  "K": [
+   343.1635437011719,
+   0.0,
+   320.0,
+   0.0,
+   343.1635437011719,
+   180.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "w": 640,
+  "h": 360,
+  "frame": "camera_head_link",
+  "D": [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ]
+ },
+ "cam_head_depth_info": {
+  "K": [
+   343.1635437011719,
+   0.0,
+   320.0,
+   0.0,
+   343.1635437011719,
+   180.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "w": 640,
+  "h": 360,
+  "frame": "camera_head_link",
+  "D": [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ]
+ },
+ "cam_torso_color_info": {
+  "K": [
+   343.1635437011719,
+   0.0,
+   320.0,
+   0.0,
+   343.1635437011719,
+   180.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "w": 640,
+  "h": 360,
+  "frame": "camera_body_front_link",
+  "D": [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ]
+ },
+ "cam_torso_depth_info": {
+  "K": [
+   343.1635437011719,
+   0.0,
+   320.0,
+   0.0,
+   343.1635437011719,
+   180.0,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "w": 640,
+  "h": 360,
+  "frame": "camera_body_front_link",
+  "D": [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ]
+ },
+ "cam_torso_color": {
+  "enc": "rgb8",
+  "frame": "camera_body_front_link",
+  "stamp": 70.66999842
+ },
+ "cam_torso_depth": {
+  "enc": "16UC1",
+  "frame": "camera_body_front_link",
+  "stamp": 70.66999842
+ }
+}

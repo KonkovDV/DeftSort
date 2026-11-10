@@ -1,0 +1,17 @@
+{
+ "id": "dmitrijkv/team048-tpu-alt-tpuv5p8",
+ "title": "team048-tpu-alt-tpuv5p8",
+ "code_file": "team048-tpu-probe-alt.py",
+ "language": "python",
+ "kernel_type": "script",
+ "is_private": true,
+ "enable_gpu": false,
+ "enable_tpu": true,
+ "enable_internet": true,
+ "machine_shape": "TpuV5P8",
+ "docker_image_pinning_type": "latest",
+ "dataset_sources": [],
+ "kernel_sources": [],
+ "competition_sources": [],
+ "model_sources": []
+}

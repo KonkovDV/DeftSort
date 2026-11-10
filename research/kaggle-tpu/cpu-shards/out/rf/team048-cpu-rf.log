@@ -1,0 +1,27 @@
+[{"stream_name":"stdout","time":5.857284057,"data":"2026-11-09T06:22:04Z IN=/kaggle/input/datasets/dmitrijkv/team048-tpu-cpu-inputs listing=[PosixPath('/kaggle/input/datasets/dmitrijkv/team048-tpu-cpu-inputs/dataset-metadata.json.bak'), PosixPath('/kaggle/input/datasets/dmitrijkv/team048-tpu-cpu-inputs/datasets-metadata.json'), PosixPath('/kaggle/input/datasets/dmitrijkv/team048-tpu-cpu-inputs/ik'), PosixPath('/kaggle/input/datasets/dmitrijkv/team048-tpu-cpu-inputs/perception'), PosixPath('/kaggle/input/datasets/dmitrijkv/team048-tpu-cpu-inputs/solution_pkg'), PosixPath('/kaggle/input/datasets/dmitrijkv/team048-tpu-cpu-inputs/v5_frames')]\n"}
+,{"stream_name":"stdout","time":6.992891273,"data":"2026-11-09T06:22:05Z perc=/kaggle/working/in/perception\n"}
+,{"stream_name":"stdout","time":7.026873063,"data":"2026-11-09T06:22:05Z loaded features.json total=1403\n"}
+,{"stream_name":"stdout","time":7.099308147,"data":"2026-11-09T06:22:05Z loaded features_hard.json total=4372\n"}
+,{"stream_name":"stdout","time":8.515837994,"data":"2026-11-09T06:22:07Z pool3 {'fit_s': 1.138, 'n_train': 1161, 'n_test': 916, 'thresholds': {'0.5': {'coverage': 0.8712, 'selective_error': 0.0038, 'n_kept': 782}, '0.7': {'coverage': 0.8177, 'selective_error': 0.0, 'n_kept': 748}, '0.8': {'coverage': 0.7555, 'selective_error': 0.0, 'n_kept': 692}, '0.9': {'coverage': 0.5983, 'selective_error': 0.0, 'n_kept': 548}}, 'model': 'forest_pool3_cpu.joblib'}\n"}
+,{"stream_name":"stdout","time":9.806126013,"data":"2026-11-09T06:22:08Z pool6 {'fit_s': 1.017, 'n_train': 951, 'n_test': 824, 'thresholds': {'0.5': {'coverage': 0.9891, 'selective_error': 0.0037, 'n_kept': 806}, '0.7': {'coverage': 0.9417, 'selective_error': 0.0, 'n_kept': 775}, '0.8': {'coverage': 0.9114, 'selective_error': 0.0, 'n_kept': 751}, '0.9': {'coverage': 0.8313, 'selective_error': 0.0, 'n_kept': 685}}, 'model': 'forest_pool6_cpu.joblib'}\n"}
+,{"stream_name":"stderr","time":9.809083654,"data":"/usr/local/lib/python3.13/dist-packages/sklearn/base.py:380: InconsistentVersionWarning: Trying to unpickle estimator DecisionTreeClassifier from version 1.9.1 when using version 1.6.1. This might lead to breaking code or invalid results. Use at your own risk. For more info please refer to:\n"}
+,{"stream_name":"stderr","time":9.809105039,"data":"https://scikit-learn.org/stable/model_persistence.html#security-maintainability-limitations\n"}
+,{"stream_name":"stderr","time":9.809112448,"data":"  warnings.warn(\n"}
+,{"stream_name":"stderr","time":9.984209563,"data":"/usr/local/lib/python3.13/dist-packages/sklearn/base.py:380: InconsistentVersionWarning: Trying to unpickle estimator RandomForestClassifier from version 1.9.1 when using version 1.6.1. This might lead to breaking code or invalid results. Use at your own risk. For more info please refer to:\n"}
+,{"stream_name":"stderr","time":9.984250566,"data":"https://scikit-learn.org/stable/model_persistence.html#security-maintainability-limitations\n"}
+,{"stream_name":"stderr","time":9.984254983,"data":"  warnings.warn(\n"}
+,{"stream_name":"stderr","time":10.052550552,"data":"/usr/local/lib/python3.13/dist-packages/sklearn/base.py:380: InconsistentVersionWarning: Trying to unpickle estimator DecisionTreeClassifier from version 1.9.1 when using version 1.6.1. This might lead to breaking code or invalid results. Use at your own risk. For more info please refer to:\n"}
+,{"stream_name":"stderr","time":10.052602195,"data":"https://scikit-learn.org/stable/model_persistence.html#security-maintainability-limitations\n"}
+,{"stream_name":"stderr","time":10.052607637,"data":"  warnings.warn(\n"}
+,{"stream_name":"stderr","time":10.149711292,"data":"/usr/local/lib/python3.13/dist-packages/sklearn/base.py:380: InconsistentVersionWarning: Trying to unpickle estimator RandomForestClassifier from version 1.9.1 when using version 1.6.1. This might lead to breaking code or invalid results. Use at your own risk. For more info please refer to:\n"}
+,{"stream_name":"stderr","time":10.149758911,"data":"https://scikit-learn.org/stable/model_persistence.html#security-maintainability-limitations\n"}
+,{"stream_name":"stderr","time":10.149763954,"data":"  warnings.warn(\n"}
+,{"stream_name":"stdout","time":10.207115992,"data":"2026-11-09T06:22:08Z shipped={'pool3': {'coverage': 0.8384, 'selective_error': 0.0, 'n_test': 916}, 'pool6': {'coverage': 0.9709, 'selective_error': 0.0, 'n_test': 824}}\n"}
+,{"stream_name":"stdout","time":10.207158198,"data":"2026-11-09T06:22:08Z ALL OK\n"}
+,{"stream_name":"stderr","time":13.051478342,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":13.051517014,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":13.402546868,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":13.402582748,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":15.334919444,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":16.52921674,"data":"[NbConvertApp] Writing 315085 bytes to __results__.html\n"}
+]

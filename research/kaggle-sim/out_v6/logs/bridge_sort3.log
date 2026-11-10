@@ -1,0 +1,1520 @@
+++ /tmp/w/bin/micromamba shell hook -s bash
++ eval '
+# Copyright (C) 2012 Anaconda, Inc
+# SPDX-License-Identifier: BSD-3-Clause
+
+__mamba_exe() (
+    "/tmp/w/bin/micromamba" "${@}"
+)
+
+__mamba_hashr() {
+    if [ -n "${ZSH_VERSION:+x}" ]; then
+        \rehash
+    elif [ -n "${POSH_VERSION:+x}" ]; then
+        :  # pass
+    else
+        \hash -r
+    fi
+}
+
+__mamba_xctivate() {
+    \local ask_mamba
+    ask_mamba="$(PS1="${PS1:-}" __mamba_exe shell "${@}" --shell bash)" || \return
+    \eval "${ask_mamba}"
+    __mamba_hashr
+}
+
+__mamba_wrap() {
+    \local cmd="${1-__missing__}"
+    case "${cmd}" in
+        activate|reactivate|deactivate)
+            for arg in "${@}"; do
+                case "${arg}" in
+                    -h|--help)
+                        __mamba_exe "${@}"
+                        return
+                        ;;
+                esac
+            done
+            __mamba_xctivate "${@}"
+            ;;
+        install|update|upgrade|remove|uninstall)
+            __mamba_exe "${@}" || \return
+            __mamba_xctivate reactivate
+            ;;
+        self-update)
+            __mamba_exe "${@}" || \return
+
+            # remove leftover backup file on Windows
+            if [ -f "/tmp/w/bin/micromamba.bkup" ]; then
+                rm -f "/tmp/w/bin/micromamba.bkup"
+            fi
+            ;;
+        *)
+            __mamba_exe "${@}"
+            ;;
+    esac
+}
+
+
+# We need to define a function with the same name as the executable to be called by the user.
+# There is no way to register it dynamically without relying on hacks or eval.
+__exe_name="$(basename "/tmp/w/bin/micromamba")"
+__exe_name="${__exe_name%.*}"
+
+case "${__exe_name}" in
+    micromamba)
+        micromamba() {
+            __mamba_wrap "$@"
+        }
+        ;;
+    mamba)
+        mamba() {
+            __mamba_wrap "$@"
+        }
+        ;;
+    *)
+        echo "Error unknown MAMBA_EXE: \"/tmp/w/bin/micromamba\", filename must be mamba or micromamba" 1>&2
+        ;;
+esac
+
+
+if [ -z "${CONDA_SHLVL+x}" ]; then
+    \export CONDA_SHLVL=0
+    \export PATH="${MAMBA_ROOT_PREFIX}/condabin:${PATH}"
+
+    # We'\''re not allowing PS1 to be unbound. It must at least be set.
+    # However, we'\''re not exporting it, which can cause problems when starting a second shell
+    # via a first shell (i.e. starting zsh from bash).
+    if [ -z "${PS1+x}" ]; then
+        PS1=
+    fi
+fi
+
+if [ -n "${ZSH_VERSION:+x}" ]; then
+  if ! command -v compinit > /dev/null; then
+    autoload -U +X compinit && if [[ "${ZSH_DISABLE_COMPFIX-}" = true ]]; then
+      compinit -u
+    else
+      compinit
+    fi
+  fi
+  autoload -U +X bashcompinit && bashcompinit
+
+  _umamba_zsh_completions()
+  {
+    COMPREPLY=($(__mamba_exe completer "${(@s: :)${(@s: :)COMP_LINE}:1}"))
+  }
+
+  complete -o default -F _umamba_zsh_completions micromamba
+fi
+if [ -n "${BASH_VERSION:+x}" ]; then
+  _umamba_bash_completions()
+  {
+    COMPREPLY=($(__mamba_exe completer "${COMP_WORDS[@]:1}"))
+  }
+  complete -o default -F _umamba_bash_completions micromamba
+fi'
++++ basename /tmp/w/bin/micromamba
+++ __exe_name=micromamba
+++ __exe_name=micromamba
+++ case "${__exe_name}" in
+++ '[' -z '' ']'
+++ export CONDA_SHLVL=0
+++ CONDA_SHLVL=0
+++ export PATH=/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin
+++ PATH=/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin
+++ '[' -z '' ']'
+++ PS1=
+++ '[' -n '' ']'
+++ '[' -n x ']'
+++ complete -o default -F _umamba_bash_completions micromamba
++ micromamba activate ros
++ __mamba_wrap activate ros
++ local cmd=activate
++ case "${cmd}" in
++ for arg in "${@}"
++ case "${arg}" in
++ for arg in "${@}"
++ case "${arg}" in
++ __mamba_xctivate activate ros
++ local ask_mamba
+++ PS1=
+++ __mamba_exe shell activate ros --shell bash
+++ /tmp/w/bin/micromamba shell activate ros --shell bash
++ ask_mamba='PS1='\''(ros) '\''
+export PATH='\''/tmp/w/mm/envs/ros/bin:/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin'\''
+export CONDA_PREFIX='\''/tmp/w/mm/envs/ros'\''
+export CONDA_SHLVL='\''1'\''
+export CONDA_DEFAULT_ENV='\''ros'\''
+export CONDA_PROMPT_MODIFIER='\''(ros) '\''
+. "/tmp/w/mm/envs/ros/etc/conda/activate.d/libglib_activate.sh"
+. "/tmp/w/mm/envs/ros/etc/conda/activate.d/libxml2_activate.sh"
+. "/tmp/w/mm/envs/ros/etc/conda/activate.d/ros-humble-ros-workspace_activate.sh"'
++ eval 'PS1='\''(ros) '\''
+export PATH='\''/tmp/w/mm/envs/ros/bin:/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin'\''
+export CONDA_PREFIX='\''/tmp/w/mm/envs/ros'\''
+export CONDA_SHLVL='\''1'\''
+export CONDA_DEFAULT_ENV='\''ros'\''
+export CONDA_PROMPT_MODIFIER='\''(ros) '\''
+. "/tmp/w/mm/envs/ros/etc/conda/activate.d/libglib_activate.sh"
+. "/tmp/w/mm/envs/ros/etc/conda/activate.d/libxml2_activate.sh"
+. "/tmp/w/mm/envs/ros/etc/conda/activate.d/ros-humble-ros-workspace_activate.sh"'
+++ PS1='(ros) '
+++ export PATH=/tmp/w/mm/envs/ros/bin:/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin
+++ PATH=/tmp/w/mm/envs/ros/bin:/tmp/w/mm/condabin:/opt/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/tools/node/bin:/tools/google-cloud-sdk/bin
+++ export CONDA_PREFIX=/tmp/w/mm/envs/ros
+++ CONDA_PREFIX=/tmp/w/mm/envs/ros
+++ export CONDA_SHLVL=1
+++ CONDA_SHLVL=1
+++ export CONDA_DEFAULT_ENV=ros
+++ CONDA_DEFAULT_ENV=ros
+++ export 'CONDA_PROMPT_MODIFIER=(ros) '
+++ CONDA_PROMPT_MODIFIER='(ros) '
+++ . /tmp/w/mm/envs/ros/etc/conda/activate.d/libglib_activate.sh
++++ export GSETTINGS_SCHEMA_DIR_CONDA_BACKUP=
++++ GSETTINGS_SCHEMA_DIR_CONDA_BACKUP=
++++ export GSETTINGS_SCHEMA_DIR=/tmp/w/mm/envs/ros/share/glib-2.0/schemas
++++ GSETTINGS_SCHEMA_DIR=/tmp/w/mm/envs/ros/share/glib-2.0/schemas
+++ . /tmp/w/mm/envs/ros/etc/conda/activate.d/libxml2_activate.sh
++++ test -n ''
++++ xml_catalog_files_libxml2=
++++ XML_CATALOG_FILES=
++++ conda_catalog_files=
++++ ifs_libxml2=' 	
+'
++++ IFS=' '
++++ rem=/tmp/w/mm/envs/ros
++++ for pre in ${rem}
++++ test '' = /tmp/w/mm/envs/ros
++++ conda_catalog_files=/tmp/w/mm/envs/ros
++++ rem=
++++ IFS=' 	
+'
++++ conda_catalog_files='file:///tmp/w/mm/envs/ros/etc/xml/catalog file:///etc/xml/catalog'
++++ export 'XML_CATALOG_FILES=file:///tmp/w/mm/envs/ros/etc/xml/catalog file:///etc/xml/catalog'
++++ XML_CATALOG_FILES='file:///tmp/w/mm/envs/ros/etc/xml/catalog file:///etc/xml/catalog'
++++ unset conda_catalog_files ifs_libxml2 rem
+++ . /tmp/w/mm/envs/ros/etc/conda/activate.d/ros-humble-ros-workspace_activate.sh
++++ '[' '' = 1 -a '' '!=' '' ']'
++++ source /tmp/w/mm/envs/ros/setup.sh
+++++ : /tmp/w/mm/envs/ros
+++++ : sh
+++++ _prefix_setup_IFS=' 	
+'
+++++ IFS='
+'
+++++ _UNIQUE_PREFIX_PATH=
+++++ '[' -z SKIP_PARENT_PREFIX_PATH ']'
+++++ ament_append_unique_value _UNIQUE_PREFIX_PATH /tmp/w/mm/envs/ros
+++++ _listname=_UNIQUE_PREFIX_PATH
+++++ _value=/tmp/w/mm/envs/ros
+++++ eval '_values=$_UNIQUE_PREFIX_PATH'
++++++ _values=
+++++ _duplicate=
+++++ _ament_append_unique_value_IFS='
+'
+++++ IFS=:
+++++ '[' sh = zsh ']'
+++++ unset _item
+++++ '[' -z '' ']'
+++++ '[' -z '' ']'
+++++ eval '_UNIQUE_PREFIX_PATH="/tmp/w/mm/envs/ros"'
++++++ _UNIQUE_PREFIX_PATH=/tmp/w/mm/envs/ros
+++++ IFS='
+'
+++++ unset _ament_append_unique_value_IFS
+++++ unset _duplicate
+++++ unset _values
+++++ unset _value
+++++ unset _listname
+++++ unset AMENT_CURRENT_PREFIX
+++++ _prefix_setup_AMENT_SHELL=sh
+++++ IFS=:
+++++ '[' sh = zsh ']'
+++++ for _path in $_UNIQUE_PREFIX_PATH
+++++ '[' -n '' ']'
+++++ '[' -f /tmp/w/mm/envs/ros/local_setup.sh ']'
+++++ '[' sh = sh ']'
+++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++++ IFS=' 	
+'
+++++ . /tmp/w/mm/envs/ros/local_setup.sh
++++++ _ament_prefix_sh_AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ '[' -z /tmp/w/mm/envs/ros ']'
++++++ _ament_prefix_sh_AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ : sh
++++++ _ament_python_executable=/tmp/w/mm/envs/ros/bin/python
++++++ '[' -n '' ']'
++++++ '[' '!' -f /tmp/w/mm/envs/ros/bin/python ']'
++++++ _ament_additional_extension=
++++++ '[' sh '!=' sh ']'
+++++++ /tmp/w/mm/envs/ros/bin/python /tmp/w/mm/envs/ros/_local_setup_util.py sh
++++++ _ament_ordered_commands='export AMENT_PREFIX_PATH="/tmp/w/mm/envs/ros:$AMENT_PREFIX_PATH"
+export PYTHONPATH="/tmp/w/mm/envs/ros/lib/python3.11/site-packages:$PYTHONPATH"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh"
+export ROS_DISTRO="humble"
+export ROS_LOCALHOST_ONLY="0"
+export ROS_PYTHON_VERSION="3"
+export ROS_VERSION="2"
+export PYTHONPATH="/tmp/w/mm/envs/ros/lib/python311/site-packages:$PYTHONPATH"
+export AMENT_PREFIX_PATH=${AMENT_PREFIX_PATH#:}
+export AMENT_PREFIX_PATH=${AMENT_PREFIX_PATH%:}
+export ROS_DISTRO=${ROS_DISTRO#:}
+export ROS_DISTRO=${ROS_DISTRO%:}
+export ROS_PYTHON_VERSION=${ROS_PYTHON_VERSION#:}
+export ROS_PYTHON_VERSION=${ROS_PYTHON_VERSION%:}
+export ROS_VERSION=${ROS_VERSION#:}
+export ROS_VERSION=${ROS_VERSION%:}'
++++++ unset _ament_additional_extension
++++++ unset _ament_python_executable
++++++ '[' -n '' ']'
++++++ eval 'export AMENT_PREFIX_PATH="/tmp/w/mm/envs/ros:$AMENT_PREFIX_PATH"
+export PYTHONPATH="/tmp/w/mm/envs/ros/lib/python3.11/site-packages:$PYTHONPATH"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh"
+export ROS_DISTRO="humble"
+export ROS_LOCALHOST_ONLY="0"
+export ROS_PYTHON_VERSION="3"
+export ROS_VERSION="2"
+export PYTHONPATH="/tmp/w/mm/envs/ros/lib/python311/site-packages:$PYTHONPATH"
+export AMENT_PREFIX_PATH=${AMENT_PREFIX_PATH#:}
+export AMENT_PREFIX_PATH=${AMENT_PREFIX_PATH%:}
+export ROS_DISTRO=${ROS_DISTRO#:}
+export ROS_DISTRO=${ROS_DISTRO%:}
+export ROS_PYTHON_VERSION=${ROS_PYTHON_VERSION#:}
+export ROS_PYTHON_VERSION=${ROS_PYTHON_VERSION%:}
+export ROS_VERSION=${ROS_VERSION#:}
+export ROS_VERSION=${ROS_VERSION%:}'
+++++++ export AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros:
+++++++ AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros:
+++++++ export PYTHONPATH=/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++++ PYTHONPATH=/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++++++ _ament_prefix_sh_source_script /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh
+++++++ '[' -f /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh ']'
+++++++ '[' -n '' ']'
+++++++ . /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh
++++++++ '[' -n '' -a '' '!=' humble ']'
+++++++ export ROS_DISTRO=humble
+++++++ ROS_DISTRO=humble
+++++++ export ROS_LOCALHOST_ONLY=0
+++++++ ROS_LOCALHOST_ONLY=0
+++++++ export ROS_PYTHON_VERSION=3
+++++++ ROS_PYTHON_VERSION=3
+++++++ export ROS_VERSION=2
+++++++ ROS_VERSION=2
+++++++ export PYTHONPATH=/tmp/w/mm/envs/ros/lib/python311/site-packages:/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++++ PYTHONPATH=/tmp/w/mm/envs/ros/lib/python311/site-packages:/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++++ export AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros:
+++++++ AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros:
+++++++ export AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros
+++++++ AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros
+++++++ export ROS_DISTRO=humble
+++++++ ROS_DISTRO=humble
+++++++ export ROS_DISTRO=humble
+++++++ ROS_DISTRO=humble
+++++++ export ROS_PYTHON_VERSION=3
+++++++ ROS_PYTHON_VERSION=3
+++++++ export ROS_PYTHON_VERSION=3
+++++++ ROS_PYTHON_VERSION=3
+++++++ export ROS_VERSION=2
+++++++ ROS_VERSION=2
+++++++ export ROS_VERSION=2
+++++++ ROS_VERSION=2
++++++ unset _ament_ordered_commands
++++++ unset _ament_prefix_sh_source_script
++++++ unset _ament_prefix_sh_AMENT_CURRENT_PREFIX
+++++ AMENT_SHELL=sh
+++++ unset _path
+++++ IFS=' 	
+'
+++++ unset _prefix_setup_IFS
+++++ unset _prefix_setup_AMENT_SHELL
+++++ unset _UNIQUE_PREFIX_PATH
+++++ unset AMENT_SHELL
++++ case "$OSTYPE" in
++++ export ROS_OS_OVERRIDE=conda:linux
++++ ROS_OS_OVERRIDE=conda:linux
++++ export ROS_ETC_DIR=/tmp/w/mm/envs/ros/etc/ros
++++ ROS_ETC_DIR=/tmp/w/mm/envs/ros/etc/ros
++++ export AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros
++++ AMENT_PREFIX_PATH=/tmp/w/mm/envs/ros
++ __mamba_hashr
++ '[' -n '' ']'
++ '[' -n '' ']'
++ hash -r
++ source /tmp/w/ws/install/setup.bash
+++ COLCON_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++ _colcon_prefix_chain_bash_source_script /tmp/w/mm/envs/ros/local_setup.bash
+++ '[' -f /tmp/w/mm/envs/ros/local_setup.bash ']'
+++ '[' -n '' ']'
+++ . /tmp/w/mm/envs/ros/local_setup.bash
++++ AMENT_SHELL=bash
++++++ dirname /tmp/w/mm/envs/ros/local_setup.bash
+++++ builtin cd /tmp/w/mm/envs/ros
+++++ pwd
++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++ '[' -n '' ']'
++++ . /tmp/w/mm/envs/ros/local_setup.sh
+++++ _ament_prefix_sh_AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++++ '[' -z /tmp/w/mm/envs/ros ']'
+++++ _ament_prefix_sh_AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++++ : bash
+++++ _ament_python_executable=/tmp/w/mm/envs/ros/bin/python
+++++ '[' -n '' ']'
+++++ '[' '!' -f /tmp/w/mm/envs/ros/bin/python ']'
+++++ _ament_additional_extension=
+++++ '[' bash '!=' sh ']'
+++++ _ament_additional_extension=bash
++++++ /tmp/w/mm/envs/ros/bin/python /tmp/w/mm/envs/ros/_local_setup_util.py sh bash
+++++ _ament_ordered_commands='AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh"
+export ROS_DISTRO="humble"
+# export ROS_LOCALHOST_ONLY="0"
+export ROS_PYTHON_VERSION="3"
+export ROS_VERSION="2"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash"'
+++++ unset _ament_additional_extension
+++++ unset _ament_python_executable
+++++ '[' -n '' ']'
+++++ eval 'AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh"
+export ROS_DISTRO="humble"
+# export ROS_LOCALHOST_ONLY="0"
+export ROS_PYTHON_VERSION="3"
+export ROS_VERSION="2"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash"'
++++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ _ament_prefix_sh_source_script /tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash
++++++ '[' -f /tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash ']'
++++++ '[' -n '' ']'
++++++ . /tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash
+++++++ type register-python-argcomplete
++++++++ register-python-argcomplete ros2
+++++++ eval '#compdef ros2
+# Run something, muting output or redirecting it to the debug stream
+# depending on the value of _ARC_DEBUG.
+# If ARGCOMPLETE_USE_TEMPFILES is set, use tempfiles for IPC.
+__python_argcomplete_run() {
+    if [[ -z "${ARGCOMPLETE_USE_TEMPFILES-}" ]]; then
+        __python_argcomplete_run_inner "$@"
+        return
+    fi
+    local tmpfile="$(mktemp)"
+    _ARGCOMPLETE_STDOUT_FILENAME="$tmpfile" __python_argcomplete_run_inner "$@"
+    local code=$?
+    cat "$tmpfile"
+    rm "$tmpfile"
+    return $code
+}
+
+__python_argcomplete_run_inner() {
+    if [[ -z "${_ARC_DEBUG-}" ]]; then
+        "$@" 8>&1 9>&2 1>/dev/null 2>&1 </dev/null
+    else
+        "$@" 8>&1 9>&2 1>&9 2>&1 </dev/null
+    fi
+}
+
+_python_argcomplete() {
+    local IFS=$'\''\013'\''
+    local script=""
+    if [[ -n "${ZSH_VERSION-}" ]]; then
+        local completions
+        completions=($(IFS="$IFS" \
+            COMP_LINE="$BUFFER" \
+            COMP_POINT="$CURSOR" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="zsh" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=1 \
+            __python_argcomplete_run ${script:-${words[1]}}))
+        local nosort=()
+        local nospace=()
+        if is-at-least 5.8; then
+            nosort=(-o nosort)
+        fi
+        if [[ "${completions-}" =~ ([^\\\\]): && "${match[1]}" =~ [=/:] ]]; then
+            nospace=(-S '\'''\'')
+        fi
+        _describe "${words[1]}" completions "${nosort[@]}" "${nospace[@]}"
+    else
+        local SUPPRESS_SPACE=0
+        if compopt +o nospace 2> /dev/null; then
+            SUPPRESS_SPACE=1
+        fi
+        COMPREPLY=($(IFS="$IFS" \
+            COMP_LINE="$COMP_LINE" \
+            COMP_POINT="$COMP_POINT" \
+            COMP_TYPE="$COMP_TYPE" \
+            _ARGCOMPLETE_COMP_WORDBREAKS="$COMP_WORDBREAKS" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="bash" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=$SUPPRESS_SPACE \
+            __python_argcomplete_run ${script:-$1}))
+        if [[ $? != 0 ]]; then
+            unset COMPREPLY
+        elif [[ $SUPPRESS_SPACE == 1 ]] && [[ "${COMPREPLY-}" =~ [=/:]$ ]]; then
+            compopt -o nospace
+        fi
+    fi
+}
+if [[ -z "${ZSH_VERSION-}" ]]; then
+    complete -o nospace -o default -o bashdefault -F _python_argcomplete ros2
+else
+    # When called by the Zsh completion system, this will end with
+    # "loadautofunc" when initially autoloaded and "shfunc" later on, otherwise,
+    # the script was "eval"-ed so use "compdef" to register it with the
+    # completion system
+    autoload is-at-least
+    if [[ $zsh_eval_context == *func ]]; then
+        _python_argcomplete "$@"
+    else
+        compdef _python_argcomplete ros2
+    fi
+fi'
++++++++ [[ -z '' ]]
++++++++ complete -o nospace -o default -o bashdefault -F _python_argcomplete ros2
++++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ _ament_prefix_sh_source_script /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh
++++++ '[' -f /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh ']'
++++++ '[' -n '' ']'
++++++ . /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh
+++++++ '[' -n humble -a humble '!=' humble ']'
++++++ export ROS_DISTRO=humble
++++++ ROS_DISTRO=humble
++++++ export ROS_PYTHON_VERSION=3
++++++ ROS_PYTHON_VERSION=3
++++++ export ROS_VERSION=2
++++++ ROS_VERSION=2
++++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ _ament_prefix_sh_source_script /tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash
++++++ '[' -f /tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash ']'
++++++ '[' -n '' ']'
++++++ . /tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash
+++++++ type register-python-argcomplete3
+++++++ type register-python-argcomplete
++++++++ register-python-argcomplete rosidl
+++++++ eval '#compdef rosidl
+# Run something, muting output or redirecting it to the debug stream
+# depending on the value of _ARC_DEBUG.
+# If ARGCOMPLETE_USE_TEMPFILES is set, use tempfiles for IPC.
+__python_argcomplete_run() {
+    if [[ -z "${ARGCOMPLETE_USE_TEMPFILES-}" ]]; then
+        __python_argcomplete_run_inner "$@"
+        return
+    fi
+    local tmpfile="$(mktemp)"
+    _ARGCOMPLETE_STDOUT_FILENAME="$tmpfile" __python_argcomplete_run_inner "$@"
+    local code=$?
+    cat "$tmpfile"
+    rm "$tmpfile"
+    return $code
+}
+
+__python_argcomplete_run_inner() {
+    if [[ -z "${_ARC_DEBUG-}" ]]; then
+        "$@" 8>&1 9>&2 1>/dev/null 2>&1 </dev/null
+    else
+        "$@" 8>&1 9>&2 1>&9 2>&1 </dev/null
+    fi
+}
+
+_python_argcomplete() {
+    local IFS=$'\''\013'\''
+    local script=""
+    if [[ -n "${ZSH_VERSION-}" ]]; then
+        local completions
+        completions=($(IFS="$IFS" \
+            COMP_LINE="$BUFFER" \
+            COMP_POINT="$CURSOR" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="zsh" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=1 \
+            __python_argcomplete_run ${script:-${words[1]}}))
+        local nosort=()
+        local nospace=()
+        if is-at-least 5.8; then
+            nosort=(-o nosort)
+        fi
+        if [[ "${completions-}" =~ ([^\\\\]): && "${match[1]}" =~ [=/:] ]]; then
+            nospace=(-S '\'''\'')
+        fi
+        _describe "${words[1]}" completions "${nosort[@]}" "${nospace[@]}"
+    else
+        local SUPPRESS_SPACE=0
+        if compopt +o nospace 2> /dev/null; then
+            SUPPRESS_SPACE=1
+        fi
+        COMPREPLY=($(IFS="$IFS" \
+            COMP_LINE="$COMP_LINE" \
+            COMP_POINT="$COMP_POINT" \
+            COMP_TYPE="$COMP_TYPE" \
+            _ARGCOMPLETE_COMP_WORDBREAKS="$COMP_WORDBREAKS" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="bash" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=$SUPPRESS_SPACE \
+            __python_argcomplete_run ${script:-$1}))
+        if [[ $? != 0 ]]; then
+            unset COMPREPLY
+        elif [[ $SUPPRESS_SPACE == 1 ]] && [[ "${COMPREPLY-}" =~ [=/:]$ ]]; then
+            compopt -o nospace
+        fi
+    fi
+}
+if [[ -z "${ZSH_VERSION-}" ]]; then
+    complete -o nospace -o default -o bashdefault -F _python_argcomplete rosidl
+else
+    # When called by the Zsh completion system, this will end with
+    # "loadautofunc" when initially autoloaded and "shfunc" later on, otherwise,
+    # the script was "eval"-ed so use "compdef" to register it with the
+    # completion system
+    autoload is-at-least
+    if [[ $zsh_eval_context == *func ]]; then
+        _python_argcomplete "$@"
+    else
+        compdef _python_argcomplete rosidl
+    fi
+fi'
++++++++ [[ -z '' ]]
++++++++ complete -o nospace -o default -o bashdefault -F _python_argcomplete rosidl
+++++ unset _ament_ordered_commands
+++++ unset _ament_prefix_sh_source_script
+++++ unset _ament_prefix_sh_AMENT_CURRENT_PREFIX
+++++ dirname /tmp/w/ws/install/setup.bash
++++ builtin cd /tmp/w/ws/install
++++ pwd
+++ COLCON_CURRENT_PREFIX=/tmp/w/ws/install
+++ _colcon_prefix_chain_bash_source_script /tmp/w/ws/install/local_setup.bash
+++ '[' -f /tmp/w/ws/install/local_setup.bash ']'
+++ '[' -n '' ']'
+++ . /tmp/w/ws/install/local_setup.bash
++++ '[' -z /tmp/w/ws/install ']'
++++ _colcon_prefix_bash_COLCON_CURRENT_PREFIX=/tmp/w/ws/install
++++ _colcon_prefix_bash_prepend_unique_value COLCON_PREFIX_PATH /tmp/w/ws/install
++++ _listname=COLCON_PREFIX_PATH
++++ _value=/tmp/w/ws/install
++++ eval '_values="$COLCON_PREFIX_PATH"'
+++++ _values=
++++ _colcon_prefix_bash_prepend_unique_value_IFS=' 	
+'
++++ IFS=:
++++ _all_values=/tmp/w/ws/install
++++ _contained_value=
++++ unset _item
++++ '[' -z '' ']'
++++ '[' -n '' ']'
++++ unset _contained_value
++++ IFS=' 	
+'
++++ unset _colcon_prefix_bash_prepend_unique_value_IFS
++++ eval export 'COLCON_PREFIX_PATH="/tmp/w/ws/install"'
+++++ export COLCON_PREFIX_PATH=/tmp/w/ws/install
+++++ COLCON_PREFIX_PATH=/tmp/w/ws/install
++++ unset _all_values
++++ unset _values
++++ unset _value
++++ unset _listname
++++ unset _colcon_prefix_bash_prepend_unique_value
++++ '[' -n '' ']'
++++ _colcon_python_executable=/tmp/w/mm/envs/ros/bin/python3.11
++++ '[' '!' -f /tmp/w/mm/envs/ros/bin/python3.11 ']'
+++++ /tmp/w/mm/envs/ros/bin/python3.11 /tmp/w/ws/install/_local_setup_util_sh.py sh bash
++++ _colcon_ordered_commands='export CMAKE_PREFIX_PATH="/tmp/w/ws/install/bodyctrl_msgs:$CMAKE_PREFIX_PATH"
+export LD_LIBRARY_PATH="/tmp/w/ws/install/bodyctrl_msgs/lib:$LD_LIBRARY_PATH"
+export PYTHONPATH="/tmp/w/ws/install/bodyctrl_msgs/lib/python3.11/site-packages:$PYTHONPATH"
+export AMENT_PREFIX_PATH="/tmp/w/ws/install/bodyctrl_msgs:$AMENT_PREFIX_PATH"
+if [ "$(echo -n $CMAKE_PREFIX_PATH | head -c 1)" = ":" ]; then export CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH#?} ; fi
+if [ "$(echo -n $CMAKE_PREFIX_PATH | tail -c 1)" = ":" ]; then export CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH%?} ; fi'
++++ unset _colcon_python_executable
++++ '[' -n '' ']'
++++ eval 'export CMAKE_PREFIX_PATH="/tmp/w/ws/install/bodyctrl_msgs:$CMAKE_PREFIX_PATH"
+export LD_LIBRARY_PATH="/tmp/w/ws/install/bodyctrl_msgs/lib:$LD_LIBRARY_PATH"
+export PYTHONPATH="/tmp/w/ws/install/bodyctrl_msgs/lib/python3.11/site-packages:$PYTHONPATH"
+export AMENT_PREFIX_PATH="/tmp/w/ws/install/bodyctrl_msgs:$AMENT_PREFIX_PATH"
+if [ "$(echo -n $CMAKE_PREFIX_PATH | head -c 1)" = ":" ]; then export CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH#?} ; fi
+if [ "$(echo -n $CMAKE_PREFIX_PATH | tail -c 1)" = ":" ]; then export CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH%?} ; fi'
+++++ export CMAKE_PREFIX_PATH=/tmp/w/ws/install/bodyctrl_msgs:
+++++ CMAKE_PREFIX_PATH=/tmp/w/ws/install/bodyctrl_msgs:
+++++ export LD_LIBRARY_PATH=/tmp/w/ws/install/bodyctrl_msgs/lib:/usr/local/nvidia/lib64:/usr/local/cuda/lib64:/usr/local/nvidia/lib:/usr/local/nvidia/lib64:/usr/local/cuda/lib64
+++++ LD_LIBRARY_PATH=/tmp/w/ws/install/bodyctrl_msgs/lib:/usr/local/nvidia/lib64:/usr/local/cuda/lib64:/usr/local/nvidia/lib:/usr/local/nvidia/lib64:/usr/local/cuda/lib64
+++++ export PYTHONPATH=/tmp/w/ws/install/bodyctrl_msgs/lib/python3.11/site-packages:/tmp/w/mm/envs/ros/lib/python311/site-packages:/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++ PYTHONPATH=/tmp/w/ws/install/bodyctrl_msgs/lib/python3.11/site-packages:/tmp/w/mm/envs/ros/lib/python311/site-packages:/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++ export AMENT_PREFIX_PATH=/tmp/w/ws/install/bodyctrl_msgs:/tmp/w/mm/envs/ros
+++++ AMENT_PREFIX_PATH=/tmp/w/ws/install/bodyctrl_msgs:/tmp/w/mm/envs/ros
++++++ echo -n /tmp/w/ws/install/bodyctrl_msgs:
++++++ head -c 1
+++++ '[' / = : ']'
++++++ echo -n /tmp/w/ws/install/bodyctrl_msgs:
++++++ tail -c 1
+++++ '[' : = : ']'
+++++ export CMAKE_PREFIX_PATH=/tmp/w/ws/install/bodyctrl_msgs
+++++ CMAKE_PREFIX_PATH=/tmp/w/ws/install/bodyctrl_msgs
++++ unset _colcon_ordered_commands
++++ unset _colcon_prefix_sh_source_script
++++ unset _colcon_prefix_bash_COLCON_CURRENT_PREFIX
+++ unset COLCON_CURRENT_PREFIX
+++ unset _colcon_prefix_chain_bash_source_script
++ '[' -f /tmp/sol/install/setup.bash ']'
++ source /tmp/sol/install/setup.bash
+++ COLCON_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++ _colcon_prefix_chain_bash_source_script /tmp/w/mm/envs/ros/local_setup.bash
+++ '[' -f /tmp/w/mm/envs/ros/local_setup.bash ']'
+++ '[' -n '' ']'
+++ . /tmp/w/mm/envs/ros/local_setup.bash
++++ AMENT_SHELL=bash
++++++ dirname /tmp/w/mm/envs/ros/local_setup.bash
+++++ builtin cd /tmp/w/mm/envs/ros
+++++ pwd
++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++ '[' -n '' ']'
++++ . /tmp/w/mm/envs/ros/local_setup.sh
+++++ _ament_prefix_sh_AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++++ '[' -z /tmp/w/mm/envs/ros ']'
+++++ _ament_prefix_sh_AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
+++++ : bash
+++++ _ament_python_executable=/tmp/w/mm/envs/ros/bin/python
+++++ '[' -n '' ']'
+++++ '[' '!' -f /tmp/w/mm/envs/ros/bin/python ']'
+++++ _ament_additional_extension=
+++++ '[' bash '!=' sh ']'
+++++ _ament_additional_extension=bash
++++++ /tmp/w/mm/envs/ros/bin/python /tmp/w/mm/envs/ros/_local_setup_util.py sh bash
+++++ _ament_ordered_commands='AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh"
+export ROS_DISTRO="humble"
+# export ROS_LOCALHOST_ONLY="0"
+export ROS_PYTHON_VERSION="3"
+export ROS_VERSION="2"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash"'
+++++ unset _ament_additional_extension
+++++ unset _ament_python_executable
+++++ '[' -n '' ']'
+++++ eval 'AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh"
+export ROS_DISTRO="humble"
+# export ROS_LOCALHOST_ONLY="0"
+export ROS_PYTHON_VERSION="3"
+export ROS_VERSION="2"
+AMENT_CURRENT_PREFIX="/tmp/w/mm/envs/ros" _ament_prefix_sh_source_script "/tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash"'
++++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ _ament_prefix_sh_source_script /tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash
++++++ '[' -f /tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash ']'
++++++ '[' -n '' ']'
++++++ . /tmp/w/mm/envs/ros/share/ros2cli/environment/ros2-argcomplete.bash
+++++++ type register-python-argcomplete
++++++++ register-python-argcomplete ros2
+++++++ eval '#compdef ros2
+# Run something, muting output or redirecting it to the debug stream
+# depending on the value of _ARC_DEBUG.
+# If ARGCOMPLETE_USE_TEMPFILES is set, use tempfiles for IPC.
+__python_argcomplete_run() {
+    if [[ -z "${ARGCOMPLETE_USE_TEMPFILES-}" ]]; then
+        __python_argcomplete_run_inner "$@"
+        return
+    fi
+    local tmpfile="$(mktemp)"
+    _ARGCOMPLETE_STDOUT_FILENAME="$tmpfile" __python_argcomplete_run_inner "$@"
+    local code=$?
+    cat "$tmpfile"
+    rm "$tmpfile"
+    return $code
+}
+
+__python_argcomplete_run_inner() {
+    if [[ -z "${_ARC_DEBUG-}" ]]; then
+        "$@" 8>&1 9>&2 1>/dev/null 2>&1 </dev/null
+    else
+        "$@" 8>&1 9>&2 1>&9 2>&1 </dev/null
+    fi
+}
+
+_python_argcomplete() {
+    local IFS=$'\''\013'\''
+    local script=""
+    if [[ -n "${ZSH_VERSION-}" ]]; then
+        local completions
+        completions=($(IFS="$IFS" \
+            COMP_LINE="$BUFFER" \
+            COMP_POINT="$CURSOR" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="zsh" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=1 \
+            __python_argcomplete_run ${script:-${words[1]}}))
+        local nosort=()
+        local nospace=()
+        if is-at-least 5.8; then
+            nosort=(-o nosort)
+        fi
+        if [[ "${completions-}" =~ ([^\\\\]): && "${match[1]}" =~ [=/:] ]]; then
+            nospace=(-S '\'''\'')
+        fi
+        _describe "${words[1]}" completions "${nosort[@]}" "${nospace[@]}"
+    else
+        local SUPPRESS_SPACE=0
+        if compopt +o nospace 2> /dev/null; then
+            SUPPRESS_SPACE=1
+        fi
+        COMPREPLY=($(IFS="$IFS" \
+            COMP_LINE="$COMP_LINE" \
+            COMP_POINT="$COMP_POINT" \
+            COMP_TYPE="$COMP_TYPE" \
+            _ARGCOMPLETE_COMP_WORDBREAKS="$COMP_WORDBREAKS" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="bash" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=$SUPPRESS_SPACE \
+            __python_argcomplete_run ${script:-$1}))
+        if [[ $? != 0 ]]; then
+            unset COMPREPLY
+        elif [[ $SUPPRESS_SPACE == 1 ]] && [[ "${COMPREPLY-}" =~ [=/:]$ ]]; then
+            compopt -o nospace
+        fi
+    fi
+}
+if [[ -z "${ZSH_VERSION-}" ]]; then
+    complete -o nospace -o default -o bashdefault -F _python_argcomplete ros2
+else
+    # When called by the Zsh completion system, this will end with
+    # "loadautofunc" when initially autoloaded and "shfunc" later on, otherwise,
+    # the script was "eval"-ed so use "compdef" to register it with the
+    # completion system
+    autoload is-at-least
+    if [[ $zsh_eval_context == *func ]]; then
+        _python_argcomplete "$@"
+    else
+        compdef _python_argcomplete ros2
+    fi
+fi'
++++++++ [[ -z '' ]]
++++++++ complete -o nospace -o default -o bashdefault -F _python_argcomplete ros2
++++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ _ament_prefix_sh_source_script /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh
++++++ '[' -f /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh ']'
++++++ '[' -n '' ']'
++++++ . /tmp/w/mm/envs/ros/share/ros_environment/environment/0.ros_distro_check.sh
+++++++ '[' -n humble -a humble '!=' humble ']'
++++++ export ROS_DISTRO=humble
++++++ ROS_DISTRO=humble
++++++ export ROS_PYTHON_VERSION=3
++++++ ROS_PYTHON_VERSION=3
++++++ export ROS_VERSION=2
++++++ ROS_VERSION=2
++++++ AMENT_CURRENT_PREFIX=/tmp/w/mm/envs/ros
++++++ _ament_prefix_sh_source_script /tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash
++++++ '[' -f /tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash ']'
++++++ '[' -n '' ']'
++++++ . /tmp/w/mm/envs/ros/share/rosidl_cli/environment/rosidl-argcomplete.bash
+++++++ type register-python-argcomplete3
+++++++ type register-python-argcomplete
++++++++ register-python-argcomplete rosidl
+++++++ eval '#compdef rosidl
+# Run something, muting output or redirecting it to the debug stream
+# depending on the value of _ARC_DEBUG.
+# If ARGCOMPLETE_USE_TEMPFILES is set, use tempfiles for IPC.
+__python_argcomplete_run() {
+    if [[ -z "${ARGCOMPLETE_USE_TEMPFILES-}" ]]; then
+        __python_argcomplete_run_inner "$@"
+        return
+    fi
+    local tmpfile="$(mktemp)"
+    _ARGCOMPLETE_STDOUT_FILENAME="$tmpfile" __python_argcomplete_run_inner "$@"
+    local code=$?
+    cat "$tmpfile"
+    rm "$tmpfile"
+    return $code
+}
+
+__python_argcomplete_run_inner() {
+    if [[ -z "${_ARC_DEBUG-}" ]]; then
+        "$@" 8>&1 9>&2 1>/dev/null 2>&1 </dev/null
+    else
+        "$@" 8>&1 9>&2 1>&9 2>&1 </dev/null
+    fi
+}
+
+_python_argcomplete() {
+    local IFS=$'\''\013'\''
+    local script=""
+    if [[ -n "${ZSH_VERSION-}" ]]; then
+        local completions
+        completions=($(IFS="$IFS" \
+            COMP_LINE="$BUFFER" \
+            COMP_POINT="$CURSOR" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="zsh" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=1 \
+            __python_argcomplete_run ${script:-${words[1]}}))
+        local nosort=()
+        local nospace=()
+        if is-at-least 5.8; then
+            nosort=(-o nosort)
+        fi
+        if [[ "${completions-}" =~ ([^\\\\]): && "${match[1]}" =~ [=/:] ]]; then
+            nospace=(-S '\'''\'')
+        fi
+        _describe "${words[1]}" completions "${nosort[@]}" "${nospace[@]}"
+    else
+        local SUPPRESS_SPACE=0
+        if compopt +o nospace 2> /dev/null; then
+            SUPPRESS_SPACE=1
+        fi
+        COMPREPLY=($(IFS="$IFS" \
+            COMP_LINE="$COMP_LINE" \
+            COMP_POINT="$COMP_POINT" \
+            COMP_TYPE="$COMP_TYPE" \
+            _ARGCOMPLETE_COMP_WORDBREAKS="$COMP_WORDBREAKS" \
+            _ARGCOMPLETE=1 \
+            _ARGCOMPLETE_SHELL="bash" \
+            _ARGCOMPLETE_SUPPRESS_SPACE=$SUPPRESS_SPACE \
+            __python_argcomplete_run ${script:-$1}))
+        if [[ $? != 0 ]]; then
+            unset COMPREPLY
+        elif [[ $SUPPRESS_SPACE == 1 ]] && [[ "${COMPREPLY-}" =~ [=/:]$ ]]; then
+            compopt -o nospace
+        fi
+    fi
+}
+if [[ -z "${ZSH_VERSION-}" ]]; then
+    complete -o nospace -o default -o bashdefault -F _python_argcomplete rosidl
+else
+    # When called by the Zsh completion system, this will end with
+    # "loadautofunc" when initially autoloaded and "shfunc" later on, otherwise,
+    # the script was "eval"-ed so use "compdef" to register it with the
+    # completion system
+    autoload is-at-least
+    if [[ $zsh_eval_context == *func ]]; then
+        _python_argcomplete "$@"
+    else
+        compdef _python_argcomplete rosidl
+    fi
+fi'
++++++++ [[ -z '' ]]
++++++++ complete -o nospace -o default -o bashdefault -F _python_argcomplete rosidl
+++++ unset _ament_ordered_commands
+++++ unset _ament_prefix_sh_source_script
+++++ unset _ament_prefix_sh_AMENT_CURRENT_PREFIX
+++ COLCON_CURRENT_PREFIX=/tmp/w/ws/install
+++ _colcon_prefix_chain_bash_source_script /tmp/w/ws/install/local_setup.bash
+++ '[' -f /tmp/w/ws/install/local_setup.bash ']'
+++ '[' -n '' ']'
+++ . /tmp/w/ws/install/local_setup.bash
++++ '[' -z /tmp/w/ws/install ']'
++++ _colcon_prefix_bash_COLCON_CURRENT_PREFIX=/tmp/w/ws/install
++++ _colcon_prefix_bash_prepend_unique_value COLCON_PREFIX_PATH /tmp/w/ws/install
++++ _listname=COLCON_PREFIX_PATH
++++ _value=/tmp/w/ws/install
++++ eval '_values="$COLCON_PREFIX_PATH"'
+++++ _values=/tmp/w/ws/install
++++ _colcon_prefix_bash_prepend_unique_value_IFS=' 	
+'
++++ IFS=:
++++ _all_values=/tmp/w/ws/install
++++ _contained_value=
++++ for _item in $_values
++++ '[' -z /tmp/w/ws/install ']'
++++ '[' /tmp/w/ws/install = /tmp/w/ws/install ']'
++++ _contained_value=1
++++ continue
++++ unset _item
++++ '[' -z 1 ']'
++++ unset _contained_value
++++ IFS=' 	
+'
++++ unset _colcon_prefix_bash_prepend_unique_value_IFS
++++ eval export 'COLCON_PREFIX_PATH="/tmp/w/ws/install"'
+++++ export COLCON_PREFIX_PATH=/tmp/w/ws/install
+++++ COLCON_PREFIX_PATH=/tmp/w/ws/install
++++ unset _all_values
++++ unset _values
++++ unset _value
++++ unset _listname
++++ unset _colcon_prefix_bash_prepend_unique_value
++++ '[' -n '' ']'
++++ _colcon_python_executable=/tmp/w/mm/envs/ros/bin/python3.11
++++ '[' '!' -f /tmp/w/mm/envs/ros/bin/python3.11 ']'
+++++ /tmp/w/mm/envs/ros/bin/python3.11 /tmp/w/ws/install/_local_setup_util_sh.py sh bash
++++ _colcon_ordered_commands=
++++ unset _colcon_python_executable
++++ '[' -n '' ']'
++++ eval ''
++++ unset _colcon_ordered_commands
++++ unset _colcon_prefix_sh_source_script
++++ unset _colcon_prefix_bash_COLCON_CURRENT_PREFIX
+++++ dirname /tmp/sol/install/setup.bash
++++ builtin cd /tmp/sol/install
++++ pwd
+++ COLCON_CURRENT_PREFIX=/tmp/sol/install
+++ _colcon_prefix_chain_bash_source_script /tmp/sol/install/local_setup.bash
+++ '[' -f /tmp/sol/install/local_setup.bash ']'
+++ '[' -n '' ']'
+++ . /tmp/sol/install/local_setup.bash
++++ '[' -z /tmp/sol/install ']'
++++ _colcon_prefix_bash_COLCON_CURRENT_PREFIX=/tmp/sol/install
++++ _colcon_prefix_bash_prepend_unique_value COLCON_PREFIX_PATH /tmp/sol/install
++++ _listname=COLCON_PREFIX_PATH
++++ _value=/tmp/sol/install
++++ eval '_values="$COLCON_PREFIX_PATH"'
+++++ _values=/tmp/w/ws/install
++++ _colcon_prefix_bash_prepend_unique_value_IFS=' 	
+'
++++ IFS=:
++++ _all_values=/tmp/sol/install
++++ _contained_value=
++++ for _item in $_values
++++ '[' -z /tmp/w/ws/install ']'
++++ '[' /tmp/w/ws/install = /tmp/sol/install ']'
++++ _all_values=/tmp/sol/install:/tmp/w/ws/install
++++ unset _item
++++ '[' -z '' ']'
++++ '[' -n '' ']'
++++ unset _contained_value
++++ IFS=' 	
+'
++++ unset _colcon_prefix_bash_prepend_unique_value_IFS
++++ eval export 'COLCON_PREFIX_PATH="/tmp/sol/install:/tmp/w/ws/install"'
+++++ export COLCON_PREFIX_PATH=/tmp/sol/install:/tmp/w/ws/install
+++++ COLCON_PREFIX_PATH=/tmp/sol/install:/tmp/w/ws/install
++++ unset _all_values
++++ unset _values
++++ unset _value
++++ unset _listname
++++ unset _colcon_prefix_bash_prepend_unique_value
++++ '[' -n '' ']'
++++ _colcon_python_executable=/tmp/w/mm/envs/ros/bin/python3.11
++++ '[' '!' -f /tmp/w/mm/envs/ros/bin/python3.11 ']'
+++++ /tmp/w/mm/envs/ros/bin/python3.11 /tmp/sol/install/_local_setup_util_sh.py sh bash
++++ _colcon_ordered_commands='export PYTHONPATH="/tmp/sol/install/team048_solution/lib/python3.11/site-packages:$PYTHONPATH"
+export AMENT_PREFIX_PATH="/tmp/sol/install/team048_solution:$AMENT_PREFIX_PATH"'
++++ unset _colcon_python_executable
++++ '[' -n '' ']'
++++ eval 'export PYTHONPATH="/tmp/sol/install/team048_solution/lib/python3.11/site-packages:$PYTHONPATH"
+export AMENT_PREFIX_PATH="/tmp/sol/install/team048_solution:$AMENT_PREFIX_PATH"'
+++++ export PYTHONPATH=/tmp/sol/install/team048_solution/lib/python3.11/site-packages:/tmp/w/ws/install/bodyctrl_msgs/lib/python3.11/site-packages:/tmp/w/mm/envs/ros/lib/python311/site-packages:/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++ PYTHONPATH=/tmp/sol/install/team048_solution/lib/python3.11/site-packages:/tmp/w/ws/install/bodyctrl_msgs/lib/python3.11/site-packages:/tmp/w/mm/envs/ros/lib/python311/site-packages:/tmp/w/mm/envs/ros/lib/python3.11/site-packages:/kaggle/lib/kagglegym:/kaggle/lib
+++++ export AMENT_PREFIX_PATH=/tmp/sol/install/team048_solution:/tmp/w/ws/install/bodyctrl_msgs:/tmp/w/mm/envs/ros
+++++ AMENT_PREFIX_PATH=/tmp/sol/install/team048_solution:/tmp/w/ws/install/bodyctrl_msgs:/tmp/w/mm/envs/ros
++++ unset _colcon_ordered_commands
++++ unset _colcon_prefix_sh_source_script
++++ unset _colcon_prefix_bash_COLCON_CURRENT_PREFIX
+++ unset COLCON_CURRENT_PREFIX
+++ unset _colcon_prefix_chain_bash_source_script
++ python teleoperation/bridges/ros2_zmq_bridge.py
+[INFO] [1794204387.985087322] [tiangong_ros_bridge]: hack_sim_node started: /tmp/nssr_sim/hackathon/ros2/nssr_polygon/nssr_polygon/sim_node.py
+[INFO] [1794204388.064953400] [tiangong_ros_bridge]: robot_state_publisher started with /tmp/nssr_sim/assets/robots/tiangong_pro/tiangong_pro_with_hands.urdf
+[INFO] [1794204388.067229236] [tiangong_ros_bridge]: Tiangong ROS 2 Bridge (Control Only) Started
+[INFO] [1794204388.068178252] [tiangong_ros_bridge]: Starting Python camera bridge: /tmp/nssr_sim/hackathon/ros2/nssr_polygon/nssr_polygon/camera_bridge.py
+[WARN] [1794204388.451785860] [kdl_parser]: The root link pelvis has an inertia specified in the URDF, but KDL does not support a root link with an inertia.  As a workaround, you can add an extra dummy link to your URDF.
+[INFO] [1794204388.452047083] [robot_state_publisher]: got segment L_base_link
+[INFO] [1794204388.452096774] [robot_state_publisher]: got segment R_base_link
+[INFO] [1794204388.452120644] [robot_state_publisher]: got segment ankle_pitch_l_link
+[INFO] [1794204388.452131985] [robot_state_publisher]: got segment ankle_pitch_r_link
+[INFO] [1794204388.452144855] [robot_state_publisher]: got segment ankle_roll_l_link
+[INFO] [1794204388.452157625] [robot_state_publisher]: got segment ankle_roll_r_link
+[INFO] [1794204388.452171326] [robot_state_publisher]: got segment camera_body_back_link
+[INFO] [1794204388.452184700] [robot_state_publisher]: got segment camera_body_front_link
+[INFO] [1794204388.452199408] [robot_state_publisher]: got segment camera_head_link
+[INFO] [1794204388.452212538] [robot_state_publisher]: got segment elbow_pitch_l_link
+[INFO] [1794204388.452224751] [robot_state_publisher]: got segment elbow_pitch_r_link
+[INFO] [1794204388.452237783] [robot_state_publisher]: got segment elbow_yaw_l_link
+[INFO] [1794204388.452247290] [robot_state_publisher]: got segment elbow_yaw_r_link
+[INFO] [1794204388.452255192] [robot_state_publisher]: got segment head_pitch_link
+[INFO] [1794204388.452263930] [robot_state_publisher]: got segment head_roll_link
+[INFO] [1794204388.452273169] [robot_state_publisher]: got segment head_yaw_link
+[INFO] [1794204388.452285733] [robot_state_publisher]: got segment hip_pitch_l_link
+[INFO] [1794204388.452298193] [robot_state_publisher]: got segment hip_pitch_r_link
+[INFO] [1794204388.452309857] [robot_state_publisher]: got segment hip_roll_l_link
+[INFO] [1794204388.452322770] [robot_state_publisher]: got segment hip_roll_r_link
+[INFO] [1794204388.452337134] [robot_state_publisher]: got segment hip_yaw_l_link
+[INFO] [1794204388.452348829] [robot_state_publisher]: got segment hip_yaw_r_link
+[INFO] [1794204388.452358379] [robot_state_publisher]: got segment imu_link
+[INFO] [1794204388.452371686] [robot_state_publisher]: got segment knee_pitch_l_link
+[INFO] [1794204388.452385545] [robot_state_publisher]: got segment knee_pitch_r_link
+[INFO] [1794204388.452399300] [robot_state_publisher]: got segment left_index_1
+[INFO] [1794204388.452413245] [robot_state_publisher]: got segment left_index_2
+[INFO] [1794204388.452427025] [robot_state_publisher]: got segment left_little_1
+[INFO] [1794204388.452441525] [robot_state_publisher]: got segment left_little_2
+[INFO] [1794204388.452454785] [robot_state_publisher]: got segment left_middle_1
+[INFO] [1794204388.452467810] [robot_state_publisher]: got segment left_middle_2
+[INFO] [1794204388.452480958] [robot_state_publisher]: got segment left_ring_1
+[INFO] [1794204388.452494238] [robot_state_publisher]: got segment left_ring_2
+[INFO] [1794204388.452506697] [robot_state_publisher]: got segment left_tcp_link
+[INFO] [1794204388.452520126] [robot_state_publisher]: got segment left_thumb_1
+[INFO] [1794204388.452531829] [robot_state_publisher]: got segment left_thumb_2
+[INFO] [1794204388.452545371] [robot_state_publisher]: got segment left_thumb_3
+[INFO] [1794204388.452559376] [robot_state_publisher]: got segment left_thumb_4
+[INFO] [1794204388.452572521] [robot_state_publisher]: got segment pelvis
+[INFO] [1794204388.452585226] [robot_state_publisher]: got segment right_index_1
+[INFO] [1794204388.452596252] [robot_state_publisher]: got segment right_index_2
+[INFO] [1794204388.452605528] [robot_state_publisher]: got segment right_little_1
+[INFO] [1794204388.452613847] [robot_state_publisher]: got segment right_little_2
+[INFO] [1794204388.452622140] [robot_state_publisher]: got segment right_middle_1
+[INFO] [1794204388.452632941] [robot_state_publisher]: got segment right_middle_2
+[INFO] [1794204388.452644450] [robot_state_publisher]: got segment right_ring_1
+[INFO] [1794204388.452655614] [robot_state_publisher]: got segment right_ring_2
+[INFO] [1794204388.452668198] [robot_state_publisher]: got segment right_tcp_link
+[INFO] [1794204388.452714413] [robot_state_publisher]: got segment right_thumb_1
+[INFO] [1794204388.452723281] [robot_state_publisher]: got segment right_thumb_2
+[INFO] [1794204388.452731123] [robot_state_publisher]: got segment right_thumb_3
+[INFO] [1794204388.452738784] [robot_state_publisher]: got segment right_thumb_4
+[INFO] [1794204388.452746141] [robot_state_publisher]: got segment shoulder_pitch_l_link
+[INFO] [1794204388.452753439] [robot_state_publisher]: got segment shoulder_pitch_r_link
+[INFO] [1794204388.452761116] [robot_state_publisher]: got segment shoulder_roll_l_link
+[INFO] [1794204388.452769273] [robot_state_publisher]: got segment shoulder_roll_r_link
+[INFO] [1794204388.452781212] [robot_state_publisher]: got segment shoulder_yaw_l_link
+[INFO] [1794204388.452789464] [robot_state_publisher]: got segment shoulder_yaw_r_link
+[INFO] [1794204388.452799063] [robot_state_publisher]: got segment waist_yaw_link
+[INFO] [1794204388.452811303] [robot_state_publisher]: got segment wrist_pitch_l_link
+[INFO] [1794204388.452823594] [robot_state_publisher]: got segment wrist_pitch_r_link
+[INFO] [1794204388.452835511] [robot_state_publisher]: got segment wrist_roll_l_link
+[INFO] [1794204388.452883247] [robot_state_publisher]: got segment wrist_roll_r_link
+[INFO] [1794204388.540641487] [hack_camera_bridge]: camera bridge up: ['cam_head', 'cam_torso']
+[INFO] [1794204388.711228755] [hack_sim_node]: hack shaper: cmd_pos spd, cmd_vel, hand speed/force/state, wrist F/T
+[INFO] [1794204388.712446910] [hack_sim_node]: hack_sim_node: /sim/objects/{set,randomize,names}, /sim/task{,/check,/result}
+[INFO] [1794204393.505149841] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0
+[INFO] [1794204398.504418085] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0
+[INFO] [1794204403.505013866] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0
+[INFO] [1794204408.505151159] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0
+[INFO] [1794204413.504838815] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0
+[INFO] [1794204418.504942774] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0
+[INFO] [1794204423.504538052] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0
+[INFO] [1794204428.504816969] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0
+[INFO] [1794204433.505256695] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0
+[INFO] [1794204438.504526929] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0
+[INFO] [1794204443.505617875] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0
+[INFO] [1794204448.504779019] [hack_camera_bridge]: frames/5s: cam_head=28, cam_torso=28
+[INFO] [1794204453.504699512] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204458.504782843] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204463.504803075] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794204468.504826518] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794204473.504690241] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204478.504457381] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=39
+[INFO] [1794204483.504743611] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=42
+[INFO] [1794204488.505467158] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204493.504756699] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794204498.504374903] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204503.504444489] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794204508.504645926] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794204513.504550382] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204518.504410324] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794204523.504995002] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204528.504807207] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794204533.504600295] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794204538.504705779] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204543.504975334] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204548.504422289] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794204553.504700190] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794204558.505258226] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204563.504418686] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204568.504778051] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794204573.504444298] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794204578.504430848] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204583.504822953] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204588.504880900] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204593.504414061] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204598.504895109] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204603.504750818] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204608.504515152] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204613.504787582] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204618.504788249] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794204623.504759406] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=41
+[INFO] [1794204628.509887394] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=42
+[INFO] [1794204633.504764812] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794204638.504927572] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=41
+[INFO] [1794204643.504912829] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=40
+[INFO] [1794204648.504920254] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=41
+[INFO] [1794204653.504442579] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=42
+[INFO] [1794204658.504473233] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794204663.504624405] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=41
+[INFO] [1794204668.504958173] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=42
+[INFO] [1794204673.504595416] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794204678.504799241] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204683.504731633] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204688.504707554] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=40
+[INFO] [1794204693.504357699] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=42
+[INFO] [1794204698.506070059] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=41
+[INFO] [1794204703.504648035] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=41
+[INFO] [1794204708.505068455] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794204713.504800299] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794204718.504676875] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794204723.504641968] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204728.504827366] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204733.504658483] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204738.505068886] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204743.504564336] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794204748.505887016] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=41
+[INFO] [1794204753.504839183] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=41
+[INFO] [1794204758.504974233] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204763.504427626] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204768.504418125] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794204773.504970831] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794204778.504711025] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=40
+[INFO] [1794204783.504351465] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=41
+[INFO] [1794204788.504720794] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=41
+[INFO] [1794204793.504659876] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=42
+[INFO] [1794204798.504740276] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204803.504751419] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794204808.504477895] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=41
+[INFO] [1794204813.504504298] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=41
+[INFO] [1794204818.504713842] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794204823.504795658] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204828.504733753] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794204833.504537632] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204838.504761849] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794204843.504580859] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794204848.504379913] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794204853.504737714] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794204858.504636914] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794204863.505207379] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=41
+[INFO] [1794204868.505010866] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=42
+[INFO] [1794204873.505096490] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204878.504546476] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794204883.504576275] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794204888.505017905] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794204893.506171631] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=41
+[INFO] [1794204898.504430681] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=41
+[INFO] [1794204903.504447920] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794204908.504711524] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794204913.504307180] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204918.504433682] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=41
+[INFO] [1794204923.504455822] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=42
+[INFO] [1794204928.504765810] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=40
+[INFO] [1794204933.504709695] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=42
+[INFO] [1794204938.504702509] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204943.504699549] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794204948.504638102] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794204953.504622304] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794204958.505812811] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794204963.504667608] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204968.504394292] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794204973.504636771] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204978.504687870] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204983.504679836] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794204988.504774077] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794204993.504737939] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=41
+[INFO] [1794204998.504602063] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=41
+[INFO] [1794205003.504287979] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794205008.504593742] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=40
+[INFO] [1794205013.504661729] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=41
+[INFO] [1794205018.504470425] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205023.504581977] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205028.504956425] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794205033.504741967] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205038.504893856] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=40
+[INFO] [1794205043.504634981] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=41
+[INFO] [1794205048.504451204] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794205053.504736385] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205058.504494823] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=41
+[INFO] [1794205063.504814486] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=42
+[INFO] [1794205068.504739909] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205073.504541958] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205078.504965108] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=41
+[INFO] [1794205083.504410607] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=41
+[INFO] [1794205088.505275271] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205093.504658909] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205098.504678687] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205103.504463913] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794205108.504756567] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205113.505366533] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=41
+[INFO] [1794205118.504398284] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=41
+[INFO] [1794205123.504797707] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=40
+[INFO] [1794205128.504951772] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=42
+[INFO] [1794205133.504354459] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205138.504444404] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205143.504547746] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205148.505354698] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=40
+[INFO] [1794205153.504888661] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=41
+[INFO] [1794205158.504690287] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205163.504407210] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205168.504881692] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794205173.504823994] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205178.504965604] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205183.504540538] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205188.504430853] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794205193.504589690] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794205198.504685000] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205203.504712282] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205208.504534576] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205213.504928131] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205218.505150375] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205223.504688203] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205228.504726732] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794205233.504719956] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794205238.504714972] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205243.504714019] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=40
+[INFO] [1794205248.504816585] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=40
+[INFO] [1794205253.504777271] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205258.505124556] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=40
+[INFO] [1794205263.504745343] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=40
+[INFO] [1794205268.504716283] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205273.504751119] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205278.504635870] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205283.504338739] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205288.504807927] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205293.504748811] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205298.504842805] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205303.505373379] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794205308.504995788] [hack_camera_bridge]: frames/5s: cam_head=37, cam_torso=37
+[INFO] [1794205313.504831720] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=39
+[INFO] [1794205318.504887678] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205323.504536677] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=40
+[INFO] [1794205328.504513939] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794205333.505018607] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205338.504793192] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794205343.504809932] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205348.504576213] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205353.504759244] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205358.504596510] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205363.504513686] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205368.504786000] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794205372.947624950] [hack_sim_node]: /sim/task/check -> sim
+[INFO] [1794205373.010335972] [hack_sim_node]: /sim/task/check -> sim
+[INFO] [1794205373.504684465] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794205375.162474988] [hack_sim_node]: /sim/objects/randomize -> sim: seed 102
+[INFO] [1794205378.504817852] [hack_camera_bridge]: frames/5s: cam_head=12, cam_torso=12
+[INFO] [1794205383.504426215] [hack_camera_bridge]: frames/5s: cam_head=33, cam_torso=33
+[INFO] [1794205388.504946275] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=39
+[INFO] [1794205393.504646569] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=39
+[INFO] [1794205398.504376629] [hack_camera_bridge]: frames/5s: cam_head=37, cam_torso=37
+[INFO] [1794205403.505151484] [hack_camera_bridge]: frames/5s: cam_head=37, cam_torso=37
+[INFO] [1794205408.504753303] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=38
+[INFO] [1794205413.504860618] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=39
+[INFO] [1794205418.505976177] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=40
+[INFO] [1794205423.504797313] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205428.504627010] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=38
+[INFO] [1794205433.504960111] [hack_camera_bridge]: frames/5s: cam_head=32, cam_torso=32
+[INFO] [1794205438.504600041] [hack_camera_bridge]: frames/5s: cam_head=36, cam_torso=36
+[INFO] [1794205443.505381397] [hack_camera_bridge]: frames/5s: cam_head=35, cam_torso=35
+[INFO] [1794205448.504508306] [hack_camera_bridge]: frames/5s: cam_head=35, cam_torso=35
+[INFO] [1794205453.504737756] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794205458.504573681] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794205463.504603132] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=38
+[INFO] [1794205468.505064045] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794205473.504667819] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=39
+[INFO] [1794205478.504951236] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=41
+[INFO] [1794205483.504920565] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=38
+[INFO] [1794205488.504330983] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=40
+[INFO] [1794205493.505788025] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205498.504740826] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794205503.504975865] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794205508.504921684] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794205513.504728526] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205518.506027303] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794205523.506043817] [hack_camera_bridge]: frames/5s: cam_head=36, cam_torso=36
+[INFO] [1794205528.504752807] [hack_camera_bridge]: frames/5s: cam_head=36, cam_torso=36
+[INFO] [1794205533.506244847] [hack_camera_bridge]: frames/5s: cam_head=35, cam_torso=35
+[INFO] [1794205538.505241492] [hack_camera_bridge]: frames/5s: cam_head=35, cam_torso=34
+[INFO] [1794205543.505127970] [hack_camera_bridge]: frames/5s: cam_head=37, cam_torso=37
+[INFO] [1794205548.505132573] [hack_camera_bridge]: frames/5s: cam_head=36, cam_torso=37
+[INFO] [1794205553.505183577] [hack_camera_bridge]: frames/5s: cam_head=34, cam_torso=34
+[INFO] [1794205558.507354893] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=38
+[INFO] [1794205563.504804464] [hack_camera_bridge]: frames/5s: cam_head=37, cam_torso=37
+[INFO] [1794205568.504950996] [hack_camera_bridge]: frames/5s: cam_head=37, cam_torso=37
+[INFO] [1794205573.504955734] [hack_camera_bridge]: frames/5s: cam_head=36, cam_torso=36
+[INFO] [1794205578.505555334] [hack_camera_bridge]: frames/5s: cam_head=36, cam_torso=36
+[INFO] [1794205583.504999422] [hack_camera_bridge]: frames/5s: cam_head=37, cam_torso=37
+[INFO] [1794205588.504560915] [hack_camera_bridge]: frames/5s: cam_head=37, cam_torso=37
+[INFO] [1794205593.505429467] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=37
+[INFO] [1794205598.505073884] [hack_camera_bridge]: frames/5s: cam_head=35, cam_torso=36
+[INFO] [1794205603.505022320] [hack_camera_bridge]: frames/5s: cam_head=36, cam_torso=36
+[INFO] [1794205608.504989954] [hack_camera_bridge]: frames/5s: cam_head=36, cam_torso=36
+[INFO] [1794205613.505036423] [hack_camera_bridge]: frames/5s: cam_head=34, cam_torso=34
+[INFO] [1794205618.504813350] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=37
+[INFO] [1794205623.504496874] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=40
+[INFO] [1794205628.504487403] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794205633.504776021] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=38
+[INFO] [1794205638.504531016] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=39
+[INFO] [1794205643.505719263] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=40
+[INFO] [1794205648.504970097] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794205653.504744880] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794205658.504827458] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205663.504466114] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205668.507426425] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205673.507825395] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=38
+[INFO] [1794205678.506514352] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794205683.504875037] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=39
+[INFO] [1794205688.504664498] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794205693.504419917] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=38
+[INFO] [1794205698.504887674] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794205703.504899448] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205708.504897941] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205713.504817957] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205718.505157059] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205723.506204433] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205728.506393443] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=38
+[INFO] [1794205733.504989149] [hack_camera_bridge]: frames/5s: cam_head=35, cam_torso=34
+[INFO] [1794205738.505164744] [hack_camera_bridge]: frames/5s: cam_head=37, cam_torso=38
+[INFO] [1794205743.507671905] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=38
+[INFO] [1794205748.504795877] [hack_camera_bridge]: frames/5s: cam_head=37, cam_torso=37
+[INFO] [1794205753.504914391] [hack_camera_bridge]: frames/5s: cam_head=37, cam_torso=37
+[INFO] [1794205758.504708080] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=38
+[INFO] [1794205763.504810530] [hack_camera_bridge]: frames/5s: cam_head=37, cam_torso=37
+[INFO] [1794205768.504929794] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=37
+[INFO] [1794205773.504673371] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=38
+[INFO] [1794205778.504977415] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=39
+[INFO] [1794205783.505183105] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=37
+[INFO] [1794205788.504762431] [hack_camera_bridge]: frames/5s: cam_head=37, cam_torso=38
+[INFO] [1794205793.504629515] [hack_camera_bridge]: frames/5s: cam_head=35, cam_torso=34
+[INFO] [1794205798.504962150] [hack_camera_bridge]: frames/5s: cam_head=37, cam_torso=38
+[INFO] [1794205803.504435215] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=40
+[INFO] [1794205808.504345035] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=41
+[INFO] [1794205813.504697838] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205818.504815592] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=40
+[INFO] [1794205823.504379342] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=41
+[INFO] [1794205828.504438996] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205828.975922145] [hack_sim_node]: /sim/task/check -> sim
+[INFO] [1794205829.035297429] [hack_sim_node]: /sim/task/check -> sim
+[INFO] [1794205831.042813825] [hack_sim_node]: /sim/objects/randomize -> sim: seed 103
+[INFO] [1794205833.504690784] [hack_camera_bridge]: frames/5s: cam_head=28, cam_torso=28
+[INFO] [1794205838.504386726] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794205843.504312454] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794205848.504692614] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205853.505516288] [hack_camera_bridge]: frames/5s: cam_head=36, cam_torso=36
+[INFO] [1794205858.504962315] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=38
+[INFO] [1794205863.507585045] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=37
+[INFO] [1794205868.504906402] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=38
+[INFO] [1794205873.504917074] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794205878.504810971] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794205883.504543809] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=38
+[INFO] [1794205888.504752002] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205893.504668151] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205898.504871663] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205903.504575110] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205908.504415820] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=41
+[INFO] [1794205913.504632972] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=39
+[INFO] [1794205918.504665611] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205923.504777971] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205928.504747707] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205933.505588795] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=39
+[INFO] [1794205938.504712385] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=42
+[INFO] [1794205943.504781368] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205948.504719288] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794205953.504577941] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205958.504603967] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205963.504940140] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205968.504598050] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205973.504386120] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794205978.504411417] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794205983.504707587] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794205988.504594490] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=40
+[INFO] [1794205993.504534100] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=41
+[INFO] [1794205998.504757853] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794206003.504826049] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794206008.504916307] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794206013.504590410] [hack_camera_bridge]: frames/5s: cam_head=37, cam_torso=37
+[INFO] [1794206018.505124993] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794206023.505368786] [hack_camera_bridge]: frames/5s: cam_head=37, cam_torso=37
+[INFO] [1794206028.504425852] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=38
+[INFO] [1794206033.504832413] [hack_camera_bridge]: frames/5s: cam_head=34, cam_torso=34
+[INFO] [1794206038.504887150] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=38
+[INFO] [1794206043.504680255] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=38
+[INFO] [1794206048.506057794] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794206053.504615291] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794206058.504390286] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794206063.504555322] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794206068.504492509] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=40
+[INFO] [1794206073.504350235] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=41
+[INFO] [1794206078.504643509] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794206083.504671846] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794206088.506134037] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794206093.505079095] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794206098.504677146] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794206103.504789381] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794206108.504648074] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794206113.505426313] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794206118.504841940] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794206123.506436246] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794206128.504803713] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794206133.504422081] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=40
+[INFO] [1794206138.504734760] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=41
+[INFO] [1794206143.504941375] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794206148.505071968] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794206153.504897101] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794206158.504318646] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794206163.504454804] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794206168.504736257] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794206173.504808115] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794206178.504656701] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794206183.504614123] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=39
+[INFO] [1794206188.504918428] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794206193.505201888] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=40
+[INFO] [1794206198.504675917] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794206203.504728055] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794206208.504668072] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794206213.504392556] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794206218.504432013] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794206223.505593215] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=40
+[INFO] [1794206228.504431687] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=42
+[INFO] [1794206233.504573124] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794206238.505234930] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=41
+[INFO] [1794206243.504760772] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=42
+[INFO] [1794206248.504659068] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794206253.504575419] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794206258.504619098] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794206263.505066698] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794206268.505516073] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794206273.504959610] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794206278.504907226] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794206283.504780842] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794206288.504619730] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794206293.504893264] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794206298.504798056] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794206303.504410274] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794206308.505831173] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794206313.504622940] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794206318.504621361] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794206323.504703994] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794206328.504661910] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794206333.504807141] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794206338.504682410] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794206343.504724813] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794206348.505490330] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=42
+[INFO] [1794206353.504623173] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794206358.504770565] [hack_camera_bridge]: frames/5s: cam_head=42, cam_torso=41
+[INFO] [1794206363.504737634] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=41
+[INFO] [1794206368.504552941] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=39
+[INFO] [1794206373.504712035] [hack_camera_bridge]: frames/5s: cam_head=38, cam_torso=39
+[INFO] [1794206378.504660877] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794206383.504806546] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794206388.504833890] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794206393.504882809] [hack_camera_bridge]: frames/5s: cam_head=37, cam_torso=37
+[INFO] [1794206398.504770956] [hack_camera_bridge]: frames/5s: cam_head=40, cam_torso=40
+[INFO] [1794206403.504745438] [hack_camera_bridge]: frames/5s: cam_head=41, cam_torso=41
+[INFO] [1794206408.009721490] [hack_sim_node]: /sim/task/check -> sim
+[INFO] [1794206408.504743967] [hack_camera_bridge]: frames/5s: cam_head=39, cam_torso=39
+[INFO] [1794206413.504384397] [hack_camera_bridge]: frames/5s: cam_head=0, cam_torso=0
+[INFO] [1794206418.229280821] [rclcpp]: signal_handler(signum=15)
+Traceback (most recent call last):
+  File "/tmp/nssr_sim/hackathon/ros2/nssr_polygon/nssr_polygon/sim_node.py", line 110, in <module>
+Traceback (most recent call last):
+  File "/tmp/nssr_sim/hackathon/ros2/nssr_polygon/nssr_polygon/camera_bridge.py", line 125, in <module>
+    main()
+    main()
+  File "/tmp/nssr_sim/hackathon/ros2/nssr_polygon/nssr_polygon/camera_bridge.py", line 115, in main
+  File "/tmp/nssr_sim/hackathon/ros2/nssr_polygon/nssr_polygon/sim_node.py", line 101, in main
+    rclpy.spin(node)
+    rclpy.spin(n)
+  File "/tmp/w/mm/envs/ros/lib/python3.11/site-packages/rclpy/__init__.py", line 226, in spin
+  File "/tmp/w/mm/envs/ros/lib/python3.11/site-packages/rclpy/__init__.py", line 226, in spin
+    executor.spin_once()
+  File "/tmp/w/mm/envs/ros/lib/python3.11/site-packages/rclpy/executors.py", line 751, in spin_once
+    executor.spin_once()
+  File "/tmp/w/mm/envs/ros/lib/python3.11/site-packages/rclpy/executors.py", line 751, in spin_once
+    self._spin_once_impl(timeout_sec)
+    self._spin_once_impl(timeout_sec)
+  File "/tmp/w/mm/envs/ros/lib/python3.11/site-packages/rclpy/executors.py", line 740, in _spin_once_impl
+  File "/tmp/w/mm/envs/ros/lib/python3.11/site-packages/rclpy/executors.py", line 740, in _spin_once_impl
+    handler, entity, node = self.wait_for_ready_callbacks(timeout_sec=timeout_sec)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    handler, entity, node = self.wait_for_ready_callbacks(timeout_sec=timeout_sec)
+  File "/tmp/w/mm/envs/ros/lib/python3.11/site-packages/rclpy/executors.py", line 723, in wait_for_ready_callbacks
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/w/mm/envs/ros/lib/python3.11/site-packages/rclpy/executors.py", line 723, in wait_for_ready_callbacks
+    return next(self._cb_iter)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/tmp/w/mm/envs/ros/lib/python3.11/site-packages/rclpy/executors.py", line 624, in _wait_for_ready_callbacks
+    return next(self._cb_iter)
+    raise ExternalShutdownException()
+           ^^^^^^^^^^^^^^^^^^^
+rclpy.executors.ExternalShutdownException
+  File "/tmp/w/mm/envs/ros/lib/python3.11/site-packages/rclpy/executors.py", line 624, in _wait_for_ready_callbacks
+    raise ExternalShutdownException()
+rclpy.executors.ExternalShutdownException

@@ -1,0 +1,605 @@
++ T=/tmp/w
++ export MAMBA_ROOT_PREFIX=/tmp/w/mm
++ MAMBA_ROOT_PREFIX=/tmp/w/mm
++ MM=/tmp/w/bin/micromamba
++ cd /tmp/nssr_sim
++ export ROS_DOMAIN_ID=146 RMW_IMPLEMENTATION=rmw_fastrtps_cpp ACCEPT_EULA=Y PRIVACY_CONSENT=Y OMNI_KIT_ACCEPT_EULA=YES
++ ROS_DOMAIN_ID=146
++ RMW_IMPLEMENTATION=rmw_fastrtps_cpp
++ ACCEPT_EULA=Y
++ PRIVACY_CONSENT=Y
++ OMNI_KIT_ACCEPT_EULA=YES
++ export FASTRTPS_DEFAULT_PROFILES_FILE=/tmp/nssr_sim/hackathon/docker/fastdds_hack.xml
++ FASTRTPS_DEFAULT_PROFILES_FILE=/tmp/nssr_sim/hackathon/docker/fastdds_hack.xml
++ export VK_ICD_FILENAMES=/tmp/w/nvidia_icd.json VK_DRIVER_FILES=/tmp/w/nvidia_icd.json __EGL_VENDOR_LIBRARY_DIRS=/tmp/w/egl
++ VK_ICD_FILENAMES=/tmp/w/nvidia_icd.json
++ VK_DRIVER_FILES=/tmp/w/nvidia_icd.json
++ __EGL_VENDOR_LIBRARY_DIRS=/tmp/w/egl
++ : sort3
++ : 103
++ : 2400
++ DL=1794230919
++ RPY=/tmp/w/mm/envs/ros/bin/python
++ rm -rf /tmp/sol
++ cp -r /kaggle/working/solution /tmp/sol
++ /tmp/w/mm/envs/ros/bin/python -m pip --version
++ /tmp/w/mm/envs/ros/bin/python -c 'import team048_accel as m;print('\''accel import OK'\'',m.__version__)'
++ cd /tmp/sol
++ rosenv colcon build
++ echo sol_build_rc=0
++ grep -q sol_build_rc=0 /kaggle/working/logs/sol_build.log
++ export HACK_TASK=sort3 HACK_POOL=3 HACK_SEED=100 HACK_HEADLESS=1 HACK_RES=1280x720 HACK_RENDER_INTERVAL=3
++ HACK_TASK=sort3
++ HACK_POOL=3
++ HACK_SEED=100
++ HACK_HEADLESS=1
++ HACK_RES=1280x720
++ HACK_RENDER_INTERVAL=3
++ export HACK_SELF_COLLISION=1
++ HACK_SELF_COLLISION=1
++ export 'HACK_KIT_ARGS=--/rtx/raytracing/fractionalCutoutOpacity=true --/rtx/pathtracing/fractionalCutoutOpacity=true --/rtx/translucency/maxRefractionBounces=4 --/app/runLoops/main/rateLimitEnabled=false --/app/renderer/resolution/width=1280 --/app/renderer/resolution/height=720'
++ HACK_KIT_ARGS='--/rtx/raytracing/fractionalCutoutOpacity=true --/rtx/pathtracing/fractionalCutoutOpacity=true --/rtx/translucency/maxRefractionBounces=4 --/app/runLoops/main/rateLimitEnabled=false --/app/renderer/resolution/width=1280 --/app/renderer/resolution/height=720'
++ BR=7429
++ sleep 3
++ rosenv python teleoperation/bridges/ros2_zmq_bridge.py
++ SIM=7523
++ D=1808
++ up=0
++ LD_LIBRARY_PATH=/tmp/w/nvlib:/usr/local/nvidia/lib64:/usr/local/cuda/lib64:/usr/local/nvidia/lib:/usr/local/nvidia/lib64:/usr/local/cuda/lib64
++ '[' 8 -lt 1808 ']'
++ /tmp/w/mm/envs/isaac/bin/python scripts/sim_runner.py --task NSSRSim-TiangongPro-Parlor-v0 --enable_cameras --num_envs 1 --perf_stats --step_hz 100 --headless --device cpu
+++ left
++++ date +%s
+++ echo 5043
++ '[' 5043 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 22 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 5029
++ '[' 5029 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 36 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 5015
++ '[' 5015 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 51 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 5000
++ '[' 5000 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 65 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4986
++ '[' 4986 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 80 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4971
++ '[' 4971 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 96 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4955
++ '[' 4955 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 111 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4940
++ '[' 4940 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 125 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4926
++ '[' 4926 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 140 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4911
++ '[' 4911 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 155 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4896
++ '[' 4896 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 169 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4882
++ '[' 4882 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 184 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4867
++ '[' 4867 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 198 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4853
++ '[' 4853 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 214 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4837
++ '[' 4837 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 229 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4822
++ '[' 4822 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 243 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4808
++ '[' 4808 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 257 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4794
++ '[' 4794 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 271 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4780
++ '[' 4780 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 287 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4764
++ '[' 4764 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 302 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4749
++ '[' 4749 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 316 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4735
++ '[' 4735 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 330 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4721
++ '[' 4721 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 344 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4707
++ '[' 4707 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 359 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4692
++ '[' 4692 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 373 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4678
++ '[' 4678 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 387 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4664
++ '[' 4664 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 401 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4650
++ '[' 4650 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 415 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4636
++ '[' 4636 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 429 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4622
++ '[' 4622 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 444 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4607
++ '[' 4607 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 458 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4593
++ '[' 4593 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 472 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4579
++ '[' 4579 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 487 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4564
++ '[' 4564 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 501 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4550
++ '[' 4550 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 517 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4534
++ '[' 4534 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 531 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4520
++ '[' 4520 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 547 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4504
++ '[' 4504 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 561 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4490
++ '[' 4490 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 575 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4476
++ '[' 4476 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 590 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4461
++ '[' 4461 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 604 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4447
++ '[' 4447 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 618 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4433
++ '[' 4433 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 632 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4419
++ '[' 4419 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 646 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4405
++ '[' 4405 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 660 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4391
++ '[' 4391 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 675 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4376
++ '[' 4376 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 689 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4362
++ '[' 4362 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 703 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4348
++ '[' 4348 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 717 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4334
++ '[' 4334 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 731 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4320
++ '[' 4320 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 746 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4305
++ '[' 4305 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 761 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4290
++ '[' 4290 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 775 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4276
++ '[' 4276 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 790 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4261
++ '[' 4261 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 804 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4247
++ '[' 4247 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 818 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4233
++ '[' 4233 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 832 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4219
++ '[' 4219 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 846 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4205
++ '[' 4205 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 860 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4191
++ '[' 4191 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 874 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4177
++ '[' 4177 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 889 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4162
++ '[' 4162 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 904 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4147
++ '[' 4147 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 918 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4133
++ '[' 4133 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 932 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4119
++ '[' 4119 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 947 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4104
++ '[' 4104 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 961 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4090
++ '[' 4090 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 976 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4075
++ '[' 4075 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 991 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4060
++ '[' 4060 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 1005 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4046
++ '[' 4046 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 1020 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4031
++ '[' 4031 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 1034 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4017
++ '[' 4017 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 1048 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 4003
++ '[' 4003 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ sleep 5
++ '[' 1062 -lt 1808 ']'
+++ left
++++ date +%s
+++ echo 3989
++ '[' 3989 -gt 1500 ']'
++ rosenv timeout -k 2 8 ros2 topic echo --once --qos-durability transient_local /sim/task std_msgs/msg/String
++ up=1
++ break
++ echo 'sim boot: up=1 after 1070s'
++ '[' 1 = 1 ']'
++ grep -q 'self-collisions ON' /kaggle/working/logs/sim_sort3.log
++ echo 'self-collisions ON (sim log)'
++ for S in $SEEDS
+++ left
++++ date +%s
+++ echo 3981
++ L=3981
++ '[' 3981 -lt 400 ']'
++ RT=2400
++ '[' 2400 -lt 2400 ']'
++ rosenv ros2 topic pub --once /sim/objects/randomize std_msgs/msg/Int32 '{data: 103}'
++ sleep 15
+++ seq 1 36
++ for w in $(seq 1 36)
++ grep -q '"sim_t": [0-9]'
++ rosenv timeout -k 5 30 python /kaggle/working/score.py start
++ break
++ rosenv timeout -k 5 60 python /kaggle/working/score.py start
++ GRAB_OUT=/kaggle/working/frames_end/sort3_103_start
++ rosenv timeout -k 5 60 python /kaggle/working/grab_frames.py
++ export TEAM048_TRACE_DIR=/kaggle/working/trace/sort3_103
++ TEAM048_TRACE_DIR=/kaggle/working/trace/sort3_103
++ echo 'run rc=0 cap=2400'
++ rosenv timeout -k 5 120 python /kaggle/working/score.py check sort3 103
++ GRAB_OUT=/kaggle/working/frames_end/sort3_103_end
++ rosenv timeout -k 5 60 python /kaggle/working/grab_frames.py
++ tail -1 /kaggle/working/results.jsonl
++ kill -INT 7523
++ sleep 10
++ kill 7429
++ pkill -f sim_node.py
++ pkill -f camera_bridge.py
++ pkill -f robot_state_publisher
++ pkill -9 -f sim_runner.py
++ sleep 5

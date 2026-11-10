@@ -1,0 +1,19 @@
+{
+  "id": "dmitrijkv/team048-tpu-cpuwork",
+  "title": "team048-tpu-cpuwork",
+  "code_file": "team048-tpu-cpuwork.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": false,
+  "enable_tpu": true,
+  "enable_internet": true,
+  "machine_shape": "TpuV5E8",
+  "docker_image_pinning_type": "latest",
+  "dataset_sources": [
+    "dmitrijkv/team048-tpu-cpu-inputs"
+  ],
+  "kernel_sources": [],
+  "competition_sources": [],
+  "model_sources": []
+}
