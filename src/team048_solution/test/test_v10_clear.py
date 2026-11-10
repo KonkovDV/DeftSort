@@ -1,4 +1,4 @@
-"""v10 open-hand clearance (fixes/V10_HEAVY_RU.md): the open Inspire hand (UBTECH meshes, tools/hand_open_points.py)
+"""Open-hand clearance: the open Inspire hand (UBTECH meshes, tools/hand_open_points.py)
 must not overlap the MEASURED object box at the grasp pose or along the approach. Sim evidence: v7+v8 side grasps of
 mustard / Crayola / Crunch / Perricone touched the object before closing (fixture v7v8_side_at_grasp.json)."""
 import os,sys,json,unittest

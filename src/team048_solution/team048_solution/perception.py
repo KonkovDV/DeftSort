@@ -7,6 +7,7 @@ from . import _accel
 
 @dataclass
 class Detection:
+    """One segment above the table: centroid and bounds (pelvis, m), pixel indices, feature vector."""
     centroid: np.ndarray
     lower: np.ndarray
     upper: np.ndarray
@@ -103,6 +104,7 @@ def rect_mask(P, rects):
 
 
 def rect_mask_py(P, rects):
+    """NumPy reference of the rotated-rectangle mask (rects in pelvis-frame m)."""
     m = np.zeros(np.shape(P)[:2], bool)
     for x, y, u0, u1, v0, v1, ha, hb in rects:
         dx = P[..., 0]-x; dy = P[..., 1]-y
@@ -124,6 +126,7 @@ def deproject(depth_mm, K, T):
 
 
 def deproject_py(dmm, K, T):
+    """NumPy reference: depth (mm) -> organised cloud (H, W, 3) in m via K (px) and camera->pelvis T."""
     h, w = dmm.shape
     v, u = np.mgrid[0:h, 0:w]; Z = dmm/1000.
     X = (u-K[0, 2])*Z/K[0, 0]; Y = (v-K[1, 2])*Z/K[1, 1]
@@ -145,6 +148,7 @@ def _refine_plane(p, best, score, min_inliers):
 
 
 def table_plane_py(points, valid, iterations=120, tolerance=.006, min_inliers=100, seed=0):
+    """NumPy reference RANSAC plane (n, d) with n.p + d = 0 (m) on the valid points; tolerance in m."""
     p = np.asarray(points)[np.asarray(valid, dtype=bool)]
     p = p[np.isfinite(p).all(axis=1)]
     if len(p) < min_inliers:
@@ -184,7 +188,7 @@ def near_edge(points, valid, plane, y_half=.5, drop=.05, q=.1, min_cols=40, min_
     below it in that column (closer to the camera along the image) include >= min_below valid points at least `drop`
     under the plane (the view passes the edge and drops to the floor/crates). Otherwise the inlier boundary is just the
     image border and the true edge may be closer -> None (caller uses a conservative bound).
-    Kaggle v7 torso frames: edge pixels at x 0.21-0.25 m (pelvis), head frames: edge not visible (None)."""
+    Run v7 torso frames: edge pixels at x 0.21-0.25 m (pelvis), head frames: edge not visible (None)."""
     P = np.asarray(points, float)
     ok = np.asarray(valid, bool) & np.isfinite(P).all(axis=-1)
     n, d = np.asarray(plane[0], float), float(plane[1])
@@ -261,6 +265,7 @@ def _components_py(p, mask, max_jump):
 
 
 def segment_py(points, rgb, valid, plane, roi, min_pixels=25, max_jump=.025, min_height=.012, max_height=.35):
+    """NumPy reference segmentation above the plane inside the ROI box (pelvis, m); heights and jumps in m."""
     p = np.asarray(points); rgb = np.asarray(rgb)
     if p.shape != rgb.shape or p.shape[-1] != 3 or rgb.dtype != np.uint8:
         raise ValueError('RGB-D shape/type mismatch')

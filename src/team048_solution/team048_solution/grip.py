@@ -2,16 +2,16 @@
   /arm_6dof_{left,right}       geometry_msgs/WrenchStamped, external load on the hand, hand weight subtracted
   /inspire_hand/state/{l,r}    sensor_msgs/JointState: position 0..1 (1 open), velocity = fraction of max speed,
                                effort = fraction of the force limit
-Verified on Kaggle v5 (check_interfaces): both wrists |F| = 0.00 N with an empty hand; hand state has 6 x pos/vel/eff.
+Verified in run v5 (interface check): both wrists |F| = 0.00 N with an empty hand; hand state has 6 x pos/vel/eff.
 The held/empty decision is held_rule (finger deviation + effort, calibrated on v7+v8 traces below). The older
 finger_verdict/past_verdict and the wrist F/T are kept for the log only.
 """
 import numpy as np
 
-# Wrist F/T is NOT used for the decision: v7 Kaggle (31 frames) shows empty-hand offsets of 0.05-5.5 N depending on
+# Wrist F/T is NOT used for the decision: run v7 (31 frames) shows empty-hand offsets of 0.05-5.5 N depending on
 # arm pose and finger state (open hand ~4.5 N, closed fist ~0.1 N) -- as large as the objects' weight (0.8-4.2 N).
 GRASP_DF_MIN_N = None
-# Finger criterion, calibrated on v7 Kaggle 'lifted' frames (sort3 pool 3, 2026-11-09):
+# Finger criterion, calibrated on run v7 'lifted' frames (sort3 pool 3, 2026-11-09):
 #   loaded (3: Ecoforms x2, Threshold): commanded-closing fingers stopped 0.67-0.98 above target, effort 1.00
 #   empty  (7: 2 rim, 5 side): fingers within 0.02 of target, effort <= 0.334
 # thresholds = midpoints between the classes.
@@ -28,9 +28,9 @@ FINGER_EFF_HELD = FINGER_EFF_HELD_R1
 # INTERFACES.md: set_force ratio 1.0 = 1000 g (default); set_speed 1.0 = full stroke in 0.8 s, 0.5 = 1.6 s.
 # Defaults (env overrides for sim sweeps, TEAM048_HAND_FORCE / _SPEED / _CLOSE_PAST):
 #   force 0.4  : middle of the organiser's 0.3-0.5 range. Heaviest pool-3 object 0.51 kg (004_sugar_box, objects.yaml).
-#                TODO(sim): sweep 0.3/0.4/0.5 on the heaviest objects; TRACE logs slips (lifted vs carry verdict).
+#                Not swept in the simulator; TRACE logs slips (lifted vs carry verdict).
 #   thumb rotation (DOF 6) keeps 1.0: it positions the thumb into opposition and does not squeeze the object; a weak
-#                rotation actuator would let the contact force push the thumb out of opposition. TODO(sim) confirm.
+#                rotation actuator would let the contact force push the thumb out of opposition (not verified in the simulator).
 #   speed 0.5  : the organiser's example value (1.6 s full stroke) -> wait_fingers timeouts scale with it.
 #   close past : phase 1 closes towards the fully-closed target until the fingers stop on the object (contact
 #                position p_c measured on /inspire_hand/state); phase 2 re-targets p_c - CLOSE_PAST, i.e. "slightly past
@@ -114,7 +114,7 @@ def contact_target(contact_pos, closed_target, past=None, tol=JAM_TOL):
     return [float(min(TARGET_MAX, x)) for x in t]
 
 
-# ---- Held rule (v8 fix 2, evidence: fixes/V8_ANALYSIS_RU.md section 5, fixtures test/fixtures/v7v8_grasp_traces.json)
+# ---- Held rule (evidence: runs v7+v8, fixture test/fixtures/v7v8_grasp_traces.json)
 # Held iff at least one commanded-closing finger (DOF 1-5) deviates >= HELD_DEV from its CURRENT command and its
 # effort is >= HELD_EFF. 15/15 correct on the v7+v8 closed/lifted pairs (4 held, 11 empty, force 1.0), where
 # past_verdict misses 2 of 4 held (v8 Perricone: the fingers travelled 0.46-0.76 past contact, only the jammed thumb
@@ -216,11 +216,13 @@ SETTLE_COUNT = 3             # consecutive state messages (~20 Hz) with all fing
 
 
 def force_vec(wrench):
+    """Force part of a WrenchStamped-like message as a (3,) array in N."""
     f = wrench.force
     return np.array([f.x, f.y, f.z], float)
 
 
 class GraspMonitor:
+    """Held/empty verdict from wrist force change (N) and finger position/effort; votes only on data present."""
     def __init__(self, df_min=None, blocked_min=None, effort_min=None):
         self.df_min = GRASP_DF_MIN_N if df_min is None else df_min
         self.blocked_min = FINGER_BLOCKED_MIN if blocked_min is None else blocked_min
@@ -228,6 +230,7 @@ class GraspMonitor:
         self.f0 = None
 
     def baseline(self, force):
+        """Store the wrist force (N) before closing as the reference for the force vote."""
         self.f0 = None if force is None else np.asarray(force, float)
 
     def verdict(self, force=None, hand_pos=None, hand_eff=None):

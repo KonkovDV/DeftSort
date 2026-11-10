@@ -88,7 +88,7 @@ HAND_LOG_DT=.1        # s sim: hand-state log period during the guarded approach
 HAND_CFG_POLL_S=.2      # s wall between delivery passes
 HAND_CFG_REPLY_S=2.     # s wall to wait for a reply before the request is sent again
 HAND_CFG_SENDS_MAX=5    # sends per service; after that the request counts as delivered without a reply
-# Camera frame period in sim time: '[hack] camera period 0.0300 s sim, render_interval 3' (sim_sort2.log of the Kaggle
+# Camera frame period in sim time: '[hack] camera period 0.0300 s sim, render_interval 3' (simulator log of
 # runs v9a, v9b, v11b; the bridge logged 37-41 frames per 5 s wall at RTF ~0.2). A frame up to two periods older than
 # the request (one frame in flight plus one dropped) is still accepted when no newer one arrives within `wait`.
 CAMERA_PERIOD_S=.03
@@ -96,10 +96,12 @@ CAPTURE_MAX_AGE=2*CAMERA_PERIOD_S
 class JointStateMissing(RuntimeError):
     """An arm joint has never been reported on /joint_states (v15: no motion from an invented posture)."""
 def quat_to_T(t,q):
+    """4x4 transform from translation t (m) and unit quaternion q = (x, y, z, w)."""
     x,y,z,w=q;T=np.eye(4)
     T[:3,:3]=[[1-2*(y*y+z*z),2*(x*y-z*w),2*(x*z+y*w)],[2*(x*y+z*w),1-2*(x*x+z*z),2*(y*z-x*w)],[2*(x*z-y*w),2*(y*z+x*w),1-2*(x*x+y*y)]]
     T[:3,3]=t;return T
 class Sol(Node):
+    """The ROS 2 node: subscriptions, task state machine, survey, pick and place, safe end."""
     def __init__(s):
         super().__init__('team048_solution')
         lat=QoSProfile(depth=1,durability=DurabilityPolicy.TRANSIENT_LOCAL,reliability=ReliabilityPolicy.RELIABLE)
@@ -130,8 +132,10 @@ class Sol(Node):
         s.wall_ready=time.monotonic()   # subscriptions exist from here: later waiting for /clock costs no sim time
         s.hand_target={'l':None,'r':None};s.t0=None;s.trays={};s.placed={};s.plane=None;s.table_x=None;s.monitor=GRIP.GraspMonitor()
     def on_js(s,m):
+        """/joint_states callback: store the latest position (rad) per joint name."""
         with s.lock:s.js.update(zip(m.name,m.position))
     def on_hand(s,k,m):
+        """Hand state callback for side k: latest state and short position/velocity histories."""
         # v15: the history is replaced by a NEW tuple (one atomic assignment) instead of append + del in place: a reader
         # on the task thread (wait_fingers -> fingers_stalled) iterating the old list while this callback trimmed it
         # could skip samples (test_v15.HandHistory).
@@ -151,13 +155,19 @@ class Sol(Node):
                  pos=r(None if h is None else h.position),vel=r(None if h is None else h.velocity),
                  eff=r(None if h is None else h.effort),cmd=r(s.hand_target.get(side)),F=r(s.wrench.get(side)))   # F: log only
         rec.update(extra);s.log('HAND',json.dumps(rec))
-    def now(s):return s.get_clock().now().nanoseconds*1e-9
+    def now(s):
+        """Current ROS time in seconds (sim time with use_sim_time)."""
+        return s.get_clock().now().nanoseconds*1e-9
     def sleep(s,dt):
+        """Sleep dt seconds of ROS time."""
         t=s.now()
         while s.now()-t<dt:time.sleep(.01)
-    def log(s,*a):s.get_logger().info(' '.join(str(x) for x in a))
+    def log(s,*a):
+        """Log the arguments joined by spaces at INFO level."""
+        s.get_logger().info(' '.join(str(x) for x in a))
     # ---------------- actuation ----------------
     def cmd(s,group,ids,q,spd):
+        """Publish one position command: motor ids, targets (rad), speeds clipped to [1e-3, 0.8] rad/s."""
         m=CmdSetMotorPosition()
         for i,p,v in zip(ids,q,spd):
             c=SetMotorPosition();c.name=int(i);c.pos=float(p);c.spd=float(min(.8,max(v,1e-3)));c.cur=1.0;m.cmds.append(c)
@@ -196,8 +206,11 @@ class Sol(Node):
                 goal=np.clip(goal+e,s.arms[side].chain.lower,s.arms[side].chain.upper);s.cmd('arm',IDS[side],goal,np.full(7,.3));t=s.now();T=REFINE_T
         return np.abs(q-s.q_now(side)).max()<.06
     def hand_set(s,side,v):
+        """Command the six hand DOF of one side (normalised positions, 1 = open)."""
         s.hand_target[side]=list(v);m=JointState();m.name=['1','2','3','4','5','6'];m.position=[float(x) for x in v];s.hand[SIDE_NAME[side]].publish(m)
-    def hand_open(s,side):s.hand_set(side,[1,1,1,1,1,0.])      # fingers open, thumb rotated into opposition (DOF 6 = 0)
+    def hand_open(s,side):
+        """Open the fingers and rotate the thumb into opposition (DOF 6 = 0)."""
+        s.hand_set(side,[1,1,1,1,1,0.])      # fingers open, thumb rotated into opposition (DOF 6 = 0)
     def fingers_open(s,side,min_open=RELEASE_OPEN_MIN):
         """/inspire_hand/state position is a fraction, 1.0 open / 0.0 closed (INTERFACES.md); v7 releases read 0.96-0.97."""
         h=s.hstate.get(side)
@@ -305,6 +318,7 @@ class Sol(Node):
         c=getattr(s,'hand_cfg',{}).get(('force',side))
         return c is not None and c['state']!='waiting'
     def hand_cfg_summary(s):
+        """Delivery state of the set_force / set_speed requests per hand."""
         return {f"{SIDE_NAME[k]}_{kind}":c['state'] for (kind,k),c in sorted(getattr(s,'hand_cfg',{}).items())}
     def hand_verdict(s,side,grasp=None):
         """v8 fix 2: held iff a closing finger deviates >= GRIP.HELD_DEV from its current command with effort >=
@@ -410,6 +424,7 @@ class Sol(Node):
             R.append((x,y,u,v,a/2+TRAY_MASK_MARGIN,b/2+TRAY_MASK_MARGIN))
         return rect_mask(P,R)   # |dx*u0+dy*u1| < a/2+margin & |dx*v0+dy*v1| < b/2+margin, any tray (Rust or NumPy)
     def observe(s,not_before=None):
+        """One observation: capture, table plane, tray refinement, segments. Returns (P, rgb, plane, detections)."""
         P,rgb,valid=s.capture(not_before=not_before)
         plane=s.measure_plane(P,valid);s.plane=plane
         s.locate_trays(P,rgb,valid,plane,refine_only=True)
@@ -504,6 +519,7 @@ class Sol(Node):
         return out
     # ---------------- task ----------------
     def run(s):
+        """Whole task: hand settings, wait for /sim/task and /clock, survey, pick-and-place loop, safe end, done."""
         s.hand_settings()     # background delivery starts before the task arrives (service discovery takes wall time)
         while s.task is None or s.now()<=0:time.sleep(.05)
         # v7 s101: 'startup 206.9 s' -- the wait for the (not yet running) sim clock was counted as sim time.
@@ -804,13 +820,13 @@ def accel_status():
 def replan_infeasible(nofeas,name,handled):
     """False when the last planning for `name` found no pick+place plan and no object has been removed since
     (obstacles unchanged -> the deterministic planner would fail again and only burn sim time; v7: observe->start
-    planning 12.0 s sim mean). Offline episode MC (fixes/budget/episode_mc.py, pool 3 sort3, 100 layouts): +0.4..0.9 pts
+    planning 12.0 s sim mean). Offline episode Monte Carlo (pool 3 sort3, 100 layouts): +0.4..0.9 pts
     when planning costs 2x sim time."""
     return nofeas.get(name) is None or nofeas[name]!=len(handled)
 PLACE_AXES=(np.array([1.,0,0]),np.array([0,1.,0]),np.array([-1.,0,0]),np.array([0,-1.,0]))
 def held_offset(A,q_grasp,g,c3):
     """Centre of the held object in the TCP frame for grasps whose grip point is NOT over the object centre (rim pinch:
-    the pinch is on the rim, the dish centre r0 away), else None. Check on Kaggle data: FK of the measured at_grasp
+    the pinch is on the rim, the dish centre r0 away), else None. Check on recorded run data: FK of the measured at_grasp
     joints (v8, v9b, v11b, 5 rim attempts), pinch point + r0 * closing axis lies 10.4-12.9 mm from the dish centre
     measured in the head frame (TCP_TOL 1 cm plus the circle fit). Height = the pinch height (plan_place uses only the
     horizontal part)."""
@@ -828,7 +844,7 @@ def plan_place(A,q_from,tx,ty,top,fallback=None,tray_h=TRAY_H,obj_off=None):
     slot, toward or over the tray wall."""
     z_from=A.tcp(q_from)[2,3]
     for (x,y) in [(tx,ty)]+([fallback] if fallback is not None else []):
-        for dz in (.20,.25,.30):            # unchanged heights; lowering needs payload-vs-tray-wall data (TODO)
+        for dz in (.20,.25,.30):            # unchanged heights; lowering needs payload-vs-tray-wall data
             c=np.array([x,y,top+tray_h+dz-.1])
             for ca in PLACE_AXES:
                 T=A.grasp_pose(c,ca,np.array([0,0,-1.]))
@@ -842,6 +858,7 @@ def plan_place(A,q_from,tx,ty,top,fallback=None,tray_h=TRAY_H,obj_off=None):
                 if A.col.certify(q_from,q):return q,A.lift(q,RETREAT_DZ),None
     return None
 def rotz(a):
+    """3x3 rotation about z by a (rad)."""
     c,s_=np.cos(a),np.sin(a);return np.array([[c,-s_,0],[s_,c,0],[0,0,1.]])
 YAW_MAX=2.5           # rad, |body_yaw| used for placing (INTERFACES.md: body_yaw_joint motor 31, [-2.97, 3.14], plus = left)
 # Candidate bearings (rad, torso frame, toward this arm's side) at which the arm can place: a ROBOT-REACH property
@@ -860,7 +877,7 @@ def yaw_candidates(side,tx,ty):
 FAR_TRAY_Y=.3
 def far_tray(side,ty):
     """Tray on the OTHER arm's side (tray_left for the right arm, tray_right for the left arm).
-    Offline evidence (2026-11-09): reach-p3/p6 Kaggle, 30 layouts x 2 pools, 0 of 450 picked objects were placeable in the
+    Offline evidence (2026-11-09): reach study, 30 layouts x 2 pools, 0 of 450 picked objects were placeable in the
     far tray with body_yaw=0; study r3s3 (new planner, organiser layout generator) 103/103 far-tray placements used yaw."""
     return (side=='l' and ty<-FAR_TRAY_Y) or (side=='r' and ty>FAR_TRAY_Y)
 def plan_place_yaw(A,q_from,tx,ty,plane,trays,fallback=None,tray_h=TRAY_H,obj_off=None):
@@ -892,7 +909,9 @@ def plan_place_yaw(A,q_from,tx,ty,plane,trays,fallback=None,tray_h=TRAY_H,obj_of
 def move_time(a,b,vmax=.8,settle=None):
     """Pessimistic sim seconds of one move_arm from a to b (see MOVE_SETTLE_S)."""
     return float(np.max(np.abs(np.asarray(b)-np.asarray(a))))/vmax*1.6+(MOVE_SETTLE_S if settle is None else settle)
-def heavy(name):return float(PRI.get(name,{}).get('mass',0.))>=HEAVY_KG
+def heavy(name):
+    """True when the object mass in priors.json (from objects.yaml) is at least HEAVY_KG."""
+    return float(PRI.get(name,{}).get('mass',0.))>=HEAVY_KG
 def place_time(A,q_lift,place,yaw,vmax=.8,release_s=None,q_from=None,settle=None):
     """Pessimistic seconds from 'fingers closed' to 'arm home, waist back': joint-space moves at <= vmax (max joint
     delta / vmax, x1.6 PD margin as move_arm) plus MOVE_SETTLE_S each, the lift itself (q_from = q_grasp -> q_lift,
@@ -921,8 +940,11 @@ def lift_allowed(remaining,need,hold,safety):
     """#595 lift decision: the typical-time model (place_time + safety: lift, transport, release, retreat home) AND the
     worst-case hold bound (every in-hand step timing out) must both fit in the remaining sim time."""
     return remaining>=max(need+safety,hold+HOLD_MARGIN_S)
-def self_w(s):return min(s.arms['l'].hand['opposed_open']-.01,.11)
+def self_w(s):
+    """Widest graspable object width (m) for the open hand, capped at 0.11 m."""
+    return min(s.arms['l'].hand['opposed_open']-.01,.11)
 def main():
+    """Entry point: start the node on a multi-threaded executor and run one task."""
     rclpy.init();n=Sol();ex=MultiThreadedExecutor(4);ex.add_node(n)
     th=threading.Thread(target=ex.spin,daemon=True);th.start()
     try:n.run()

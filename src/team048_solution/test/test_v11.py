@@ -1,4 +1,4 @@
-"""v11 regression tests from the Kaggle v9b run (f525ed9, sort2 seed 101, 10 points, 1 of 6 objects).
+"""v11 regression tests from run v9b (sort2 seed 101, 10 points, 1 of 6 objects).
 1. The left hand never received its SetForce request (fixture v9b_hand_settings.json): requests are now retried until
    the service is discovered and has answered; an arm whose hand force was never delivered is not used.
 2. The Threshold ramekin has a closed top in every recorded frame; the rim pinch put the thumb on it in 4 of 4

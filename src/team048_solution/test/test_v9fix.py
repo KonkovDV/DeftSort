@@ -1,4 +1,4 @@
-"""v9fix (fixes/V9_ANALYSIS_RU.md): Kaggle v9a sort3 s103 scored 0 -- the start->home move before the table was
+"""Run v9a sort3 seed 103 scored 0 -- the start->home move before the table was
 measured jammed both hands in the table front; torso envelope missing; guard threshold without margin; early stop."""
 import os,sys,json,types,unittest
 import numpy as np

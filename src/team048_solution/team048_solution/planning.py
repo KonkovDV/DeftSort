@@ -11,6 +11,7 @@ from . import _accel
 
 @dataclass(frozen=True)
 class Sphere:
+    """Collision sphere: link name, centre in the link frame (m), radius (m)."""
     link: str
     center: np.ndarray
     radius: float
@@ -35,6 +36,7 @@ def spheres_bulk(link, centers, radii):
 
 ESCAPE_TOL=.001   # m, see CollisionModel.certify_escape
 class CollisionModel:
+    """Sphere model of an arm chain against a base-frame environment, with a safety margin (m)."""
     def __init__(self, chain, spheres, environment, ignored_pairs=(), *, audited_complete=False, margin=.015):
         if not audited_complete or not spheres or not environment:
             raise ValueError('complete audited robot/hand/payload and environment envelopes mandatory')
@@ -69,10 +71,12 @@ class CollisionModel:
 
     @property
     def margin(self):
+        """Safety margin (m) added to every sphere-sphere distance check."""
         return self._margin
 
     @margin.setter
     def margin(self,value):
+        """Safety margin (m) added to every sphere-sphere distance check."""
         if not np.isfinite(value) or value<=0: raise ValueError('positive safety margin required')
         self._margin=value
         if self._fast is not None: self._fast.margin=float(value)
@@ -82,10 +86,12 @@ class CollisionModel:
 
     @property
     def environment(self):
+        """Environment spheres in the chain base frame (pelvis)."""
         return self._environment
 
     @environment.setter
     def environment(self,values):
+        """Environment spheres in the chain base frame (pelvis)."""
         # Sphere is frozen with a private read-only centre copy: reuse instances, re-validate anything else
         self._environment=tuple(s if type(s) is Sphere else Sphere(s.link,s.center,s.radius) for s in values)
         values=self._environment
@@ -109,6 +115,7 @@ class CollisionModel:
             except BaseException as e: self._fallback('set_env',e)
 
     def valid(self, q, inflation=0):
+        """True when posture q (rad) keeps every checked pair apart by more than the margin (+ inflation, m)."""
         inflation=np.broadcast_to(finite(inflation),(len(self.spheres),))
         if np.any(inflation<0): raise ValueError('invalid collision inflation')
         if self._fast is not None:
@@ -151,6 +158,7 @@ class CollisionModel:
         return True
 
     def certify(self, a, b, max_step=.003):
+        """True when the straight joint-space path a -> b (rad) is proven collision-free."""
         if not np.isfinite(max_step) or max_step <= 0:
             raise ValueError('positive finite collision resolution required')
         a = self.chain.validate_q(a); b = self.chain.validate_q(b)
@@ -183,7 +191,7 @@ class CollisionModel:
           * every pair that is clear at `a` stays clear along the whole swept segment (same inflation bound as certify),
           * every pair that is NOT clear at `a` never gets more than ESCAPE_TOL closer than it was AT THE START
             (no deeper penetration than the start posture itself; 1 mm < the 2.9 mm real mesh clearance of the
-            start posture, fixes/diag/v9a_mesh_contacts.py), and
+            start posture), and
           * `b` is fully valid.
         If `a` is valid this is exactly certify(a, b). Implementation: environment spheres touched at `a` are removed
         for a normal (Rust/NumPy) certify of the rest, and checked separately on the same samples."""
@@ -250,11 +258,13 @@ class CollisionModel:
 
 @dataclass
 class Trajectory:
+    """Time-parametrised joint path: points (rad) and times (s)."""
     points: np.ndarray
     times: np.ndarray
 
 
 def joint_path(chain, collision, waypoints, speed=.35, acceleration=.4, dt=.05):
+    """Trapezoidal-velocity joint trajectory through certified waypoints (speed rad/s, acceleration rad/s^2, dt s)."""
     if not np.isfinite([speed, acceleration, dt]).all() or not 0 < speed <= .8 or acceleration <= 0 or dt <= 0:
         raise ValueError('invalid trajectory bounds')
     qs = [chain.validate_q(q) for q in waypoints]

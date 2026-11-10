@@ -5,7 +5,7 @@ path is used only when the extension imports, the model is supported (7 active j
 TEAM048_ACCEL != "0". Any unexpected error inside the extension disables it for the process and the NumPy
 reference takes over (logged once to stderr), so a missing or broken wheel can never stop the solution.
 Equivalence (tests/test_accel_equivalence.py): FK/Jacobian/frames <= 1e-12, IK solutions <= 1e-9 on thousands of
-random targets, collision verdicts identical, RANSAC plane and segments identical on the Kaggle frames.
+random targets, collision verdicts identical, RANSAC plane and segments identical on the recorded simulator frames.
 """
 import os, sys
 import numpy as np
@@ -29,10 +29,12 @@ PARALLEL = os.environ.get('TEAM048_ACCEL_PARALLEL', '0') == '1'
 
 
 def enabled():
+    """True when the Rust module is importable and has not been disabled by a failure in this process."""
     return AVAILABLE and not _disabled
 
 
 def enabled2():
+    """True when the loaded Rust module exposes API >= 2 (perception and grasp kernels) and is not disabled."""
     return API >= 2 and not _disabled
 
 
@@ -51,6 +53,7 @@ def guard(exc):
 
 
 def fast_chain(chain):
+    """Rust FK/IK chain mirroring a kinematics.Chain (7 active joints), or None when unavailable or unsupported."""
     if not enabled() or len(chain.active) != getattr(_ext, 'N_ACTIVE', 7) or len(chain.joints) > 24 or chain.joints[-1].child != chain.tip:
         return None
     try:
@@ -63,6 +66,7 @@ def fast_chain(chain):
 
 
 def fast_collision(model):
+    """Rust sphere collision model mirroring a planning.CollisionModel whose chain has a Rust twin, or None."""
     fc = getattr(model.chain, '_fast', None)
     if fc is None or not enabled():
         return None
@@ -83,10 +87,12 @@ def fast_collision(model):
 
 
 def plane_inlier_counts(points, planes, tol):
+    """Rust: inlier count per candidate plane (n_x, n_y, n_z, d) for points (N, 3) in m, |n.p + d| < tol (m)."""
     return _ext.plane_inlier_counts(np.ascontiguousarray(points, float), np.ascontiguousarray(planes, float), float(tol), PARALLEL)
 
 
 def flood_fill(mask, points, max_jump):
+    """Rust: connected components of `mask` over the organised cloud, neighbours joined when the 3-D jump is < max_jump (m)."""
     return _ext.flood_fill(np.ascontiguousarray(mask, bool), np.ascontiguousarray(points, float), float(max_jump))
 
 
@@ -105,47 +111,57 @@ def pcg_state(seed):
 
 
 def ransac_plane(P, mask, seed, iterations, tol):
+    """Rust: RANSAC table plane on the organised cloud P (H, W, 3) in m, same PCG64 stream as NumPy for `seed`."""
     return _ext.ransac_plane(np.ascontiguousarray(P, float), np.ascontiguousarray(mask, bool), pcg_state(seed),
                              int(iterations), float(tol), PARALLEL)
 
 
 def deproject(depth, fx, fy, cx, cy, T):
+    """Rust: depth image in mm -> organised cloud (H, W, 3) in m, pinhole K (px) then the 4x4 camera->pelvis transform T."""
     return _ext.deproject(np.ascontiguousarray(depth, float), float(fx), float(fy), float(cx), float(cy),
                           np.ascontiguousarray(T, float), PARALLEL)
 
 
 def tray_window_mask(P, rgb, valid, h, window, band, channel, chroma_min):
+    """Rust: tray colour/height mask inside the pelvis-frame search window (m), height band above the table (m)."""
     return _ext.tray_window_mask(np.ascontiguousarray(P, float), np.ascontiguousarray(rgb, np.uint8), np.ascontiguousarray(valid, bool),
                                  np.ascontiguousarray(h, float), tuple(float(x) for x in window), (float(band[0]), float(band[1])),
                                  int(channel), float(chroma_min))
 
 
 def rot_rect_mask(P, rects):
+    """Rust: pixels whose pelvis-frame xy lies in any rotated rectangle (x, y, u0, u1, v0, v1, half_a, half_b) in m."""
     return _ext.rot_rect_mask(np.ascontiguousarray(P, float), [tuple(float(x) for x in r) for r in rects])
 
 
 def segment_components(P, rgb, valid, n, d, min_h, max_h, low, high, max_jump, min_pixels):
+    """Rust: object segments above the table plane (n, d) inside the ROI box (m) with per-component statistics."""
     return _ext.segment_components(np.ascontiguousarray(P, float), np.ascontiguousarray(rgb, np.uint8), np.ascontiguousarray(valid, bool),
                                    [float(x) for x in n], float(d), float(min_h), float(max_h), [float(x) for x in low],
                                    [float(x) for x in high], float(max_jump), int(min_pixels))
 
 
 def min_caliper(hull, dirs):
+    """Rust: minimum convex-hull width (m) over the direction table `dirs` and the index of the best direction."""
     return _ext.min_caliper(np.ascontiguousarray(hull, float), np.ascontiguousarray(dirs, float))
 
 
 def min_area_rect_scan(xy, dirs, q):
+    """Rust: trimmed-quantile minimum-area rectangle scan over `dirs` for xy points in m (q = trimmed fraction)."""
     return _ext.min_area_rect_scan(np.ascontiguousarray(xy, float), np.ascontiguousarray(dirs, float), float(q))
 
 
 def min_dist_xy(tips, pts):
+    """Rust: smallest xy distance (m) from each fingertip point to the point set."""
     return _ext.min_dist_xy(np.ascontiguousarray(tips, float), np.ascontiguousarray(pts, float))
 
 
 def fast_env(centers, radii):
+    """Rust environment (pelvis-frame sphere centres in m and radii in m) for the collision model."""
     return _ext.FastEnv(np.ascontiguousarray(centers, float), np.ascontiguousarray(radii, float))
 
 
 def table_mask(P, valid, x_lo, x_hi, y_abs, rects):
+    """Rust: valid pixels on the table region x in [x_lo, x_hi], |y| < y_abs (m, pelvis) outside the given rectangles."""
     return _ext.table_mask(np.ascontiguousarray(P, float), np.ascontiguousarray(valid, bool), float(x_lo), float(x_hi), float(y_abs),
                            [tuple(float(v) for v in r) for r in rects])

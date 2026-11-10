@@ -5,7 +5,7 @@ outside a tray) at the end scores -10, while an untouched object scores 0.
 """
 import math
 
-# TODO(calibrate from Kaggle v6+ sort logs): measured pick+place cycle and release/retreat times.
+# Priors from the v6/v7 sort logs; TimeBudget.record_cycle updates the estimate from measured cycles.
 FIRST_CYCLE_S = 35.0   # prior for one pick+place cycle until the first real cycle is measured
 PLACE_TAIL_S = 12.0    # transport to tray + release + retreat, added to the planned pick duration
 SAFETY_S = 8.0         # final go-home + /sim/task/done margin
@@ -13,6 +13,7 @@ LIMITS = {'sort2': 270.0, 'sort3': 405.0}
 
 
 class TimeBudget:
+    """Sim-time budget of one task: limit (s), start t0 (s), pessimistic per-object cycle estimate (s)."""
     def __init__(self, limit, t0, first_cycle=FIRST_CYCLE_S, safety=SAFETY_S, alpha=.5):
         if not (math.isfinite(limit) and limit > 0 and math.isfinite(t0)):
             raise ValueError('invalid budget')
@@ -23,9 +24,11 @@ class TimeBudget:
         self.cycles = []
 
     def elapsed(self, now):
+        """Sim seconds since t0."""
         return now - self.t0
 
     def remaining(self, now):
+        """Sim seconds left until the task limit."""
         return self.limit - (now - self.t0)
 
     def record_cycle(self, seconds):
@@ -47,7 +50,7 @@ def start_time(sim_now_at_first_clock, wall_at_first_clock, wall_at_import, rtf_
 
     Process startup before rclpy sees /clock is not visible in sim time; bound it by the wall time elapsed since
     import scaled by an upper bound of the real-time factor (rtf_max=1: the sim is not faster than real time;
-    Kaggle T4 measured ~24 Hz physics, i.e. slower). Pessimistic = earlier t0 = less remaining time.
+    the T4 GPU runs measured ~24 Hz physics, i.e. slower). Pessimistic = earlier t0 = less remaining time.
     """
     lag = max(0.0, wall_at_first_clock - wall_at_import)
     return sim_now_at_first_clock - rtf_max*lag
@@ -81,5 +84,6 @@ def launch_age_s(marker='run.sh', max_up=6):
 
 
 def time_boot():
+    """Wall-clock seconds since boot (CLOCK_BOOTTIME), used to age the run.sh process."""
     import time
     return time.clock_gettime(time.CLOCK_BOOTTIME)

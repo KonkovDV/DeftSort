@@ -1,4 +1,4 @@
-"""Grasp/time audit (fixes/V9_ANALYSIS_RU.md section 8): place_time calibrated on the v8 Perricone TRACE (the old
+"""Grasp/time audit: place_time calibrated on the v8 Perricone TRACE (the old
 model under-estimated the closed->released chain 6.6 s vs 12.0 s measured and left the lift out), light-first order."""
 import os,sys,json,types,unittest,time
 from unittest import mock

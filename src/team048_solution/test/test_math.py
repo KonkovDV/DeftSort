@@ -1,5 +1,5 @@
 """v15 math review (docs/MATH_PHYSICS.md): property tests of the formulas on random inputs and checks against the
-simulator's own numbers (camera_info and /tf printed by tf2_echo in the Kaggle v5 logs, objects.yaml masses).
+simulator's own numbers (camera_info and /tf printed by tf2_echo in the run v5 logs, objects.yaml masses).
 Nothing here changes a plan; every constant below names its source."""
 import os,sys,math,unittest
 import numpy as np
@@ -7,9 +7,9 @@ sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
 import test_node_stub as TS  # noqa: F401  (installs the ROS stubs)
 from team048_solution import node as N, arm as ARM, geometry as GEO, perception as PE, trays as TR, grasp as GR
 
-# camera_info of /camera/head and /camera/body_front (Kaggle v5 logs, frames.json): 640x360, D = 0
+# camera_info of /camera/head and /camera/body_front (run v5 logs): 640x360, D = 0
 K_LOG=np.array([[343.1635437011719,0.,320.],[0.,343.1635437011719,180.],[0.,0.,1.]]);W_LOG,H_LOG=640,360
-# tf2_echo pelvis camera_head_link at sim t = 62.17 s (Kaggle v5 logs): translation, quaternion xyzw, printed matrix
+# tf2_echo pelvis camera_head_link at sim t = 62.17 s (run v5 logs): translation, quaternion xyzw, printed matrix
 TF_T=[0.105,0.011,0.648];TF_Q=[0.613,-0.613,0.353,-0.353]
 TF_M=np.array([[0.000,-0.502,0.865,0.105],[-1.000,-0.000,0.000,0.011],[0.000,-0.865,-0.502,0.648]])
 
@@ -78,7 +78,7 @@ class Pinhole(unittest.TestCase):
 
 class Ransac(unittest.TestCase):
     def test_finds_the_table_at_the_lowest_measured_inlier_fraction(s):
-        """62 recorded head frames: inlier fraction of the table region 0.41-0.63 (research/diag/v15/math_checks.py).
+        """62 recorded head frames: inlier fraction of the table region 0.41-0.63 (measured offline on those frames).
         Synthetic: 2 deg tilted plane, 40 % inliers (+-2 mm noise), 60 % object/tray points above it."""
         rng=np.random.default_rng(5);n0=np.array([math.sin(math.radians(2)),0,math.cos(math.radians(2))]);d0=.2
         for seed in range(10):
@@ -100,7 +100,7 @@ class Rectangles(unittest.TestCase):
                 s.assertLess(abs(size[0]-a),bound);s.assertLess(abs(size[1]-b),bound)
                 # axis: NOT within the 0.5 deg scan bound. The 2 % trimmed extents make the area flat over a few degrees
                 # around the true angle and the scan keeps the first minimum: 1.7 deg median, 3.6 deg max on the documented
-                # tray size (research/diag/v15/MATH_REVIEW.md 4, change deferred: it moves slot positions)
+                # tray size (known bias, docs/MATH_PHYSICS.md; a fix would move slot positions)
                 s.assertLess(math.degrees(math.acos(min(1.,abs(ax@u)))),4.);s.assertLess(np.linalg.norm(cc-c),.004)
     def test_caliper_width_between_true_width_and_half_degree_bound(s):
         rng=np.random.default_rng(7)

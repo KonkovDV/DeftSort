@@ -7,7 +7,7 @@
   * размер ящика как граница правдоподобия (DOC_SIZE, ±40 %); сам размер, высота стенок и ориентация МЕРЯЮТСЯ.
 Если ящик не найден, возвращается None: вызывающий код переснимает (поворот головы) и никогда не подставляет позу.
 
-Colour evidence (Kaggle v5/v7 head frames): green tray RGB ~(234,250,238), dominant-channel margin ~0.047; the table is
+Colour evidence (run v5/v7 head frames): green tray RGB ~(234,250,238), dominant-channel margin ~0.047; the table is
 neutral ~(224,225,224), margin ~0.004 -> CHROMA_MIN=0.03 separates both. TASKS.md images show pastel red/blue trays.
 """
 import numpy as np
@@ -96,6 +96,7 @@ def min_area_rect(xy, q=.02):
 
 
 def min_area_rect_py(xy, q=.02):
+    """NumPy reference: trimmed-quantile minimum-area rectangle of xy points (m), 1 deg steps over 0-90 deg."""
     xy = np.asarray(xy, float)
     best = None
     for a in np.linspace(0, np.pi/2, 91):
@@ -181,7 +182,7 @@ def canonical_axis(axis, eps=1e-9):
 
 def slot_offset(k, half_extent, step=SLOT_STEP, size=DOC_SIZE, wall=TRAY_WALL, clearance=.01, ty=0.):
     """Offset ALONG THE TRAY LONG AXIS for the k-th object placed in this tray: 0, inner, outer, 0, ...
-    inner = toward the robot midline (v7 Kaggle: the outer slot of tray_left was not reached, TCP 13.7 cm off).
+    inner = toward the robot midline (run v7: the outer slot of tray_left was not reached, TCP 13.7 cm off).
     `size` = MEASURED tray size (short, long) or (x, y) extent; s = min(step, room) keeps the object's footprint
     half-extent inside the walls with clearance."""
     room = max(size)/2-wall-clearance-max(0., float(half_extent))

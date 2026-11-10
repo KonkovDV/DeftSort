@@ -1,5 +1,5 @@
 //! criterion benchmarks on the REAL left-arm model (benches/data/arm_l.json from benches/export_model.py) and a
-//! Kaggle v7 head frame (optional binary files, skipped when absent).
+//! recorded head frame (optional binary files, not shipped; the frame benchmarks are skipped when absent).
 use criterion::{criterion_group, criterion_main, Criterion};
 use std::hint::black_box;
 use team048_accel::col::{Collision, Env};

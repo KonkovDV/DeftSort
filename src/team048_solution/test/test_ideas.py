@@ -161,7 +161,7 @@ class Kinematics(unittest.TestCase):      # I7 + I9 + I10
         q_after=q_meas+(qc-q_goal)                       # same undershoot applied to the corrected command
         s.assertLess(A.position_error(q_after,A.tcp(q_goal)),e0*.5)
     def test_head_fk_matches_sim_tf_v5(s):
-        """Real data (Kaggle v5, tf2_echo pelvis camera_head_link): our URDF FK at head 0 agrees to < 5 mm."""
+        """Real data (run v5, tf2_echo pelvis camera_head_link): our URDF FK at head 0 agrees to < 5 mm."""
         T=quaternion_transform([0.105,0.011,0.648],[0.613,-0.613,0.353,-0.353])
         F=arm.fk_link('camera_head_link',{})
         s.assertLess(np.linalg.norm(F[:3,3]-T[:3,3]),.005);s.assertLess(np.abs(F[:3,:3]-T[:3,:3]).max(),.01)
@@ -214,7 +214,7 @@ class V7Fixes(unittest.TestCase):
         # node ready 3 s after import, sim clock first seen 200 s later at sim t=10: t0 = 10-3, not 10-203
         self.assertAlmostEqual(budget.start_time(10.,3.,0.),7.)
     def test_table_env_follows_measured_plane(self):
-        n=np.array([-.0699,0,.9976]);d=.1788          # v7 Kaggle plane (pelvis frame)
+        n=np.array([-.0699,0,.9976]);d=.1788          # run v7 plane (pelvis frame)
         T=arm.table_env((n,d));nu=n/np.linalg.norm(n);du=d/np.linalg.norm(n)
         x0=min(sp.center[0]-sp.radius for sp in T);tangent=0
         for sp in T:
@@ -244,7 +244,7 @@ class V7Fixes(unittest.TestCase):
         self.assertLess(trays.slot_offset(1,.03,ty=.69),0);self.assertGreater(trays.slot_offset(1,.03,ty=-.69),0)
 
 class GraspStudy(unittest.TestCase):
-    """Offline study evidence (fixes/kaggle-tpu/study local-g3dx/g3bx/g6x, 2026-11-09)."""
+    """Offline study evidence (offline grasp study, 2026-11-09)."""
     def test_dish_has_multi_angle_rim(self):
         from team048_solution.grasp import candidates,RIM_ANGLE_DEG
         rng=np.random.default_rng(1);t=rng.uniform(0,2*np.pi,2500);h=.07

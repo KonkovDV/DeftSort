@@ -7,7 +7,7 @@ Strategies (chosen by recognised category, never by ground-truth pose):
 Hand opening W_MAX and finger geometry are PARAMETERS: the Inspire hand limits must come from the robot
 assets/SDK (not guessed here).
 
-Offline evidence (fixes/kaggle-tpu/study, 100 layouts, body_yaw place, Rust accel, 2026-11-09):
+Offline evidence (grasp study on 100 generated layouts, body_yaw place, Rust accel, 2026-11-09):
   dish base rim-only ok=0.880; UNION of rim angles at 30/60/90 deg -> 1.000 (Ecoforms 0.69->1.00).
   pool3 box side-only 0.639; topdown_pinch 0.913 (+104 new). pool6 box topdown_wide 0.947 (gelatin 0->0.84).
   Razer mouse (min width 10 cm) remains 0: wider than opposed_open-margin and mesh pad_gap_open 7.8 cm.
@@ -16,7 +16,7 @@ import numpy as np
 from scipy.spatial import ConvexHull
 from . import _accel
 # Rim pinch: grip centre BELOW the rim top so the finger pads overlap the wall instead of touching its edge.
-# v6 (Kaggle, old code z=rim top): 0/3 rim picks ended in a tray. Value = geometric choice (pad overlap), UNVERIFIED:
+# Run v6 (old code z=rim top): 0/3 rim picks ended in a tray. Value = geometric choice (pad overlap), UNVERIFIED:
 # the next run logs wrist force and finger positions at every grasp to confirm or recalibrate it.
 RIM_DEPTH=.015
 # Extra rim samples around the fitted circle (deg). Near-robot point (0) is always first / highest score.
@@ -27,7 +27,7 @@ TOP_DEPTH=.03
 # Rim width used for the pinch (m): the pad that goes inside the rim needs free space this far in from the rim circle.
 RIM_W=.025
 # Rim pinch only when the dish's gravity torque about the pinch, m*g*r (m: objects.yaml mass of the IDENTIFIED object,
-# r: rim radius fitted to the measured footprint), stays below this. Kaggle v7/v8/v9b/v11b rim pinches: Ecoforms
+# r: rim radius fitted to the measured footprint), stays below this. Rim pinches of runs v7/v8/v9b/v11b: Ecoforms
 # (0.05 N*m) held 2 of 2, Threshold (0.11) 1 of 3 (V9 analysis 8.2), Utana (0.23) 0 of 7: 6 lifted empty (v7, v8, v9b x4),
 # v11b held at the lift, slipped during the carry and ended on the table outside the tray (likely -10). Threshold =
 # midpoint of 0.11 and 0.23. Without a known mass the gate is off. A dish above it gets no rim candidate (skipped).
@@ -45,6 +45,7 @@ def _caliper_py(hull):
     return best
 
 def footprint(cloud,plane):
+    """Top-view footprint of an object cloud (pelvis, m): min caliper width, length, axis, centre, height, hull."""
     n,d=plane;h=cloud@n+d;xy=cloud[:,:2]
     hull=xy[ConvexHull(xy).vertices];best=None
     if _accel.enabled2():
@@ -56,6 +57,7 @@ def footprint(cloud,plane):
     return dict(width=float(w),length=float(L),axis=u,center=center,height=float(np.quantile(h,.98)),hull=hull)
 
 def circle_fit(xy):
+    """Least-squares (Kasa) circle through xy points (m): centre (2,), radius."""
     A=np.c_[2*xy,np.ones(len(xy))];b=(xy**2).sum(1);c,*_=np.linalg.lstsq(A,b,rcond=None);r=np.sqrt(c[2]+c[0]**2+c[1]**2);return c[:2],r
 
 def _box(f,ax,w,cyl):
@@ -76,6 +78,7 @@ def rim_closed(cloud,plane,f,c0,r0):
     return bool(inner.any() and np.median(h[inner])>f['height']-RIM_DEPTH)
 
 def candidates(cloud,plane,category,others=(),W_MAX=.09,finger=.02,depth=.04,margin=.01,robot_xy=(0.,0.),mass=None):
+    """Grasp candidates (side, top, rim) for one object cloud (pelvis frame, m) and the measured table plane."""
     f=footprint(cloud,plane);out=[];cyl=False
     if category=='jar':   # visible arc of a cylinder under-estimates the diameter: circle fit on mid-height slice
         h=cloud@plane[0]+plane[1];sl=cloud[np.abs(h-.5*f['height'])<.01,:2]

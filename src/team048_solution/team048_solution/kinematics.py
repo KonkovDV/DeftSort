@@ -8,6 +8,7 @@ from . import _accel
 
 @dataclass
 class Joint:
+    """One URDF joint of a chain: origin (4x4), axis (unit, joint frame), limits (rad), movable flag."""
     name: str
     child: str
     origin: np.ndarray
@@ -19,10 +20,12 @@ class Joint:
 
 
 def numbers(text, default):
+    """Whitespace-separated floats of a URDF attribute, `default` when absent."""
     return [float(s) for s in (text if text is not None else default).split()]
 
 
 class Chain:
+    """Serial chain base -> tip from URDF with a fixed TCP offset: FK, frames, Jacobian, damped least-squares IK."""
     def __init__(self, joints, base, tip, tcp):
         self.joints = joints; self.base = base; self.tip = tip
         self.tcp = check_transform(tcp)
@@ -41,6 +44,7 @@ class Chain:
 
     @classmethod
     def from_urdf(cls, xml, base, tip, tcp):
+        """Build the chain base -> tip from URDF text (DOCTYPE/ENTITY and oversized input rejected)."""
         if '<!DOCTYPE' in xml.upper() or '<!ENTITY' in xml.upper() or len(xml) > 5000000:
             raise ValueError('unsupported XML')
         root = ET.fromstring(xml); by_child = {}; names = set()
@@ -97,6 +101,7 @@ class Chain:
         return Chain(joints,self.base,self.tip,self.tcp)
 
     def validate_q(self, q):
+        """q as a finite array of the active-joint length within URDF limits (rad), else ValueError."""
         q = finite(q, (len(self.active),))
         if np.any(q < self.lower-1e-9) or np.any(q > self.upper+1e-9):
             raise ValueError('joint limit violation')
@@ -111,6 +116,7 @@ class Chain:
         _accel.guard(exc); _accel.failed(where, exc); self._fast = None
 
     def frames(self, q):
+        """Base-frame 4x4 pose of every link at q (rad); Rust when available, else frames_py."""
         q = self.validate_q(q)
         if self._fast is not None:
             try:
@@ -121,6 +127,7 @@ class Chain:
         return self.frames_py(q)
 
     def frames_py(self, q):
+        """NumPy reference of frames()."""
         q = self.validate_q(q); frames = {self.base: np.eye(4)}; T = np.eye(4); i = 0
         for k, j in enumerate(self.joints):
             T = T@j.origin
@@ -130,6 +137,7 @@ class Chain:
         return frames
 
     def fk(self, q):
+        """Base-frame 4x4 TCP pose at q (rad); Rust when available, else fk_py."""
         if self._fast is not None:
             q = self.validate_q(q)
             try: return self._fast.fk(np.ascontiguousarray(q, float))
@@ -137,6 +145,7 @@ class Chain:
         return self.fk_py(q)
 
     def fk_py(self, q):
+        """NumPy reference of fk()."""
         return self.frames_py(q)[self.tip]@self.tcp
 
     def jacobian(self, q):
@@ -148,6 +157,7 @@ class Chain:
         return self.jacobian_py(q)
 
     def jacobian_py(self, q):
+        """NumPy reference of the 6 x n geometric Jacobian (linear m/rad over angular rad/rad) at q."""
         q=self.validate_q(q); T=np.eye(4); origins=[]; axes=[]; i=0
         for k,joint in enumerate(self.joints):
             T=T@joint.origin

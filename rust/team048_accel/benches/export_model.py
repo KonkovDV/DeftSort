@@ -16,8 +16,10 @@ d=dict(origins=[j.origin.ravel().tolist() for j in ch.joints],axes=[j.axis.tolis
        levers=col.levers.tolist(),margin=col.margin,env_centers=col._env_centers.tolist(),env_radii=col._env_radii.tolist(),
        q=[q.tolist() for q in Q],targets=[ch.fk(q).ravel().tolist() for q in Q],free=[q.tolist() for q in free])
 json.dump(d,open(os.path.join(HERE,'data','arm_l.json'),'w'))
-RES=os.environ.get('TEAM048_RESEARCH',os.path.join(HERE,'..','..','..','research'))   # Kaggle frames + cycle.py (not in the submission)
-fr=sorted(glob.glob(os.path.join(os.environ.get('TEAM048_V7_TRACE',os.path.join(RES,'kaggle-sim','out_v7','trace')),'*','*closed*.npz')))
+# Optional frame data (not shipped): TEAM048_FRAME_TOOLS = directory with the cycle.py frame helper,
+# TEAM048_V7_TRACE = directory of recorded head frames. Without both only arm_l.json is exported.
+RES=os.environ.get('TEAM048_FRAME_TOOLS');V7=os.environ.get('TEAM048_V7_TRACE')
+fr=sorted(glob.glob(os.path.join(V7,'*','*closed*.npz'))) if RES and V7 else []
 if fr:
     sys.path.insert(0,os.path.join(RES,'rust'));import cycle
     z=np.load(fr[0]);P,valid=cycle.frame_cloud(z);tb=valid&(P[...,0]>.15)&(P[...,0]<.75)&(np.abs(P[...,1])<.7)

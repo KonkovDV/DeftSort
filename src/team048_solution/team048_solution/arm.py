@@ -43,6 +43,7 @@ def load_urdf(xml_text):
         XML,ROOT,J,BYCHILD=old;_ENV_CACHE.clear();return False,f'incomplete ({type(e).__name__})'
     _ENV_CACHE.clear();return True,'ok'
 def joints():
+    """All URDF joints: name -> dict(type, parent, child, T (4x4 origin), axis, lim (lower, upper, velocity))."""
     out={}
     for j in ROOT.findall('joint'):
         o=j.find('origin');a=j.find('axis');l=j.find('limit')
@@ -53,11 +54,13 @@ def joints():
     return out
 J=joints();BYCHILD={v['child']:k for k,v in J.items()}
 def inertial(link):
+    """URDF inertial of `link`: mass (kg), centre of mass (m, link frame), principal inertia eigenvalues (kg m^2)."""
     l=ROOT.find(f"link[@name='{link}']");i=l.find('inertial')
     m=float(i.find('mass').get('value'));c=np.array([float(x) for x in i.find('origin').get('xyz').split()])
     I=i.find('inertia').attrib;I=np.array([[float(I['ixx']),float(I['ixy']),float(I['ixz'])],[float(I['ixy']),float(I['iyy']),float(I['iyz'])],[float(I['ixz']),float(I['iyz']),float(I['izz'])]])
     ev=np.linalg.eigvalsh(I);return m,c,ev
 def link_radius(link,inflate=1.25,lo=.025,hi=.09):
+    """Collision radius (m) of a link from its inertia, treated as a solid cylinder, inflated and clipped to [lo, hi]."""
     m,c,ev=inertial(link);return float(np.clip(inflate*np.sqrt(2*ev[0]/max(m,1e-6)),lo,hi))   # solid-cylinder axial inertia
 def fk_link(link,q=None):
     """pelvis->link with given joint values (default 0, clipped into limits)."""
@@ -90,11 +93,12 @@ def hand_opening(side='l',n=9):
                 close_axis_hand=(f-t)/np.linalg.norm(f-t),grip_center_hand=(t+f)/2)
 # ---------------- arm chain + collision envelope ----------------
 def arm_chain(side):
+    """Kinematic chain pelvis -> wrist tip for side 'l' or 'r', body yaw locked at 0 rad."""
     tip=SIDE[side]['tip'];c=Chain.from_urdf(XML,'pelvis',tip,np.eye(4))
     return c.lock_joints({'body_yaw_joint':0.})
-NULL_WEIGHT=.1   # IK null-space pull toward home; 0 disables (tested: accuracy unchanged, see tests/test_ideas.py)
+NULL_WEIGHT=.1   # IK null-space pull toward home; 0 disables (tested: accuracy unchanged, see test/test_ideas.py)
 # I3: mesh-fitted collision spheres (tools/fit_spheres.py on the UBTECH tiangong2pro_urdf STL meshes, Apache-2.0).
-# TODO(calibrate): keep USE_MESH_SPHERES=False until the mesh frames are verified against the simulator /tf
+# Kept False until the mesh frames are verified against the simulator /tf
 # (FK vs TF for all arm links) and the JSON carries "validated": true. Inertia-derived spheres are used meanwhile.
 USE_MESH_SPHERES=False
 MESH_SPHERES=os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','spheres_mesh.json')
@@ -121,7 +125,7 @@ def hand_mesh(side):
         return d[side]
     except Exception:return None
 # ---------------- open-hand mesh vs measured object box (side/top grasps) ----------------
-# v7+v8 Kaggle TRACE (fixes/V10_HEAVY_RU.md): the side grasps of the long boxes pushed the object with the hand BEFORE
+# Runs v7+v8 TRACE: the side grasps of the long boxes pushed the object with the hand BEFORE
 # closing (wrist |F| at the grasp pose 17.8 N Crayola v7, 15.4 N Crunch v8; fingers bent back 1.26-1.46 in Crunch v8,
 # Perricone v7) while the sphere envelope saw no contact (object = obstacle-free target). Cause, from the hand meshes
 # (tools/hand_open_points.py): at the grasp pose the object box overlaps the open hand -- the proximal phalanges of
@@ -193,6 +197,7 @@ def grasp_clear_shift(side,Tg,approach,box,pre=.08,margins=CLEAR_MARGINS,su=SHIF
             return dict(du=float(du),dr=float(dr),margin=float(m),shift=du*eu3-dr*a)
     return None
 def arm_spheres(side,chain,mesh=True):
+    """Collision spheres (link frames, m) of one arm and hand; mesh-fitted ones only when USE_MESH_SPHERES is on."""
     if mesh and USE_MESH_SPHERES and chain is not None:
         M=mesh_spheres()
         links=set(chain.frames(np.clip(np.zeros(len(chain.active)),chain.lower,chain.upper)))
@@ -209,7 +214,7 @@ def arm_spheres(side,chain,mesh=True):
     tip=SIDE[s]['tip']   # hand + fingers: palm and finger region along hand z in tcp frame (hand frame == tcp up to rotation)
     R=J[f"{'left' if s=='l' else 'right'}_hand_to_tcp"]['T'][:3,:3]
     for z,r in ((.03,.045),(.08,.045),(.13,.04),(.17,.035)):S.append(Sphere(tip,R@np.array([0,0,z]),r))
-    # thumb (off the hand axis by up to 9 cm, NOT covered by the axis spheres): v7 Kaggle side grasps pressed the
+    # thumb (off the hand axis by up to 9 cm, NOT covered by the axis spheres): run v7 side grasps pressed the
     # table with +11..+32 N (pelvis z) while the thumb tip was the lowest hand point (FK) -> mesh-derived thumb spheres
     hm=hand_mesh(s)
     if hm:
@@ -218,7 +223,7 @@ def arm_spheres(side,chain,mesh=True):
 # v9fix: torso envelope fitted to the waist_yaw_link (torso) STL mesh (tools/fit_spheres.py --links waist_yaw_link
 # --r-max .03 --pad .005 --max-spheres 64; UBTECH tiangong2pro_urdf, Apache-2.0). Robot geometry, not scene (#645).
 # Mesh frames: the UBTECH URDF has the SAME 62 joints with identical origins/axes as the organiser URDF (only 4 sensor
-# links renamed), checked by fixes/diag/v9a_mesh_contacts.py. v9a Kaggle (HACK_SELF_COLLISION=1): at the Ecoforms
+# links renamed), checked offline against the mesh contacts. Run v9a (HACK_SELF_COLLISION=1): at the Ecoforms
 # pre-grasp the forearm/hand were 1-8 mm from the torso mesh and the wrist F/T read 581 N, while the old column model
 # (two spheres r<=0.08 at x=-0.03/0.04) accepted the posture.
 TORSO_SPHERES=os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','torso_spheres.json')
@@ -290,12 +295,12 @@ def table_env(plane,x=None,y=None,R=.1,step=.03):
     """plane is REQUIRED (measured by the head camera); x=(near,far): near = measured near edge."""
     return list(_table_entry(plane,x,y,R,step)[0])
 TABLE_EDGE_R=.025      # m, small spheres along the measured near edge (top lip + front face)
-TABLE_FRONT_DEPTH=.35  # m below the measured top: the table front is solid at least this deep. v9a Kaggle: the
+TABLE_FRONT_DEPTH=.35  # m below the measured top: the table front is solid at least this deep. Run v9a: the
                        # straight start->home sweep jammed both hands against the table front 2-22 cm BELOW the top
-                       # (wrist |F| 258 N / 938 N, TCP x 0.20 / z -0.20 / -0.16 m pelvis; fixes/V9_ANALYSIS_RU.md)
+                       # (wrist |F| 258 N / 938 N, TCP x 0.20 / z -0.20 / -0.16 m pelvis)
 def table_env_build(plane,x,y,R=.1,step=.03):
     """Table as spheres tangent to the MEASURED top surface plane=(n,d) (pelvis frame, n.p+d=0, head camera).
-    v7 Kaggle frames show the table tilted 4.0 deg in the pelvis frame (n_x=-0.070 in all 31 frames).
+    Run v7 frames show the table tilted 4.0 deg in the pelvis frame (n_x=-0.070 in all 31 frames).
     v9fix: the big spheres start R behind the MEASURED near edge x[0] (they used to start AT the edge and bulged R=10 cm
     toward the robot below the top, so no certified path existed from the start posture); the band between the edge
     and the first big sphere is covered by small TABLE_EDGE_R spheres tangent to the top, and the front face by a
@@ -330,10 +335,11 @@ def _tray_entry(trays,plane,size=(.22,.32),height=.07,r=.02,step=.03):
     key=('tray',np.asarray(G,float).tobytes(),np.asarray(plane[0],float).tobytes(),float(plane[1]),_key(r,step))
     return _cached_entry(key,lambda:tray_env_build(G,plane,size,height,r,step))
 def tray_env(trays,plane,size=(.22,.32),height=.07,r=.02,step=.03):
+    """Tray wall spheres in the pelvis frame (m) from the measured trays and table plane, see tray_env_build."""
     return list(_tray_entry(trays,plane,size,height,r,step)[0])
 def tray_env_build(trays,plane,size=(.22,.32),height=.07,r=.02,step=.03):
     """Tray walls as spheres (centres r below the rim) from the MEASURED centre, long axis, size and wall height:
-    v7 Kaggle s103 the hand was carried into the tray_right wall (82 N, TCP 14 cm below plan) when trays were not
+    Run v7 seed 103: the hand was carried into the tray_right wall (82 N, TCP 14 cm below plan) when trays were not
     obstacles."""
     n,d=np.asarray(plane[0],float),float(plane[1]);out=[]
     for t in trays:
@@ -349,12 +355,14 @@ def tray_env_build(trays,plane,size=(.22,.32),height=.07,r=.02,step=.03):
     return spheres_bulk('pelvis',out,r) if out else []
 HOME_Q=(-.6,.25,0.,-1.2,0.,0.,0.)   # forward-reaching elbow-bent home posture (robot posture; y-sign mirrored per side)
 def home_dict(side):
+    """Home posture of one arm as {joint name: angle in rad}, shoulder roll mirrored for the right arm."""
     s=1 if side=='l' else -1;v=list(HOME_Q);v[1]*=s
     return dict(zip([f'{n}_{side}_joint' for n in ARM],v))
 def other_home(side):
     """The other arm at ITS home posture (the default while this arm plans; updated from /joint_states by set_other)."""
     return home_dict('r' if side=='l' else 'l')
 class Arm:
+    """One arm of the robot: chain, IK, collision model (body, other arm, measured table and trays) and planning."""
     def __init__(self,side,margin=.015,table=True):
         self.side=side;self.chain=arm_chain(side);self.hand=hand_opening(side)
         # No table until the head camera measured it (#645): planning refuses to run before set_scene().
@@ -435,6 +443,7 @@ class Arm:
     ROADMAP_SR=(0.,.25,.6,1.)
     ROADMAP_EL=(-1.2,-1.6,-2.0,-2.4)
     def roadmap_nodes(self,q=None):
+        """Roadmap postures (rad): grid shoulder pitch x roll x elbow around home, plus moves from q when given."""
         sg=1. if self.side=='l' else -1.;N=[]
         for sp in self.ROADMAP_SP:
             for sr in self.ROADMAP_SR:
@@ -472,6 +481,7 @@ class Arm:
         while k>0:path.append(V[k]);k=prev[k]
         return path[::-1]
     def tcp(self,q):
+        """Pelvis-frame 4x4 pose of the tool centre point at joint angles q (rad)."""
         return self.chain.fk(q)
     def lift(self,q,dz=.08):
         """Straight-up retreat target from q (same orientation, +dz in pelvis z), certified swept path, or None."""
@@ -515,6 +525,7 @@ class Arm:
             v=c[key]=(A,g_t)
         return v
     def solve(self,T,seed=None,w_null=NULL_WEIGHT):
+        """Collision-free IK for the pelvis-frame 4x4 target T: q (rad) of the first converged seed, or None."""
         # 7-DOF redundancy: secondary pull toward the elbow-out home posture (away from the torso), see kinematics.ik
         seeds=([seed] if seed is not None else [])+self.seeds
         if self.col._fast is not None and self.chain._fast is not None and _accel.enabled2():

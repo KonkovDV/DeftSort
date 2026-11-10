@@ -1,6 +1,6 @@
-"""v8 fixes (fixes/V8_ANALYSIS_RU.md): held rule, jammed fingers / clamped targets, guarded approach, position stall,
-re-observe after contact, 'no plan' / tray-source / accel logs. Evidence: real Kaggle v7+v8 TRACE fixtures
-(fixtures/v7v8_grasp_traces.json, force 1.0, built by fixes/diag/make_v7v8_fixture.py)."""
+"""Held rule, jammed fingers / clamped targets, guarded approach, position stall,
+re-observe after contact, 'no plan' / tray-source / accel logs. Evidence: real run v7+v8 TRACE fixtures
+(fixtures/v7v8_grasp_traces.json, force 1.0, extracted from the run logs)."""
 import os,sys,types,unittest,json
 import numpy as np
 HERE=os.path.dirname(os.path.abspath(__file__));sys.path.insert(0,HERE)

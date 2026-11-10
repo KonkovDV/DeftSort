@@ -135,7 +135,7 @@ class TrayAxisSign(unittest.TestCase):
 
 from team048_solution import perception as PER, _accel as ACC
 class FfiEdges(unittest.TestCase):
-    """research/diag/v14/ffi_edges.py: of 43 edge inputs only an empty depth image made a Rust kernel panic."""
+    """Offline edge-input sweep: of 43 edge inputs only an empty depth image made a Rust kernel panic."""
     @unittest.skipUnless(ACC.enabled2(), 'needs the Rust module (API 2)')
     def test_empty_depth_image_keeps_rust_enabled(s):
         K=np.array([[343.16,0,320],[0,343.16,240],[0,0,1.]]);T=np.eye(4)
