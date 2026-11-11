@@ -246,6 +246,7 @@ The 16 equivalence tests (in `test_accel_phase2.py` and `test_accel_equivalence.
 | [docs/MATH_PHYSICS.md](docs/MATH_PHYSICS.md) | Formulas with code references: frames, deprojection, grasping, IK, collisions, time |
 | [docs/PARAMETERS.md](docs/PARAMETERS.md) | Every parameter, its value and origin |
 | [docs/PREPUSH_CHECKLIST.md](docs/PREPUSH_CHECKLIST.md) | Checks before submission |
+| [CHANGELOG.md](CHANGELOG.md) | Changes to the solution by topic (English) |
 
 ## Licences and provenance
 

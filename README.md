@@ -246,6 +246,7 @@ flowchart LR
 | [docs/MATH_PHYSICS.md](docs/MATH_PHYSICS.md) | Формулы со ссылками на код: системы координат, депроекция, захват, ИК, столкновения, время |
 | [docs/PARAMETERS.md](docs/PARAMETERS.md) | Каждый параметр, его значение и происхождение |
 | [docs/PREPUSH_CHECKLIST.md](docs/PREPUSH_CHECKLIST.md) | Проверки перед сдачей |
+| [CHANGELOG.md](CHANGELOG.md) | Изменения решения по темам (на английском) |
 
 ## Лицензии и происхождение
 
