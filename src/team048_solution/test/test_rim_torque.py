@@ -1,5 +1,5 @@
 """Rim pinch gated by the dish's gravity torque, and rim-held dishes placed by their centre.
-Fixtures: v12_rim_dishes.npz/.json (v7 sort3 s102 start head frame: Utana, Ecoforms, Threshold segments; v11b
+Fixtures: rim_dishes.npz/.json (v7 sort3 s102 start head frame: Utana, Ecoforms, Threshold segments; v11b
 trace 0098.15: Utana before the attempt that slipped during the carry, at_grasp joint angles from the log)."""
 import os,sys,json,unittest
 import numpy as np
@@ -7,7 +7,7 @@ HERE=os.path.dirname(os.path.abspath(__file__));sys.path.insert(0,os.path.join(H
 import test_node_stub as TS  # noqa: F401  (installs the ROS stubs)
 from team048_solution import arm as ARM, grasp as GR, node as N, trays as TR
 import scene_fixture as SF
-FX=os.path.join(HERE,'fixtures');Z=np.load(os.path.join(FX,'v12_rim_dishes.npz'));META=json.load(open(os.path.join(FX,'v12_rim_dishes.json')))
+FX=os.path.join(HERE,'fixtures');Z=np.load(os.path.join(FX,'rim_dishes.npz'));META=json.load(open(os.path.join(FX,'rim_dishes.json')))
 def seg(k):return Z[k+'_cloud'].astype(float),(Z[k+'_n'],float(Z[k+'_d']))
 def mass(k):return N.PRI[META[k]['obj']]['mass']
 

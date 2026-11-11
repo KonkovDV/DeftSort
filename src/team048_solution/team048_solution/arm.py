@@ -1,5 +1,5 @@
 """TienKung 2.0 Pro arm IK + sphere self-collision built from the REAL organiser URDF (robot-only data).
-Frames: pelvis, z up, x forward. Uses the v4 Chain (bounded DLS IK) and CollisionModel (swept sphere certification).
+Frames: pelvis, z up, x forward. Uses kinematics.Chain (bounded DLS IK) and planning.CollisionModel (swept sphere certification).
 Limitations: the URDF STL meshes are absent, so link envelopes are spheres sized from the URDF inertial tensors
 (equivalent-cylinder radius, inflated) -- an approximation, not mesh collision."""
 import os,numpy as np,xml.etree.ElementTree as ET

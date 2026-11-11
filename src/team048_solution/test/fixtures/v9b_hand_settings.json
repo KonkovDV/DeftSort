@@ -1,5 +1,5 @@
 {
- "about": "Simulator-side confirmation of /inspire_hand/set_force per layout: the sim prints '[hack] <side> hand force limits: [...]' when the service handles a request. Before v11 the solution sent the requests once, only to services already discovered (node.hand_settings, service_is_ready).",
+ "about": "Simulator-side confirmation of /inspire_hand/set_force per layout: the sim prints '[hack] <side> hand force limits: [...]' when the service handles a request. In runs v7-v9b the solution sent the requests once, only to services already discovered (node.hand_settings, service_is_ready).",
  "layouts": [
   {"run": "v7 sort3 seed 101", "log": "recorded run v7, simulator log line 154", "left": null, "right": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]},
   {"run": "v7 sort3 seed 102", "log": "recorded run v7, simulator log line 521", "left": null, "right": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]},
