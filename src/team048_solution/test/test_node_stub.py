@@ -165,4 +165,19 @@ class NodeWiring(unittest.TestCase):
         # survey first (arms in the start posture), then home along a path certified against the measured table
         s.assertEqual(calls[:3],['survey','home','home']);s.assertEqual(calls.count('obs'),N.EMPTY_OBS_MAX)
         s.assertTrue(sol.pubs['/sim/task/done'].sent)
+
+class BadMessages(unittest.TestCase):
+    """A malformed message is logged and dropped inside the callback: nothing propagates to the executor."""
+    def test_malformed_task_is_ignored_until_a_valid_one(s):
+        sol=N.Sol();logs=[];sol.log=lambda *a:logs.append(' '.join(map(str,a)))
+        cb=sol.subs['/sim/task']
+        for bad in ('{"task": "sort2"',  '[1, 2]', '"sort2"', 'null', ''):
+            cb(Msg(data=bad));s.assertIsNone(sol.task,bad)
+        s.assertEqual(len(logs),5);s.assertTrue(all('dropped a message' in x for x in logs))
+        cb(Msg(data='{"task": "sort2", "categories": {}}'));s.assertEqual(sol.task['task'],'sort2')
+    def test_bad_sensor_messages_do_not_raise(s):
+        sol=N.Sol();sol.log=lambda *a:None
+        sol.subs['/joint_states'](Msg(name=['a'],position=None))     # zip(None) -> TypeError, dropped
+        sol.subs['/inspire_hand/state/left_hand'](Msg())              # no velocity/position fields, dropped
+        sol.subs['/joint_states'](Msg(name=['a'],position=[.5]));s.assertEqual(sol.js['a'],.5)
 if __name__=='__main__':unittest.main()

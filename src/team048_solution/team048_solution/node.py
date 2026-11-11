@@ -107,22 +107,23 @@ class Sol(Node):
         lat=QoSProfile(depth=1,durability=DurabilityPolicy.TRANSIENT_LOCAL,reliability=ReliabilityPolicy.RELIABLE)
         s.task=None;s.js={};s.info=None;s.lock=threading.Lock();s.frames=PairBuffer()
         s.wrench={};s.hstate={};s.hvel={'l':(),'r':()};s.hpos={'l':(),'r':()};s.hand_log_t={}
-        s.create_subscription(String,'/sim/task',lambda m:setattr(s,'task',json.loads(m.data)),lat)
-        s.create_subscription(JointState,'/joint_states',s.on_js,20)
-        s.create_subscription(Image,'/cam_head/color/image_raw',s.frames.add_rgb,qos_profile_sensor_data)
-        s.create_subscription(Image,'/cam_head/depth/image_raw',s.frames.add_depth,qos_profile_sensor_data)
-        s.create_subscription(CameraInfo,'/cam_head/depth/camera_info',lambda m:setattr(s,'info',m),10)
+        cb=s.guarded   # every callback body runs inside guarded(): a bad message is logged and dropped
+        s.create_subscription(String,'/sim/task',cb(s.on_task),lat)
+        s.create_subscription(JointState,'/joint_states',cb(s.on_js),20)
+        s.create_subscription(Image,'/cam_head/color/image_raw',cb(s.frames.add_rgb),qos_profile_sensor_data)
+        s.create_subscription(Image,'/cam_head/depth/image_raw',cb(s.frames.add_depth),qos_profile_sensor_data)
+        s.create_subscription(CameraInfo,'/cam_head/depth/camera_info',cb(lambda m:setattr(s,'info',m)),10)
         # torso camera: only for the table near edge (#645: measured, not stored); intrinsics from its camera_info (#613)
         s.frames_torso=PairBuffer();s.info_torso=None
-        s.create_subscription(Image,'/cam_torso/color/image_raw',s.frames_torso.add_rgb,qos_profile_sensor_data)
-        s.create_subscription(Image,'/cam_torso/depth/image_raw',s.frames_torso.add_depth,qos_profile_sensor_data)
-        s.create_subscription(CameraInfo,'/cam_torso/depth/camera_info',lambda m:setattr(s,'info_torso',m),10)
+        s.create_subscription(Image,'/cam_torso/color/image_raw',cb(s.frames_torso.add_rgb),qos_profile_sensor_data)
+        s.create_subscription(Image,'/cam_torso/depth/image_raw',cb(s.frames_torso.add_depth),qos_profile_sensor_data)
+        s.create_subscription(CameraInfo,'/cam_torso/depth/camera_info',cb(lambda m:setattr(s,'info_torso',m)),10)
         # #595.4: /robot_description is published by robot_state_publisher, QoS TRANSIENT_LOCAL
         s.robot_description=None
-        s.create_subscription(String,'/robot_description',lambda m:setattr(s,'robot_description',m.data),lat)
+        s.create_subscription(String,'/robot_description',cb(lambda m:setattr(s,'robot_description',m.data)),lat)
         for k,n in SIDE_NAME.items():
-            s.create_subscription(WrenchStamped,f'/arm_6dof_{n}',lambda m,k=k:s.wrench.__setitem__(k,GRIP.force_vec(m.wrench)),qos_profile_sensor_data)
-            s.create_subscription(JointState,f'/inspire_hand/state/{n}_hand',lambda m,k=k:s.on_hand(k,m),10)
+            s.create_subscription(WrenchStamped,f'/arm_6dof_{n}',cb(lambda m,k=k:s.wrench.__setitem__(k,GRIP.force_vec(m.wrench))),qos_profile_sensor_data)
+            s.create_subscription(JointState,f'/inspire_hand/state/{n}_hand',cb(lambda m,k=k:s.on_hand(k,m)),10)
         s.pub={g:s.create_publisher(CmdSetMotorPosition,f'/{g}/cmd_pos',10) for g in ('arm','head','waist')}
         s.hand={k:s.create_publisher(JointState,f'/inspire_hand/ctrl/{k}_hand',10) for k in ('left','right')}
         s.cli_force={k:s.create_client(SetForce,f'/inspire_hand/set_force/{n}_hand') for k,n in SIDE_NAME.items()}
@@ -131,6 +132,21 @@ class Sol(Node):
         s.tfb=tf2_ros.Buffer();s.tfl=tf2_ros.TransformListener(s.tfb,s)
         s.wall_ready=time.monotonic()   # subscriptions exist from here: later waiting for /clock costs no sim time
         s.hand_target={'l':None,'r':None};s.t0=None;s.trays={};s.placed={};s.plane=None;s.table_x=None;s.monitor=GRIP.GraspMonitor()
+    def guarded(s,fn):
+        """Callback wrapper: an exception inside fn is logged and the message dropped, so the executor thread keeps
+        spinning (rclpy re-raises callback exceptions out of spin, which would stop /clock and every other topic)."""
+        def wrapped(*a):
+            try:return fn(*a)
+            except Exception as e:
+                try:s.log(f'callback {getattr(fn,"__name__","?")} dropped a message: {type(e).__name__}: {e}')
+                except Exception:pass
+        return wrapped
+    def on_task(s,m):
+        """/sim/task callback: the task is accepted only as a JSON object; anything else is logged and ignored, and
+        run() keeps waiting for a valid task."""
+        t=json.loads(m.data)
+        if not isinstance(t,dict):raise ValueError(f'/sim/task is not a JSON object: {type(t).__name__}')
+        s.task=t
     def on_js(s,m):
         """/joint_states callback: store the latest position (rad) per joint name."""
         with s.lock:s.js.update(zip(m.name,m.position))
@@ -946,7 +962,15 @@ def self_w(s):
 def main():
     """Entry point: start the node on a multi-threaded executor and run one task."""
     rclpy.init();n=Sol();ex=MultiThreadedExecutor(4);ex.add_node(n)
-    th=threading.Thread(target=ex.spin,daemon=True);th.start()
+    def spin():
+        # callbacks are guarded; this loop also keeps the executor alive if spin itself raises
+        while rclpy.ok():
+            try:ex.spin()
+            except Exception as e:
+                try:n.get_logger().error(f'executor: {type(e).__name__}: {e}')
+                except Exception:pass
+                time.sleep(.01)
+    th=threading.Thread(target=spin,daemon=True);th.start()
     try:n.run()
     finally:
         time.sleep(.5);rclpy.shutdown()
