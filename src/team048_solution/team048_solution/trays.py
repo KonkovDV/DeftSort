@@ -1,11 +1,12 @@
-"""Сортировочные ящики: поиск камерой (цвет + глубина) и места внутри ящика.
+"""Sorting trays: found by the camera (colour + depth), and the slots inside a tray.
 
-Соответствие ответу организаторов #645 (2026-11-05): положение ящиков решение находит камерами, заранее измеренные
-координаты не зашиваются. Здесь допустимы только
-  * цвет ящика по имени: TASKS.md ("tray_left красный, tray_right синий, tray_center зелёный") и /sim/task["trays"];
-  * ШИРОКИЕ окна поиска по смыслу имени (слева / справа / по центру от робота), а не измеренные позиции;
-  * размер ящика как граница правдоподобия (DOC_SIZE, ±40 %); сам размер, высота стенок и ориентация МЕРЯЮТСЯ.
-Если ящик не найден, возвращается None: вызывающий код переснимает (поворот головы) и никогда не подставляет позу.
+Organiser answer #645 (2026-11-05): tray positions are found by the cameras, no measured coordinates are stored. The
+only constants allowed here are
+  * the tray colour by name: TASKS.md ("tray_left red, tray_right blue, tray_center green") and /sim/task["trays"];
+  * WIDE search windows by the meaning of the name (left of / right of / in front of the robot), not measured positions;
+  * the tray size as a plausibility bound (DOC_SIZE, +-40 %); the size itself, the wall height and the orientation are
+    MEASURED.
+If a tray is not found, None is returned: the caller looks again (head yaw) and never substitutes a pose.
 
 Colour evidence (run v5/v7 head frames): green tray RGB ~(234,250,238), dominant-channel margin ~0.047; the table is
 neutral ~(224,225,224), margin ~0.004 -> CHROMA_MIN=0.03 separates both. TASKS.md images show pastel red/blue trays.
