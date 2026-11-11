@@ -1,5 +1,5 @@
 {
- "source": "Kaggle out_v7/out_v8 logs/run_sort3_*.log TRACE: side grasps, wrist force (hand weight subtracted by the sim) and finger positions at the grasp pose BEFORE closing",
+ "source": "recorded simulator runs v7 and v8, sort3, node log TRACE lines: side grasps, wrist force (hand weight subtracted by the sim) and finger positions at the grasp pose BEFORE closing",
  "attempts": [
   {
    "run": "v7",

@@ -1,5 +1,5 @@
 {
-"source": "Kaggle v9a (team048-sim-v9a), sort3 pool 3 seed 103, HACK_SELF_COLLISION=1, solution master d96da87; extracted from logs/run_sort3_103.log (TRACE/HAND JSON lines + plain log lines)",
+"source": "recorded simulator run v9a, sort3 pool 3 seed 103, HACK_SELF_COLLISION=1, solution of that time; extracted from the node log (TRACE/HAND JSON lines + plain log lines)",
 "trace": [
 {
 "t": 23.19,

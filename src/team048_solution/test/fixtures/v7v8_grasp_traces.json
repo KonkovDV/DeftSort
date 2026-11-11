@@ -1,5 +1,5 @@
 {
-"source": "Kaggle out_v7/out_v8 run_sort3_*.log TRACE, force 1.0 speed 1.0, hand open cmd [1,1,1,1,1,0]",
+"source": "recorded simulator runs v7 and v8, sort3, node log TRACE lines, force 1.0 speed 1.0, hand open cmd [1,1,1,1,1,0]",
 "attempts": [
 {
 "run": "v7",
