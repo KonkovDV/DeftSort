@@ -29,7 +29,7 @@ from . import arm as ARMMOD
 from . import budget as BUD, grip as GRIP, trays as TR
 from .sensing import PairBuffer
 from .perception import table_plane,segment,near_edge,deproject,table_region,rect_mask
-from .grasp import candidates
+from .grasp import candidates,demote_failed
 D=os.path.join(os.path.dirname(os.path.abspath(__file__)),'data')
 PRI=json.load(open(os.path.join(D,'priors.json')))
 TRAY_H=TR.DOC_H        # used only when a detected tray carries no measured wall height
@@ -547,6 +547,7 @@ class Sol(Node):
             s.done.publish(Empty());return
         s.budget=BUD.TimeBudget(BUD.LIMITS[task['task']],t0)
         handled=set();fails={};why='time budget';s.arms={}
+        s.failed_grasps={}   # name -> [(kind, centre xy, closing axis xy)] of executed attempts that failed (grasp.demote_failed); kept across retry rounds
         try:
             # Inside the guarded block: a malformed task message (no 'categories'/'objects') or an arm model that
             # fails to build must not end the process before /sim/task/done (the robot has not moved yet)
@@ -595,10 +596,11 @@ class Sol(Node):
                     if tray not in s.trays:
                         s.log('no plan:',name,json.dumps({'reason':'tray not found by the cameras','tray':tray}));continue
                     others=[P[d.pixels[:,0],d.pixels[:,1]] for d in dets if d is not det]   # every segment is an obstacle
-                    t=s.now();s.last_infeasible=False;s.last_contact=False
+                    t=s.now();s.last_infeasible=False;s.last_contact=False;s.last_attempt=None
                     try:ok=s.pick_place(name,cat,cloud,plane,others,tray)
                     except Exception as e:      # recover (hands open, arms home) and go on with a fresh observation
                         s.log('pick failed with exception',name,type(e).__name__,e);s.recover();ok=False;s.last_contact=True
+                    remember_failure(s.failed_grasps,name,ok,s.last_attempt)
                     if ok is False and s.last_infeasible:nofeas[name]=len(handled)
                     if ok is None:stop=True;break           # budget: no time to finish another object
                     if ok:handled.add(name);did=True;s.budget.record_cycle(s.now()-t);break
@@ -742,6 +744,7 @@ class Sol(Node):
     def pick_place(s,name,cat,cloud,plane,others,tray):
         """True placed / False failed (safe, nothing lifted left outside) / None not started for lack of time."""
         f,C=candidates(cloud,plane,cat,others,W_MAX=self_w(s),robot_xy=(0.,0.),mass=PRI.get(name,{}).get('mass'))
+        C=demote_failed(C,getattr(s,'failed_grasps',{}).get(name,()))   # a grasp that already failed is tried last
         tx,ty,ax,ay,ts,tl,th=ARMMOD.tray_geom(s.trays[tray])
         order='lr' if ty>.1 else ('rl' if ty<-.1 else ('lr' if f['center'][1]>=0 else 'rl'))
         k=s.placed.get(tray,0);dl=TR.slot_offset(k,.5*f['length'],size=(ts,tl),ty=ty)   # along the measured long axis
@@ -783,6 +786,7 @@ class Sol(Node):
                 cl=p.get('clear') or {}
                 s.log('pick',name,cat,'->',tray,'slot',k,'arm',side,g['kind'],'w',round(g['width'],3),'z',round(g['z'],3),
                       'clear',json.dumps({k_:(None if cl.get(k_) is None else round(cl[k_],3)) for k_ in ('du','dr','margin')}))
+                s.last_attempt=(g['kind'],np.asarray(g['center'],float)[:2].copy(),np.asarray(g['close_axis'],float)[:2].copy())   # executed from here (failure memory)
                 Tg=A.tcp(p['q_grasp']);s.trace('start',side,name,kind=g['kind'],center=[round(float(x),3) for x in c3])
                 s.hand_open(side);s.move_arm(side,p['q_pre']);Tp=A.tcp(p['q_pre']);s.trace('pre',side,name,Tp)
                 thumb=s.wait_thumb(side)      # #648: thumb in opposition before anything closes (usually already there)
@@ -867,6 +871,12 @@ class Sol(Node):
                        'no collision-free pick IK' if not why['place'] else 'no place plan (tray reach / collisions)')
         s.log('no plan:',name,json.dumps(why))
         return False
+def remember_failure(memory,name,ok,attempt):
+    """Failure memory (grasp.demote_failed): store attempt = (kind, centre xy, closing axis xy) under name when the attempt was executed
+    (attempt is not None) and failed (ok is False). Placed (True), not started for time (None) or never executed
+    (planning failure, attempt None) leave the memory unchanged. Returns the memory."""
+    if ok is False and attempt is not None:memory.setdefault(name,[]).append(attempt)
+    return memory
 def accel_status():
     """('on'|'off', reason) of the optional Rust extension (logged at start and at the end of the run)."""
     try:

@@ -77,6 +77,34 @@ def rim_closed(cloud,plane,f,c0,r0):
     h=cloud@plane[0]+plane[1];inner=np.linalg.norm(cloud[:,:2]-np.asarray(c0,float),axis=1)<r0-RIM_W
     return bool(inner.any() and np.median(h[inner])>f['height']-RIM_DEPTH)
 
+# Failure memory. An executed attempt that ended empty (fingers closed on nothing, empty after the lift, approach guard,
+# pre-grasp not reached, exception) is remembered as (kind, centre xy, closing axis xy). The planner is deterministic:
+# on an unchanged scene it returns the same first candidate, so the next attempt would replay the failed grasp. Run v9b
+# sort2_101 ('start' TRACE centres): Threshold rim pinch 4 times at (0.431, -0.234); Utana rim pinch 4 times at two
+# points, the 3rd and 4th within 1.3 cm of the 1st and 2nd. demote_failed moves such candidates behind every other one; nothing is
+# removed, so an object with a single candidate is still tried. Idea: retry under different conditions and keep several
+# grasp options (Hernandez et al., IEEE T-II 2018, doi:10.1109/TII.2018.2800744; Morrison et al., ICRA 2018,
+# doi:10.1109/ICRA.2018.8463191); the code is ours.
+FAIL_SAME_R=.02     # m. Rim samples 30 deg apart lie 2.6 cm apart on the smallest fitted rim of the fixtures (Ecoforms,
+                    # r0 0.050 m, rim_dishes.json); a 2 cm radius never merges two different rim angles of that dish.
+FAIL_SAME_COS=.866  # |cos| between closing axes above which two candidates at the same centre are the same grasp (30 deg):
+                    # the two side (or top) candidates of one footprint share the centre and differ by 90 deg.
+
+def demote_failed(C,failed,r=FAIL_SAME_R,cos_min=FAIL_SAME_COS):
+    """Stable reorder of the candidate list C: candidates matching a failed attempt (same kind, centre xy within r m,
+    closing axes within acos(cos_min)) go after all others, in their original order. failed: iterable of
+    (kind, centre xy, closing axis xy). Empty failed -> a copy of C in the same order.
+    Dishes are already screened before any attempt (rim_closed: closed top; RIM_TORQUE_MAX: too heavy for a rim
+    pinch); this memory covers what those checks cannot see, an executed grasp that still came back empty."""
+    F=[(k,np.asarray(c,float)[:2],np.asarray(a,float)[:2]) for k,c,a in failed]
+    if not F:return list(C)
+    def same(g):
+        c=np.asarray(g['center'],float)[:2];a=np.asarray(g['close_axis'],float)[:2]
+        return any(g['kind']==k and float(np.linalg.norm(c-fc))<r and
+                   abs(float(a@fa))>=cos_min*float(np.linalg.norm(a)*np.linalg.norm(fa)) for k,fc,fa in F)
+    bad=[same(g) for g in C]
+    return [g for g,b in zip(C,bad) if not b]+[g for g,b in zip(C,bad) if b]
+
 def candidates(cloud,plane,category,others=(),W_MAX=.09,finger=.02,depth=.04,margin=.01,robot_xy=(0.,0.),mass=None):
     """Grasp candidates (side, top, rim) for one object cloud (pelvis frame, m) and the measured table plane."""
     f=footprint(cloud,plane);out=[];cyl=False
