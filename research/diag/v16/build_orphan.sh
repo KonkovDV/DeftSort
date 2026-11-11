@@ -12,7 +12,7 @@ EXCLUDE=(research HANDOFF.md
 WT=/tmp/submit-048; BR=submit-048
 IDX=$(mktemp); trap 'rm -f "$IDX"' EXIT
 GIT_INDEX_FILE=$IDX git read-tree "$SRC"
-GIT_INDEX_FILE=$IDX git rm -r -q --cached --ignore-unmatch "${EXCLUDE[@]}" >/dev/null
+GIT_INDEX_FILE=$IDX git rm -r -q -f --cached --ignore-unmatch "${EXCLUDE[@]}" >/dev/null
 TREE=$(GIT_INDEX_FILE=$IDX git write-tree)
 DATE=$(git show -s --format=%cI "$SRC")
 C=$(GIT_AUTHOR_NAME=team048-local GIT_AUTHOR_EMAIL=local@invalid GIT_COMMITTER_NAME=team048-local GIT_COMMITTER_EMAIL=local@invalid \
