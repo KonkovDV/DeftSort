@@ -7,7 +7,7 @@ before closing. Hand force/speed (#648) are sent to each hand as soon as its ser
 returns, and an arm whose hand never got the force limit is not used.
 Tubes: not solved -> immediate /sim/task/done (0 points, allowed by SCORING).
 Debug topics (/sim/task/check, /sim/objects/*) are never used.
-Scene (#645): table plane + near edge and the trays are MEASURED by the cameras at run time (head survey with head
+Scene (#645): table plane + near edge and the trays are measured by the cameras at run time (head survey with head
 yaw scan, torso camera for the near edge); only approximate search bounds and robot geometry are constants."""
 import json,os,time,threading
 WALL_IMPORT=time.monotonic()
@@ -38,23 +38,23 @@ SIDE_NAME={'l':'left','r':'right'}
 APPROACH_VMAX=.3      # rad/s on the last pre-grasp -> grasp segment (do not knock the object); 0.8 elsewhere
 TCP_TOL=.01           # m, measured TCP vs planned before closing; one correction if exceeded
 RETREAT_DZ=.08        # m, straight-up lift after release / before going home from low poses
-LOW_ABOVE_TABLE=.10    # m, TCP lower than this above the MEASURED table -> lift straight up before going home
+LOW_ABOVE_TABLE=.10    # m, TCP lower than this above the measured table -> lift straight up before going home
 HEAD_PITCH=.4         # rad, look-down posture for the table (head_pitch_joint)
 HEAD_TOL=.01          # rad, head considered on target
 HEAD_TMAX=6.          # s sim, give up waiting for the head (logged)
 # Tray survey (#645): generic look-left / look-right head yaws. Camera FOV geometry (camera_info: 640x360, 86 deg HFOV;
 # URDF head chain): at pitch 0.4 the views at yaw 0/+0.6/-0.6 jointly cover bearings -83..+83 deg of the table in front
 # of the robot -- the whole half-plane, not a stored tray position. A tray seen cut by the image border is re-aimed at
-# its own measured centroid (TRAY_RELOOK_MAX times); a tray that is never fully seen is NOT used (its category is
+# its own measured centroid (TRAY_RELOOK_MAX times); a tray that is never fully seen is not used (its category is
 # skipped -> 0 points, never -10).
 HEAD_SCAN_YAWS=(0.,.6,-.6)
 TRAY_RELOOK_MAX=2
 TRAY_RESURVEY_MAX=1   # extra survey later in the run when a needed tray is still missing
 TRAY_MASK_MARGIN=.03  # m, pixels within the measured tray rectangle + margin are not objects
-ID_CONF_MIN=.7        # identify(): category margin; render-set study 2026-11-09 (pool 3, 625 segments): 0.7 -> 599 accepted / 7 wrong vs 1.0 -> 498 / 3
+ID_CONF_MIN=.7        # identify(): category margin; render-set study (pool 3, 625 segments): 0.7 -> 599 accepted / 7 wrong vs 1.0 -> 498 / 3
 ID_COST_MAX=2.5
 TRACE_DIR=os.environ.get('TEAM048_TRACE_DIR')   # offline test harness only: per-object JSON trace + RGB-D frames
-SHADOW_DF_N=.5*.08*9.81   # NOT used for decisions: logged 'would-be' verdict, 1/2 weight of the lightest pool-3 object (sim cfg 0.08 kg)
+SHADOW_DF_N=.5*.08*9.81   # not used for decisions: logged 'would-be' verdict, 1/2 weight of the lightest pool-3 object (sim cfg 0.08 kg)
 PRE_TOL=.05           # m, pre-grasp TCP error above which the pick is aborted (v7 s101 mustard: 26.6 cm, then knocked)
 RELEASE_OPEN_MIN=.8    # fingers 1-4 mean after release; v7: 0.96-0.97 released, 0.99 home
 PLACE_TOL=.04         # m, release TCP error: one correction before opening (v7 s101 Ecoforms released 13.7 cm off)
@@ -79,7 +79,7 @@ MOVE_SETTLE_S=2.6     # s per arm move on top of the 1.6x speed line (move_arm: 
 FAILS_MAX=2           # failed attempts per object before it is skipped (per round)
 RETRY_ROUNDS=1        # extra round with reset failure counters when time is left (v9a: stop at 124 s of 405 s)
 HAND_LOG_DT=.1        # s sim: hand-state log period during the guarded approach and the closing (10 Hz, for the guard and stall checks)
-# SetForce / SetSpeed delivery (#648: finger force 0.3-0.5 on BOTH hands). Requests sent once at
+# SetForce / SetSpeed delivery (#648: finger force 0.3-0.5 on both hands). Requests sent once at
 # start, and only to services already discovered, are not enough: the simulator printed '[hack] <side> hand force limits'
 # for the right hand only in 5 of 6 recorded layouts (v7 x3, v8, v9a, v9b sim logs), so the left hand closed at the
 # default force 1.0 (v9b: 5 left-hand closes). Therefore every request is retried from a background thread until the
@@ -136,7 +136,7 @@ class Sol(Node):
         with s.lock:s.js.update(zip(m.name,m.position))
     def on_hand(s,k,m):
         """Hand state callback for side k: latest state and short position/velocity histories."""
-        # The history is replaced by a NEW tuple (one atomic assignment), never appended + trimmed in place: a reader
+        # The history is replaced by a new tuple (one atomic assignment), never appended + trimmed in place: a reader
         # on the task thread (wait_fingers -> fingers_stalled) iterating a list while this callback trims it
         # could skip samples (test_topics_motion.HandHistory).
         s.hstate[k]=m;s.hvel[k]=(tuple(s.hvel[k])+(tuple(m.velocity),))[-10:]
@@ -222,7 +222,7 @@ class Sol(Node):
         opposition). side: whole hand; rim/top pinch: index+middle against the thumb."""
         return [0,0,0,0,0,0.] if kind=='side' else [1,1,.1,.1,.2,0.]
     def wait_thumb(s,side,tmax=None):
-        """#648: the thumb is rotated into opposition FIRST (hand_open sets DOF 6), the other fingers close only
+        """#648: the thumb is rotated into opposition first (hand_open sets DOF 6), the other fingers close only
         after /inspire_hand/state shows DOF 6 there. Returns True/False (timeout) / None (no state)."""
         tmax=GRIP.finger_stroke_time()+.5 if tmax is None else tmax;t=s.now()
         while s.now()-t<tmax:
@@ -322,7 +322,7 @@ class Sol(Node):
         return {f"{SIDE_NAME[k]}_{kind}":c['state'] for (kind,k),c in sorted(getattr(s,'hand_cfg',{}).items())}
     def hand_verdict(s,side,grasp=None):
         """Held iff a closing finger deviates >= GRIP.HELD_DEV from its current command with effort >=
-        GRIP.HELD_EFF (15/15 on v7+v8). Wrist F/T, past_verdict and the v7 finger_verdict are LOG-ONLY
+        GRIP.HELD_EFF (15/15 on v7+v8). Wrist F/T, past_verdict and the v7 finger_verdict are log-only
         (hand_shadow)."""
         h=s.hstate.get(side)
         if h is None:return None
@@ -395,7 +395,7 @@ class Sol(Node):
         while time.monotonic()-t<wait and (pair is None or getattr(s,info_attr) is None):
             pair=buf.pair(t_req);time.sleep(.02)
         if pair is None:
-            # The newest pair of ANY age could predate the last head/arm motion, so
+            # The newest pair of any age could predate the last head/arm motion, so
             # only a pair at most CAPTURE_MAX_AGE older than the request is accepted; otherwise the capture fails and
             # observe_retry captures again.
             pair=buf.pair(t_req-CAPTURE_MAX_AGE)
@@ -545,8 +545,8 @@ class Sol(Node):
                 if not s.budget.can_start(s.now()):raise RuntimeError('no /joint_states while an object cycle still fit the budget')
                 time.sleep(.05)
             for k in 'lr':s.hand_open(k)
-            # Survey FIRST with the arms in the start posture (v7 s102 start frames: table plane, near edge and
-            # trays are measured with the arms hanging), then go home along a path certified against the MEASURED
+            # Survey first with the arms in the start posture (v7 s102 start frames: table plane, near edge and
+            # trays are measured with the arms hanging), then go home along a path certified against the measured
             # table. v9a: going home before the table was known commanded the straight start->home joint path, which
             # sweeps the hands through the table front -> both arms jammed (|F| 258 N / 938 N) and 4 of 7 picks were lost.
             t_head=s.survey()
@@ -657,7 +657,7 @@ class Sol(Node):
             time.sleep(.02)
         s.log('waist not settled',s.js.get('body_yaw_joint'),'target',theta);return False
     def go_home(s,side):
-        """#625: home only along a CERTIFIED (self-, body-, other-arm- and table-collision-free) joint path from the
+        """#625: home only along a certified (self-, body-, other-arm- and table-collision-free) joint path from the
         measured posture: straight, or straight up first. If none exists the arm is moved anyway (it cannot stay in
         a low pose) and the event is logged for the trajectory review."""
         A=s.arms[side];o='r' if side=='l' else 'l'
@@ -697,7 +697,7 @@ class Sol(Node):
         f,C=candidates(cloud,plane,cat,others,W_MAX=self_w(s),robot_xy=(0.,0.),mass=PRI.get(name,{}).get('mass'))
         tx,ty,ax,ay,ts,tl,th=ARMMOD.tray_geom(s.trays[tray])
         order='lr' if ty>.1 else ('rl' if ty<-.1 else ('lr' if f['center'][1]>=0 else 'rl'))
-        k=s.placed.get(tray,0);dl=TR.slot_offset(k,.5*f['length'],size=(ts,tl),ty=ty)   # along the MEASURED long axis
+        k=s.placed.get(tray,0);dl=TR.slot_offset(k,.5*f['length'],size=(ts,tl),ty=ty)   # along the measured long axis
         sx,sy=tx+dl*ax,ty+dl*ay
         why={'candidates':len(C),'feasible':int(sum(1 for g in C if g['feasible'])),'pick_ik':{},'place':{},'hand_clear':{}}   # why no plan: logged per object
         if 'rim_closed' in f:why['rim_closed']=f['rim_closed']
@@ -825,7 +825,7 @@ def replan_infeasible(nofeas,name,handled):
     return nofeas.get(name) is None or nofeas[name]!=len(handled)
 PLACE_AXES=(np.array([1.,0,0]),np.array([0,1.,0]),np.array([-1.,0,0]),np.array([0,-1.,0]))
 def held_offset(A,q_grasp,g,c3):
-    """Centre of the held object in the TCP frame for grasps whose grip point is NOT over the object centre (rim pinch:
+    """Centre of the held object in the TCP frame for grasps whose grip point is not over the object centre (rim pinch:
     the pinch is on the rim, the dish centre r0 away), else None. Check on recorded run data: FK of the measured at_grasp
     joints (v8, v9b, v11b, 5 rim attempts), pinch point + r0 * closing axis lies 10.4-12.9 mm from the dish centre
     measured in the head frame (TCP_TOL 1 cm plus the circle fit). Height = the pinch height (plan_place uses only the
@@ -838,7 +838,7 @@ def plan_place(A,q_from,tx,ty,top,fallback=None,tray_h=TRAY_H,obj_off=None):
     """Release pose over (tx,ty) at the lowest feasible height -> (q_place, q_up, q_carry) or None.
     q_carry: straight-up lift from q_from to the release height (carry high over the tray walls), None if not needed
     or not feasible (then q_from->q_place must be certified directly). q_up: straight-up retreat after release.
-    Closing axis tried with BOTH signs (v6: tray_right reachable only with the mirrored axis); fallback=(x,y) (tray
+    Closing axis tried with both signs (v6: tray_right reachable only with the mirrored axis); fallback=(x,y) (tray
     centre) is tried when the slot is out of reach. obj_off (held_offset): the pose is shifted horizontally so that
     the OBJECT centre, not the hand's grip point, is over (x,y); without it a rim-held dish hangs r0 (5-6.6 cm) off the
     slot, toward or over the tray wall."""
@@ -862,22 +862,22 @@ def rotz(a):
     c,s_=np.cos(a),np.sin(a);return np.array([[c,-s_,0],[s_,c,0],[0,0,1.]])
 YAW_MAX=2.5           # rad, |body_yaw| used for placing (INTERFACES.md: body_yaw_joint motor 31, [-2.97, 3.14], plus = left)
 # Candidate bearings (rad, torso frame, toward this arm's side) at which the arm can place: a ROBOT-REACH property
-# (arm workspace beside the shoulder; offline reach study 2026-11-09: placements found at 0.5-1.3 rad, densest ~1.1),
-# applied to the tray position MEASURED by the camera. Not a scene coordinate (#645).
+# (arm workspace beside the shoulder; offline reach study: placements found at 0.5-1.3 rad, densest ~1.1),
+# applied to the tray position measured by the camera. Not a scene coordinate (#645).
 YAW_AIMS=(1.1,.9,1.3,.7,.5)
 def yaw_candidates(side,tx,ty):
     """Torso yaw angles that bring the tray in front of this arm's shoulder (rotation about pelvis z, joint at origin).
-    Offline (2026-11-09, reach-p3 30 layouts): with body_yaw locked no object reached both trays with one arm."""
+    Offline (reach study, 30 layouts): with body_yaw locked no object reached both trays with one arm."""
     phi=np.arctan2(ty,tx);out=[]
     sg=1. if side=='l' else -1.
-    for aim in YAW_AIMS:    # bearing of the MEASURED tray in the rotated torso frame (beside this arm's shoulder)
+    for aim in YAW_AIMS:    # bearing of the measured tray in the rotated torso frame (beside this arm's shoulder)
         th=float(phi-sg*aim)
         if abs(th)<=YAW_MAX and abs(th)>.15 and all(abs(th-o)>.1 for o in out):out.append(th)
     return out
 FAR_TRAY_Y=.3
 def far_tray(side,ty):
     """Tray on the OTHER arm's side (tray_left for the right arm, tray_right for the left arm).
-    Offline evidence (2026-11-09): reach study, 30 layouts x 2 pools, 0 of 450 picked objects were placeable in the
+    Offline evidence: reach study, 30 layouts x 2 pools, 0 of 450 picked objects were placeable in the
     far tray with body_yaw=0; study r3s3 (current planner, organiser layout generator) 103/103 far-tray placements used yaw."""
     return (side=='l' and ty<-FAR_TRAY_Y) or (side=='r' and ty>FAR_TRAY_Y)
 def plan_place_yaw(A,q_from,tx,ty,plane,trays,fallback=None,tray_h=TRAY_H,obj_off=None):
@@ -926,7 +926,7 @@ def move_bound(a,b,vmax=.8,refine=2):
     MOVE_T_PAD (the measured start may be off the planned one by up to MOVE_RES), then `refine` re-commands of REFINE_T."""
     return (float(np.max(np.abs(np.asarray(b)-np.asarray(a))))+MOVE_RES)/vmax*1.6+MOVE_T_PAD+refine*REFINE_T
 def hold_time_bound(q_grasp,q_lift,place,yaw,vmax=.8):
-    """#595: upper bound of the sim time from the lift command to the end of the release when EVERY step times out:
+    """#595: upper bound of the sim time from the lift command to the end of the release when every step times out:
     lift (+0.3 s pause), carry, waist (WAIST_TMAX), place, one TCP correction (A.correct max_step 0.15 rad, refine 1),
     release with one re-open (2 x RELEASE_WAIT). Lifting only when this fits guarantees no object in the hand at the
     limit regardless of the typical-time model place_time."""

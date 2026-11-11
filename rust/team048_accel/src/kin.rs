@@ -1,4 +1,4 @@
-//! Serial-chain kinematics, a faithful port of `team048_solution.kinematics.Chain` (fk / frames / jacobian / ik)
+//! Serial-chain kinematics, a port of `team048_solution.kinematics.Chain` (fk / frames / jacobian / ik)
 //! and `geometry.rotation_error`. Arithmetic follows the NumPy reference operation by operation; results agree to
 //! ~1e-15 (BLAS may reorder 3-term sums), which the equivalence tests bound by 1e-9.
 use nalgebra::{Matrix3, SMatrix, SVector, Vector3};

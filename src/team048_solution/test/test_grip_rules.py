@@ -60,7 +60,7 @@ class JammedAndClamp(unittest.TestCase):
             for d in jam:self.assertEqual(t2[d-1],t0(a)[d-1])          # jammed: keeps the closed target
             old=[max(t,p-.15) for t,p in zip(t0(a)[:5],C['fing'][:5]) if t<.5]
             old_over+=max(old)>1.
-        self.assertEqual(old_over,7)            # the pre-fix formula: 7 of 16 attempts asked for > 1.0
+        self.assertEqual(old_over,7)            # the unclamped formula: 7 of 16 attempts asked for > 1.0
     def test_jammed_examples(self):
         self.assertEqual(G.jammed([.988,1.117,1.738,.123,.215,0],RIM),[3])      # v8 Threshold: middle bent back
         self.assertEqual(G.jammed([.988,1.117,1.738,.123,.215,0]),[2,3])         # all fingers

@@ -1,7 +1,7 @@
-"""Offline: surface sample of the OPEN Inspire hand (fingers open, thumb rotated into opposition = the hand_open
+"""Offline: surface sample of the open Inspire hand (fingers open, thumb rotated into opposition = the hand_open
 command [1,1,1,1,1,0]) in the TCP frame, from the UBTECH tiangong2pro_urdf STL meshes (Apache-2.0, robot assets; hand
 joint origins identical to the organiser URDF, see tools/hand_from_meshes.py). Used by arm.grasp_clear_shift to check
-the open hand against the MEASURED object footprint box at the grasp pose and along the approach.
+the open hand against the measured object footprint box at the grasp pose and along the approach.
 Triangles are sampled at <= STEP spacing (vertices alone miss large flat faces), then voxel-downsampled to STEP.
 Usage: python tools/hand_open_points.py <meshes_dir>"""
 import sys,os,json,struct,numpy as np

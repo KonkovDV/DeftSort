@@ -1,5 +1,5 @@
 #!/bin/bash
-# Optional Rust acceleration (team048_accel). Runs once at install time (internet available); NEVER fails the install:
+# Optional Rust acceleration (team048_accel). Runs once at install time (internet available); never fails the install:
 # without the extension the solution uses its NumPy reference implementation (identical results, slower planning).
 # 1) vendored prebuilt wheel (SHA256-checked): manylinux2014 x86_64, abi3 (CPython >= 3.10), baseline x86-64 code;
 #    the AVX2 kernels are selected at run time only if the CPU has AVX2 (TEAM048_ACCEL_NO_AVX2=1 forces baseline); glibc >= 2.14

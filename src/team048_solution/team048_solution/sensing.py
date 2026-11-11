@@ -1,4 +1,4 @@
-"""RGB-D frame pairing. Run v5: colour and depth of cam_head carry the SAME stamp (70.039998434 s),
+"""RGB-D frame pairing. Run v5: colour and depth of cam_head carry the same stamp (70.039998434 s),
 both 640x360, depth aligned to colour, so pairing by stamp is exact in the simulator; tolerance covers real robots."""
 from collections import deque
 import threading

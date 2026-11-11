@@ -118,9 +118,9 @@ class TrayAxisSign(unittest.TestCase):
         s.assertTrue(np.allclose(TRY.canonical_axis(np.array([-1.,-1e-12])),[1.,1e-12]))
     def test_general_axes_unchanged(s):
         for ax in ([.927,.375],[-.3,.954],[0.,1.]):
-            s.assertEqual(TRY.canonical_axis(np.array(ax)).tolist(),ax)              # y > 0: kept as before
+            s.assertEqual(TRY.canonical_axis(np.array(ax)).tolist(),ax)              # y > 0: kept
         for ax in ([.927,-.375],[.3,-.954],[0.,-1.]):
-            s.assertEqual(TRY.canonical_axis(np.array(ax)).tolist(),[-ax[0],-ax[1]])   # y < 0: flipped as before
+            s.assertEqual(TRY.canonical_axis(np.array(ax)).tolist(),[-ax[0],-ax[1]])   # y < 0: flipped
     def test_detect_uses_canonical_sign(s):
         # synthetic x-aligned tray: whichever tie winner min_area_rect returns, detect reports axis x > 0
         P=np.zeros((60,80,3));P[...,0]=np.linspace(.2,.5,80)[None,:];P[...,1]=np.linspace(.5,.72,60)[:,None];P[...,2]=-.15

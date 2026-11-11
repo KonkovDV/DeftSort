@@ -40,7 +40,7 @@ class StartPath(unittest.TestCase):
             self.assertFalse(A.col.valid(q0))                     # forearm vs hip sphere (real mesh gap 3 mm)
             ge,gs=A.col.gaps(q0);self.assertGreater(ge.min(),-.03);self.assertTrue(len(gs)==0 or gs.min()>0)
     def test_straight_start_to_home_crosses_the_table(self):
-        """v9a root cause: the straight joint path start->home is NOT collision-free against the measured table."""
+        """v9a root cause: the straight joint path start->home is not collision-free against the measured table."""
         for side in 'lr':
             A=self.arm(side);q0=np.clip(np.zeros(7),A.chain.lower,A.chain.upper)
             ok=A.col.certify_escape(q0,A.home);self.assertFalse(ok)

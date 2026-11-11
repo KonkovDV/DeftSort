@@ -83,7 +83,7 @@ class Chain:
     def lock_joints(self,positions):
         """Explicit calibrated locks, never inferred zero angles.
 
-        Caller MUST monitor these measured joints and abort on drift. This folds
+        Caller must monitor these measured joints and abort on drift. This folds
         their actual reviewed posture into FK, without commanding the joint.
         """
         active={j.name:j for j in self.active}

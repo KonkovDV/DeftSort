@@ -1,4 +1,4 @@
-//! PyO3 bindings. All heavy calls release the GIL (`py.detach`, formerly `allow_threads`) so the ROS executor
+//! PyO3 bindings. All heavy calls release the GIL (`py.detach`) so the ROS executor
 //! threads keep running while planning.
 use crate::col::{Collision, Env};
 use crate::kin::{Chain, Rt, N, Q};

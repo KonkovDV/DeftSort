@@ -1,11 +1,11 @@
 """Sorting trays: found by the camera (colour + depth), and the slots inside a tray.
 
-Organiser answer #645 (2026-11-05): tray positions are found by the cameras, no measured coordinates are stored. The
+Organiser answer #645: tray positions are found by the cameras, no measured coordinates are stored. The
 only constants allowed here are
   * the tray colour by name: TASKS.md ("tray_left red, tray_right blue, tray_center green") and /sim/task["trays"];
-  * WIDE search windows by the meaning of the name (left of / right of / in front of the robot), not measured positions;
+  * wide search windows by the meaning of the name (left of / right of / in front of the robot), not measured positions;
   * the tray size as a plausibility bound (DOC_SIZE, +-40 %); the size itself, the wall height and the orientation are
-    MEASURED.
+    measured.
 If a tray is not found, None is returned: the caller looks again (head yaw) and never substitutes a pose.
 
 Colour evidence (run v5/v7 head frames): green tray RGB ~(234,250,238), dominant-channel margin ~0.047; the table is
@@ -23,7 +23,7 @@ CHANNEL = {'red': 0, 'green': 1, 'blue': 2}
 CHROMA_MIN = .03
 SLOT_STEP = .08
 # Search windows (pelvis frame, x forward, y left) -- semantic regions "left of / right of / in front of the robot"
-# that cover the whole reachable table half-planes; NOT measured positions (#645: approximate search bounds allowed).
+# that cover the whole reachable table half-planes; not measured positions (#645: approximate search bounds allowed).
 SEARCH = {'tray_left': ((.05, 1.10), (.20, 1.30)),
           'tray_right': ((.05, 1.10), (-1.30, -.20)),
           'tray_center': ((.20, 1.10), (-.45, .45))}
@@ -121,7 +121,7 @@ def detect(P, rgb, valid, name, colour, plane, min_px=150, border=2):
     Returns dict(center=(x,y), size=(short,long), axis=long-axis unit (x,y), height=wall top above the table,
     partial=bool, centroid=(x,y), px=int) or None when nothing tray-like of that colour is in the search window.
     partial=True: the component touches the image border or is smaller than the plausibility bound -> the centre is
-    NOT reliable; the caller re-aims the head at `centroid` and looks again (never falls back to a stored pose).
+    not reliable; the caller re-aims the head at `centroid` and looks again (never falls back to a stored pose).
     """
     if colour not in CHANNEL or name not in SEARCH:
         return None
@@ -181,7 +181,7 @@ def canonical_axis(axis, eps=1e-9):
 def slot_offset(k, half_extent, step=SLOT_STEP, size=DOC_SIZE, wall=TRAY_WALL, clearance=.01, ty=0.):
     """Offset ALONG THE TRAY LONG AXIS for the k-th object placed in this tray: 0, inner, outer, 0, ...
     inner = toward the robot midline (run v7: the outer slot of tray_left was not reached, TCP 13.7 cm off).
-    `size` = MEASURED tray size (short, long) or (x, y) extent; s = min(step, room) keeps the object's footprint
+    `size` = measured tray size (short, long) or (x, y) extent; s = min(step, room) keeps the object's footprint
     half-extent inside the walls with clearance."""
     room = max(size)/2-wall-clearance-max(0., float(half_extent))
     s = max(0., min(step, room))

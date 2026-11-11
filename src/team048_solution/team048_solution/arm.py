@@ -1,4 +1,4 @@
-"""TienKung 2.0 Pro arm IK + sphere self-collision built from the REAL organiser URDF (robot-only data).
+"""TienKung 2.0 Pro arm IK + sphere self-collision built from the real organiser URDF (robot-only data).
 Frames: pelvis, z up, x forward. Uses kinematics.Chain (bounded DLS IK) and planning.CollisionModel (swept sphere certification).
 Limitations: the URDF STL meshes are absent, so link envelopes are spheres sized from the URDF inertial tensors
 (equivalent-cylinder radius, inflated) -- an approximation, not mesh collision."""
@@ -11,9 +11,9 @@ from .geometry import pose,rotation,check_transform,check_rotation,finite
 URDF=os.environ.get('HACK_URDF',os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','tiangong_pro_with_hands.urdf'))
 import re
 XML=re.sub(r'<axis\s+xyz="0 0 0"\s*/>','',open(URDF).read());ROOT=ET.fromstring(XML)
-# #645 (2026-11-05): table, trays and racks are found by the cameras; no pre-measured scene coordinates here.
+# #645: table, trays and racks are found by the cameras; no pre-measured scene coordinates here.
 # Only APPROXIMATE SEARCH BOUNDS (allowed): the table plane must lie in this pelvis-z band (a wide "the table is roughly
-# at this height" window, 40 cm), and the table obstacle extends from the MEASURED near edge to these far bounds
+# at this height" window, 40 cm), and the table obstacle extends from the measured near edge to these far bounds
 # (conservative: an obstacle where there may be no table only removes plans, never adds collisions).
 TABLE_Z_BAND=(-.45,-.05)    # m, pelvis frame: accepted table-top height at x=0.4 (search window, not a measurement)
 TABLE_X_FAR=1.0             # m, far bound of the table obstacle (search bound)
@@ -114,7 +114,7 @@ HAND_MESH=os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','hand_m
 _HAND_MESH_CACHE={}
 def hand_mesh(side):
     """Mesh-derived hand geometry (tools/hand_from_meshes.py) or None. Parsed once per file version (path, mtime,
-    size): grasp_pose calls this for every candidate pose (was 248 JSON parses per 10 objects). Treat as read-only."""
+    size): grasp_pose calls this for every candidate pose. Treat as read-only."""
     try:
         st=os.stat(HAND_MESH);key=(HAND_MESH,st.st_mtime_ns,st.st_size)
         d=_HAND_MESH_CACHE.get(key)
@@ -125,14 +125,14 @@ def hand_mesh(side):
         return d[side]
     except Exception:return None
 # Open-hand mesh vs measured object box (side/top grasps)
-# Runs v7+v8 TRACE: the side grasps of the long boxes pushed the object with the hand BEFORE
+# Runs v7+v8 TRACE: the side grasps of the long boxes pushed the object with the hand before
 # closing (wrist |F| at the grasp pose 17.8 N Crayola v7, 15.4 N Crunch v8; fingers bent back 1.26-1.46 in Crunch v8,
 # Perricone v7) while the sphere envelope saw no contact (object = obstacle-free target). Cause, from the hand meshes
 # (tools/hand_open_points.py): at the grasp pose the object box overlaps the open hand -- the proximal phalanges of
 # the fingers reach 6 mm past the grip point toward the thumb and the palm starts 5.7 cm behind it, so a box longer than
 # ~6 cm along the approach, or wider than the asymmetric pad gap (fingers +2.8 cm, thumb -4.6 cm from the grip
 # point), is hit on the way in. grasp_clear_shift moves the grip point along the closing axis (centring the object in
-# the REAL pad gap) and back along the approach (as little as possible: every cm is a gravity lever about the closing
+# the real pad gap) and back along the approach (as little as possible: every cm is a gravity lever about the closing
 # axis) until the open hand clears the measured footprint box at the grasp pose and along the whole approach.
 HAND_OPEN_PTS=os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','hand_open_points.json')
 _HOP_CACHE={}
@@ -166,11 +166,11 @@ def box_inside(B,box,m=0.):
     if box.get('cyl'):return zin&(np.hypot(B[...,0],B[...,1])<w/2+m)
     return zin&(np.abs(B[...,0])<w/2+m)&(np.abs(B[...,1])<L/2+m)
 def grasp_clear_shift(side,Tg,approach,box,pre=.08,margins=CLEAR_MARGINS,su=SHIFT_U,sr=SHIFT_R):
-    """Smallest retreat dr (then smallest |du|) such that the OPEN hand at Tg shifted by du*u_box - dr*approach does
+    """Smallest retreat dr (then smallest |du|) such that the open hand at Tg shifted by du*u_box - dr*approach does
     not overlap the measured object box (inflated by the margin) at the grasp pose and at every APPROACH_SWEEP_STEP
     along the last `pre` metres, and the distal pads (index/middle/thumb) still project onto the object (the closing
     fingers meet it). Returns dict(du,dr,margin,shift (3,)) or None (no clear shift: the hand cannot take this object
-    this way). Without hand data -> zero shift (old behaviour)."""
+    this way). Without hand data the shift is zero."""
     hp=hand_open_points(side)
     if hp is None:return dict(du=0.,dr=0.,margin=None,shift=np.zeros(3))
     P,parts=hp;a=np.asarray(approach,float);a=a/np.linalg.norm(a)
@@ -214,7 +214,7 @@ def arm_spheres(side,chain,mesh=True):
     tip=SIDE[s]['tip']   # hand + fingers: palm and finger region along hand z in tcp frame (hand frame == tcp up to rotation)
     R=J[f"{'left' if s=='l' else 'right'}_hand_to_tcp"]['T'][:3,:3]
     for z,r in ((.03,.045),(.08,.045),(.13,.04),(.17,.035)):S.append(Sphere(tip,R@np.array([0,0,z]),r))
-    # thumb (off the hand axis by up to 9 cm, NOT covered by the axis spheres): run v7 side grasps pressed the
+    # thumb (off the hand axis by up to 9 cm, not covered by the axis spheres): run v7 side grasps pressed the
     # table with +11..+32 N (pelvis z) while the thumb tip was the lowest hand point (FK) -> mesh-derived thumb spheres
     hm=hand_mesh(s)
     if hm:
@@ -222,7 +222,7 @@ def arm_spheres(side,chain,mesh=True):
     return S
 # Torso envelope fitted to the waist_yaw_link (torso) STL mesh (tools/fit_spheres.py --links waist_yaw_link
 # --r-max .03 --pad .005 --max-spheres 64; UBTECH tiangong2pro_urdf, Apache-2.0). Robot geometry, not scene (#645).
-# Mesh frames: the UBTECH URDF has the SAME 62 joints with identical origins/axes as the organiser URDF (only 4 sensor
+# Mesh frames: the UBTECH URDF has the same 62 joints with identical origins/axes as the organiser URDF (only 4 sensor
 # links renamed), checked offline against the mesh contacts. Run v9a (HACK_SELF_COLLISION=1): at the Ecoforms
 # pre-grasp the forearm/hand were 1-8 mm from the torso mesh and the wrist F/T read 581 N, while a column model
 # (two spheres r<=0.08 at x=-0.03/0.04) accepted the posture.
@@ -299,9 +299,9 @@ TABLE_FRONT_DEPTH=.35  # m below the measured top: the table front is solid at l
                        # straight start->home sweep jammed both hands against the table front 2-22 cm BELOW the top
                        # (wrist |F| 258 N / 938 N, TCP x 0.20 / z -0.20 / -0.16 m pelvis)
 def table_env_build(plane,x,y,R=.1,step=.03):
-    """Table as spheres tangent to the MEASURED top surface plane=(n,d) (pelvis frame, n.p+d=0, head camera).
+    """Table as spheres tangent to the measured top surface plane=(n,d) (pelvis frame, n.p+d=0, head camera).
     Run v7 frames show the table tilted 4.0 deg in the pelvis frame (n_x=-0.070 in all 31 frames).
-    The big spheres start R behind the MEASURED near edge x[0] (starting AT the edge they would bulge R=10 cm
+    The big spheres start R behind the measured near edge x[0] (starting at the edge they would bulge R=10 cm
     toward the robot below the top, so no certified path would exist from the start posture); the band between the edge
     and the first big sphere is covered by small TABLE_EDGE_R spheres tangent to the top, and the front face by a
     column of small spheres from the top down to TABLE_FRONT_DEPTH. Nothing of the model is closer than x[0]."""
@@ -318,7 +318,7 @@ def table_env_build(plane,x,y,R=.1,step=.03):
     return spheres_bulk('pelvis',big,R)+spheres_bulk('pelvis',np.vstack([lip,front]),r)
 def tray_geom(t,size=(.22,.32),height=.07):
     """Normalise a tray to (x, y, ax, ay, short, long, height): a 2-tuple (x,y) (synthetic tests) or the dict of
-    trays.detect() / a 7-tuple with the MEASURED long axis, size and wall height."""
+    trays.detect() / a 7-tuple with the measured long axis, size and wall height."""
     if isinstance(t,dict):
         return (float(t['center'][0]),float(t['center'][1]),float(t['axis'][0]),float(t['axis'][1]),
                 float(t['size'][0]),float(t['size'][1]),float(t.get('height',height)))
@@ -338,7 +338,7 @@ def tray_env(trays,plane,size=(.22,.32),height=.07,r=.02,step=.03):
     """Tray wall spheres in the pelvis frame (m) from the measured trays and table plane, see tray_env_build."""
     return list(_tray_entry(trays,plane,size,height,r,step)[0])
 def tray_env_build(trays,plane,size=(.22,.32),height=.07,r=.02,step=.03):
-    """Tray walls as spheres (centres r below the rim) from the MEASURED centre, long axis, size and wall height:
+    """Tray walls as spheres (centres r below the rim) from the measured centre, long axis, size and wall height:
     Run v7 seed 103: the hand was carried into the tray_right wall (82 N, TCP 14 cm below plan) when trays were not
     obstacles."""
     n,d=np.asarray(plane[0],float),float(plane[1]);out=[]
@@ -411,7 +411,7 @@ class Arm:
             C.setflags(write=False);R.setflags(write=False);b=self._body_arr=(self.body,C,R)
         return (tuple(b[0]),b[1],b[2])
     def set_other(self,q_other):
-        """#625 arm-to-arm: the other arm's envelope at its MEASURED joints (7-vector in ARM order or dict)."""
+        """#625 arm-to-arm: the other arm's envelope at its measured joints (7-vector in ARM order or dict)."""
         o='r' if self.side=='l' else 'l'
         if not isinstance(q_other,dict):q_other=dict(zip([f'{n}_{o}_joint' for n in ARM],[float(x) for x in q_other]))
         key=tuple(round(q_other.get(f'{n}_{o}_joint',0.),3) for n in ARM)
@@ -490,7 +490,7 @@ class Arm:
         except ValueError:return None
         return qu if self.col.valid(qu) and self.col.certify(q,qu) else None
     def correct(self,q_measured,q_goal,max_step=.05):
-        """One position-only Jacobian correction of the commanded joints so the MEASURED TCP reaches the goal TCP
+        """One position-only Jacobian correction of the commanded joints so the measured TCP reaches the goal TCP
         (compensates PD undershoot under load). Returns a certified command or None."""
         e=self.chain.fk(q_goal)[:3,3]-self.chain.fk(q_measured)[:3,3]
         Jp=self.chain.jacobian(q_measured)[:3]
@@ -504,7 +504,7 @@ class Arm:
         return float(np.linalg.norm(self.chain.fk(q_measured)[:3,3]-T_goal[:3,3]))
     def grasp_pose(self,center_xyz,close_axis,approach,point='grip'):
         """TCP pose so that the hand's thumb->finger closing axis maps to close_axis and fingers point along approach.
-        point='grip': midpoint of the OPEN finger tips; 'pinch': where thumb and index/middle meshes first touch when
+        point='grip': midpoint of the open finger tips; 'pinch': where thumb and index/middle meshes first touch when
         closing (mesh-derived, 1.8 cm deeper toward the palm) -- used for rim pinches."""
         A,g_t=self._hand_frame(point)
         u=close_axis/np.linalg.norm(close_axis);a=approach-u*(approach@u);a/=np.linalg.norm(a)
@@ -512,7 +512,7 @@ class Arm:
         T=np.eye(4);T[:3,:3]=R;T[:3,3]=center_xyz-R@g_t;return T
     def _hand_frame(self,point):
         """(A, g_t) of grasp_pose: hand closing/finger frame and grip point in the tcp frame. Pure function of the robot
-        data and hand_mesh: memoised per (point, hand_mesh version); same arithmetic as the former inline code."""
+        data and hand_mesh: memoised per (point, hand_mesh version)."""
         hm=hand_mesh(self.side);key=(point=='pinch' and bool(hm),next(iter(_HAND_MESH_CACHE),None))
         c=self.__dict__.setdefault('_hand_frames',{})
         v=c.get(key)
@@ -564,7 +564,7 @@ class Arm:
         return None
     def plan_pick(self,center,close_axis,approach,width,pre=.08,lift=.08,tilts=(0,.35,.6),point='grip',obj=None):
         """Returns dict(q_pre,q_grasp,q_lift,traj) or None. Speed capped at 0.8 rad/s by joint_path/Chain.velocity.
-        obj: MEASURED object box (grasp_clear_shift) -> the grip point is shifted so the open hand clears it on the way
+        obj: measured object box (grasp_clear_shift) -> the grip point is shifted so the open hand clears it on the way
         in (dict 'clear' in the result); a tilt/sign whose hand cannot clear it is skipped (self.last_clear_fail)."""
         if width>self.hand['opposed_open']-.01:return None
         if not self.scene_ready:return None   # no measured table yet: never plan against an assumed scene (#645)

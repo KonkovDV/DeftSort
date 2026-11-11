@@ -25,7 +25,7 @@ class Detection:
 def table_plane(points, valid, iterations=120, tolerance=.006, min_inliers=100, seed=0):
     """RANSAC horizontal plane. Same RNG stream and candidate arithmetic as table_plane_py; only the inlier COUNTING
     of all candidates is batched (Rust kernel, else one chunked BLAS product); the winner is the first candidate with
-    the maximal count (== the reference's strict '>' scan) and its inlier set is recomputed exactly as before."""
+    the maximal count (== the reference's strict '>' scan) and its inlier set is recomputed exactly as in the NumPy reference."""
     if _accel.enabled2() and np.ndim(points) == 3 and np.shape(valid) == np.shape(points)[:2] and type(seed) is int and seed >= 0:
         try:
             r = _accel.ransac_plane(points, valid, seed, iterations, tolerance)
@@ -118,7 +118,7 @@ def deproject(depth_mm, K, T):
     (fixed evaluation order; NumPy's BLAS product may differ by <= 2 ulp depending on the CPU's OpenBLAS kernel)."""
     K = np.asarray(K, float); T = np.asarray(T, float); dmm = np.asarray(depth_mm, float)
     # dmm.size: an empty image (0 rows or columns) would panic in the Rust kernel (perc.rs chunk size 0), and the
-    # panic would switch the WHOLE process to the NumPy reference (2x slower planning); the reference returns (h, w, 3).
+    # panic would switch the whole process to the NumPy reference (2x slower planning); the reference returns (h, w, 3).
     if _accel.enabled2() and dmm.ndim == 2 and dmm.size and K.shape == (3, 3) and T.shape == (4, 4):
         try: return _accel.deproject(dmm, K[0, 0], K[1, 1], K[0, 2], K[1, 2], T)
         except BaseException as e: _accel.guard(e); _accel.failed('deproject', e)
@@ -210,7 +210,7 @@ def near_edge(points, valid, plane, y_half=.5, drop=.05, q=.1, min_cols=40, min_
 
 def segment(points, rgb, valid, plane, roi, min_pixels=25, max_jump=.025, min_height=.012, max_height=.35):
     """Depth-continuity components above the plane. The flood fill (seed order, stack order, neighbour order and
-    jump test identical to segment_py) runs in Rust when available; features are computed exactly as before."""
+    jump test identical to segment_py) runs in Rust when available; features are computed exactly as in the NumPy reference."""
     p = np.asarray(points); rgb = np.asarray(rgb)
     if p.shape != rgb.shape or p.shape[-1] != 3 or rgb.dtype != np.uint8:
         raise ValueError('RGB-D shape/type mismatch')

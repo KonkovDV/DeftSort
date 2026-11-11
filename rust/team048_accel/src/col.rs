@@ -411,7 +411,7 @@ impl Collision {
                 .iter()
                 .all(|&i| self.valid_buf(&sample(i), &infl, &mut w));
         }
-        // 1) coarse samples first (early exit on a colliding path, as before) ...
+        // 1) coarse samples first (early exit on a colliding path) ...
         let coarse = order.len().min(9);
         if !order[..coarse]
             .iter()
@@ -635,7 +635,7 @@ mod tests {
                 }
             }
         }
-        // rigorous swept-volume levers, as CollisionModel builds them: for every movable joint up to the sphere's
+        // conservative swept-volume levers, as CollisionModel builds them: for every movable joint up to the sphere's
         // link, sum of the downstream origin translations + |centre| (the skip certificate relies on this bound)
         let levers: Vec<[f64; N]> = (0..s)
             .map(|k| {

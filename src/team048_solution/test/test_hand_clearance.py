@@ -1,5 +1,5 @@
 """Open-hand clearance: the open Inspire hand (UBTECH meshes, tools/hand_open_points.py)
-must not overlap the MEASURED object box at the grasp pose or along the approach. Sim evidence: v7+v8 side grasps of
+must not overlap the measured object box at the grasp pose or along the approach. Sim evidence: v7+v8 side grasps of
 mustard / Crayola / Crunch / Perricone touched the object before closing (fixture v7v8_side_at_grasp.json)."""
 import os,sys,json,unittest
 import numpy as np
@@ -30,7 +30,7 @@ class HandPoints(unittest.TestCase):
             for k in ('palm','thumb_4','index_2','middle_2','little_1'):self.assertIn(k,set(parts))
     def test_open_gap_is_asymmetric_about_grip_point(self):
         # grasp frame (x approach, y closing axis, z up): distal finger pads at y >= +0.028, thumb tip at y <= -0.046,
-        # the proximal finger phalanges reach y = +0.006 -> the unshifted grip point is NOT centred in the real pad gap
+        # the proximal finger phalanges reach y = +0.006 -> the unshifted grip point is not centred in the real pad gap
         A=ARM.Arm('l');T=A.grasp_pose(np.zeros(3),np.array([0,1.,0]),np.array([1.,0,0]),'grip')
         P,parts=ARM.hand_open_points('l');W=(T[:3,:3]@P.T).T+T[:3,3]
         self.assertGreater(W[parts=='index_2',1].min(),.02);self.assertLess(W[parts=='thumb_4',1].max(),-.04)
@@ -40,7 +40,7 @@ class ClearShift(unittest.TestCase):
     A=ARM.Arm('l')
     def test_logged_contacts_are_predicted(self):
         """Every v7/v8 side attempt on mustard/Crayola/Crunch touched the object before closing (|F| >= 5 N or a finger
-        bent back past 1.1); the old zero-shift grasp overlaps their measured box at every tilt and sign."""
+        bent back past 1.1); a zero-shift grasp overlaps their measured box at every tilt and sign."""
         hit={a['obj'] for a in SIDE if np.linalg.norm(a['at_grasp_F'])>=5 or max(a['at_grasp_fing'][:5])>1.1}
         for n in ('006_mustard_bottle','Crayola_Bonus_64_Crayons','Crunch_Girl_Scouts_Candy_Bars_Peanut_Butter_Creme_78_oz_box'):
             self.assertIn(n,hit)

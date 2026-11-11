@@ -49,7 +49,7 @@ class CollisionModel:
         if any(s.link not in links for s in spheres):
             raise ValueError('unknown collision link')
         # Per-sphere/per-upstream-joint global center displacement bound.
-        # Origin translations BEFORE a joint do not contribute its lever arm.
+        # Origin translations before a joint do not contribute its lever arm.
         self.levers=np.zeros((len(self.spheres),len(chain.active)))
         for row,sphere in enumerate(self.spheres):
             stop=next((i for i,j in enumerate(chain.joints) if j.child==sphere.link),-1)
@@ -189,7 +189,7 @@ class CollisionModel:
         within the safety margin of some pairs (v9a: the organiser start posture has the forearm 3 mm from the hip
         mesh, inside the 1.5 cm margin). The segment a->b is accepted iff
           * every pair that is clear at `a` stays clear along the whole swept segment (same inflation bound as certify),
-          * every pair that is NOT clear at `a` never gets more than ESCAPE_TOL closer than it was AT THE START
+          * every pair that is not clear at `a` never gets more than ESCAPE_TOL closer than it was at the start
             (no deeper penetration than the start posture itself; 1 mm < the 2.9 mm real mesh clearance of the
             start posture), and
           * `b` is fully valid.
@@ -243,7 +243,7 @@ class CollisionModel:
         return all(self.valid_py(a+(b-a)*(i/steps), inflation) for i in range(steps+1))
 
     def certify_box(self, a, b, padding=0.):
-        """Conditional sphere-envelope bound for ANY joint ordering in box.
+        """Conditional sphere-envelope bound for any joint ordering in box.
 
         Padding is a calibrated per-joint tracking/latency/encoder bound in rad.
         This is not mesh CCD or a guarantee about unmodeled robot geometry.

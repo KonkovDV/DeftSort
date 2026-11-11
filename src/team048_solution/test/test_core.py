@@ -245,7 +245,7 @@ class V7Fixes(unittest.TestCase):
         self.assertLess(trays.slot_offset(1,.03,ty=.69),0);self.assertGreater(trays.slot_offset(1,.03,ty=-.69),0)
 
 class GraspStudy(unittest.TestCase):
-    """Offline study evidence (offline grasp study, 2026-11-09)."""
+    """Offline grasp study evidence."""
     def test_dish_has_multi_angle_rim(self):
         from team048_solution.grasp import candidates,RIM_ANGLE_DEG
         rng=np.random.default_rng(1);t=rng.uniform(0,2*np.pi,2500);h=.07

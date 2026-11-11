@@ -23,7 +23,7 @@ _disabled = False
 # (Arm.solve, cached environments, deprojection, RANSAC stream, tray selection, segment statistics, grasp kernels).
 # An API-1 wheel keeps working: the API-2 call sites then use their NumPy reference.
 API = int(getattr(_ext, 'API', 1)) if AVAILABLE else 0
-# rayon threads are opt-in: the simulator shares the evaluation machine's CPU, and on the 2-core-equivalent box
+# rayon threads are opt-in: the simulator shares the evaluation machine's CPU, and on a machine with about two CPU cores
 # parallel sweeps measured slower (certify 3.3 vs 2.7 ms). TEAM048_ACCEL_PARALLEL=1 enables them.
 PARALLEL = os.environ.get('TEAM048_ACCEL_PARALLEL', '0') == '1'
 

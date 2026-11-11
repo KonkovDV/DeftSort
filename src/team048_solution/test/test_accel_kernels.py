@@ -103,7 +103,7 @@ class Api2Kernels(unittest.TestCase):
         class S:pass
         o=S();o.trays={'tray_left':dict(center=(.34,.69),size=(.22,.32),axis=(.1,.995),height=.068),'tray_center':(.53,0.)}
         m=NODE.Sol.tray_mask(o,P);ref=np.zeros(P.shape[:2],bool)
-        for t in o.trays.values():   # the former inline expression
+        for t in o.trays.values():   # inline reference expression
             x,y,ax,ay,a,b,_=arm.tray_geom(t);v=np.array([ax,ay]);u=np.array([v[1],-v[0]]);dx=P[...,0]-x;dy=P[...,1]-y
             ref|=(np.abs(dx*u[0]+dy*u[1])<a/2+NODE.TRAY_MASK_MARGIN)&(np.abs(dx*v[0]+dy*v[1])<b/2+NODE.TRAY_MASK_MARGIN)
         s.assertTrue(np.array_equal(m,ref) and m.any())
@@ -229,7 +229,7 @@ class Api2Kernels(unittest.TestCase):
         dets=perception.segment_py(P,rgb,tb,pl,(np.array([.18,-.62,-1.]),np.array([.62,.62,1.])),min_pixels=40)
         class S:pass
         got=NODE.Sol.identify(S(),dets,P,pl,list(NODE.PRI))
-        # reference: the former scalar double loop
+        # reference: scalar double loop
         from scipy.optimize import linear_sum_assignment
         clouds=[P[d.pixels[:,0],d.pixels[:,1]] for d in dets];feats=[]
         for c in clouds:

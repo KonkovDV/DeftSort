@@ -8,21 +8,21 @@ finger_verdict/past_verdict and the wrist F/T are kept for the log only.
 """
 import numpy as np
 
-# Wrist F/T is NOT used for the decision: run v7 (31 frames) shows empty-hand offsets of 0.05-5.5 N depending on
+# Wrist F/T is not used for the decision: run v7 (31 frames) shows empty-hand offsets of 0.05-5.5 N depending on
 # arm pose and finger state (open hand ~4.5 N, closed fist ~0.1 N) -- as large as the objects' weight (0.8-4.2 N).
 GRASP_DF_MIN_N = None
-# Finger criterion, calibrated on run v7 'lifted' frames (sort3 pool 3, 2026-11-09):
+# Finger criterion, calibrated on run v7 'lifted' frames (sort3 pool 3):
 #   loaded (3: Ecoforms x2, Threshold): commanded-closing fingers stopped 0.67-0.98 above target, effort 1.00
 #   empty  (7: 2 rim, 5 side): fingers within 0.02 of target, effort <= 0.334
 # thresholds = midpoints between the classes.
 FINGER_DEV_HELD = .35        # mean(position - target) over the commanded-closing fingers (target = fully closed)
-FINGER_EFF_HELD_R1 = .67     # max effort, midpoint 0.334 (empty) .. 1.00 (loaded) -- valid at force ratio 1.0 ONLY
+FINGER_EFF_HELD_R1 = .67     # max effort, midpoint 0.334 (empty) .. 1.00 (loaded) -- valid at force ratio 1.0 only
 FINGER_EFF_EMPTY_R1 = .334   # v7 empty-hand max effort at force ratio 1.0 (upper end of the 7 empty frames)
-FINGER_BLOCKED_MIN = FINGER_DEV_HELD   # backward-compatible names
+FINGER_BLOCKED_MIN = FINGER_DEV_HELD   # aliases
 EFFORT_MIN = FINGER_EFF_HELD_R1
 FINGER_EFF_HELD = FINGER_EFF_HELD_R1
 
-# Hand force / speed / closing, organiser answer #648 (2026-11-06)
+# Hand force / speed / closing, organiser answer #648
 # "Full-force squeezing makes the physics push the object out; lower /inspire_hand/set_force (e.g. 0.3-0.5 instead of
 #  1.0), target slightly 'past' the object, lower the finger speed, rotate the thumb first, then close the rest."
 # INTERFACES.md: set_force ratio 1.0 = 1000 g (default); set_speed 1.0 = full stroke in 0.8 s, 0.5 = 1.6 s.
@@ -34,7 +34,7 @@ FINGER_EFF_HELD = FINGER_EFF_HELD_R1
 #   speed 0.5  : the organiser's example value (1.6 s full stroke) -> wait_fingers timeouts scale with it.
 #   close past : phase 1 closes towards the fully-closed target until the fingers stop on the object (contact
 #                position p_c measured on /inspire_hand/state); phase 2 re-targets p_c - CLOSE_PAST, i.e. "slightly past
-#                the object" by a MEASURED amount instead of an uncalibrated width->position map.
+#                the object" by a measured amount instead of an uncalibrated width->position map.
 def _env_ratio(name, default, lo, hi):
     import os
     try:
@@ -69,7 +69,7 @@ def finger_stroke_time(speed=None):
 
 def effort_held_threshold(ratio=None, empty_r1=FINGER_EFF_EMPTY_R1, loaded=1.0):
     """Effort threshold at force ratio r. The simulator publishes effort = |tau| / (lim0 * r), clipped to 1
-    (hack_sim/robot_io.py finger_effort): a finger BLOCKED by an object saturates at 1.0 for any r, while the torque of
+    (the organisers' simulator, finger_effort): a finger blocked by an object saturates at 1.0 for any r, while the torque of
     an unloaded finger is independent of r, so its normalised effort scales as 1/r (ASSUMPTION, to be confirmed by the
     next sim run's TRACE). Threshold = midpoint between min(1, empty_r1/r) and the loaded level. At r=0.4 this is
     0.92 with only a 0.165 gap -> the effort vote is weak at low force; the position criteria carry the decision."""
@@ -104,7 +104,7 @@ def contact_target(contact_pos, closed_target, past=None, tol=JAM_TOL):
     """Phase-2 command: for every commanded-closing finger (closed_target < .5, DOF 1-5) target = min(1, max(closed_target,
     p_contact - past)); other DOFs unchanged. 'Slightly past' the measured contact, never beyond the closed target and
     never above 1.0 (in 7 of 15 v7+v8 attempts an unclamped rule produced targets up to 1.66 = 'open further' for jammed fingers).
-    Jammed fingers (contact position > 1 + tol, bent back by a contact, not pinching) are NOT re-targeted: they keep
+    Jammed fingers (contact position > 1 + tol, bent back by a contact, not pinching) are not re-targeted: they keep
     the closed target."""
     past = CLOSE_PAST if past is None else past
     p = np.asarray(contact_pos, float); t = np.asarray(closed_target, float).copy()
@@ -139,7 +139,7 @@ def held_rule(pos, eff, command, closed_target, dev_min=HELD_DEV, eff_min=HELD_E
     return bool(any(abs(p[i]-c[i]) >= dev_min and abs(e[i]) >= eff_min for i in k))
 
 
-# Guarded approach: v8 attempts 1-4 had fingers bent by contact BEFORE the close command
+# Guarded approach: v8 attempts 1-4 had fingers bent by contact before the close command
 # (Utana middle/index -0.06/-0.10, Threshold index 0.16 with 16 N, Crunch 1.06-1.46 with 14.6 N, mustard little 1.60).
 # Only the fingers that will CLOSE for this grasp kind are guarded (closed_target < .5): in both held v7 Ecoforms rim
 # grasps the (non-closing) ring finger read 1.14/1.17 at the grasp pose, so guarding every finger would have aborted
@@ -196,7 +196,7 @@ def contact_empty(contact_pos, closed_target, empty_max=EMPTY_CONTACT_MAX):
 
 
 def past_verdict(pos, target2, closed_target, past=None):
-    """LOG-ONLY (it misses 2 of 4 v7+v8 held grasps; held_rule decides). Held check after phase 2 (target2 = contact - past). Held: the fingers are still blocked short of target2 by
+    """Logged only, not used for decisions (it misses 2 of 4 v7+v8 held grasps; held_rule decides). Held check after phase 2 (target2 = contact - past). Held: the fingers are still blocked short of target2 by
     at least half of `past` (the object holds them); empty: they reached target2 (object gone) or ran to the closed
     target. Threshold past/2 = 0.075 for past 0.15, vs 0.02 position noise of an unloaded finger in v7."""
     past = CLOSE_PAST if past is None else past

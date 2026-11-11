@@ -98,7 +98,7 @@ class Rectangles(unittest.TestCase):
                 cc,size,ax=f(xy)
                 bound=b*math.sin(math.radians(.5))+.004          # 0.5 deg worst scan offset + quantile sampling
                 s.assertLess(abs(size[0]-a),bound);s.assertLess(abs(size[1]-b),bound)
-                # axis: NOT within the 0.5 deg scan bound. The 2 % trimmed extents make the area flat over a few degrees
+                # axis: not within the 0.5 deg scan bound. The 2 % trimmed extents make the area flat over a few degrees
                 # around the true angle and the scan keeps the first minimum: 1.7 deg median, 3.6 deg max on the documented
                 # tray size (known bias, docs/MATH_PHYSICS.md; a fix would move slot positions)
                 s.assertLess(math.degrees(math.acos(min(1.,abs(ax@u)))),4.);s.assertLess(np.linalg.norm(cc-c),.004)

@@ -50,7 +50,7 @@ def start_time(sim_now_at_first_clock, wall_at_first_clock, wall_at_import, rtf_
 
     Process startup before rclpy sees /clock is not visible in sim time; bound it by the wall time elapsed since
     import scaled by an upper bound of the real-time factor (rtf_max=1: the sim is not faster than real time;
-    the T4 GPU runs measured ~24 Hz physics, i.e. slower). Pessimistic = earlier t0 = less remaining time.
+    our simulator runs measured ~24 Hz physics, i.e. slower). Pessimistic = earlier t0 = less remaining time.
     """
     lag = max(0.0, wall_at_first_clock - wall_at_import)
     return sim_now_at_first_clock - rtf_max*lag

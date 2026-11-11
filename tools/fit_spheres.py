@@ -1,4 +1,4 @@
-"""OFFLINE (never at run time): fit conservative collision spheres to robot link meshes.
+"""Offline tool, never used at run time: fit conservative collision spheres to robot link meshes.
 
 Input : URDF (data/tiangong_pro_with_hands.urdf) + a directory with the link STL meshes it references
         (package://tiangong2pro_urdf/meshes/*.STL; public source: github.com/UBTECH-Robot/tiangong2pro_tf, Apache-2.0).
@@ -32,7 +32,7 @@ def rpy_matrix(r, p, y):
 
 
 def cover(points, r_max=.05, pad=.005, max_spheres=24):
-    """Spheres (centre, radius) covering ALL points, each radius <= r_max+pad when achievable within max_spheres."""
+    """Spheres (centre, radius) covering all points, each radius <= r_max+pad when achievable within max_spheres."""
     P = np.unique(np.round(np.asarray(points, float), 5), axis=0)
     centres = [P.mean(axis=0)]
     while True:

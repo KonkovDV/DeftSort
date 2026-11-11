@@ -1,4 +1,4 @@
-"""Existing IK/collision acceptance tests (package import)."""
+"""IK/collision acceptance tests (package import)."""
 import os,sys,unittest,numpy as np
 sys.path.insert(0,os.path.join(os.path.dirname(__file__),'..'))
 sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)));import scene_fixture as SF
