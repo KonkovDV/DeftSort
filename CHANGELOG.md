@@ -20,8 +20,8 @@ Changes to the team 048 solution, grouped by topic. Run labels (v5–v11b) name 
 - Rim pinch only when the object's weight torque on the rim is at most `RIM_TORQUE_MAX` (0.17 N·m); no rim pinch on a
   closed top.
 - A dish taken by the rim is placed by its centre in the slot.
-- Finger force 0.3–0.5 (rule #648) is sent to both hands and retried until each hand answers; a hand without a
-  confirmed force request is not used. `TEAM048_HAND_FORCE` is clamped to 0.3–0.5. Thumb rotation force stays 1.0
+- Finger force 0.3–0.5 (rule #648) is sent to both hands and re-sent until each hand answers (at most 5 sends); an
+  arm whose force request was never sent (service not found) is not used. `TEAM048_HAND_FORCE` is clamped to 0.3–0.5. Thumb rotation force stays 1.0
   (see [docs/COMPLIANCE.md](docs/COMPLIANCE.md)).
 
 ## Planning and motion

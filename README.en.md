@@ -44,7 +44,9 @@ python3 -m pytest -q                      # with the Rust module if installed
 TEAM048_ACCEL=0 python3 -m pytest -q      # NumPy reference only
 ```
 
-The `pip`, `setup.sh`, `colcon build` and `pytest` steps were run in a clean copy of the submission tree (Python 3.10.22, NumPy 1.26.4, scipy 1.13.1). `run.sh` needs ROS 2 and a running simulator.
+`setup.sh` installs the module for `/usr/bin/python3`, the ROS 2 Humble interpreter. In a virtualenv or with another Python, run `TEAM048_PY=$(which python3) bash setup.sh`. `scipy==1.13.1` needs NumPy ≥ 1.22.4, so pip upgrades an older NumPy.
+
+The `pip`, `setup.sh`, `colcon build` and `pytest` steps were run in clean copies of the submission tree (Python 3.10.22, scipy 1.13.1, NumPy 1.26.4 and 2.2.6). `run.sh` needs ROS 2 and a running simulator.
 
 | Variable | Default | Purpose |
 |---|---|---|
@@ -133,7 +135,7 @@ Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (Russian).
 | Robot sensors only, no simulator poses (#595.1) | Subscriptions only to sensors and `/sim/task`; debug topics never opened | `test_compliance.py`, `test_node_stub.py`, `test_rules_edges.py` (AST of all subscriptions, publishers and imports) |
 | No scene coordinates (#645) | Table, near edge and trays are measured; the code has only search windows, documented sizes and robot geometry | `test_compliance.py` (layout literals by AST), `test_arm.py` (no plan before measurement) |
 | Self-collision (#623/#625/#628) | Whole-path certificate, mesh torso, other arm at its measured posture, certified path home | `test_arm.py`, `test_start_posture.py` |
-| Hand force 0.3–0.5 (#648) | 0.4 on the squeezing fingers of both hands, request repeated until answered; an arm without confirmed force is not used; two-phase close | `test_compliance.py`, `test_hand_settings.py`, `test_rules_edges.py` |
+| Hand force 0.3–0.5 (#648) | 0.4 on the squeezing fingers of both hands, request re-sent until answered (at most 5 sends); an arm whose force request was never sent (service not found) is not used; two-phase close | `test_compliance.py`, `test_hand_settings.py`, `test_rules_edges.py` |
 | −10 for an object outside its tray or in hand (#595.2) | Time checks before starting and before lifting, with a worst case; on an error the hands open and the arms go home | `test_compliance.py`, `test_audit.py`, `test_run_robustness.py`, `test_topics_motion.py` |
 | Sim-time limit including launch (#595.3, #638) | `use_sim_time`; the age of the `run.sh` process is subtracted pessimistically | `test_compliance.py`, `test_ideas.py` |
 | Each layout in a new process (#636/#638) | State only in process memory | `test_node_stub.py` |
