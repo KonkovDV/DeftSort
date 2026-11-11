@@ -141,7 +141,7 @@ class EndOfRun595(unittest.TestCase):
         self.assertGreater(t0,G.finger_stroke_time());self.assertAlmostEqual(t1-t0,2/.8+1.,6)
     def test_no_lift_when_place_does_not_fit(self):
         """A lifted object outside a tray at the limit is -10, untouched 0: with time for the grasp but not for the
-        transport, the hand opens at the object and the arm retreats WITHOUT lifting."""
+        transport, the hand opens at the object and the arm retreats without lifting."""
         from team048_solution import budget as B
         s=N.Sol();s.arms={k:ARM.Arm(k) for k in 'lr'};s.hand_settings_step()
         for A in s.arms.values():A.set_scene(SF.plane(),list(SF.TRAYS.values()))

@@ -12,7 +12,7 @@ URDF=os.environ.get('HACK_URDF',os.path.join(os.path.dirname(os.path.abspath(__f
 import re
 XML=re.sub(r'<axis\s+xyz="0 0 0"\s*/>','',open(URDF).read());ROOT=ET.fromstring(XML)
 # #645: table, trays and racks are found by the cameras; no pre-measured scene coordinates here.
-# Only APPROXIMATE SEARCH BOUNDS (allowed): the table plane must lie in this pelvis-z band (a wide "the table is roughly
+# Only approximate search bounds (allowed): the table plane must lie in this pelvis-z band (a wide "the table is roughly
 # at this height" window, 40 cm), and the table obstacle extends from the measured near edge to these far bounds
 # (conservative: an obstacle where there may be no table only removes plans, never adds collisions).
 TABLE_Z_BAND=(-.45,-.05)    # m, pelvis frame: accepted table-top height at x=0.4 (search window, not a measurement)
@@ -255,7 +255,7 @@ def body_env(side,other_q=None):
     E+=torso_spheres(side)
     hp=P('head_pitch_link');E.append(Sphere('pelvis',hp+np.array([.02,0,.08]),.12))
     o='r' if side=='l' else 'l';q=other_q or {}
-    # #625: the OTHER arm at its (measured) posture with the same segment + hand envelope as the moving arm
+    # #625: the other arm at its (measured) posture with the same segment + hand envelope as the moving arm
     # (arm_spheres), mapped to pelvis by FK -- not one sphere per joint origin.
     for sp in arm_spheres(o,None,mesh=False):
         E.append(Sphere('pelvis',(fk_link(sp.link,q)@np.r_[sp.center,1])[:3],sp.radius))
@@ -292,11 +292,11 @@ def _table_entry(plane,x=None,y=None,R=.1,step=.03):
     x,y=_table_args(plane,x,y);pk=(np.asarray(plane[0],float).tobytes(),float(plane[1]))
     return _cached_entry(('table',_key(x,y,R,step),pk),lambda:table_env_build(plane,x,y,R,step))
 def table_env(plane,x=None,y=None,R=.1,step=.03):
-    """plane is REQUIRED (measured by the head camera); x=(near,far): near = measured near edge."""
+    """plane is required (measured by the head camera); x=(near,far): near = measured near edge."""
     return list(_table_entry(plane,x,y,R,step)[0])
 TABLE_EDGE_R=.025      # m, small spheres along the measured near edge (top lip + front face)
 TABLE_FRONT_DEPTH=.35  # m below the measured top: the table front is solid at least this deep. Run v9a: the
-                       # straight start->home sweep jammed both hands against the table front 2-22 cm BELOW the top
+                       # straight start->home sweep jammed both hands against the table front 2-22 cm below the top
                        # (wrist |F| 258 N / 938 N, TCP x 0.20 / z -0.20 / -0.16 m pelvis)
 def table_env_build(plane,x,y,R=.1,step=.03):
     """Table as spheres tangent to the measured top surface plane=(n,d) (pelvis frame, n.p+d=0, head camera).
@@ -436,9 +436,9 @@ class Arm:
         return self.roadmap_path(q)
     # Posture roadmap for getting home from low / jammed postures (v9a: the straight start->home joint path swept both
     # hands through the table front, 38k mesh vertices inside the table volume, arms jammed for ~90 s sim).
-    # Nodes are ROBOT postures only (shoulder pitch/roll and elbow on a grid between the start posture q=0 and the
+    # Nodes are robot postures only (shoulder pitch/roll and elbow on a grid between the start posture q=0 and the
     # elbow-folded range; the other joints at their home values) -- no scene coordinates (#645). Edges are certified
-    # against the CURRENT measured scene; the start edge uses certify_escape.
+    # against the current measured scene; the start edge uses certify_escape.
     ROADMAP_SP=(.6,.3,0.,-.3,-.6)
     ROADMAP_SR=(0.,.25,.6,1.)
     ROADMAP_EL=(-1.2,-1.6,-2.0,-2.4)

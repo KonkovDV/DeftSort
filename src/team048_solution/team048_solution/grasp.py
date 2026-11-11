@@ -8,14 +8,14 @@ Hand opening W_MAX and finger geometry are PARAMETERS: the Inspire hand limits m
 assets/SDK (not guessed here).
 
 Offline evidence (grasp study on 100 generated layouts, body_yaw place, Rust accel):
-  dish base rim-only ok=0.880; UNION of rim angles at 30/60/90 deg -> 1.000 (Ecoforms 0.69->1.00).
+  dish base rim-only ok=0.880; union of rim angles at 30/60/90 deg -> 1.000 (Ecoforms 0.69->1.00).
   pool3 box side-only 0.639; topdown_pinch 0.913 (+104 new). pool6 box topdown_wide 0.947 (gelatin 0->0.84).
   Razer mouse (min width 10 cm) remains 0: wider than opposed_open-margin and mesh pad_gap_open 7.8 cm.
 """
 import numpy as np
 from scipy.spatial import ConvexHull
 from . import _accel
-# Rim pinch: grip centre BELOW the rim top so the finger pads overlap the wall instead of touching its edge.
+# Rim pinch: grip centre below the rim top so the finger pads overlap the wall instead of touching its edge.
 # Run v6 (grip at the rim top): 0/3 rim picks ended in a tray. Value = geometric choice (pad overlap), unverified:
 # the next run logs wrist force and finger positions at every grasp to confirm or recalibrate it.
 RIM_DEPTH=.015
@@ -26,7 +26,7 @@ RIM_ANGLE_DEG=(0,30,-30,60,-60,90,-90)
 TOP_DEPTH=.03
 # Rim width used for the pinch (m): the pad that goes inside the rim needs free space this far in from the rim circle.
 RIM_W=.025
-# Rim pinch only when the dish's gravity torque about the pinch, m*g*r (m: objects.yaml mass of the IDENTIFIED object,
+# Rim pinch only when the dish's gravity torque about the pinch, m*g*r (m: objects.yaml mass of the identified object,
 # r: rim radius fitted to the measured footprint), stays below this. Rim pinches of runs v7/v8/v9b/v11b: Ecoforms
 # (0.05 N*m) held 2 of 2, Threshold (0.11) 1 of 3, Utana (0.23) 0 of 7: 6 lifted empty (v7, v8, v9b x4),
 # v11b held at the lift, slipped during the carry and ended on the table outside the tray (likely -10). Threshold =

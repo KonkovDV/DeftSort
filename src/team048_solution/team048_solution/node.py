@@ -247,7 +247,7 @@ class Sol(Node):
             t2=GRIP.contact_target(pc,t0);s.hand_set(side,t2);s.wait_fingers(side,tmin=.2,log_phase='close2')
         return dict(contact=pc,target2=t2,empty=empty,settled=settled,closed=t0,jam=jam)
     def wait_fingers(s,side,tmin=.3,tmax=None,log_phase=None):
-        """Until the fingers stop (blocked by the object or at target), by POSITION (a velocity criterion
+        """Until the fingers stop (blocked by the object or at target), by position (a velocity criterion
         fired in only 3 of 16 v7+v8 closes): every finger moved < GRIP.STALL_TOL over GRIP.STALL_WINDOW s, on samples newer
         than the command. Default timeout = one full stroke at the configured finger speed + 0.5 s (speed 0.5 -> 2.1 s).
         log_phase: hand state logged at 10 Hz meanwhile."""
@@ -439,7 +439,7 @@ class Sol(Node):
         need=set((t.get('categories') or {}).values()) or set(colours)
         return {n:colours.get(n) for n in need if colours.get(n) in TR.CHANNEL}
     def locate_trays(s,P,rgb,valid,plane,refine_only=False):
-        """Detect trays in this frame. Only FULL (non-partial) detections are stored. refine_only: update trays
+        """Detect trays in this frame. Only full (non-partial) detections are stored. refine_only: update trays
         already found (the main view) without adding new ones from a possibly occluded view.
         Returns {name: detection-or-None} for this frame."""
         out={}
@@ -679,7 +679,7 @@ class Sol(Node):
             if qu is not None:s.move_arm(side,qu,tol=.03)
         s.go_home(side)
     def finger_dev(s,side,kind):
-        """Deviation of this grasp kind's CLOSING fingers from the current (open) command."""
+        """Deviation of this grasp kind's closing fingers from the current (open) command."""
         h=s.hstate.get(side)
         return GRIP.approach_deviation(None if h is None else list(h.position),s.hand_target.get(side),s.closed_target(kind))
     def approach_guard(s,side,kind):
@@ -840,7 +840,7 @@ def plan_place(A,q_from,tx,ty,top,fallback=None,tray_h=TRAY_H,obj_off=None):
     or not feasible (then q_from->q_place must be certified directly). q_up: straight-up retreat after release.
     Closing axis tried with both signs (v6: tray_right reachable only with the mirrored axis); fallback=(x,y) (tray
     centre) is tried when the slot is out of reach. obj_off (held_offset): the pose is shifted horizontally so that
-    the OBJECT centre, not the hand's grip point, is over (x,y); without it a rim-held dish hangs r0 (5-6.6 cm) off the
+    the object centre, not the hand's grip point, is over (x,y); without it a rim-held dish hangs r0 (5-6.6 cm) off the
     slot, toward or over the tray wall."""
     z_from=A.tcp(q_from)[2,3]
     for (x,y) in [(tx,ty)]+([fallback] if fallback is not None else []):
@@ -861,7 +861,7 @@ def rotz(a):
     """3x3 rotation about z by a (rad)."""
     c,s_=np.cos(a),np.sin(a);return np.array([[c,-s_,0],[s_,c,0],[0,0,1.]])
 YAW_MAX=2.5           # rad, |body_yaw| used for placing (INTERFACES.md: body_yaw_joint motor 31, [-2.97, 3.14], plus = left)
-# Candidate bearings (rad, torso frame, toward this arm's side) at which the arm can place: a ROBOT-REACH property
+# Candidate bearings (rad, torso frame, toward this arm's side) at which the arm can place: a robot-reach property
 # (arm workspace beside the shoulder; offline reach study: placements found at 0.5-1.3 rad, densest ~1.1),
 # applied to the tray position measured by the camera. Not a scene coordinate (#645).
 YAW_AIMS=(1.1,.9,1.3,.7,.5)
@@ -876,7 +876,7 @@ def yaw_candidates(side,tx,ty):
     return out
 FAR_TRAY_Y=.3
 def far_tray(side,ty):
-    """Tray on the OTHER arm's side (tray_left for the right arm, tray_right for the left arm).
+    """Tray on the other arm's side (tray_left for the right arm, tray_right for the left arm).
     Offline evidence: reach study, 30 layouts x 2 pools, 0 of 450 picked objects were placeable in the
     far tray with body_yaw=0; study r3s3 (current planner, organiser layout generator) 103/103 far-tray placements used yaw."""
     return (side=='l' and ty<-FAR_TRAY_Y) or (side=='r' and ty>FAR_TRAY_Y)

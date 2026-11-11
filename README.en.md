@@ -124,6 +124,14 @@ stateDiagram-v2
   End --> [*]: arms home, /sim/task/done
 ```
 
+![Head camera frame: table, trays, segments](docs/img/perception.png)
+
+Head camera frame from run v7 at the start of the episode. Yellow: points in the table plane. The centre tray is found whole and measured at 22×32 cm. The left and right trays are cut by the frame edge; the survey turns the head towards them. Cyan boxes are segments above the table; the arms in the start posture show up as segments too, which is why objects are observed only after the arms have gone home.
+
+![Left-arm pick planned in the measured scene](docs/img/plan.png)
+
+The same scene in the collision model: table and tray walls built from this frame, grey spheres are obstacles, blue spheres the left arm at the grasp pose. The red line is the TCP path: home, pre-grasp, grasp, lift; the whole path is checked. Both figures come from `tools/make_figures.py` and the fixture `test/fixtures/v7_s102_start_frames.npz`.
+
 First the robot looks at the table and the trays with its head (yaw 0 and ±0.6 rad), and only then moves the arms. The arms go home along a path checked against the measured scene. Then objects one by one: look, identify, pick a grasp, check the time. Approach while watching for contact, close in two phases, check the hand is not empty before the lift, carry and release. Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (in Russian).
 
 | Module (`src/team048_solution/team048_solution/`) | Lines | What it does |
@@ -148,7 +156,12 @@ The crate `rust/team048_accel` 0.2.0 (PyO3 abi3-py310, nalgebra, rayon) mirrors 
 - **Prebuilt wheel.** `vendor/` holds a manylinux2014 x86_64 wheel (abi3, CPython ≥ 3.10) with its SHA256. If the wheel does not install, `setup.sh` builds the module from source.
 - **Rust checks.** `cargo test --release` (18 tests including proptest) and `cargo clippy --all-targets --features python -- -D warnings` without warnings, rustc 1.89.
 
-SPEED_TABLE_PLACEHOLDER_EN
+Speed on inputs shipped in the repository (`python3 tools/bench_accel.py 7`: perception on the two recorded head frames in `test/fixtures`, grasp planning for 10 objects on the synthetic test scene; median of 7 runs; Intel Xeon, 8 logical CPUs, Python 3.10.22, NumPy 2.2.6):
+
+| Measurement | NumPy | Rust | Speed-up |
+|---|---:|---:|---:|
+| Perception, ms per frame | 170 | 10.6 | 16× |
+| Grasp planning, 10 objects, s | 20.7 | 0.088 | 235× |
 
 ### Recorded runs
 

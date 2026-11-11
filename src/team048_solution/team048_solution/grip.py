@@ -70,7 +70,7 @@ def finger_stroke_time(speed=None):
 def effort_held_threshold(ratio=None, empty_r1=FINGER_EFF_EMPTY_R1, loaded=1.0):
     """Effort threshold at force ratio r. The simulator publishes effort = |tau| / (lim0 * r), clipped to 1
     (the organisers' simulator, finger_effort): a finger blocked by an object saturates at 1.0 for any r, while the torque of
-    an unloaded finger is independent of r, so its normalised effort scales as 1/r (ASSUMPTION, to be confirmed by the
+    an unloaded finger is independent of r, so its normalised effort scales as 1/r (assumption, to be confirmed by the
     next sim run's TRACE). Threshold = midpoint between min(1, empty_r1/r) and the loaded level. At r=0.4 this is
     0.92 with only a 0.165 gap -> the effort vote is weak at low force; the position criteria carry the decision."""
     r = HAND_FORCE_RATIO if ratio is None else ratio
@@ -85,7 +85,7 @@ def thumb_rotated(pos, target_rot=0., tol=THUMB_ROT_TOL):
     return bool(abs(float(pos[5])-target_rot) <= tol)
 
 
-JAM_TOL = .02                # a finger reading above 1 + JAM_TOL is bent BACK past fully open by a contact ("jammed").
+JAM_TOL = .02                # a finger reading above 1 + JAM_TOL is bent back past fully open by a contact ("jammed").
                              # v7+v8 'closed' frames: 8 of 15 attempts had such fingers (up to 1.81); none are pinching.
 TARGET_MAX = 1.0             # hand command range [0, 1] (1 = open, INTERFACES.md)
 
@@ -115,7 +115,7 @@ def contact_target(contact_pos, closed_target, past=None, tol=JAM_TOL):
 
 
 # Held rule (evidence: runs v7+v8, fixture test/fixtures/v7v8_grasp_traces.json)
-# Held iff at least one commanded-closing finger (DOF 1-5) deviates >= HELD_DEV from its CURRENT command and its
+# Held iff at least one commanded-closing finger (DOF 1-5) deviates >= HELD_DEV from its current command and its
 # effort is >= HELD_EFF. 15/15 correct on the v7+v8 closed/lifted pairs (4 held, 11 empty, force 1.0), where
 # past_verdict misses 2 of 4 held (v8 Perricone: the fingers travelled 0.46-0.76 past contact, only the jammed thumb
 # held) and finger_verdict answers None for Perricone. Blocked fingers saturate the normalised effort (1.0 at any
@@ -168,7 +168,7 @@ def approach_deviation(pos, command, closed_target=None, dofs=5):
     return float(max(d[i] for i in k)), [i+1 for i in k if d[i] > GUARD_DEV]
 
 
-# Finger stall by POSITION: a velocity criterion fired in only 3 of 16 v7+v8 closes.
+# Finger stall by position: a velocity criterion fired in only 3 of 16 v7+v8 closes.
 STALL_TOL = .005             # max |delta position| of every finger over the window
 STALL_WINDOW = .15           # s sim
 

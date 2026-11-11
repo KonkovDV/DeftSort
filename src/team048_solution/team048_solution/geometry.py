@@ -32,7 +32,7 @@ _E4 = np.array([0., 0., 0., 1.]); _I3 = np.eye(3)
 
 
 def _close(a, b, atol=1e-8, rtol=1e-5):
-    # == np.allclose(a, b, rtol, atol) for FINITE inputs (np.isclose: |a-b| <= atol + rtol*|b|), without its overhead
+    # == np.allclose(a, b, rtol, atol) for finite inputs (np.isclose: |a-b| <= atol + rtol*|b|), without its overhead
     return bool(np.all(np.abs(a-b) <= atol+rtol*np.abs(b)))
 
 

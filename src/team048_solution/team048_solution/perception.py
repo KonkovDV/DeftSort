@@ -23,7 +23,7 @@ class Detection:
 
 
 def table_plane(points, valid, iterations=120, tolerance=.006, min_inliers=100, seed=0):
-    """RANSAC horizontal plane. Same RNG stream and candidate arithmetic as table_plane_py; only the inlier COUNTING
+    """RANSAC horizontal plane. Same RNG stream and candidate arithmetic as table_plane_py; only the inlier counting
     of all candidates is batched (Rust kernel, else one chunked BLAS product); the winner is the first candidate with
     the maximal count (== the reference's strict '>' scan) and its inlier set is recomputed exactly as in the NumPy reference."""
     if _accel.enabled2() and np.ndim(points) == 3 and np.shape(valid) == np.shape(points)[:2] and type(seed) is int and seed >= 0:

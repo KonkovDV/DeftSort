@@ -92,7 +92,7 @@ class NodeWiring(unittest.TestCase):
         sol.trays={}
         P,rgb2,plane,dets=sol.observe()
         s.assertEqual(P.shape,(360,640,3));s.assertGreater(plane[0][2],.96);s.assertTrue(ARM.plane_plausible(plane))
-        s.assertEqual(sol.trays,{})       # observe() never invents trays; the survey adds only FULL detections
+        s.assertEqual(sol.trays,{})       # observe() never invents trays; the survey adds only full detections
         valid=np.isfinite(P).all(-1)&(f['depth']>0)
         out=sol.locate_trays(P,rgb2,valid,plane)
         d=out.get('tray_center')          # v5 frame: the green tray is cut by the bottom image border

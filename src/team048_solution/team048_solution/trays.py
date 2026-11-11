@@ -179,7 +179,7 @@ def canonical_axis(axis, eps=1e-9):
 
 
 def slot_offset(k, half_extent, step=SLOT_STEP, size=DOC_SIZE, wall=TRAY_WALL, clearance=.01, ty=0.):
-    """Offset ALONG THE TRAY LONG AXIS for the k-th object placed in this tray: 0, inner, outer, 0, ...
+    """Offset along the tray long axis for the k-th object placed in this tray: 0, inner, outer, 0, ...
     inner = toward the robot midline (run v7: the outer slot of tray_left was not reached, TCP 13.7 cm off).
     `size` = measured tray size (short, long) or (x, y) extent; s = min(step, room) keeps the object's footprint
     half-extent inside the walls with clearance."""
