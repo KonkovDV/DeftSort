@@ -79,11 +79,11 @@ MOVE_SETTLE_S=2.6     # s per arm move on top of the 1.6x speed line (move_arm: 
 FAILS_MAX=2           # failed attempts per object before it is skipped (per round)
 RETRY_ROUNDS=1        # extra round with reset failure counters when time is left (v9a: stop at 124 s of 405 s)
 HAND_LOG_DT=.1        # s sim: hand-state log period during the guarded approach and the closing (10 Hz, for the guard and stall checks)
-# SetForce / SetSpeed delivery (#648: finger force 0.3-0.5 on both hands). Requests sent once at
-# start, and only to services already discovered, are not enough: the simulator printed '[hack] <side> hand force limits'
-# for the right hand only in 5 of 6 recorded layouts (v7 x3, v8, v9a, v9b sim logs), so the left hand closed at the
-# default force 1.0 (v9b: 5 left-hand closes). Therefore every request is retried from a background thread until the
-# service has answered; an arm whose hand never received its force request is not used for picking.
+# SetForce / SetSpeed delivery (#648: finger force 0.3-0.5 on both hands). DDS discovery of the hand services can lag
+# behind the node start, and a hand without a SetForce request closes at the default force 1.0 (the simulator logs
+# '[hack] <side> hand force limits' for every request it applies; fixture v9b_hand_settings.json). Every request is
+# therefore retried from a background thread until the service has answered;
+# an arm whose hand never received its force request is not used for picking.
 # The values below are wall-clock design choices (DDS discovery runs on wall time), not measured thresholds.
 HAND_CFG_POLL_S=.2      # s wall between delivery passes
 HAND_CFG_REPLY_S=2.     # s wall to wait for a reply before the request is sent again
