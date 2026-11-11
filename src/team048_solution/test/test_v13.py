@@ -1,4 +1,4 @@
-"""v13 audit fixes: thread-safe RGB-D pairing, exception safety of the run loop (release, home, /sim/task/done on
+"""Thread-safe RGB-D pairing, exception safety of the run loop (release, home, /sim/task/done on
 every path), one retry of a failed observation."""
 import os,sys,types,unittest,threading,time,collections
 from unittest import mock
@@ -22,7 +22,7 @@ class Feeder:
 
 class PairRace(unittest.TestCase):
     def test_unlocked_deque_iteration_races(s):
-        # the failure the lock removes: iterating a deque another thread appends to (the pre-v13 pair() loop)
+        # the failure the lock removes: iterating a deque another thread appends to (an unlocked pair() loop)
         d=collections.deque(maxlen=6);err=0;t0=time.time()
         with Feeder(d.append,d.append):
             while err==0 and time.time()-t0<5.:

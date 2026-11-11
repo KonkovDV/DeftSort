@@ -1,4 +1,4 @@
-"""v12: rim pinch gated by the dish's gravity torque, and rim-held dishes placed by their centre.
+"""Rim pinch gated by the dish's gravity torque, and rim-held dishes placed by their centre.
 Fixtures: v12_rim_dishes.npz/.json (v7 sort3 s102 start head frame: Utana, Ecoforms, Threshold segments; v11b
 trace 0098.15: Utana before the attempt that slipped during the carry, at_grasp joint angles from the log)."""
 import os,sys,json,unittest
@@ -17,7 +17,7 @@ class RimTorque(unittest.TestCase):
             cl,pl=seg(k);f,C=GR.candidates(cl,pl,'dish',mass=mass(k))
             self.assertTrue(f['rim_heavy'],k);self.assertEqual(C,[],k)
             self.assertGreater(f['rim_torque'],.2);self.assertLess(f['rim_torque'],.23)
-            f0,C0=GR.candidates(cl,pl,'dish');self.assertEqual(sum(g['kind']=='rim' for g in C0),7,k)   # without mass: as v11
+            f0,C0=GR.candidates(cl,pl,'dish');self.assertEqual(sum(g['kind']=='rim' for g in C0),7,k)   # without mass: no torque gate
     def test_light_dishes_unchanged(self):
         for k in ('ecoforms_v7s102','threshold_v7s102'):
             cl,pl=seg(k);f,C=GR.candidates(cl,pl,'dish',mass=mass(k));f0,C0=GR.candidates(cl,pl,'dish')

@@ -78,9 +78,9 @@ MOVE_SETTLE_S=2.6     # s per arm move on top of the 1.6x speed line (move_arm: 
                       # lifted->carry 2.8 s for |dq| 0.30 (line 0.6 s), carry->over_tray 4.9 s for |dq| 1.15 (line 2.3 s)
 FAILS_MAX=2           # failed attempts per object before it is skipped (per round)
 RETRY_ROUNDS=1        # extra round with reset failure counters when time is left (v9a: stop at 124 s of 405 s)
-HAND_LOG_DT=.1        # s sim: hand-state log period during the guarded approach and the closing (10 Hz, v8 fix 4)
-# SetForce / SetSpeed delivery (#648: finger force 0.3-0.5 on BOTH hands). Until v10 the requests were sent once at
-# start and only to services that were already discovered: the simulator printed '[hack] <side> hand force limits'
+HAND_LOG_DT=.1        # s sim: hand-state log period during the guarded approach and the closing (10 Hz, for the guard and stall checks)
+# SetForce / SetSpeed delivery (#648: finger force 0.3-0.5 on BOTH hands). Requests sent once at
+# start, and only to services already discovered, are not enough: the simulator printed '[hack] <side> hand force limits'
 # for the right hand only in 5 of 6 recorded layouts (v7 x3, v8, v9a, v9b sim logs), so the left hand closed at the
 # default force 1.0 (v9b: 5 left-hand closes). Now every request is retried from a background thread until the
 # service has answered; an arm whose hand never received its force request is not used for picking.
@@ -94,7 +94,7 @@ HAND_CFG_SENDS_MAX=5    # sends per service; after that the request counts as de
 CAMERA_PERIOD_S=.03
 CAPTURE_MAX_AGE=2*CAMERA_PERIOD_S
 class JointStateMissing(RuntimeError):
-    """An arm joint has never been reported on /joint_states (v15: no motion from an invented posture)."""
+    """An arm joint has never been reported on /joint_states (the arm is not moved from an invented posture)."""
 def quat_to_T(t,q):
     """4x4 transform from translation t (m) and unit quaternion q = (x, y, z, w)."""
     x,y,z,w=q;T=np.eye(4)
@@ -136,8 +136,8 @@ class Sol(Node):
         with s.lock:s.js.update(zip(m.name,m.position))
     def on_hand(s,k,m):
         """Hand state callback for side k: latest state and short position/velocity histories."""
-        # v15: the history is replaced by a NEW tuple (one atomic assignment) instead of append + del in place: a reader
-        # on the task thread (wait_fingers -> fingers_stalled) iterating the old list while this callback trimmed it
+        # The history is replaced by a NEW tuple (one atomic assignment), never appended + trimmed in place: a reader
+        # on the task thread (wait_fingers -> fingers_stalled) iterating a list while this callback trims it
         # could skip samples (test_v15.HandHistory).
         s.hstate[k]=m;s.hvel[k]=(tuple(s.hvel[k])+(tuple(m.velocity),))[-10:]
         try:t=s.now()
@@ -173,8 +173,8 @@ class Sol(Node):
             c=SetMotorPosition();c.name=int(i);c.pos=float(p);c.spd=float(min(.8,max(v,1e-3)));c.cur=1.0;m.cmds.append(c)
         s.pub[group].publish(m)
     def q_now(s,side):
-        """Measured arm joints from /joint_states. v15: a joint that never arrived used to read as 0 rad and the planner
-        started from that invented posture; now it is an error (JointStateMissing, logged) and the caller does not move
+        """Measured arm joints from /joint_states. A joint that never arrived must not read as 0 rad (the planner would
+        start from an invented posture); it is an error (JointStateMissing, logged) and the caller does not move
         this arm. s.js keeps the last received value of every joint, so a joint missing in one message keeps its last
         known value."""
         names=[f'{n}_{side}_joint' for n in ARMMOD.ARM]
@@ -186,7 +186,7 @@ class Sol(Node):
         return q
     def move_arm(s,side,q,tol=.02,timeout=None,refine=2,vmax=.8,guard=None):
         """guard: optional callable polled every cycle; a truthy return stops the arm where it is (hold command at the
-        measured joints), stores it in s.guard_trip and returns False (v8 fix 4: guarded approach)."""
+        measured joints), stores it in s.guard_trip and returns False (guarded approach)."""
         vmax=min(.8,vmax)
         q=np.asarray(q,float);q0=s.q_now(side);dq=np.abs(q-q0);m=max(dq.max(),1e-3)
         spd=np.maximum(vmax*dq/m,.05*vmax/.8)     # synchronized: every joint arrives together (straight joint-space line)
@@ -247,8 +247,8 @@ class Sol(Node):
             t2=GRIP.contact_target(pc,t0);s.hand_set(side,t2);s.wait_fingers(side,tmin=.2,log_phase='close2')
         return dict(contact=pc,target2=t2,empty=empty,settled=settled,closed=t0,jam=jam)
     def wait_fingers(s,side,tmin=.3,tmax=None,log_phase=None):
-        """Until the fingers stop (blocked by the object or at target), by POSITION (v8 fix 5: the velocity criterion
-        fired in 3 of 16 v7+v8 closes): every finger moved < GRIP.STALL_TOL over GRIP.STALL_WINDOW s, on samples newer
+        """Until the fingers stop (blocked by the object or at target), by POSITION (a velocity criterion
+        fired in only 3 of 16 v7+v8 closes): every finger moved < GRIP.STALL_TOL over GRIP.STALL_WINDOW s, on samples newer
         than the command. Default timeout = one full stroke at the configured finger speed + 0.5 s (speed 0.5 -> 2.1 s).
         log_phase: hand state logged at 10 Hz meanwhile."""
         tmax=GRIP.finger_stroke_time()+.5 if tmax is None else tmax
@@ -321,7 +321,7 @@ class Sol(Node):
         """Delivery state of the set_force / set_speed requests per hand."""
         return {f"{SIDE_NAME[k]}_{kind}":c['state'] for (kind,k),c in sorted(getattr(s,'hand_cfg',{}).items())}
     def hand_verdict(s,side,grasp=None):
-        """v8 fix 2: held iff a closing finger deviates >= GRIP.HELD_DEV from its current command with effort >=
+        """Held iff a closing finger deviates >= GRIP.HELD_DEV from its current command with effort >=
         GRIP.HELD_EFF (15/15 on v7+v8). Wrist F/T, past_verdict and the v7 finger_verdict are LOG-ONLY
         (hand_shadow)."""
         h=s.hstate.get(side)
@@ -395,7 +395,7 @@ class Sol(Node):
         while time.monotonic()-t<wait and (pair is None or getattr(s,info_attr) is None):
             pair=buf.pair(t_req);time.sleep(.02)
         if pair is None:
-            # v15: the fallback took the newest pair of ANY age (possibly from before the last head/arm motion). Now
+            # The newest pair of ANY age could predate the last head/arm motion, so
             # only a pair at most CAPTURE_MAX_AGE older than the request is accepted; otherwise the capture fails and
             # observe_retry captures again.
             pair=buf.pair(t_req-CAPTURE_MAX_AGE)
@@ -405,7 +405,7 @@ class Sol(Node):
         if pair is None or info is None:raise RuntimeError('no synchronised RGB-D pair / camera_info')
         rgbm,dm=pair
         rgb=np.frombuffer(bytes(rgbm.data),np.uint8).reshape(rgbm.height,rgbm.width,3)
-        if getattr(rgbm,'encoding','')=='bgr8':rgb=rgb[...,::-1]   # v14: tray colour (red/blue) must not swap; rgb8 unchanged
+        if getattr(rgbm,'encoding','')=='bgr8':rgb=rgb[...,::-1]   # tray colour (red/blue) must not swap; rgb8 unchanged
         dmm=np.frombuffer(bytes(dm.data),np.uint16).reshape(dm.height,dm.width).astype(float)
         K=np.array(info.k).reshape(3,3);T=s.tf('pelvis',dm.header.frame_id or default_frame,dm.header.stamp)
         P=deproject(dmm,K,T)   # X=(u-cx)Z/fx, Y=(v-cy)Z/fy, Z=mm/1000, pelvis = R@[X,Y,Z]+t (Rust kernel or NumPy reference)
@@ -531,21 +531,21 @@ class Sol(Node):
         s.budget=BUD.TimeBudget(BUD.LIMITS[task['task']],t0)
         handled=set();fails={};why='time budget';s.arms={}
         try:
-            # v14: inside the guarded block -- a malformed task message (no 'categories'/'objects') or an arm model that
-            # fails to build used to end the process before /sim/task/done (the robot had not moved yet)
+            # Inside the guarded block: a malformed task message (no 'categories'/'objects') or an arm model that
+            # fails to build must not end the process before /sim/task/done (the robot has not moved yet)
             cats=task['categories'];objs=task['objects']
             s.use_robot_description()
             s.arms={k:ARMMOD.Arm(k) for k in 'lr'}
             s.log('startup',round(s.budget.elapsed(s.now()),1),'s of',s.budget.limit)
             s.log('accel',*accel_status())
-            # v15: /joint_states is required before any motion; the wait used to be unbounded (no /sim/task/done ever). It
-            # now ends as soon as no object cycle could be finished any more (the same can_start rule as the task loop),
+            # /joint_states is required before any motion, but an unbounded wait would never publish /sim/task/done. It
+            # ends as soon as no object cycle could be finished any more (the same can_start rule as the task loop),
             # which goes to end_safe (no arm motion without joint states) and publishes done inside the budget.
             while not s.js:
                 if not s.budget.can_start(s.now()):raise RuntimeError('no /joint_states while an object cycle still fit the budget')
                 time.sleep(.05)
             for k in 'lr':s.hand_open(k)
-            # v9fix: survey FIRST with the arms in the start posture (v7 s102 start frames: table plane, near edge and
+            # Survey FIRST with the arms in the start posture (v7 s102 start frames: table plane, near edge and
             # trays are measured with the arms hanging), then go home along a path certified against the MEASURED
             # table. v9a: going home before the table was known commanded the straight start->home joint path, which
             # sweeps the hands through the table front -> both arms jammed (|F| 258 N / 938 N) and 4 of 7 picks were lost.
@@ -580,13 +580,13 @@ class Sol(Node):
                     others=[P[d.pixels[:,0],d.pixels[:,1]] for d in dets if d is not det]   # every segment is an obstacle
                     t=s.now();s.last_infeasible=False;s.last_contact=False
                     try:ok=s.pick_place(name,cat,cloud,plane,others,tray)
-                    except Exception as e:      # v13: recover (hands open, arms home) and go on with a fresh observation
+                    except Exception as e:      # recover (hands open, arms home) and go on with a fresh observation
                         s.log('pick failed with exception',name,type(e).__name__,e);s.recover();ok=False;s.last_contact=True
                     if ok is False and s.last_infeasible:nofeas[name]=len(handled)
                     if ok is None:stop=True;break           # budget: no time to finish another object
                     if ok:handled.add(name);did=True;s.budget.record_cycle(s.now()-t);break
                     fails[name]=fails.get(name,0)+1
-                    if s.last_contact:           # v8 fix 6: the hand touched the scene -> the other clouds are stale
+                    if s.last_contact:           # the hand touched the scene -> the other clouds are stale
                         s.log('re-observe after contact',name);touched=True;break
                 if stop:why='time budget (next object would not finish)';break
                 if not did and resurveys<TRAY_RESURVEY_MAX and any(cats.get(objs.get(x[1],x[2])) not in s.trays for x in ids):
@@ -600,7 +600,7 @@ class Sol(Node):
                     if retries<RETRY_ROUNDS and left and s.budget.can_start(s.now()):
                         retries+=1;s.log('retry round',retries,'objects',[n[:24] for n in left]);fails={};nofeas={};empty=0;continue
                     why='nothing pickable in %d observations'%empty;break
-        except Exception as e:   # v13: an unexpected error must not skip the end-of-run release/retreat/done below
+        except Exception as e:   # an unexpected error must not skip the end-of-run release/retreat/done below
             why=f'exception {type(e).__name__}: {e}';s.log('run loop failed:',why)
         s.end_safe()
         if getattr(s,'hand_cfg_stop',None) is not None:s.hand_cfg_stop.set()
@@ -631,7 +631,7 @@ class Sol(Node):
             except Exception as e:s.log('recover: wait failed',k,type(e).__name__,e)
         s.end_safe()
     def observe_retry(s,not_before):
-        """observe(), once more on a failure (a single failed capture or plane fit ended the whole run before v13)."""
+        """observe(), once more on a failure (a single failed capture or plane fit must not end the whole run)."""
         try:return s.observe(not_before)
         except Exception as e:s.log('observe failed, retrying once:',type(e).__name__,e)
         return s.observe(s.now())
@@ -699,7 +699,7 @@ class Sol(Node):
         order='lr' if ty>.1 else ('rl' if ty<-.1 else ('lr' if f['center'][1]>=0 else 'rl'))
         k=s.placed.get(tray,0);dl=TR.slot_offset(k,.5*f['length'],size=(ts,tl),ty=ty)   # along the MEASURED long axis
         sx,sy=tx+dl*ax,ty+dl*ay
-        why={'candidates':len(C),'feasible':int(sum(1 for g in C if g['feasible'])),'pick_ik':{},'place':{},'hand_clear':{}}   # v8 fix 7
+        why={'candidates':len(C),'feasible':int(sum(1 for g in C if g['feasible'])),'pick_ik':{},'place':{},'hand_clear':{}}   # why no plan: logged per object
         if 'rim_closed' in f:why['rim_closed']=f['rim_closed']
         if f.get('rim_torque') is not None:why['rim_torque']=round(f['rim_torque'],3)
         for side in order:
@@ -741,7 +741,7 @@ class Sol(Node):
                 thumb=s.wait_thumb(side)      # #648: thumb in opposition before anything closes (usually already there)
                 if A.position_error(np.clip(s.q_now(side),A.chain.lower,A.chain.upper),Tp)>PRE_TOL:
                     s.log('pre-grasp not reached, abort',name);s.retreat(side);return False
-                # v8 fix 4, guarded approach: the open fingers must follow their command; a finger off by > GRIP.GUARD_DEV
+                # Guarded approach: the open fingers must follow their command; a finger off by > GRIP.GUARD_DEV
                 # is touching something -> stop, do not close, re-observe. At pre-grasp the open command is re-sent once
                 # first (a deflection that survives it is a contact, not motion transient).
                 dev,fl=s.finger_dev(side,g['kind'])
@@ -764,7 +764,7 @@ class Sol(Node):
                 gr=s.grasp_close(side,g['kind'])
                 s.trace('closed',side,name,Tg,settled=gr['settled'],thumb=thumb,contact=gr['contact'],target2=gr['target2'],
                         empty=gr['empty'],jam=gr.get('jam'),force=GRIP.HAND_FORCE_RATIO,speed=GRIP.HAND_SPEED_RATIO,past=GRIP.CLOSE_PAST)
-                if gr.get('jam') or not gr['empty']:s.last_contact=True   # the hand touched the scene (v8 fix 6)
+                if gr.get('jam') or not gr['empty']:s.last_contact=True   # the hand touched the scene
                 if gr['empty']:       # fingers ran to the closed target: nothing between them -> do not lift (0, not -10)
                     s.log('grasp check (contact): empty',name);s.hand_open(side);s.retreat(side);return False
                 # #595 end-of-run policy: a lifted object outside a tray (or in the hand) at the limit is -10, an
@@ -810,7 +810,7 @@ class Sol(Node):
         s.log('no plan:',name,json.dumps(why))
         return False
 def accel_status():
-    """('on'|'off', reason) of the optional Rust extension (v8 fix 7: logged at start and at the end of the run)."""
+    """('on'|'off', reason) of the optional Rust extension (logged at start and at the end of the run)."""
     try:
         from . import _accel as A
         on=A.enabled() if hasattr(A,'enabled') else bool(getattr(A,'AVAILABLE',False))
@@ -886,7 +886,7 @@ def plan_place_yaw(A,q_from,tx,ty,plane,trays,fallback=None,tray_h=TRAY_H,obj_of
     checked against the rotated scene at 5 intermediate angles (sampled, not swept)."""
     n,d=np.asarray(plane[0],float),float(plane[1])
     zt=lambda x,y,n=n:-(d+n[0]*x+n[1]*y)/n[2]
-    kw={} if obj_off is None else {'obj_off':obj_off}    # side/top grasps: same call as before v12
+    kw={} if obj_off is None else {'obj_off':obj_off}    # side/top grasps: no object offset
     if not far_tray(A.side,ty):    # the unyawed search for the far tray always fails: skip it (planning costs sim time)
         r=plan_place(A,q_from,tx,ty,zt(tx,ty),fallback,tray_h,**kw)
         if r is not None:return 0.,r

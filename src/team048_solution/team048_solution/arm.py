@@ -220,7 +220,7 @@ def arm_spheres(side,chain,mesh=True):
     if hm:
         for c in hm['thumb_env_hand']:S.append(Sphere(tip,R@np.asarray(c,float),max(.012,hm['thumb_env_radius'])))
     return S
-# v9fix: torso envelope fitted to the waist_yaw_link (torso) STL mesh (tools/fit_spheres.py --links waist_yaw_link
+# Torso envelope fitted to the waist_yaw_link (torso) STL mesh (tools/fit_spheres.py --links waist_yaw_link
 # --r-max .03 --pad .005 --max-spheres 64; UBTECH tiangong2pro_urdf, Apache-2.0). Robot geometry, not scene (#645).
 # Mesh frames: the UBTECH URDF has the SAME 62 joints with identical origins/axes as the organiser URDF (only 4 sensor
 # links renamed), checked offline against the mesh contacts. Run v9a (HACK_SELF_COLLISION=1): at the Ecoforms
@@ -301,8 +301,8 @@ TABLE_FRONT_DEPTH=.35  # m below the measured top: the table front is solid at l
 def table_env_build(plane,x,y,R=.1,step=.03):
     """Table as spheres tangent to the MEASURED top surface plane=(n,d) (pelvis frame, n.p+d=0, head camera).
     Run v7 frames show the table tilted 4.0 deg in the pelvis frame (n_x=-0.070 in all 31 frames).
-    v9fix: the big spheres start R behind the MEASURED near edge x[0] (they used to start AT the edge and bulged R=10 cm
-    toward the robot below the top, so no certified path existed from the start posture); the band between the edge
+    The big spheres start R behind the MEASURED near edge x[0] (starting AT the edge they would bulge R=10 cm
+    toward the robot below the top, so no certified path would exist from the start posture); the band between the edge
     and the first big sphere is covered by small TABLE_EDGE_R spheres tangent to the top, and the front face by a
     column of small spheres from the top down to TABLE_FRONT_DEPTH. Nothing of the model is closer than x[0]."""
     n,d=np.asarray(plane[0],float),float(plane[1]);nn=np.linalg.norm(n);n=n/nn;d=d/nn

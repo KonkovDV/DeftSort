@@ -220,7 +220,7 @@ class V7Fixes(unittest.TestCase):
         for sp in T:
             sd=float(sp.center@nu+du)
             if abs(sd+sp.radius)<1e-6:tangent+=1        # top spheres: tangent to the measured plane
-            else:                                        # v9fix front face: at the edge, below the top
+            else:                                        # front face: at the edge, below the top
                 self.assertAlmostEqual(sp.center[0]-sp.radius,x0,6);self.assertLess(sd,-.9*sp.radius)
         self.assertGreater(tangent,len(T)//2)
         z=lambda x:-(d+n[0]*x)/n[2]

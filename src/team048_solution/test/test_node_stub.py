@@ -101,7 +101,7 @@ class NodeWiring(unittest.TestCase):
     def test_budget_skip_returns_none(s):
         sol=s.s;from team048_solution import budget as B
         sol.budget=B.TimeBudget(270,t0=Clock.t-265)     # 5 s left
-        for A in sol.arms.values():sol.js.update(zip(A.chain.names,A.home))   # v15: q_now needs measured joints (no implicit 0)
+        for A in sol.arms.values():sol.js.update(zip(A.chain.names,A.home))   # q_now needs measured joints (no implicit 0)
         rng=np.random.default_rng(0);cloud=np.c_[rng.uniform(.33,.39,400),rng.uniform(.17,.23,400),rng.uniform(-.18,-.10,400)]
         plane=(np.array([0,0,1.]),-SF.TABLE_TOP);sol.trays=dict(SF.TRAYS)
         n0=len(sol.pub['arm'].sent);n1=len(sol.hand['left'].sent)+len(sol.hand['right'].sent)
@@ -162,7 +162,7 @@ class NodeWiring(unittest.TestCase):
         # start-up = wall time between import and node creation: in a long or loaded suite run it exceeded the 270 s limit
         # (no observation at all). Pin it to zero so the test does not depend on how long the suite has been running.
         with mock.patch.object(N,'WALL_LAUNCH',sol.wall_ready):sol.run()
-        # v9fix: survey first (arms in the start posture), then home along a path certified against the measured table
+        # survey first (arms in the start posture), then home along a path certified against the measured table
         s.assertEqual(calls[:3],['survey','home','home']);s.assertEqual(calls.count('obs'),N.EMPTY_OBS_MAX)
         s.assertTrue(sol.pubs['/sim/task/done'].sent)
 if __name__=='__main__':unittest.main()

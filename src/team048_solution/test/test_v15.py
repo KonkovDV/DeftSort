@@ -1,4 +1,4 @@
-"""v15 fixes (CPU, no GPU): bounded waits for required topics, frame freshness in capture, explicit handling of
+"""Bounded waits for required topics, frame freshness in capture, explicit handling of
 joints missing from /joint_states, atomic hand-state history, stable tray component order, offline tests of the
 motion methods (go_home, retreat, waist, approach_guard, recover, end_safe) on a fake ROS interface."""
 import os,sys,types,unittest,threading,time

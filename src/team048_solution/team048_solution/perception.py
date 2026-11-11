@@ -117,8 +117,8 @@ def deproject(depth_mm, K, T):
     X = (u-cx)*Z/fx, Y = (v-cy)*Z/fy, Z = depth/1000, P = [X,Y,Z] @ R.T + t. Rust kernel when available
     (fixed evaluation order; NumPy's BLAS product may differ by <= 2 ulp depending on the CPU's OpenBLAS kernel)."""
     K = np.asarray(K, float); T = np.asarray(T, float); dmm = np.asarray(depth_mm, float)
-    # v14: dmm.size -- an empty image (0 rows or columns) panicked in the Rust kernel (perc.rs chunk size 0), and the
-    # panic switched the WHOLE process to the NumPy reference (2x slower planning); the reference returns (h, w, 3).
+    # dmm.size: an empty image (0 rows or columns) would panic in the Rust kernel (perc.rs chunk size 0), and the
+    # panic would switch the WHOLE process to the NumPy reference (2x slower planning); the reference returns (h, w, 3).
     if _accel.enabled2() and dmm.ndim == 2 and dmm.size and K.shape == (3, 3) and T.shape == (4, 4):
         try: return _accel.deproject(dmm, K[0, 0], K[1, 1], K[0, 2], K[1, 2], T)
         except BaseException as e: _accel.guard(e); _accel.failed('deproject', e)

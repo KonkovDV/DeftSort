@@ -1,4 +1,4 @@
-"""v14 audit: squeeze-force range enforced for every env setting, rule checks on the AST of the solution package
+"""Squeeze-force range enforced for every env setting, rule checks on the AST of the solution package
 (ROS interfaces, imports, forbidden simulator/USD names), run() setup failures still end with /sim/task/done,
 explicit bgr8 handling of the colour image (tray colour must never swap)."""
 import ast,glob,os,subprocess,sys,types,unittest
@@ -18,7 +18,7 @@ class ForceRange(unittest.TestCase):
                            cwd=os.path.join(HERE,'..'),env=e,capture_output=True,text=True,check=True).stdout
         return float(out)
     def test_env_override_is_clamped_to_organiser_range(s):
-        # before v14 the override was clamped to the simulator's [0.02, 1]: TEAM048_HAND_FORCE=1 gave the default force
+        # clamped to the simulator's [0.02, 1] only, TEAM048_HAND_FORCE=1 would give the default force
         for env,want in ((None,.4),('0.45',.45),('0.3',.3),('0.5',.5),('1.0',.5),('0.02',.3),('-3',.3),('nan',.3),('inf',.5),('abc',.4)):
             got=s.ratio(env);s.assertTrue(.3<=got<=.5,(env,got));s.assertAlmostEqual(got,want,msg=env)
     def test_both_hands_squeeze_dofs_in_range_thumb_rotation_documented(s):
@@ -112,7 +112,7 @@ if __name__=='__main__':unittest.main()
 from team048_solution import trays as TRY
 class TrayAxisSign(unittest.TestCase):
     def test_two_representations_of_x_axis_agree(s):
-        # min_area_rect tie at 0 / 90 deg: u(0)=(1,0) or v(90 deg)=(-cos..,..)=(-1,6e-17); before v14 they kept opposite signs
+        # min_area_rect tie at 0 / 90 deg: u(0)=(1,0) or v(90 deg)=(-cos..,..)=(-1,6e-17); a plain y-sign rule keeps them opposite
         a=TRY.canonical_axis(np.array([1.,0.]));b=TRY.canonical_axis(np.array([-1.,6.123233995736766e-17]))
         s.assertGreater(a[0],0);s.assertGreater(b[0],0);s.assertTrue(np.allclose(a,b,atol=1e-12))
         s.assertTrue(np.allclose(TRY.canonical_axis(np.array([-1.,-1e-12])),[1.,1e-12]))

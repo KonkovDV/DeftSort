@@ -33,7 +33,7 @@ class Table(unittest.TestCase):
         self.assertFalse(ARM.plane_plausible((np.array([0,0,1.]),.88)))       # floor
         self.assertFalse(ARM.plane_plausible((np.array([.5,0,.866]),.18)))    # not horizontal
     def test_table_obstacle_starts_at_measured_edge(self):
-        # v9fix: no part of the table model is closer to the robot than the measured edge (spheres used to start AT it)
+        # no part of the table model is closer to the robot than the measured edge (spheres used to start AT it)
         T=ARM.table_env(SF.plane(),(.24,1.))
         self.assertAlmostEqual(min(s.center[0]-s.radius for s in T),.24,6)
         T=ARM.table_env(SF.plane(),(.0,1.))                                     # never inside the body region

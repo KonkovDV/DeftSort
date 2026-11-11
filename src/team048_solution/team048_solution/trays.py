@@ -67,7 +67,7 @@ def _largest_component(mask, min_px):
     if n == 0:
         return None
     sizes = np.bincount(lab.ravel())[1:]
-    # v15: kind='stable' -- equal sizes keep label (raster) order. The default introsort is not stable for >16
+    # kind='stable': equal sizes keep label (raster) order. The default introsort is not stable for >16
     # components: with sizes [..., 60, 60, ...] (labels 9 and 10) it returned label 10 (NumPy 1.26 and 2.x).
     i = np.argsort(-sizes, kind='stable')[0]
     return np.argwhere(lab == i+1) if sizes[i] >= min_px else None
@@ -170,7 +170,7 @@ def detect(P, rgb, valid, name, colour, plane, min_px=150, border=2):
 
 def canonical_axis(axis, eps=1e-9):
     """Sign convention of a tray long axis: y component positive; for an axis along x (|y| <= eps) x positive.
-    v14: the old rule (flip if y < 0) left the two representations of the x axis that min_area_rect returns for an
+    A plain rule (flip if y < 0) leaves the two representations of the x axis that min_area_rect returns for an
     exact 0 / 90 deg tie, u(0) = (1, 0) and v(90 deg) = (-1, 6e-17), with opposite signs. Which one wins the tie can
     change with 1-ulp rounding (NumPy 2 vs the Rust scan: 7 of 62 recorded frames, tray_left), and the sign selects the
     direction of the inner/outer slot (slot_offset * axis)."""

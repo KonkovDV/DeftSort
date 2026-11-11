@@ -42,7 +42,7 @@ def _env_ratio(name, default, lo, hi):
     except ValueError:
         v = default
     return min(hi, max(lo, v))
-# v14: the env override is clamped to the #648 range 0.3-0.5 (was the simulator's [0.02, 1]): no setting of
+# The env override is clamped to the #648 range 0.3-0.5 (not the simulator's wider [0.02, 1]): no setting of
 # TEAM048_HAND_FORCE can produce a squeeze force outside the organiser's range (test_v14.ForceRange).
 HAND_FORCE_MIN, HAND_FORCE_MAX = .3, .5
 HAND_FORCE_RATIO = _env_ratio('TEAM048_HAND_FORCE', .4, HAND_FORCE_MIN, HAND_FORCE_MAX)
@@ -103,7 +103,7 @@ def jammed(pos, closed_target=None, tol=JAM_TOL):
 def contact_target(contact_pos, closed_target, past=None, tol=JAM_TOL):
     """Phase-2 command: for every commanded-closing finger (closed_target < .5, DOF 1-5) target = min(1, max(closed_target,
     p_contact - past)); other DOFs unchanged. 'Slightly past' the measured contact, never beyond the closed target and
-    never above 1.0 (v8 fix 3: 7 of 15 v7+v8 attempts produced targets up to 1.66 = 'open further' for jammed fingers).
+    never above 1.0 (in 7 of 15 v7+v8 attempts an unclamped rule produced targets up to 1.66 = 'open further' for jammed fingers).
     Jammed fingers (contact position > 1 + tol, bent back by a contact, not pinching) are NOT re-targeted: they keep
     the closed target."""
     past = CLOSE_PAST if past is None else past
@@ -139,13 +139,13 @@ def held_rule(pos, eff, command, closed_target, dev_min=HELD_DEV, eff_min=HELD_E
     return bool(any(abs(p[i]-c[i]) >= dev_min and abs(e[i]) >= eff_min for i in k))
 
 
-# ---- Guarded approach (v8 fix 4): v8 attempts 1-4 had fingers bent by contact BEFORE the close command
+# ---- Guarded approach: v8 attempts 1-4 had fingers bent by contact BEFORE the close command
 # (Utana middle/index -0.06/-0.10, Threshold index 0.16 with 16 N, Crunch 1.06-1.46 with 14.6 N, mustard little 1.60).
 # Only the fingers that will CLOSE for this grasp kind are guarded (closed_target < .5): in both held v7 Ecoforms rim
 # grasps the (non-closing) ring finger read 1.14/1.17 at the grasp pose, so guarding every finger would have aborted
 # the only v7 success. With the closing set: 0 of 4 held v7+v8 grasps trip, 11 of 12 empty ones trip before closing
 # (test/fixtures/v7v8_grasp_traces.json).
-# v9fix: 0.10 had no margin. v9a free motion (no contact: wrist |F| 3.2-3.5 N, TCP 1.4 cm from plan) read thumb 1.094
+# A threshold of 0.10 would have no margin: v9a free motion (no contact: wrist |F| 3.2-3.5 N, TCP 1.4 cm from plan) read thumb 1.094
 # at pre-grasp and 1.103 at the trip; v7 free motion up to 0.085. Contacts before failed v7/v8 grasps: 0.225 (v8 Crunch)
 # and above, except v7 Hyaluronic 0.109. GUARD_DEV = midpoint of the largest free-motion deviation (0.103) and the
 # smallest separated contact (0.225) = 0.164 -> 0.16: 0 of 4 held grasps and 0 of 2 v9a free-motion samples trip,
@@ -168,7 +168,7 @@ def approach_deviation(pos, command, closed_target=None, dofs=5):
     return float(max(d[i] for i in k)), [i+1 for i in k if d[i] > GUARD_DEV]
 
 
-# ---- Finger stall by POSITION (v8 fix 5): the velocity criterion fired in 3 of 16 v7+v8 closes.
+# ---- Finger stall by POSITION: a velocity criterion fired in only 3 of 16 v7+v8 closes.
 STALL_TOL = .005             # max |delta position| of every finger over the window
 STALL_WINDOW = .15           # s sim
 
@@ -196,7 +196,7 @@ def contact_empty(contact_pos, closed_target, empty_max=EMPTY_CONTACT_MAX):
 
 
 def past_verdict(pos, target2, closed_target, past=None):
-    """LOG-ONLY since v8 fix 2 (misses 2 of 4 v7+v8 held grasps). Held check after phase 2 (target2 = contact - past). Held: the fingers are still blocked short of target2 by
+    """LOG-ONLY (it misses 2 of 4 v7+v8 held grasps; held_rule decides). Held check after phase 2 (target2 = contact - past). Held: the fingers are still blocked short of target2 by
     at least half of `past` (the object holds them); empty: they reached target2 (object gone) or ran to the closed
     target. Threshold past/2 = 0.075 for past 0.15, vs 0.02 position noise of an unloaded finger in v7."""
     past = CLOSE_PAST if past is None else past

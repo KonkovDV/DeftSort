@@ -1,4 +1,4 @@
-"""v15 math review (docs/MATH_PHYSICS.md): property tests of the formulas on random inputs and checks against the
+"""Math review (docs/MATH_PHYSICS.md): property tests of the formulas on random inputs and checks against the
 simulator's own numbers (camera_info and /tf printed by tf2_echo in the run v5 logs, objects.yaml masses).
 Nothing here changes a plan; every constant below names its source."""
 import os,sys,math,unittest

@@ -1,4 +1,4 @@
-"""v11 regression tests from run v9b (sort2 seed 101, 10 points, 1 of 6 objects).
+"""Hand settings delivery and closed dish tops, regression tests from run v9b (sort2 seed 101, 10 points, 1 of 6 objects).
 1. The left hand never received its SetForce request (fixture v9b_hand_settings.json): requests are now retried until
    the service is discovered and has answered; an arm whose hand force was never delivered is not used.
 2. The Threshold ramekin has a closed top in every recorded frame; the rim pinch put the thumb on it in 4 of 4
@@ -33,7 +33,7 @@ class Fixture(unittest.TestCase):
 
 class HandSettings(unittest.TestCase):
     def test_one_shot_send_misses_a_late_service(self):
-        """The v10 behaviour, reproduced: one readiness poll at start -> the late left hand gets nothing."""
+        """The old behaviour, reproduced: one readiness poll at start -> the late left hand gets nothing."""
         s=fresh(late_l=3)
         for k in 'lr':
             if s.cli_force[k].service_is_ready():s.cli_force[k].call_async(object())

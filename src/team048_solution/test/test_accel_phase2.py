@@ -171,7 +171,7 @@ class Phase2(unittest.TestCase):
         for pl,x,y in ((s.plane,(.12,1.),(-1.,1.)),((np.array([.03,-.02,.99]),.2),(.3,.85),(-.95,.95))):
             n,d=np.asarray(pl[0],float),float(pl[1]);nn=np.linalg.norm(n);n=n/nn;d=d/nn;ref=[];r=arm.TABLE_EDGE_R
             zt=lambda a,b:-(d+n[0]*a+n[1]*b)/n[2]
-            # v9fix model (scalar reference): big spheres from edge+R, top lip band, front face column
+            # table model (scalar reference): big spheres from edge+R, top lip band, front face column
             for a in np.arange(x[0]+.1,x[1]+1e-9,.03):
                 for b in np.arange(y[0],y[1]+1e-9,.03):ref.append(planning.Sphere('pelvis',np.array([a,b,zt(a,b)])-.1*n,.1))
             for a in np.arange(x[0]+r,x[0]+.1+1e-9,.03):

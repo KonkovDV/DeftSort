@@ -1,4 +1,4 @@
-"""v10 #595 guarantee: lift only if the WORST-CASE in-hand time (every move_arm / waist / release wait timing out, from
+"""#595 guarantee: lift only if the WORST-CASE in-hand time (every move_arm / waist / release wait timing out, from
 the node's own timeouts) fits, in addition to the typical-time model place_time + SAFETY_S."""
 import os,sys,json,unittest
 import numpy as np
