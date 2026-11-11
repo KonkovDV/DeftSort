@@ -136,8 +136,8 @@ Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (Russian).
 | No scene coordinates (#645) | Table, near edge and trays are measured; the code has only search windows, documented sizes and robot geometry | `test_compliance.py` (layout literals by AST), `test_arm.py` (no plan before measurement) |
 | Self-collision (#623/#625/#628) | Whole-path certificate, mesh torso, other arm at its measured posture, certified path home | `test_arm.py`, `test_start_posture.py` |
 | Hand force 0.3–0.5 (#648) | 0.4 on the squeezing fingers of both hands, request re-sent until answered (at most 5 sends); an arm whose force request was never sent (service not found) is not used; two-phase close | `test_compliance.py`, `test_hand_settings.py`, `test_rules_edges.py` |
-| −10 for an object outside its tray or in hand (#595.2) | Time checks before starting and before lifting, with a worst case; on an error the hands open and the arms go home | `test_compliance.py`, `test_audit.py`, `test_run_robustness.py`, `test_topics_motion.py` |
-| Sim-time limit including launch (#595.3, #638) | `use_sim_time`; the age of the `run.sh` process is subtracted pessimistically | `test_compliance.py`, `test_ideas.py` |
+| −10 for an object outside its tray or in hand (#595.2) | Time checks before starting and before lifting, with a worst case; on an error the hands open and the arms go home | `test_compliance.py`, `test_place_time.py`, `test_run_robustness.py`, `test_topics_motion.py` |
+| Sim-time limit including launch (#595.3, #638) | `use_sim_time`; the age of the `run.sh` process is subtracted pessimistically | `test_compliance.py`, `test_core.py` |
 | Each layout in a new process (#636/#638) | State only in process memory | `test_node_stub.py` |
 | `camera_info` and `/tf` (#554/#613) | K only from `camera_info`, camera pose from `/tf` at the frame stamp | `test_node_stub.py`, `test_math.py` |
 | No heavy models | No neural networks, no GPU; `requirements.txt`: `scipy==1.13.1` only | — |
@@ -189,7 +189,7 @@ The crate `rust/team048_accel` 0.2.0 (PyO3 abi3-py310, nalgebra, rayon) duplicat
 | Perception, ms per frame | 146.7 | 47.9 | 3.1× |
 | Planning 10 objects, s | 0.672 | 0.374 | 1.8× |
 
-- **Equivalence.** On 62 recorded frames (Python 3.10, NumPy 1.26), deprojection, plane, trays, masks and segments are bit-identical. Grasp and place poses differ by at most 2.3e-14. There are no discrete differences (object, grasp type, tray, slot, collision verdicts) in any of the 5358 records. Tests: `test_accel_equivalence.py`, `test_accel_phase2.py`.
+- **Equivalence.** On 62 recorded frames (Python 3.10, NumPy 1.26), deprojection, plane, trays, masks and segments are bit-identical. Grasp and place poses differ by at most 2.3e-14. There are no discrete differences (object, grasp type, tray, slot, collision verdicts) in any of the 5358 records. Tests: `test_accel_equivalence.py`, `test_accel_kernels.py`.
 - **Fallback.** If the module is missing, too old or raises, the solution switches to NumPy for the rest of the process. With `panic = "unwind"`, a Rust panic becomes a Python exception.
 - **Delivery.** `vendor/` holds a manylinux2014 x86_64 wheel (abi3, CPython ≥ 3.10) with its SHA256. If the wheel does not install, `setup.sh` builds the module from source with rustup and maturin.
 - **Rust checks:** `cd rust/team048_accel && cargo test --release` (18 tests, including proptest) and `cargo clippy --all-targets --features python`, no warnings, rustc 1.89.
@@ -198,11 +198,11 @@ The crate `rust/team048_accel` 0.2.0 (PyO3 abi3-py310, nalgebra, rayon) duplicat
 
 | File | Tests | What it checks |
 |---|---:|---|
-| `test_ideas.py` | 40 | Budget and launch accounting, finger verdict, trays on a real frame, RGB-D pairs, IK null space, head FK vs `/tf`, grasp candidates |
+| `test_core.py` | 40 | Budget and launch accounting, finger verdict, trays on a real frame, RGB-D pairs, IK null space, head FK vs `/tf`, grasp candidates |
 | `test_grip_rules.py` | 19 | Hold rule, guarded approach, jammed fingers (TRACE of runs v7 and v8) |
 | `test_topics_motion.py` | 19 | Bounded wait for `/joint_states`, frame freshness, missing joint, atomic hand history, stable tray-component order, motion methods on a fake robot, no dead code |
 | `test_compliance.py` | 18 | Topics, no scene constants (AST), #648, −10 policy, time limit |
-| `test_accel_phase2.py` | 15 | Rust ↔ NumPy equivalence of the perception and grasp kernels |
+| `test_accel_kernels.py` | 15 | Rust ↔ NumPy equivalence of the perception and grasp kernels |
 | `test_math.py` | 14 | Formula properties: TF vs simulator `/tf` and URDF, pinhole vs `camera_info`, RANSAC, tray rectangle, caliper, Kåsa, rim torque, SO(3), IK, `certify` lever bound |
 | `test_rules_edges.py` | 14 | Force range under any override, AST check of interfaces and imports, `done` on a setup error, `bgr8`, tray-axis sign, empty depth frame |
 | `test_start_posture.py` | 13 | Start from the v9a posture, `certify_escape`, table model, torso |
@@ -215,10 +215,10 @@ The crate `rust/team048_accel` 0.2.0 (PyO3 abi3-py310, nalgebra, rayon) duplicat
 | `test_arm.py` | 8 | URDF limits, FK/IK, self-collision, no plan before scene measurement |
 | `test_accel_equivalence.py` | 8 | FK, IK, collision, RANSAC equivalence |
 | `test_hold_time.py` | 5 | Upper bound of the holding time vs TRACE and timeouts |
-| `test_audit.py` | 5 | `place_time` vs TRACE, light-first order, masses |
+| `test_place_time.py` | 5 | `place_time` vs TRACE, light-first order, masses |
 | **Total** | **237** | |
 
-The 16 equivalence tests (in `test_accel_phase2.py` and `test_accel_equivalence.py`) run on recorded frames of run v7. Those frames are not part of the submission tree. Point `TEAM048_V7_TRACE` at their directory to run these tests; without it they are skipped. In the submission tree that gives:
+The 16 equivalence tests (in `test_accel_kernels.py` and `test_accel_equivalence.py`) run on recorded frames of run v7. Those frames are not part of the submission tree. Point `TEAM048_V7_TRACE` at their directory to run these tests; without it they are skipped. In the submission tree that gives:
 
 - Rust: 221 passed, 16 skipped;
 - `TEAM048_ACCEL=0`: 213 passed, 24 skipped.

@@ -96,7 +96,7 @@ def arm_chain(side):
     """Kinematic chain pelvis -> wrist tip for side 'l' or 'r', body yaw locked at 0 rad."""
     tip=SIDE[side]['tip'];c=Chain.from_urdf(XML,'pelvis',tip,np.eye(4))
     return c.lock_joints({'body_yaw_joint':0.})
-NULL_WEIGHT=.1   # IK null-space pull toward home; 0 disables (tested: accuracy unchanged, see test/test_ideas.py)
+NULL_WEIGHT=.1   # IK null-space pull toward home; 0 disables (tested: accuracy unchanged, see test/test_core.py)
 # I3: mesh-fitted collision spheres (tools/fit_spheres.py on the UBTECH tiangong2pro_urdf STL meshes, Apache-2.0).
 # Kept False until the mesh frames are verified against the simulator /tf
 # (FK vs TF for all arm links) and the JSON carries "validated": true. Inertia-derived spheres are used meanwhile.

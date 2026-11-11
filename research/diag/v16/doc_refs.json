@@ -102,7 +102,7 @@
 "docs/ORG_ANSWERS.md|src/team048_solution/test/test_compliance.py|88": "def test_subscriptions(self):",
 "docs/ORG_ANSWERS.md|src/team048_solution/test/test_compliance.py|93": "def test_robot_description_bundled_is_accepted(self):",
 "docs/ORG_ANSWERS.md|src/team048_solution/test/test_compliance.py|99": "def test_defaults(self):",
-"docs/ORG_ANSWERS.md|src/team048_solution/test/test_ideas.py|228": "def test_tray_walls_are_obstacles(self):",
+"docs/ORG_ANSWERS.md|src/team048_solution/test/test_core.py|228": "def test_tray_walls_are_obstacles(self):",
 "docs/ORG_ANSWERS.md|src/team048_solution/test/test_node_stub.py|151": "def test_run_retries_empty_observation_then_done(s):",
 "docs/ORG_ANSWERS.md|src/team048_solution/test/test_node_stub.py|61": "def test_speed_cap_in_command(s):",
 "docs/ORG_ANSWERS.md|src/team048_solution/test/test_node_stub.py|71": "def test_subscribed_topics(s):"

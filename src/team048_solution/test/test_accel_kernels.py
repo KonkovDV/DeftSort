@@ -40,7 +40,7 @@ def frames():
     return out
 
 @unittest.skipUnless(_accel.API>=2,'team048_accel API>=2 not installed: '+_accel.REASON)
-class Phase2(unittest.TestCase):
+class Api2Kernels(unittest.TestCase):
     @classmethod
     def setUpClass(c):
         c.F=frames()
@@ -243,7 +243,7 @@ class Phase2(unittest.TestCase):
     def test_hand_mesh_cache(s):
         d=json.load(open(arm.HAND_MESH))
         for side in 'lr':s.assertEqual(arm.hand_mesh(side),d[side])
-    def test_phase2_failures_fall_back(s):
+    def test_api2_failures_fall_back(s):
         fn,dd,T,rgb=s.F[0];P=perception.deproject_py(dd,K,T);valid=dd>0
         with reference():
             tb=perception.table_region(P,valid);pl=perception.table_plane(P,tb);loc=TR.detect(P,rgb,valid,'tray_center','green',pl)
