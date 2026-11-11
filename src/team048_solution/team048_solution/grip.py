@@ -29,8 +29,8 @@ FINGER_EFF_HELD = FINGER_EFF_HELD_R1
 # Defaults (env overrides for sim sweeps, TEAM048_HAND_FORCE / _SPEED / _CLOSE_PAST):
 #   force 0.4  : middle of the organiser's 0.3-0.5 range. Heaviest pool-3 object 0.51 kg (004_sugar_box, objects.yaml).
 #                Not swept in the simulator; TRACE logs slips (lifted vs carry verdict).
-#   thumb rotation (DOF 6) keeps 1.0: it positions the thumb into opposition and does not squeeze the object; a weak
-#                rotation actuator would let the contact force push the thumb out of opposition (not verified in the simulator).
+#   thumb rotation (DOF 6) 0.5: in the #648 range like DOF 1-5, so every SetForce channel is within 0.3-0.5; it turns
+#                the thumb into opposition before the squeeze (wait_thumb).
 #   speed 0.5  : the organiser's example value (1.6 s full stroke) -> wait_fingers timeouts scale with it.
 #   close past : phase 1 closes towards the fully-closed target until the fingers stop on the object (contact
 #                position p_c measured on /inspire_hand/state); phase 2 re-targets p_c - CLOSE_PAST, i.e. "slightly past
@@ -46,7 +46,7 @@ def _env_ratio(name, default, lo, hi):
 # TEAM048_HAND_FORCE can produce a squeeze force outside the organiser's range (test_rules_edges.ForceRange).
 HAND_FORCE_MIN, HAND_FORCE_MAX = .3, .5
 HAND_FORCE_RATIO = _env_ratio('TEAM048_HAND_FORCE', .4, HAND_FORCE_MIN, HAND_FORCE_MAX)
-HAND_FORCE_THUMB_ROT = 1.0
+HAND_FORCE_THUMB_ROT = .5     # DOF 6, within HAND_FORCE_MIN..HAND_FORCE_MAX like the squeezing DOF
 HAND_SPEED_RATIO = _env_ratio('TEAM048_HAND_SPEED', .5, .01, 1.)   # sim clamps to [0.01, 1] (robot_commands.srv_speed)
 CLOSE_PAST = _env_ratio('TEAM048_CLOSE_PAST', .15, 0., .5)         # fraction of the finger stroke past measured contact
 FULL_STROKE_S = .8           # INTERFACES.md: speed 1.0 = full stroke in 0.8 s

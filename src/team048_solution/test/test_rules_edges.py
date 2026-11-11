@@ -26,7 +26,7 @@ class ForceRange(unittest.TestCase):
         for k in 'lr':
             r=R[('force',k)];v=[getattr(r,f'force{i}_ratio') for i in range(6)]
             s.assertTrue(all(.3<=x<=.5 for x in v[:5]),v)          # DOF 1-5 squeeze the object (#648)
-            s.assertEqual(v[5],G.HAND_FORCE_THUMB_ROT);s.assertEqual(v[5],1.0)   # DOF 6 positions the thumb: COMPLIANCE.md
+            s.assertEqual(v[5],G.HAND_FORCE_THUMB_ROT);s.assertTrue(all(.3<=x<=.5 for x in v),v)   # all six channels (#648)
         doc=os.path.join(HERE,'..','..','..','docs','COMPLIANCE.md')
         if os.path.exists(doc):s.assertIn('HAND_FORCE_THUMB_ROT',open(doc).read())   # the assumption is documented
 

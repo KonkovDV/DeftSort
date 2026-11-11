@@ -98,7 +98,7 @@ class Survey(unittest.TestCase):
 class Grasp648(unittest.TestCase):
     def test_defaults(self):
         self.assertTrue(.3<=G.HAND_FORCE_RATIO<=.5);self.assertLess(G.HAND_SPEED_RATIO,1.);self.assertGreater(G.CLOSE_PAST,0)
-        v=G.force_vector();self.assertEqual(len(v),6);self.assertEqual(v[5],G.HAND_FORCE_THUMB_ROT)
+        v=G.force_vector();self.assertEqual(len(v),6);self.assertEqual(v[5],G.HAND_FORCE_THUMB_ROT);self.assertTrue(all(.3<=x<=.5 for x in v),v)
         self.assertAlmostEqual(G.finger_stroke_time(.5),1.6)                  # INTERFACES.md: 0.5 -> 1.6 s
     def test_effort_threshold_rescaled(self):
         self.assertAlmostEqual(G.effort_held_threshold(1.),.667,3)             # v7 calibration (ratio 1.0)

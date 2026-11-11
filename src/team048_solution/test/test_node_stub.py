@@ -66,7 +66,7 @@ class NodeWiring(unittest.TestCase):
         s.s.hand_settings()
         from team048_solution import grip as G
         r=s.s.cli_force['l'].calls[-1];s.assertEqual(r.force0_ratio,G.HAND_FORCE_RATIO);s.assertTrue(.3<=r.force3_ratio<=.5)
-        s.assertEqual(r.force5_ratio,G.HAND_FORCE_THUMB_ROT)          # thumb rotation: positioning, not squeezing
+        s.assertEqual(r.force5_ratio,G.HAND_FORCE_THUMB_ROT)          # thumb rotation, within 0.3-0.5 like the rest
         r=s.s.cli_speed['r'].calls[-1];s.assertEqual(r.speed3_ratio,G.HAND_SPEED_RATIO);s.assertLess(r.speed3_ratio,1.)
     def test_subscribed_topics(s):
         subs=set(s.s.subs)

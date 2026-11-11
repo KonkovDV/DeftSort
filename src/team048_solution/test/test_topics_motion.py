@@ -204,7 +204,7 @@ class MotionMethods(unittest.TestCase):
         for (kind,side),r in sol.hand_requests().items():
             if kind!='force':continue
             v=[getattr(r,f'force{i}_ratio') for i in range(6)]
-            s.assertTrue(all(G.HAND_FORCE_MIN<=x<=G.HAND_FORCE_MAX for x in v[:5]),v);s.assertEqual(v[5],G.HAND_FORCE_THUMB_ROT)
+            s.assertTrue(all(G.HAND_FORCE_MIN<=x<=G.HAND_FORCE_MAX for x in v),v);s.assertEqual(v[5],G.HAND_FORCE_THUMB_ROT)
         s.assertEqual({k for (kind,k) in sol.hand_requests() if kind=='force'},{'l','r'})
 
 import ast,glob,re
