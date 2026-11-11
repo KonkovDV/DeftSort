@@ -82,7 +82,7 @@ HAND_LOG_DT=.1        # s sim: hand-state log period during the guarded approach
 # SetForce / SetSpeed delivery (#648: finger force 0.3-0.5 on BOTH hands). Requests sent once at
 # start, and only to services already discovered, are not enough: the simulator printed '[hack] <side> hand force limits'
 # for the right hand only in 5 of 6 recorded layouts (v7 x3, v8, v9a, v9b sim logs), so the left hand closed at the
-# default force 1.0 (v9b: 5 left-hand closes). Now every request is retried from a background thread until the
+# default force 1.0 (v9b: 5 left-hand closes). Therefore every request is retried from a background thread until the
 # service has answered; an arm whose hand never received its force request is not used for picking.
 # The values below are wall-clock design choices (DDS discovery runs on wall time), not measured thresholds.
 HAND_CFG_POLL_S=.2      # s wall between delivery passes
@@ -878,7 +878,7 @@ FAR_TRAY_Y=.3
 def far_tray(side,ty):
     """Tray on the OTHER arm's side (tray_left for the right arm, tray_right for the left arm).
     Offline evidence (2026-11-09): reach study, 30 layouts x 2 pools, 0 of 450 picked objects were placeable in the
-    far tray with body_yaw=0; study r3s3 (new planner, organiser layout generator) 103/103 far-tray placements used yaw."""
+    far tray with body_yaw=0; study r3s3 (current planner, organiser layout generator) 103/103 far-tray placements used yaw."""
     return (side=='l' and ty<-FAR_TRAY_Y) or (side=='r' and ty>FAR_TRAY_Y)
 def plan_place_yaw(A,q_from,tx,ty,plane,trays,fallback=None,tray_h=TRAY_H,obj_off=None):
     """(theta, (q_place,q_up,q_carry)) or None. theta=0 first; otherwise the torso is yawed by theta while the arm holds

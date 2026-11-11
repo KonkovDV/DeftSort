@@ -149,7 +149,7 @@ class NodeWiring(unittest.TestCase):
         s.assertAlmostEqual(r['tcp_err'],0.,3)
         del sol.get_logger
     def test_run_retries_empty_observation_then_done(s):
-        # v6 seed 101: first observation empty -> loop ended at once. Now: look() first, re-observe up to EMPTY_OBS_MAX.
+        # v6 seed 101: first observation empty -> loop ended at once. Therefore look() first, re-observe up to EMPTY_OBS_MAX.
         sol=N.Sol();sol.arms=s.s.arms
         sol.task={'task':'sort2','categories':{'box':'tray_left'},'objects':{'a':'box'},'trays':{}}
         calls=[];Clock.t=50.
