@@ -1,4 +1,5 @@
-"""Unit tests for the competitor-derived ideas (COMPETITORS_RU.md I1-I10). Pure Python, no ROS needed."""
+"""Unit tests of the core pieces: time budget, finger verdicts, tray detection, RGB-D pairing, IK and the sphere
+models. Pure Python, no ROS needed."""
 import os,sys,json,struct,tempfile,types,unittest
 import numpy as np
 HERE=os.path.dirname(os.path.abspath(__file__))
@@ -8,7 +9,7 @@ from team048_solution import arm,budget,grip,trays,sensing
 from team048_solution.geometry import quaternion_transform
 V5=os.path.join(HERE,'fixtures','v5_head_frame.npz')
 
-class Budget(unittest.TestCase):          # I2 (time budget)
+class Budget(unittest.TestCase):
     def test_remaining_and_gate(s):
         b=budget.TimeBudget(270,t0=10.)
         s.assertAlmostEqual(b.remaining(40.),240.)
@@ -31,7 +32,7 @@ class Budget(unittest.TestCase):          # I2 (time budget)
     def test_invalid(s):
         with s.assertRaises(ValueError):budget.TimeBudget(0,0)
 
-class Grip(unittest.TestCase):            # I1 plumbing + I4
+class Grip(unittest.TestCase):
     def test_force_not_used_finger_calibrated(s):
         s.assertIsNone(grip.GRASP_DF_MIN_N)          # F/T offsets 0.05-5.5 N empty (v7): not a decision signal
         s.assertEqual(grip.FINGER_DEV_HELD,.35);s.assertEqual(grip.FINGER_EFF_HELD,.67)
@@ -71,7 +72,7 @@ class Grip(unittest.TestCase):            # I1 plumbing + I4
         w=types.SimpleNamespace(force=types.SimpleNamespace(x=1.,y=2.,z=3.))
         s.assertTrue(np.allclose(grip.force_vec(w),[1,2,3]))
 
-class Trays(unittest.TestCase):           # I5 + I6
+class Trays(unittest.TestCase):
     def test_slot_cycle_and_walls(s):
         offs=[trays.slot_offset(k,.03) for k in range(6)]
         s.assertEqual(offs[:3],[0.,.08,-.08]);s.assertEqual(offs[3:],offs[:3])
@@ -80,7 +81,7 @@ class Trays(unittest.TestCase):           # I5 + I6
         s.assertEqual(trays.slot_offset(1,.2),0.)   # wider than the tray half: centre only
         for k in range(3):
             for h in (0,.02,.05,.08,.1,.14):
-                s.assertLessEqual(abs(trays.slot_offset(k,h))+h,trays.TRAY_SIZE[1]/2-trays.TRAY_WALL+1e-9)
+                s.assertLessEqual(abs(trays.slot_offset(k,h))+h,trays.DOC_SIZE[1]/2-trays.TRAY_WALL+1e-9)
     @unittest.skipUnless(os.path.exists(V5),'v5 fixture missing')
     def test_chroma_on_real_v5_frame(s):
         f=np.load(V5);rgb=f['rgb']
@@ -122,7 +123,7 @@ class Trays(unittest.TestCase):           # I5 + I6
     def test_unknown_colour(s):
         with s.assertRaises(ValueError):trays.chroma_mask(np.zeros((2,2,3),np.uint8),'purple')
 
-class Sensing(unittest.TestCase):         # I8
+class Sensing(unittest.TestCase):
     def msg(s,t):
         return types.SimpleNamespace(header=types.SimpleNamespace(stamp=types.SimpleNamespace(sec=int(t),nanosec=int(round((t-int(t))*1e9)))),t=t)
     def test_pair_same_stamp_and_freshness(s):
@@ -134,7 +135,7 @@ class Sensing(unittest.TestCase):         # I8
         b=sensing.PairBuffer();b.add_rgb(s.msg(1.));b.add_depth(s.msg(1.05))
         s.assertIsNone(b.pair(0.,tol=.02));s.assertIsNotNone(b.pair(0.,tol=.06))
 
-class Kinematics(unittest.TestCase):      # I7 + I9 + I10
+class Kinematics(unittest.TestCase):
     @classmethod
     def setUpClass(c):c.A=arm.Arm('l')
     def test_null_space_keeps_accuracy_and_prefers_home(s):
@@ -166,7 +167,7 @@ class Kinematics(unittest.TestCase):      # I7 + I9 + I10
         F=arm.fk_link('camera_head_link',{})
         s.assertLess(np.linalg.norm(F[:3,3]-T[:3,3]),.005);s.assertLess(np.abs(F[:3,:3]-T[:3,:3]).max(),.01)
 
-class MeshSpheres(unittest.TestCase):     # I3 plumbing
+class MeshSpheres(unittest.TestCase):
     def test_disabled_by_default(s):
         s.assertFalse(arm.USE_MESH_SPHERES)
     def test_loader_requires_validation(s):

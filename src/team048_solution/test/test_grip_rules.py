@@ -84,7 +84,7 @@ class GuardedApproach(unittest.TestCase):
             if a['held_at_lift']:self.assertFalse(self.trips(a),(a['run'],a['seed'],a['obj']))
     def test_most_failed_grasps_trip_before_closing(self):
         bad=[a for a in FX if not a['held_at_lift']]
-        self.assertEqual(len(bad),12);self.assertGreaterEqual(sum(self.trips(a) for a in bad),10)   # GUARD_DEV .16: v7 Hyaluronic (0.109) no longer
+        self.assertEqual(len(bad),12);self.assertGreaterEqual(sum(self.trips(a) for a in bad),10)   # GUARD_DEV .16: v7 Hyaluronic (0.109) does not
     def test_all_finger_guard_would_abort_v7_success(self):
         """Why only the closing fingers are guarded: v7 Ecoforms (rim) ring finger 1.14/1.17 at the grasp pose."""
         eco=[a for a in FX if a['held_at_lift'] and a['obj'].startswith('Ecoforms')]

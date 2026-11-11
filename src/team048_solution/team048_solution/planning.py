@@ -139,7 +139,7 @@ class CollisionModel:
         return True
 
     def valid_py(self, q, inflation=0):
-        """Reference implementation (original loop)."""
+        """NumPy reference of valid()."""
         inflation=np.broadcast_to(finite(inflation),(len(self.spheres),))
         if np.any(inflation<0): raise ValueError('invalid collision inflation')
         frames = self.chain.frames_py(q); world = []
@@ -236,7 +236,7 @@ class CollisionModel:
         return True
 
     def certify_py(self, a, b, max_step=.003):
-        """Reference implementation (original loop over valid_py)."""
+        """NumPy reference of certify() (samples valid_py)."""
         a = self.chain.validate_q(a); b = self.chain.validate_q(b)
         steps = max(1, int(np.ceil(np.max(abs(b-a))/max_step)))
         inflation = self.levers@abs(b-a)/steps

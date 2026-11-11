@@ -105,8 +105,8 @@ class RunSafety(unittest.TestCase):
 
 class StartupPin(unittest.TestCase):
     def test_flaky_cause(s):
-        # why test_node_stub:150 / test_grip_rules:137 failed under load: the suite's wall time since import was charged
-        # as start-up; past ~230 s no cycle fits in sort2's 270 s. The tests now pin WALL_LAUNCH to the node creation.
+        # Node-wiring tests must pin WALL_LAUNCH to the node creation: otherwise the suite's wall time since import is
+        # charged as start-up, and past ~230 s no cycle fits in sort2's 270 s (the tests then fail under CPU load).
         from team048_solution import budget as B
         b=B.TimeBudget(270.,B.start_time(50.,1000.,1000.-240.))
         s.assertFalse(b.can_start(50.))

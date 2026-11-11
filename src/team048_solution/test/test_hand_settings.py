@@ -33,7 +33,7 @@ class Fixture(unittest.TestCase):
 
 class HandSettings(unittest.TestCase):
     def test_one_shot_send_misses_a_late_service(self):
-        """The old behaviour, reproduced: one readiness poll at start -> the late left hand gets nothing."""
+        """Why requests are retried: a single readiness poll at start leaves a late left-hand service without force."""
         s=fresh(late_l=3)
         for k in 'lr':
             if s.cli_force[k].service_is_ready():s.cli_force[k].call_async(object())

@@ -165,7 +165,7 @@ class Sol(Node):
     def log(s,*a):
         """Log the arguments joined by spaces at INFO level."""
         s.get_logger().info(' '.join(str(x) for x in a))
-    # ---------------- actuation ----------------
+    # Actuation
     def cmd(s,group,ids,q,spd):
         """Publish one position command: motor ids, targets (rad), speeds clipped to [1e-3, 0.8] rad/s."""
         m=CmdSetMotorPosition()
@@ -329,7 +329,7 @@ class Sol(Node):
         t0=(grasp or {}).get('closed') or s.closed_target('side')
         return GRIP.held_rule(list(h.position),list(h.effort),s.hand_target.get(side),t0)
     def hand_shadow(s,side,grasp=None):
-        """Old criteria, logged only: past_verdict (phase-2) and the v7 finger_verdict."""
+        """Superseded verdicts, logged only for comparison: past_verdict (after the second closing step) and finger_verdict."""
         h=s.hstate.get(side)
         if h is None:return dict(past=None,v7=None)
         t0=(grasp or {}).get('closed') or s.hand_target.get(side)
@@ -376,7 +376,7 @@ class Sol(Node):
                         depth=np.frombuffer(bytes(d.data),np.uint16).reshape(d.height,d.width),
                         head_pitch=s.js.get('head_pitch_joint',np.nan),q=qm,rec=json.dumps(rec))
             except Exception as e:s.log('trace save failed',e)
-    # ---------------- perception ----------------
+    # Perception
     def tf(s,target,source,stamp=None):
         """Transform at the image stamp (head may move); latest available if that time is not buffered."""
         to=rclpy.duration.Duration(seconds=1.)
@@ -517,7 +517,7 @@ class Sol(Node):
             conf=(min(other) if other else 9)-C[i,j]
             out.append((dets[i],N[j],cat,float(conf),clouds[i],float(C[i,j])))
         return out
-    # ---------------- task ----------------
+    # Task
     def run(s):
         """Whole task: hand settings, wait for /sim/task and /clock, survey, pick-and-place loop, safe end, done."""
         s.hand_settings()     # background delivery starts before the task arrives (service discovery takes wall time)

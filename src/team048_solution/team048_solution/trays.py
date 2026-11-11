@@ -26,9 +26,6 @@ SLOT_STEP = .08
 SEARCH = {'tray_left': ((.05, 1.10), (.20, 1.30)),
           'tray_right': ((.05, 1.10), (-1.30, -.20)),
           'tray_center': ((.20, 1.10), (-.45, .45))}
-# Backward-compatible name: the code no longer has nominal positions.
-TRAY_SIZE = DOC_SIZE
-TRAY_H = DOC_H
 
 
 def chroma_mask(rgb, colour, chroma_min=CHROMA_MIN):

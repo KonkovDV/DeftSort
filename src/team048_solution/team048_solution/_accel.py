@@ -19,9 +19,9 @@ except Exception as e:      # ImportError, or an ABI mismatch surfacing as anoth
     _ext = None; AVAILABLE = False; REASON = '%s: %s' % (type(e).__name__, e)
 
 _disabled = False
-# API level of the installed extension: 1 = phase 1 (FK/IK/collision/inlier counts/flood fill), 2 = phase 2
+# API level of the installed extension: 1 = FK/IK/collision/inlier counts/flood fill, 2 = additionally
 # (Arm.solve, cached environments, deprojection, RANSAC stream, tray selection, segment statistics, grasp kernels).
-# An older wheel keeps working: phase-2 callers then use their NumPy reference.
+# An API-1 wheel keeps working: the API-2 call sites then use their NumPy reference.
 API = int(getattr(_ext, 'API', 1)) if AVAILABLE else 0
 # rayon threads are opt-in: the simulator shares the evaluation machine's CPU, and on the 2-core-equivalent box
 # parallel sweeps measured slower (certify 3.3 vs 2.7 ms). TEAM048_ACCEL_PARALLEL=1 enables them.
@@ -96,7 +96,7 @@ def flood_fill(mask, points, max_jump):
     return _ext.flood_fill(np.ascontiguousarray(mask, bool), np.ascontiguousarray(points, float), float(max_jump))
 
 
-# ---------------- phase 2 ----------------
+# API 2 kernels
 _PCG = {}
 
 

@@ -1,5 +1,5 @@
-"""Grasp/time audit: place_time calibrated on the v8 Perricone TRACE (the old
-model under-estimated the closed->released chain 6.6 s vs 12.0 s measured and left the lift out), light-first order."""
+"""place_time against the v8 Perricone TRACE (a model without the lift and with 0.3 s settling per move gives 6.6 s
+for the closed->released chain, 12.0 s were measured), light-first order, masses."""
 import os,sys,json,types,unittest,time
 from unittest import mock
 import numpy as np
@@ -16,7 +16,7 @@ class PlaceTime(unittest.TestCase):
         self.assertGreaterEqual(N.move_time(P8['closed']['q'],P8['lifted']['q'])+.3,dt('closed','lifted'))
         for a,b in (('lifted','carry'),('carry','over_tray')):
             self.assertGreaterEqual(N.move_time(P8[a]['q'],P8[b]['q']),dt(a,b),(a,b))
-            self.assertLess(N.move_time(P8[a]['q'],P8[b]['q'],settle=.3),dt(a,b))      # the old 0.3 s overhead did not
+            self.assertLess(N.move_time(P8[a]['q'],P8[b]['q'],settle=.3),dt(a,b))      # 0.3 s settling per move does not
         self.assertGreaterEqual(G.finger_stroke_time()+.5,dt('over_tray','released'))
     def test_chain_covers_measured_and_includes_lift(self):
         A=ARM.Arm('r');q=lambda k:np.array(P8[k]['q'])
@@ -25,7 +25,7 @@ class PlaceTime(unittest.TestCase):
         home=N.move_time(q('over_tray'),A.home)
         self.assertGreaterEqual(new-home,dt('closed','released'))
         old=N.place_time(A,q('lifted'),place,0.,settle=.3)-N.move_time(q('over_tray'),A.home,settle=.3)
-        self.assertLess(old,dt('closed','released'))       # old model: 6.6 s < 12.0 s measured
+        self.assertLess(old,dt('closed','released'))       # 0.3 s model: 6.6 s < 12.0 s measured
 
 class LightFirst(unittest.TestCase):
     def test_priors_carry_masses(self):

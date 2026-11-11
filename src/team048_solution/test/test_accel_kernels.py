@@ -1,4 +1,4 @@
-"""Phase-2 Rust kernels vs their NumPy references (perception, grasp candidates, Arm.solve, scenes, certify skip).
+"""API-2 Rust kernels vs their NumPy references (perception, grasp candidates, Arm.solve, scenes, certify skip).
 Contract: bit-identical results, except values that pass through a NumPy BLAS dot product (the reference itself is
 CPU-dependent there: OpenBLAS uses FMA on AVX2/AVX-512): <= 1e-12 absolute, with identical decisions.
 Skipped when the extension (API >= 2) is not installed."""
@@ -27,7 +27,7 @@ def same(a,b):
 
 @contextlib.contextmanager
 def reference():
-    """Force every phase-2 call site onto its NumPy reference (as with an API-1 wheel or a disabled extension)."""
+    """Force every API-2 call site onto its NumPy reference (as with an API-1 wheel or a disabled extension)."""
     old=_accel.enabled2;_accel.enabled2=lambda:False
     try:yield
     finally:_accel.enabled2=old
@@ -49,7 +49,7 @@ class Api2Kernels(unittest.TestCase):
         for A in c.arms.values():A.set_scene(c.plane,list(SF.TRAYS.values()))
     def setUp(s):
         if not s.F:s.skipTest('v7 frames not on this machine')
-    # ---------------- perception ----------------
+    # Perception
     def test_rng_stream_and_candidates_match_numpy(s):
         bad=0;cases=0
         for seed in range(12):
@@ -117,7 +117,7 @@ class Api2Kernels(unittest.TestCase):
                 s.assertTrue(np.array_equal(x.pixels,y.pixels) and np.array_equal(x.centroid,y.centroid) and np.array_equal(x.lower,y.lower) and np.array_equal(x.upper,y.upper))
                 s.assertTrue(np.array_equal(np.delete(x.features,2),np.delete(y.features,2)) and abs(x.features[2]-y.features[2])<=1e-12);nd+=1
         print(f'\nsegment: {nd} detections, pixels/centroid/box/colour exact, height q98 <= 1e-12')
-    # ---------------- grasp ----------------
+    # Grasp
     def test_grasp_candidates(s):
         rng=np.random.default_rng(3);pl=s.plane;nc=0
         def cloud(cat,x,y,yaw):
@@ -139,7 +139,7 @@ class Api2Kernels(unittest.TestCase):
                 s.assertEqual(sorted(g),sorted(h))
                 for key in g:s.assertTrue(same(g[key],h[key]),(cat,key));nc+=1
         print(f'\ngrasp.candidates: 60 objects, {nc} candidate fields identical')
-    # ---------------- planning ----------------
+    # Planning
     def test_solve_matches_seed_loop(s):
         rng=np.random.default_rng(21);same=found=0
         for A in s.arms.values():
@@ -196,7 +196,7 @@ class Api2Kernels(unittest.TestCase):
             s.assertEqual(repr(got),repr(ref))
             s.assertTrue(all(np.array_equal(g.center,r.center) for g,r in zip(got,ref)))
     def test_tray_env_default_height_not_carried_over(s):
-        # regression: a tray without a measured height used to inherit the previous tray's measured height
+        # a tray without a measured height must not inherit the previous tray's measured height
         meas=dict(center=(.34,.69),size=(.22,.32),axis=(0.,1.),height=.05)
         a=arm.tray_env_build([meas,(.53,0.)],s.plane);b=arm.tray_env_build([(.53,0.)],s.plane)
         s.assertEqual(repr(a[len(a)-len(b):]),repr(b))

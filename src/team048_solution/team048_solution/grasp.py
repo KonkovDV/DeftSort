@@ -16,7 +16,7 @@ import numpy as np
 from scipy.spatial import ConvexHull
 from . import _accel
 # Rim pinch: grip centre BELOW the rim top so the finger pads overlap the wall instead of touching its edge.
-# Run v6 (old code z=rim top): 0/3 rim picks ended in a tray. Value = geometric choice (pad overlap), UNVERIFIED:
+# Run v6 (grip at the rim top): 0/3 rim picks ended in a tray. Value = geometric choice (pad overlap), UNVERIFIED:
 # the next run logs wrist force and finger positions at every grasp to confirm or recalibrate it.
 RIM_DEPTH=.015
 # Extra rim samples around the fitted circle (deg). Near-robot point (0) is always first / highest score.

@@ -22,7 +22,7 @@ FINGER_BLOCKED_MIN = FINGER_DEV_HELD   # backward-compatible names
 EFFORT_MIN = FINGER_EFF_HELD_R1
 FINGER_EFF_HELD = FINGER_EFF_HELD_R1
 
-# ---- Hand force / speed / closing, organiser answer #648 (2026-11-06) --------------------------------------------
+# Hand force / speed / closing, organiser answer #648 (2026-11-06)
 # "Full-force squeezing makes the physics push the object out; lower /inspire_hand/set_force (e.g. 0.3-0.5 instead of
 #  1.0), target slightly 'past' the object, lower the finger speed, rotate the thumb first, then close the rest."
 # INTERFACES.md: set_force ratio 1.0 = 1000 g (default); set_speed 1.0 = full stroke in 0.8 s, 0.5 = 1.6 s.
@@ -114,7 +114,7 @@ def contact_target(contact_pos, closed_target, past=None, tol=JAM_TOL):
     return [float(min(TARGET_MAX, x)) for x in t]
 
 
-# ---- Held rule (evidence: runs v7+v8, fixture test/fixtures/v7v8_grasp_traces.json)
+# Held rule (evidence: runs v7+v8, fixture test/fixtures/v7v8_grasp_traces.json)
 # Held iff at least one commanded-closing finger (DOF 1-5) deviates >= HELD_DEV from its CURRENT command and its
 # effort is >= HELD_EFF. 15/15 correct on the v7+v8 closed/lifted pairs (4 held, 11 empty, force 1.0), where
 # past_verdict misses 2 of 4 held (v8 Perricone: the fingers travelled 0.46-0.76 past contact, only the jammed thumb
@@ -139,7 +139,7 @@ def held_rule(pos, eff, command, closed_target, dev_min=HELD_DEV, eff_min=HELD_E
     return bool(any(abs(p[i]-c[i]) >= dev_min and abs(e[i]) >= eff_min for i in k))
 
 
-# ---- Guarded approach: v8 attempts 1-4 had fingers bent by contact BEFORE the close command
+# Guarded approach: v8 attempts 1-4 had fingers bent by contact BEFORE the close command
 # (Utana middle/index -0.06/-0.10, Threshold index 0.16 with 16 N, Crunch 1.06-1.46 with 14.6 N, mustard little 1.60).
 # Only the fingers that will CLOSE for this grasp kind are guarded (closed_target < .5): in both held v7 Ecoforms rim
 # grasps the (non-closing) ring finger read 1.14/1.17 at the grasp pose, so guarding every finger would have aborted
@@ -168,7 +168,7 @@ def approach_deviation(pos, command, closed_target=None, dofs=5):
     return float(max(d[i] for i in k)), [i+1 for i in k if d[i] > GUARD_DEV]
 
 
-# ---- Finger stall by POSITION: a velocity criterion fired in only 3 of 16 v7+v8 closes.
+# Finger stall by POSITION: a velocity criterion fired in only 3 of 16 v7+v8 closes.
 STALL_TOL = .005             # max |delta position| of every finger over the window
 STALL_WINDOW = .15           # s sim
 

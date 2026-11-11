@@ -71,7 +71,7 @@ def fk_link(link,q=None):
         if j['type']=='revolute':
             lo,hi,_=j['lim'];v=float(np.clip(q.get(n,0.),lo,hi));M=np.eye(4);M[:3,:3]=rotation(j['axis'],v);T=T@M
     return T
-# ---------------- hand geometry (Inspire-type, from the URDF) ----------------
+# Hand geometry (Inspire-type, from the URDF)
 def fingertip(side,finger,q):
     """Tip estimate: distal link frame + 2x its inertial CoM offset (meshes absent)."""
     pre=SIDE[side]['pre'];distal=f'{pre}_{finger}_4' if finger=='thumb' else f'{pre}_{finger}_2'
@@ -91,7 +91,7 @@ def hand_opening(side='l',n=9):
     d,t,f=opp
     return dict(max_open=float(best[0]),thumb1_at_max=float(best[1]),opposed_open=float(d),thumb_tip=t,finger_tip=f,
                 close_axis_hand=(f-t)/np.linalg.norm(f-t),grip_center_hand=(t+f)/2)
-# ---------------- arm chain + collision envelope ----------------
+# Arm chain + collision envelope
 def arm_chain(side):
     """Kinematic chain pelvis -> wrist tip for side 'l' or 'r', body yaw locked at 0 rad."""
     tip=SIDE[side]['tip'];c=Chain.from_urdf(XML,'pelvis',tip,np.eye(4))
@@ -124,7 +124,7 @@ def hand_mesh(side):
             _HAND_MESH_CACHE.clear();_HAND_MESH_CACHE[key]=d
         return d[side]
     except Exception:return None
-# ---------------- open-hand mesh vs measured object box (side/top grasps) ----------------
+# Open-hand mesh vs measured object box (side/top grasps)
 # Runs v7+v8 TRACE: the side grasps of the long boxes pushed the object with the hand BEFORE
 # closing (wrist |F| at the grasp pose 17.8 N Crayola v7, 15.4 N Crunch v8; fingers bent back 1.26-1.46 in Crunch v8,
 # Perricone v7) while the sphere envelope saw no contact (object = obstacle-free target). Cause, from the hand meshes
@@ -224,7 +224,7 @@ def arm_spheres(side,chain,mesh=True):
 # --r-max .03 --pad .005 --max-spheres 64; UBTECH tiangong2pro_urdf, Apache-2.0). Robot geometry, not scene (#645).
 # Mesh frames: the UBTECH URDF has the SAME 62 joints with identical origins/axes as the organiser URDF (only 4 sensor
 # links renamed), checked offline against the mesh contacts. Run v9a (HACK_SELF_COLLISION=1): at the Ecoforms
-# pre-grasp the forearm/hand were 1-8 mm from the torso mesh and the wrist F/T read 581 N, while the old column model
+# pre-grasp the forearm/hand were 1-8 mm from the torso mesh and the wrist F/T read 581 N, while a column model
 # (two spheres r<=0.08 at x=-0.03/0.04) accepted the posture.
 TORSO_SPHERES=os.path.join(os.path.dirname(os.path.abspath(__file__)),'data','torso_spheres.json')
 SHOULDER_LOCAL=.06   # m: arm spheres whose centre stays within this of the shoulder joint are mounted ON the torso

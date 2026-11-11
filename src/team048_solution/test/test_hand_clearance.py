@@ -30,7 +30,7 @@ class HandPoints(unittest.TestCase):
             for k in ('palm','thumb_4','index_2','middle_2','little_1'):self.assertIn(k,set(parts))
     def test_open_gap_is_asymmetric_about_grip_point(self):
         # grasp frame (x approach, y closing axis, z up): distal finger pads at y >= +0.028, thumb tip at y <= -0.046,
-        # the proximal finger phalanges reach y = +0.006 -> the old grip point is NOT centred in the real pad gap
+        # the proximal finger phalanges reach y = +0.006 -> the unshifted grip point is NOT centred in the real pad gap
         A=ARM.Arm('l');T=A.grasp_pose(np.zeros(3),np.array([0,1.,0]),np.array([1.,0,0]),'grip')
         P,parts=ARM.hand_open_points('l');W=(T[:3,:3]@P.T).T+T[:3,3]
         self.assertGreater(W[parts=='index_2',1].min(),.02);self.assertLess(W[parts=='thumb_4',1].max(),-.04)
@@ -96,6 +96,6 @@ class PlanAndCandidates(unittest.TestCase):
         a=np.array([1.,0,0])*np.cos(p['tilt'])+np.array([0,0,-np.sin(p['tilt'])])
         self.assertFalse(ARM.grasp_clear_shift('l',A.tcp(p['q_grasp']),a,b,margins=(-.002,),su=(0.,),sr=(0.,)) is None)
         p0=A.plan_pick(c3,np.array([0,1.,0]),np.array([1.,0,0]),b['w'])
-        self.assertIsNone(p0['clear'])        # old call (no box) unchanged
+        self.assertIsNone(p0['clear'])        # call without a box: no shift
 
 if __name__=='__main__':unittest.main()
