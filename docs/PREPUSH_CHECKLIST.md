@@ -7,7 +7,7 @@
 1. [ ] `python3 -m pytest -q` из корня проходит с модулем `team048_accel` и с `TEAM048_ACCEL=0`.
 2. [ ] `cd rust/team048_accel && cargo test --release` и `cargo clippy --all-targets --features python` без ошибок и предупреждений.
 3. [ ] Чистая сборка по командам README: `pip install -r requirements.txt`, `bash setup.sh`, `colcon build`. Без сети `setup.sh` ставит wheel из `vendor/` (SHA256) и не падает, `run.sh` интернета не требует.
-4. [ ] Отладочные топики не используются (`test_compliance.py`: `test_subscriptions`; `test_node_stub.py`: `test_subscribed_topics`; `test_v14.py`: `Rules`).
+4. [ ] Отладочные топики не используются (`test_compliance.py`: `test_subscriptions`; `test_node_stub.py`: `test_subscribed_topics`; `test_rules_edges.py`: `Rules`).
 5. [ ] В коде нет констант раскладки сцены (`test_compliance.py`), `test/scene_fixture.py` пакетом не импортируется.
 6. [ ] В дереве нет секретов, токенов, личных путей и ссылок на файлы вне дерева: `git grep -nIiE 'ghp_|github_pat_|token|secret|password'`, все относительные ссылки markdown ведут на существующие файлы и заголовки.
 7. [ ] README и `docs/` соответствуют коду. Лицензии: URDF Apache-2.0 (UBTECH), код команды Apache-2.0, чужой код не копировался.

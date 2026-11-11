@@ -6,7 +6,7 @@ from unittest import mock
 import numpy as np
 HERE=os.path.dirname(os.path.abspath(__file__));sys.path.insert(0,HERE)
 import test_node_stub as TS                      # installs the ROS stubs
-import test_v13 as V13
+import test_run_robustness as RR
 from team048_solution import node as N, grip as G
 PKG=os.path.join(HERE,'..','team048_solution')
 
@@ -91,7 +91,7 @@ class SetupFailures(unittest.TestCase):
         finally:TS.Clock.t=100.
         s.assertTrue(sol.pubs['/sim/task/done'].sent);s.assertTrue(any('reason: exception ValueError: bad URDF' in l for l in logs))
     def test_normal_run_unchanged(s):
-        sol,logs,calls=V13.run_stub(pick_place=lambda *a:(setattr(TS.Clock,'t',TS.Clock.t+1.) or True))
+        sol,logs,calls=RR.run_stub(pick_place=lambda *a:(setattr(TS.Clock,'t',TS.Clock.t+1.) or True))
         s.assertTrue(sol.pubs['/sim/task/done'].sent);s.assertTrue(any(l.startswith('done at') and "'a', 'b'" in l for l in logs))
 
 def img(enc,h,w,data,t):

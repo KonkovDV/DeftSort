@@ -138,7 +138,7 @@ class Sol(Node):
         """Hand state callback for side k: latest state and short position/velocity histories."""
         # The history is replaced by a NEW tuple (one atomic assignment), never appended + trimmed in place: a reader
         # on the task thread (wait_fingers -> fingers_stalled) iterating a list while this callback trims it
-        # could skip samples (test_v15.HandHistory).
+        # could skip samples (test_topics_motion.HandHistory).
         s.hstate[k]=m;s.hvel[k]=(tuple(s.hvel[k])+(tuple(m.velocity),))[-10:]
         try:t=s.now()
         except Exception:t=None

@@ -43,7 +43,7 @@ def _env_ratio(name, default, lo, hi):
         v = default
     return min(hi, max(lo, v))
 # The env override is clamped to the #648 range 0.3-0.5 (not the simulator's wider [0.02, 1]): no setting of
-# TEAM048_HAND_FORCE can produce a squeeze force outside the organiser's range (test_v14.ForceRange).
+# TEAM048_HAND_FORCE can produce a squeeze force outside the organiser's range (test_rules_edges.ForceRange).
 HAND_FORCE_MIN, HAND_FORCE_MAX = .3, .5
 HAND_FORCE_RATIO = _env_ratio('TEAM048_HAND_FORCE', .4, HAND_FORCE_MIN, HAND_FORCE_MAX)
 HAND_FORCE_THUMB_ROT = 1.0

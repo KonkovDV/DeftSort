@@ -130,11 +130,11 @@ Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (Russian).
 
 | Rule | How | Checked by |
 |---|---|---|
-| Robot sensors only, no simulator poses (#595.1) | Subscriptions only to sensors and `/sim/task`; debug topics never opened | `test_compliance.py`, `test_node_stub.py`, `test_v14.py` (AST of all subscriptions, publishers and imports) |
+| Robot sensors only, no simulator poses (#595.1) | Subscriptions only to sensors and `/sim/task`; debug topics never opened | `test_compliance.py`, `test_node_stub.py`, `test_rules_edges.py` (AST of all subscriptions, publishers and imports) |
 | No scene coordinates (#645) | Table, near edge and trays are measured; the code has only search windows, documented sizes and robot geometry | `test_compliance.py` (layout literals by AST), `test_arm.py` (no plan before measurement) |
-| Self-collision (#623/#625/#628) | Whole-path certificate, mesh torso, other arm at its measured posture, certified path home | `test_arm.py`, `test_v9fix.py` |
-| Hand force 0.3–0.5 (#648) | 0.4 on the squeezing fingers of both hands, request repeated until answered; an arm without confirmed force is not used; two-phase close | `test_compliance.py`, `test_v11.py`, `test_v14.py` |
-| −10 for an object outside its tray or in hand (#595.2) | Time checks before starting and before lifting, with a worst case; on an error the hands open and the arms go home | `test_compliance.py`, `test_audit.py`, `test_v13.py`, `test_v15.py` |
+| Self-collision (#623/#625/#628) | Whole-path certificate, mesh torso, other arm at its measured posture, certified path home | `test_arm.py`, `test_start_posture.py` |
+| Hand force 0.3–0.5 (#648) | 0.4 on the squeezing fingers of both hands, request repeated until answered; an arm without confirmed force is not used; two-phase close | `test_compliance.py`, `test_hand_settings.py`, `test_rules_edges.py` |
+| −10 for an object outside its tray or in hand (#595.2) | Time checks before starting and before lifting, with a worst case; on an error the hands open and the arms go home | `test_compliance.py`, `test_audit.py`, `test_run_robustness.py`, `test_topics_motion.py` |
 | Sim-time limit including launch (#595.3, #638) | `use_sim_time`; the age of the `run.sh` process is subtracted pessimistically | `test_compliance.py`, `test_ideas.py` |
 | Each layout in a new process (#636/#638) | State only in process memory | `test_node_stub.py` |
 | `camera_info` and `/tf` (#554/#613) | K only from `camera_info`, camera pose from `/tf` at the frame stamp | `test_node_stub.py`, `test_math.py` |
@@ -197,26 +197,24 @@ The crate `rust/team048_accel` 0.2.0 (PyO3 abi3-py310, nalgebra, rayon) duplicat
 | File | Tests | What it checks |
 |---|---:|---|
 | `test_ideas.py` | 40 | Budget and launch accounting, finger verdict, trays on a real frame, RGB-D pairs, IK null space, head FK vs `/tf`, grasp candidates |
-| `test_v8fixes.py` | 19 | Hold rule, guarded approach, jammed fingers (TRACE of runs v7 and v8) |
-| `test_v15.py` | 19 | Bounded wait for `/joint_states`, frame freshness, missing joint, atomic hand history, stable tray-component order, motion methods on a fake robot, no dead code |
+| `test_grip_rules.py` | 19 | Hold rule, guarded approach, jammed fingers (TRACE of runs v7 and v8) |
+| `test_topics_motion.py` | 19 | Bounded wait for `/joint_states`, frame freshness, missing joint, atomic hand history, stable tray-component order, motion methods on a fake robot, no dead code |
 | `test_compliance.py` | 18 | Topics, no scene constants (AST), #648, −10 policy, time limit |
 | `test_accel_phase2.py` | 15 | Rust ↔ NumPy equivalence of the perception and grasp kernels |
 | `test_math.py` | 14 | Formula properties: TF vs simulator `/tf` and URDF, pinhole vs `camera_info`, RANSAC, tray rectangle, caliper, Kåsa, rim torque, SO(3), IK, `certify` lever bound |
-| `test_v14.py` | 14 | Force range under any override, AST check of interfaces and imports, `done` on a setup error, `bgr8`, tray-axis sign, empty depth frame |
-| `test_v9fix.py` | 13 | Start from the v9a posture, `certify_escape`, table model, torso |
+| `test_rules_edges.py` | 14 | Force range under any override, AST check of interfaces and imports, `done` on a setup error, `bgr8`, tray-axis sign, empty depth frame |
+| `test_start_posture.py` | 13 | Start from the v9a posture, `certify_escape`, table model, torso |
 | `test_node_stub.py` | 12 | Node wiring and observation on a real frame |
-| `test_v11.py` | 10 | Force and speed delivery to both hands, closed top of Threshold |
-| `test_v10_clear.py` | 10 | Open-hand cloud, grasp-centre shift |
+| `test_hand_settings.py` | 10 | Force and speed delivery to both hands, closed top of Threshold |
+| `test_hand_clearance.py` | 10 | Open-hand cloud, grasp-centre shift |
 | `test_yaw_release.py` | 10 | Empty hand, release, placement with torso yaw |
-| `test_v13.py` | 9 | RGB-D pairs under parallel callbacks, exceptions in the task loop, observation retry |
-| `test_v12.py` | 8 | Rim torque gate, dish placed by its centre |
+| `test_run_robustness.py` | 9 | RGB-D pairs under parallel callbacks, exceptions in the task loop, observation retry |
+| `test_rim_torque.py` | 8 | Rim torque gate, dish placed by its centre |
 | `test_arm.py` | 8 | URDF limits, FK/IK, self-collision, no plan before scene measurement |
 | `test_accel_equivalence.py` | 8 | FK, IK, collision, RANSAC equivalence |
-| `test_v10_budget.py` | 5 | Upper bound of the holding time vs TRACE and timeouts |
+| `test_hold_time.py` | 5 | Upper bound of the holding time vs TRACE and timeouts |
 | `test_audit.py` | 5 | `place_time` vs TRACE, light-first order, masses |
 | **Total** | **237** | |
-
-The number in a file name (`test_v8fixes.py` … `test_v15.py`) is the development stage that added the tests.
 
 The 16 equivalence tests (in `test_accel_phase2.py` and `test_accel_equivalence.py`) run on recorded frames of run v7. Those frames are not part of the submission tree. Point `TEAM048_V7_TRACE` at their directory to run these tests; without it they are skipped. In the submission tree that gives:
 

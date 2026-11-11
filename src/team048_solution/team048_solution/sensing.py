@@ -14,7 +14,7 @@ class PairBuffer:
     """Thread-safe ring buffers of colour and depth messages for stamp-matched RGB-D pairs."""
     # The image callbacks run on executor threads (MultiThreadedExecutor) while pair() runs on the task thread.
     # Iterating a deque that another thread appends to raises 'RuntimeError: deque mutated during iteration'
-    # (test_v13 stress test: 258 errors in 274739 unlocked calls); in observe() that error ended the whole run.
+    # (test_run_robustness stress test: 258 errors in 274739 unlocked calls); in observe() that error ended the whole run.
     # pair() therefore iterates snapshots taken under a lock.
     def __init__(self, n=6):
         self.rgb = deque(maxlen=n); self.depth = deque(maxlen=n); self.lock = threading.Lock()
