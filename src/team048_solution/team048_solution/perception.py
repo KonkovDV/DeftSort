@@ -1,5 +1,6 @@
 """Sensor-only plane removal and organized components (object identity: node.identify, size priors)."""
 from dataclasses import dataclass
+import math
 import numpy as np
 from .geometry import finite
 from . import _accel
@@ -22,6 +23,44 @@ class Detection:
     region_diagnostics: dict | None = None
 
 
+# Adaptive number of RANSAC samples (Hartley & Zisserman, Multiple View Geometry, 2nd ed., 2004, eq. 4.18 and
+# Algorithm 4.5; Fischler & Bolles, CACM 1981, doi:10.1145/358669.358692): with inlier fraction w and minimal sample s = 3,
+# N samples contain no all-inlier sample with probability (1 - w^3)^N. After the first `iterations` samples the inlier
+# fraction of the best candidate (a lower bound of the true one) gives this miss probability; above RANSAC_MISS_MAX the
+# same RNG stream is continued up to the N of eq. 4.18 (at most RANSAC_ITER_MAX). The first `iterations` candidates are
+# the same, so the result changes only when a later candidate has strictly more inliers. 62 recorded head frames
+# (v7, v8, v9b, v11b): w 0.406-0.631 -> miss <= 2.4e-4 at 120 samples, no extension; the extension starts below w = 0.38.
+RANSAC_MISS_MAX = 1e-3
+RANSAC_ITER_MAX = 480
+
+
+def ransac_miss_probability(w, iterations, sample=3):
+    """Probability that `iterations` minimal samples of `sample` points, drawn with inlier fraction w, are all
+    contaminated: (1 - w**sample)**iterations (w clipped to [0, 1])."""
+    w = min(1., max(0., float(w)))
+    return float((1.-w**sample)**int(iterations))
+
+
+def ransac_iterations(w, miss=RANSAC_MISS_MAX, sample=3, cap=RANSAC_ITER_MAX):
+    """Samples needed for miss probability <= miss at inlier fraction w (HZ eq. 4.18), at most cap."""
+    w = min(1., max(0., float(w)))
+    q = w**sample
+    if q >= 1.:
+        return 1
+    if q <= 0.:
+        return int(cap)
+    return int(min(cap, math.ceil(math.log(miss)/math.log1p(-q))))
+
+
+def _ransac_more(count, n, iterations):
+    """Extended sample count when the first pass is not confident enough, else None (see RANSAC_MISS_MAX)."""
+    w = count/n if n else 0.
+    if iterations >= RANSAC_ITER_MAX or ransac_miss_probability(w, iterations) <= RANSAC_MISS_MAX:
+        return None
+    m = ransac_iterations(w)
+    return m if m > iterations else None
+
+
 def table_plane(points, valid, iterations=120, tolerance=.006, min_inliers=100, seed=0):
     """RANSAC horizontal plane. Same RNG stream and candidate arithmetic as table_plane_py; only the inlier counting
     of all candidates is batched (Rust kernel, else one chunked BLAS product); the winner is the first candidate with
@@ -29,6 +68,9 @@ def table_plane(points, valid, iterations=120, tolerance=.006, min_inliers=100, 
     if _accel.enabled2() and np.ndim(points) == 3 and np.shape(valid) == np.shape(points)[:2] and type(seed) is int and seed >= 0:
         try:
             r = _accel.ransac_plane(points, valid, seed, iterations, tolerance)
+            more = _ransac_more(int(r[3]) if r[2] >= 0 else 0, len(r[0]), iterations)
+            if more is not None:   # same PCG64 stream continued: the first `iterations` candidates are unchanged
+                r = _accel.ransac_plane(points, valid, seed, more, tolerance)
         except BaseException as e:
             _accel.guard(e); _accel.failed('ransac_plane', e); r = None
         if r is not None:
@@ -37,6 +79,17 @@ def table_plane(points, valid, iterations=120, tolerance=.006, min_inliers=100, 
     p = p[np.isfinite(p).all(axis=1)]
     if len(p) < min_inliers:
         raise ValueError('insufficient plane support')
+    best, score = _ransac_np(p, iterations, tolerance, seed)
+    more = _ransac_more(score, len(p), iterations)
+    if more is not None:   # same RNG stream continued: the first `iterations` candidates are unchanged
+        best, score = _ransac_np(p, more, tolerance, seed)
+    return _refine_plane(p, best, score, min_inliers)
+
+
+def _ransac_np(p, iterations, tolerance, seed):
+    """Candidates of the seeded RNG stream and the first one with the maximal inlier count (NumPy path of
+    table_plane): (normal, offset, inliers) or None, inlier count. Rows are counted in chunks so that at most
+    65536 x 120 distances are held at once (integer counts: the chunking does not change them)."""
     rng = np.random.default_rng(seed)  # algorithm RNG, never layout seed
     cands = []
     for _ in range(iterations):
@@ -59,13 +112,14 @@ def table_plane(points, valid, iterations=120, tolerance=.006, min_inliers=100, 
             except BaseException as e: _accel.guard(e); _accel.failed('plane_inlier_counts', e)
         if counts is None:
             counts = np.zeros(len(cands), np.int64); Nm = planes[:, :3].T
-            for k in range(0, len(p), 65536):
-                counts += (np.abs(p[k:k+65536]@Nm+planes[:, 3]) < tolerance).sum(axis=0)
+            rows = max(1, 65536*120//max(120, len(cands)))
+            for k in range(0, len(p), rows):
+                counts += (np.abs(p[k:k+rows]@Nm+planes[:, 3]) < tolerance).sum(axis=0)
         k = int(np.argmax(counts))
         if counts[k] > 0:
             normal, offset = cands[k]; inliers = abs(p@normal+offset) < tolerance
             score = int(inliers.sum()); best = (normal, offset, inliers)
-    return _refine_plane(p, best, score, min_inliers)
+    return best, score
 
 
 def _plane_from_best(p, planes, k, count, tolerance, min_inliers):
@@ -153,6 +207,25 @@ def table_plane_py(points, valid, iterations=120, tolerance=.006, min_inliers=10
     p = p[np.isfinite(p).all(axis=1)]
     if len(p) < min_inliers:
         raise ValueError('insufficient plane support')
+    best, score = _ransac_ref(p, iterations, tolerance, seed)
+    more = _ransac_more(score, len(p), iterations)
+    if more is not None:
+        best, score = _ransac_ref(p, more, tolerance, seed)
+    if best is None or score < min_inliers:
+        raise ValueError('no supported horizontal plane')
+    normal, offset, inliers = best
+    cloud = p[inliers]; center = cloud.mean(axis=0)
+    _, _, V = np.linalg.svd(cloud-center, full_matrices=False)
+    normal = V[-1]
+    if normal[2] < 0:
+        normal *= -1
+    if normal[2] < .96:
+        raise ValueError('bad refined plane')
+    return normal, -normal@center
+
+
+def _ransac_ref(p, iterations, tolerance, seed):
+    """Reference scan of table_plane_py: strict '>' over the seeded candidates; (normal, offset, inliers) or None, count."""
     rng = np.random.default_rng(seed)  # algorithm RNG, never layout seed
     best = None; score = 0
     for _ in range(iterations):
@@ -169,17 +242,7 @@ def table_plane_py(points, valid, iterations=120, tolerance=.006, min_inliers=10
         inliers = abs(p@normal+offset) < tolerance
         if inliers.sum() > score:
             score = inliers.sum(); best = (normal, offset, inliers)
-    if best is None or score < min_inliers:
-        raise ValueError('no supported horizontal plane')
-    normal, offset, inliers = best
-    cloud = p[inliers]; center = cloud.mean(axis=0)
-    _, _, V = np.linalg.svd(cloud-center, full_matrices=False)
-    normal = V[-1]
-    if normal[2] < 0:
-        normal *= -1
-    if normal[2] < .96:
-        raise ValueError('bad refined plane')
-    return normal, -normal@center
+    return best, int(score)
 
 
 def near_edge(points, valid, plane, y_half=.5, drop=.05, q=.1, min_cols=40, min_below=5):
