@@ -827,6 +827,7 @@ class Sol(Node):
                 shadow=None if F is None or f0 is None else bool(np.linalg.norm(F-f0)>=SHADOW_DF_N)
                 s.trace('lifted',side,name,A.tcp(p['q_lift']),verdict=held,shadow=shadow,verdict_past=old['past'],
                         verdict_v7=old['v7'],cmd=s.hand_target.get(side),eff_thr=round(GRIP.effort_held_threshold(),3))
+                if held is None:s.log('no hand state after the lift: holding verdict unknown, carrying on',name)
                 if held is False:      # nothing in the hand: open, retreat, re-observe (object untouched => 0, not -10)
                     s.log('grasp check: empty',name);s.hand_open(side);s.retreat(side);return False
                 q_place,q_up,q_carry=place
