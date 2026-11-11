@@ -264,7 +264,7 @@ class Trajectory:
 
 
 def joint_path(chain, collision, waypoints, speed=.35, acceleration=.4, dt=.05):
-    """Trapezoidal-velocity joint trajectory through certified waypoints (speed rad/s, acceleration rad/s^2, dt s)."""
+    """Joint trajectory through certified waypoints, cubic smoothstep per segment (speed rad/s, acceleration rad/s^2, dt s)."""
     if not np.isfinite([speed, acceleration, dt]).all() or not 0 < speed <= .8 or acceleration <= 0 or dt <= 0:
         raise ValueError('invalid trajectory bounds')
     qs = [chain.validate_q(q) for q in waypoints]

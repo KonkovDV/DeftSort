@@ -1,5 +1,5 @@
 //! Grasp-candidate kernels of `grasp.footprint` / `grasp.candidates`.
-//! * `min_caliper`: the 180-angle rotating-caliper sweep over the convex hull. Directions u_a = (cos a, sin a) are
+//! * `min_caliper`: the width sweep over 180 directions (1 deg apart) of the convex hull. Directions u_a = (cos a, sin a) are
 //!   computed by NumPy and passed in (so no libm differences); per angle w = max(p) - min(p), p_i = h_i0*u0 + h_i1*u1,
 //!   and the first angle with the strictly smallest width wins (reference `if w < best[0]` scan, best starts at 9).
 //! * `min_dist_xy`: finger-corridor clearance, min over cloud points of sqrt(dx*dx + dy*dy) per tip

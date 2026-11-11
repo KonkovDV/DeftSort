@@ -42,7 +42,7 @@ A TienKung 2.0 Pro humanoid with Inspire hands stands at a table. The objects go
 
 ## What already works
 
-- **Perception.** RANSAC table plane, near table edge from the torso camera, trays by colour and depth with measured size, axis and wall height. Objects are identified by size with the Hungarian algorithm.
+- **Perception.** RANSAC table plane, near table edge from the torso camera, trays by colour and depth with measured size, axis and wall height. Objects are identified by size: segments and task objects are matched as an assignment problem.
 - **Grasping.** Three kinds: side, top-down and a rim pinch on open dishes. The grasp centre is shifted so the open hand clears the object on the way in.
 - **Hand.** Two-phase close: to contact, then 0.15 of the stroke further. Before the lift the node checks that the hand is not empty.
 - **Time.** Budget on `/clock`, launch time included; light objects first.
@@ -97,7 +97,7 @@ flowchart LR
   TC --> E["near_edge: near table edge"]
   HC --> Y["trays: trays by colour and depth"]
   TF --> P
-  P --> I["identify: Hungarian algorithm on sizes"]
+  P --> I["identify: assignment on sizes"]
   I --> G["grasp: grasp candidates"]
   G --> A["arm: IK + path check"]
   Y --> A
@@ -156,7 +156,7 @@ First the robot looks at the table and the trays with its head (yaw 0 and ±0.6 
 
 ### Rust accelerator
 
-The crate `rust/team048_accel` 0.2.0 (PyO3 abi3-py310, nalgebra, rayon) mirrors the numeric kernels: FK, Jacobian and DLS IK; sphere checks and `certify`; deprojection, RANSAC table, masks, trays and segmentation; caliper and finger clearances.
+The crate `rust/team048_accel` 0.2.0 (PyO3 abi3-py310, nalgebra, rayon) mirrors the numeric kernels: FK, Jacobian and DLS IK; sphere checks and `certify`; deprojection, RANSAC table, masks, trays and segmentation; footprint width and finger clearances.
 
 - **Same answers.** On 62 frames from our runs deprojection, plane, trays, masks and segments are bit-identical to NumPy. Grasp and place poses differ by at most 2.3e-14. The chosen object, grasp, tray, slot and the collision verdicts match in all 5358 records. The frames themselves are not in the repository: the equivalence tests on them run with `TEAM048_V7_TRACE` and are skipped without it; `test_accel_kernels.py` checks each kernel on inputs shipped in the repository.
 - **Fallback.** No module, an old version or an error inside: the process runs on NumPy to the end. `panic = "unwind"`, so a Rust panic becomes a Python exception.
@@ -176,15 +176,26 @@ The hand, time and perception thresholds are calibrated on our runs of the organ
 
 ## Where the methods come from
 
+The table lists only methods that are in the code. Where our implementation differs from the classic algorithm, it says how ours works.
+
 | Method | Source | Code |
 |---|---|---|
-| Table plane, RANSAC + SVD | Fischler, Bolles, 1981 | `perception.py` |
-| Matching segments to objects | Assignment problem, Kuhn, 1955; `scipy.optimize.linear_sum_assignment` | `node.py` |
-| Footprint width | Rotating calipers, Toussaint, 1983 | `grasp.py` |
-| Rim circle | Kåsa least-squares circle, 1976 | `grasp.py` |
-| Damped IK with null space | DLS: Wampler, 1986; Nakamura, Hanafusa, 1986 | `kinematics.py` |
-| Path check | Sphere robot model, discrete check with spheres inflated by the joint travel | `planning.py` |
+| Table plane: RANSAC, then the normal by SVD | RANSAC: Fischler, Bolles, 1981. Plane refinement by orthogonal regression: Pearson, 1901 | `perception.py` |
+| Camera deprojection | Pinhole model; textbook Hartley, Zisserman, 2004 | `perception.py` |
+| Segments by depth connectivity | 4-connected flood fill with a depth-jump limit; component labelling: Rosenfeld, Pfaltz, 1966 | `perception.py` |
+| Matching segments to objects | Assignment problem: Kuhn, 1955. Solver: `scipy.optimize.linear_sum_assignment`, modified Jonker–Volgenant after Crouse, 2016 | `node.py` |
+| Footprint width | Convex hull (Qhull: Barber, Dobkin, Huhdanpaa, 1996), then a sweep over 180 directions 1° apart | `grasp.py` |
+| Rim and jar circle | Algebraic least squares: Kåsa, 1976 | `grasp.py` |
+| Tray rectangle | Our estimate: a sweep over 91 directions with 2–98 % quantiles, robust to outliers | `trays.py` |
+| Joint rotation, orientation error | Rodrigues formula, 1840; SO(3) logarithm after the textbook by Murray, Li, Sastry, 1994 | `geometry.py`, `kinematics.py` |
+| Damped IK with null space | DLS: Wampler, 1986; Nakamura, Hanafusa, 1986. Null space: Liégeois, 1977 | `kinematics.py` |
+| Geometric Jacobian | Whitney, 1969 | `kinematics.py` |
+| Path check | Our conservative scheme: robot and scene spheres, step ≤ 0.003 rad, spheres inflated by the joint travel | `planning.py` |
+| Arm motion | Synchronous straight line in joint space: all joints arrive together | `node.py` |
+| Getting out of a low posture | Dijkstra's algorithm, 1959, on a small grid of shoulder and elbow poses | `arm.py` |
+| Side, top-down and rim grasp candidates | Our rules on the visible cloud, the hand width and the rim torque m·g·r | `grasp.py` |
 | Two-phase close, thumb first | Organiser advice #648 | `grip.py`, `node.py` |
+| Time budget | Our scheme for the scoring rule: cycle estimate that rises at once and decays slowly, lift only with a margin for the worst case | `budget.py`, `node.py` |
 
 Robot geometry: UBTECH URDF and meshes (Apache-2.0). No neural networks.
 
