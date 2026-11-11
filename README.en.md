@@ -7,7 +7,7 @@
   &nbsp;
   <img src="https://img.shields.io/badge/Rust-%E2%89%A51.89-000000?logo=rust&logoColor=white" alt="Rust 1.89+">
   &nbsp;
-  <img src="https://img.shields.io/badge/tests-237-2F6B55" alt="237 tests">
+  <img src="https://img.shields.io/badge/tests-239-2F6B55" alt="239 tests">
   &nbsp;
   <img src="https://img.shields.io/badge/license-Apache--2.0-2F6B55" alt="Apache-2.0">
 </p>
@@ -22,16 +22,16 @@ A TienKung 2.0 Pro humanoid with Inspire hands stands at a table. The objects go
 
 **What DeftSort does.** One ROS 2 node in Python. It measures the table and the trays with the cameras, identifies the objects from `/sim/task`, picks a grasp and checks the whole arm path for collisions. An object is lifted only if it can reach its tray before the limit even in the worst case.
 
-**Stage.** Hackathon prototype. The build is verified offline: 237 tests on recorded frames and logs of our runs in the organisers' simulator.
+**Stage.** Hackathon prototype. The build is verified offline: 239 tests on recorded frames and logs of our runs in the organisers' simulator.
 
 ## Key strengths
 
 - **Robot sensors only.** No scene coordinates in the code: AST tests check every subscription, publisher, import and scene layout literal ([test_compliance.py](src/team048_solution/test/test_compliance.py), [test_rules_edges.py](src/team048_solution/test/test_rules_edges.py)).
 - **The whole arm path is checked.** Spheres for the arm, the torso (fitted to its mesh), the head and the other arm in its measured pose; check step ≤ 0.003 rad with every sphere inflated by the joint travel ([planning.py](src/team048_solution/team048_solution/planning.py), [test_start_posture.py](src/team048_solution/test/test_start_posture.py)).
-- **No −10 for an object left in the hand.** Before a lift the node computes the worst-case holding time, with every step timing out ([test_hold_time.py](src/team048_solution/test/test_hold_time.py)).
-- **Rust accelerator, same answers.** On 62 recorded frames perception is bit-identical to NumPy and the discrete decisions match in all 5358 records. Perception runs 16x faster, grasp planning 235x ([benchmark](#rust-accelerator); [test_accel_equivalence.py](src/team048_solution/test/test_accel_equivalence.py), [test_accel_kernels.py](src/team048_solution/test/test_accel_kernels.py)).
-- **Force within the rules.** 0.4 on the squeezing fingers of both hands; any override is clamped to 0.3–0.5 ([test_rules_edges.py](src/team048_solution/test/test_rules_edges.py), [test_hand_settings.py](src/team048_solution/test/test_hand_settings.py), [docs/COMPLIANCE.md](docs/COMPLIANCE.md#захват-648)).
-- **237 offline tests without ROS.** The node runs on stubs with real simulator frames; one command checks everything: `bash tools/verify.sh`.
+- **Lift only with time to spare.** An object is lifted only if the remaining time covers the worst-case holding time with every step timing out. Otherwise the hand opens in place and the object stays on the table ([test_hold_time.py](src/team048_solution/test/test_hold_time.py)).
+- **Rust accelerator, same answers.** On 62 frames from our runs (the frames are not in the repository) perception is bit-identical to NumPy and the discrete decisions match in all 5358 records. Perception runs 15x faster, grasp planning 223x ([benchmark](#rust-accelerator); [test_accel_equivalence.py](src/team048_solution/test/test_accel_equivalence.py), [test_accel_kernels.py](src/team048_solution/test/test_accel_kernels.py)).
+- **Force within the rules.** All six `SetForce` channels of both hands are within 0.3–0.5: 0.4 on the squeezing fingers, 0.5 on thumb rotation; any override is clamped to 0.3–0.5 ([test_rules_edges.py](src/team048_solution/test/test_rules_edges.py), [test_hand_settings.py](src/team048_solution/test/test_hand_settings.py), [docs/COMPLIANCE.md](docs/COMPLIANCE.md#захват-648)).
+- **239 offline tests without ROS.** The node runs on stubs with real simulator frames; one command checks everything: `bash tools/verify.sh`.
 
 ## What already works
 
@@ -39,7 +39,7 @@ A TienKung 2.0 Pro humanoid with Inspire hands stands at a table. The objects go
 - **Grasping.** Three kinds: side, top-down and a rim pinch on open dishes. The grasp centre is shifted so the open hand clears the object on the way in.
 - **Hand.** Two-phase close: to contact, then 0.15 of the stroke further. Before the lift the node checks that the hand is not empty.
 - **Time.** Budget on `/clock`, launch time included; light objects first.
-- **Robustness.** An error on one object opens the hands and returns the arms home; the run goes on. `/sim/task/done` is always published.
+- **Robustness.** An error on one object opens the hands and returns the arms home; the run goes on. ROS callbacks drop malformed messages and log them; an invalid task on `/sim/task` is skipped and the node waits for the next one. `/sim/task/done` is published at the end of the run, also after a setup error.
 
 ## Run
 
@@ -61,7 +61,7 @@ python3 -m pytest -q                      # with the Rust module, if installed
 TEAM048_ACCEL=0 python3 -m pytest -q      # NumPy only
 ```
 
-In a clean clone: with Rust 221 passed, 16 skipped; with `TEAM048_ACCEL=0` 213 passed, 24 skipped. The skipped tests are equivalence tests on recorded frames of run v7; those frames are not in the repository and are found through `TEAM048_V7_TRACE`. With them all 237 pass.
+In a clean clone: with Rust 223 passed, 16 skipped; with `TEAM048_ACCEL=0` 215 passed, 24 skipped. The skipped tests are equivalence tests on recorded frames of run v7; those frames are not in the repository and are found through `TEAM048_V7_TRACE`. With them all 239 pass.
 
 `setup.sh` installs the module for `/usr/bin/python3`, the ROS 2 Humble interpreter. In a virtualenv: `TEAM048_PY=$(which python3) bash setup.sh`. `scipy==1.13.1` needs NumPy ≥ 1.22.4.
 
@@ -136,7 +136,7 @@ First the robot looks at the table and the trays with its head (yaw 0 and ±0.6 
 
 | Module (`src/team048_solution/team048_solution/`) | Lines | What it does |
 |---|---:|---|
-| `node.py` | 952 | ROS node, task state machine, scene survey, execution, error recovery, TRACE |
+| `node.py` | 976 | ROS node, task state machine, scene survey, execution, error recovery, TRACE |
 | `arm.py` | 594 | URDF, collision envelopes (arm, torso, head, other arm, thighs, table, trays), open-hand point cloud, pick and place planning |
 | `perception.py` | 297 | Deprojection, RANSAC table plane, near edge, depth-connectivity segmentation |
 | `planning.py` | 285 | Spheres, `CollisionModel`: `valid`, `certify`, `certify_escape` |
@@ -151,21 +151,21 @@ First the robot looks at the table and the trays with its head (yaw 0 and ±0.6 
 
 The crate `rust/team048_accel` 0.2.0 (PyO3 abi3-py310, nalgebra, rayon) mirrors the numeric kernels: FK, Jacobian and DLS IK; sphere checks and `certify`; deprojection, RANSAC table, masks, trays and segmentation; caliper and finger clearances.
 
-- **Same answers.** On 62 recorded frames deprojection, plane, trays, masks and segments are bit-identical to NumPy. Grasp and place poses differ by at most 2.3e-14. The chosen object, grasp, tray, slot and the collision verdicts match in all 5358 records.
+- **Same answers.** On 62 frames from our runs deprojection, plane, trays, masks and segments are bit-identical to NumPy. Grasp and place poses differ by at most 2.3e-14. The chosen object, grasp, tray, slot and the collision verdicts match in all 5358 records. The frames themselves are not in the repository: the equivalence tests on them run with `TEAM048_V7_TRACE` and are skipped without it; `test_accel_kernels.py` checks each kernel on inputs shipped in the repository.
 - **Fallback.** No module, an old version or an error inside: the process runs on NumPy to the end. `panic = "unwind"`, so a Rust panic becomes a Python exception.
 - **Prebuilt wheel.** `vendor/` holds a manylinux2014 x86_64 wheel (abi3, CPython ≥ 3.10) with its SHA256. If the wheel does not install, `setup.sh` builds the module from source.
 - **Rust checks.** `cargo test --release` (18 tests including proptest) and `cargo clippy --all-targets --features python -- -D warnings` without warnings, rustc 1.89.
 
-Speed on inputs shipped in the repository (`python3 tools/bench_accel.py 7`: perception on the two recorded head frames in `test/fixtures`, grasp planning for 10 objects on the synthetic test scene; median of 7 runs; Intel Xeon, 8 logical CPUs, Python 3.10.22, NumPy 2.2.6):
+Speed on inputs shipped in the repository (`python3 tools/bench_accel.py 7`: perception on the two recorded head frames in `test/fixtures`, grasp planning for 10 objects on the synthetic test scene; median of 7 runs; Intel Xeon, 8 logical CPUs, Python 3.10.22, NumPy 2.2.6, other jobs running on the machine during the measurement):
 
 | Measurement | NumPy | Rust | Speed-up |
 |---|---:|---:|---:|
-| Perception, ms per frame | 170 | 10.6 | 16× |
-| Grasp planning, 10 objects, s | 20.7 | 0.088 | 235× |
+| Perception, ms per frame | 181 | 12.1 | 15× |
+| Grasp planning, 10 objects, s | 21.1 | 0.095 | 223× |
 
 ### Recorded runs
 
-The hand, time and perception thresholds are calibrated on our runs of the organisers' simulator on an NVIDIA T4 GPU (RTF ≈ 0.21). The labels v5–v11b are run numbers, not code versions. Their frames, TRACE records and log lines are in `test/fixtures/`, and constants in the code name the run they come from ([docs/PARAMETERS.md](docs/PARAMETERS.md)).
+The hand, time and perception thresholds are calibrated on our runs of the organisers' simulator on an NVIDIA T4 GPU (RTF 0.226–0.237 in the node logs). The labels v5–v11b are run numbers, not code versions. Frames, TRACE records and log lines of runs v5, v7, v8, v9a, v9b and v11b are in `test/fixtures/`, and constants in the code name the run they come from ([docs/PARAMETERS.md](docs/PARAMETERS.md)).
 
 ## Where the methods come from
 
@@ -185,22 +185,21 @@ Robot geometry: UBTECH URDF and meshes (Apache-2.0). No neural networks.
 
 | Area | Now | Next step |
 |---|---|---|
-| Isaac Sim validation | Offline: 237 tests, recorded frames and logs of runs v5–v11b | Run of the current build in Isaac Sim, `sort2` and `sort3` |
+| Isaac Sim validation | Offline: 239 tests, recorded frames and logs of our runs | Run of the current build in Isaac Sim, `sort2` and `sort3` |
 | Heavy objects (≥ 0.22 kg) | Scheduled last; holding at force 0.4 needs μ ≥ m·g/(2N) | Calibrate the simulator friction from TRACE |
 | Dishes by the rim | Pinch when the torque m·g·r ≤ 0.17 N·m | Two-point grasp for heavy dishes |
-| Thumb rotation | DOF 6 = 1.0: places the thumb in opposition, does not squeeze ([COMPLIANCE](docs/COMPLIANCE.md#захват-648)) | One constant, `grip.HAND_FORCE_THUMB_ROT`, if the organisers ask for 0.3–0.5 there too |
 | Collision model | Arm, torso, head, other arm, thighs, table, trays | Held object and already placed objects |
-| Pool 6 | Razer mouse (10.0 cm) and gelatin box (8.9 cm) are wider than the open pinch (7.8 cm) | Top-down grasp for wide objects |
+| Pool 6 | Razer mouse (10.0 cm) is wider than the grasp limit of 9.5 cm (hand opening from the URDF, 10.5 cm, minus a 1 cm margin) | Wide-hand grasp for objects wider than 9.5 cm |
 | Test tubes | Outside this version: the node publishes `/sim/task/done` at once | Racks and cabinet found by camera too |
 
 ## Hard questions
 
 | Question | Answer |
 |---|---|
-| Why is thumb rotation at force 1.0 when the rule says 0.3–0.5? | Advice #648 is about the force that squeezes the object. DOF 1–5 squeeze, and they are at 0.4. DOF 6 only turns the thumb into opposition before the close. In the HAND logs this channel reaches 1.0, so 0.5 is not supported by the data. |
+| What force goes to the hands? | Six `SetForce` ratios per hand, all within 0.3–0.5 (#648): 0.4 on DOF 1–5, 0.5 on thumb rotation. `test_rules_edges.py` and `test_compliance.py` check it. |
 | How does the robot know where the trays are? | It measures them: colour from `/sim/task`, depth, minimum-area rectangle. The code only has wide windows "left", "right", "centre" and the documented size as a ±40 % plausibility bound. |
-| What if time runs out with an object in the hand? | It does not happen. A lift is allowed only if the remaining time covers the worst-case holding time with every step timing out. Otherwise the hand opens in place: 0 instead of −10. |
-| Why Rust if there is NumPy? | Faster perception and planning, same answers: the equivalence tests on 62 frames check it. Without the module the whole solution runs on NumPy. |
+| What if there is not enough time to carry the object? | A lift is allowed only if the remaining time covers the worst-case holding time with every step timing out. Otherwise the hand opens in place and the object is not lifted. |
+| Why Rust if there is NumPy? | Faster perception and planning, same answers: the kernel tests on shipped inputs and the equivalence tests on 62 frames from our runs check it. Without the module the whole solution runs on NumPy. |
 | Why no neural networks? | Few objects, sizes known from the task. Geometry is deterministic, testable and needs no GPU. |
 
 ## Documents
