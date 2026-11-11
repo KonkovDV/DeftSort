@@ -58,6 +58,7 @@ SHADOW_DF_N=.5*.08*9.81   # not used for decisions: logged 'would-be' verdict, 1
 PRE_TOL=.05           # m, pre-grasp TCP error above which the pick is aborted (v7 s101 mustard: 26.6 cm, then knocked)
 RELEASE_OPEN_MIN=.8    # fingers 1-4 mean after release; v7: 0.96-0.97 released, 0.99 home
 PLACE_TOL=.04         # m, release TCP error: one correction before opening (v7 s101 Ecoforms released 13.7 cm off)
+PLACE_RETRIES=1       # re-approaches of the release pose when the release point is still off the tray
 SIDE_DZ=(0.,.02,.04)  # m, raise a side grasp when the low one is not collision-free against the measured table
 EMPTY_OBS_MAX=2       # consecutive observations with nothing to pick before giving up (an observation whose
                       # attempt touched the scene and was re-observed does not count as 'nothing to pick')
@@ -703,6 +704,36 @@ class Sol(Node):
         s.hand_log(side,'approach')
         dev,fl=s.finger_dev(side,kind)
         return dict(dev=round(dev,3),fingers=fl) if fl else None
+    def place_reached(s,A,side,Tq,tray,obj_off,yaw):
+        """Release check: the TCP is within PLACE_TOL of the planned release pose, or the measured release point (object
+        centre or grip point, pelvis frame) lies inside the measured tray rectangle."""
+        qm=np.clip(s.q_now(side),A.chain.lower,A.chain.upper)
+        if A.position_error(qm,Tq)<=PLACE_TOL:return True
+        return in_tray(release_xy(A,qm,obj_off,yaw),tray)
+    def release_off_tray(s,A,side,name,q_lift,q_carry,yaw,gr):
+        """The release point is still off the tray after the re-approach. The object must not stay in the hand, and it
+        must come down on the table, not on the floor: carry it back along the planned path (reverse order) to the lift
+        pose above the spot it was picked from and open there. Without time for the way back, open where the hand is."""
+        qm=np.clip(s.q_now(side),A.chain.lower,A.chain.upper)
+        back=(move_time(qm,q_carry)+move_time(q_carry,q_lift) if q_carry is not None else move_time(qm,q_lift))
+        back+=(2*abs(yaw)/.8+1. if yaw else 0.)+GRIP.finger_stroke_time()
+        if s.hand_verdict(side,gr) is False:
+            s.log('place not reached, hand already empty: open here',name);where='empty_hand'
+        elif s.budget.remaining(s.now())-s.budget.safety>=back:
+            s.log('place not reached: back to the pick spot to release on the table',name)
+            if q_carry is not None:s.move_arm(side,q_carry,tol=.03)
+            elif yaw:s.move_arm(side,q_lift,tol=.03)
+            if yaw:s.waist(0.)
+            s.move_arm(side,q_lift,tol=.03);where='pick_spot'
+        else:
+            s.log('place not reached and no time to carry back: release here',name);where='in_place'
+        s.trace('release_off_tray',side,name,A.tcp(np.clip(s.q_now(side),A.chain.lower,A.chain.upper)),where=where,
+                verdict=s.hand_verdict(side,gr))
+        s.hand_open(side);s.wait_fingers(side,tmin=.4,tmax=RELEASE_WAIT)
+        if s.fingers_open(side) is False:s.hand_open(side);s.wait_fingers(side,tmin=.4,tmax=RELEASE_WAIT)
+        s.go_home(side)
+        if yaw:s.waist(0.)
+        s.last_contact=True;return False
     def guard_abort(s,side,name,where,info):
         """Guarded approach tripped: hand stays open, lift straight up and home, mark contact -> re-observe."""
         s.hand_log(side,'guard_'+where,force=True,**info);s.trace('guard',side,name,where=where,**info)
@@ -755,6 +786,7 @@ class Sol(Node):
                 Tg=A.tcp(p['q_grasp']);s.trace('start',side,name,kind=g['kind'],center=[round(float(x),3) for x in c3])
                 s.hand_open(side);s.move_arm(side,p['q_pre']);Tp=A.tcp(p['q_pre']);s.trace('pre',side,name,Tp)
                 thumb=s.wait_thumb(side)      # #648: thumb in opposition before anything closes (usually already there)
+                if not thumb:s.log('thumb not in opposition before the close (non-fatal)',name,side)
                 if A.position_error(np.clip(s.q_now(side),A.chain.lower,A.chain.upper),Tp)>PRE_TOL:
                     s.log('pre-grasp not reached, abort',name);s.retreat(side);return False
                 # Guarded approach: the open fingers must follow their command; a finger off by > GRIP.GUARD_DEV
@@ -800,14 +832,21 @@ class Sol(Node):
                 q_place,q_up,q_carry=place
                 if q_carry is not None:s.move_arm(side,q_carry,tol=.03);s.trace('carry',side,name,A.tcp(q_carry))
                 if yaw:s.waist(yaw);s.trace('yawed',side,name,yaw=round(yaw,3))
-                s.move_arm(side,q_place,tol=.03);Tq=A.tcp(q_place)
-                qm=np.clip(s.q_now(side),A.chain.lower,A.chain.upper)
-                if A.position_error(qm,Tq)>PLACE_TOL:
-                    qc=A.correct(qm,q_place,max_step=.15)
-                    if qc is not None:s.move_arm(side,qc,tol=.02,refine=1)
-                old=s.hand_shadow(side,gr)
+                Tq=A.tcp(q_place);off=held_offset(A,p['q_grasp'],g,c3)
+                at_tray=lambda:s.place_reached(A,side,Tq,s.trays[tray],off,yaw)
+                for attempt in range(1+PLACE_RETRIES):   # one bounded re-approach when the release point is off the tray
+                    if attempt:s.log('place not reached, re-approach',name);s.trace('place_retry',side,name,Tq)
+                    s.move_arm(side,q_place,tol=.03)
+                    qm=np.clip(s.q_now(side),A.chain.lower,A.chain.upper)
+                    if A.position_error(qm,Tq)>PLACE_TOL:
+                        qc=A.correct(qm,q_place,max_step=.15)
+                        if qc is not None:s.move_arm(side,qc,tol=.02,refine=1)
+                    if at_tray():break
+                else:
+                    return s.release_off_tray(A,side,name,p['q_lift'],q_carry,yaw,gr)
+                old=s.hand_shadow(side,gr);over=s.hand_verdict(side,gr)
                 s.trace('over_tray',side,name,Tq,tray=tray,tray_xy=[round(sx,3),round(sy,3)],yaw=round(yaw,3),
-                        verdict=s.hand_verdict(side,gr),verdict_past=old['past'],verdict_v7=old['v7'])   # slip during transport shows up here (recalibration data)
+                        verdict=over,verdict_past=old['past'],verdict_v7=old['v7'])   # slip during transport shows up here
                 s.hand_open(side);s.wait_fingers(side,tmin=.4,tmax=RELEASE_WAIT)
                 if s.fingers_open(side) is False:s.log('fingers not open after release, re-open',name);s.hand_open(side);s.wait_fingers(side,tmin=.4,tmax=RELEASE_WAIT)
                 s.trace('released',side,name,A.tcp(q_place))
@@ -815,6 +854,8 @@ class Sol(Node):
                 s.go_home(side)
                 if yaw:s.waist(0.)
                 s.trace('home',side,name)
+                if over is False:   # the hand was empty over the tray: the object slipped out during transport
+                    s.log('carry check: hand empty over the tray, not counted',name);s.last_contact=True;return False
                 s.placed[tray]=k+1
                 return True
         if len(why.get('hand_force_not_applied',[]))==len(order):   # not a planning failure: retry once a hand is ready
@@ -850,6 +891,15 @@ def held_offset(A,q_grasp,g,c3):
     if oc is None:return None
     T=A.tcp(q_grasp);p=np.array([oc[0],oc[1],c3[2]],float)
     return T[:3,:3].T@(p-T[:3,3])
+def release_xy(A,q,obj_off,yaw):
+    """Pelvis-frame xy of the held object's centre at arm joints q: obj_off (rim pinch) or the grip point that
+    plan_place puts over the slot, rotated from the yawed torso frame back to the pelvis."""
+    T=A.tcp(q);o=np.asarray(obj_off,float) if obj_off is not None else A._hand_frame('grip')[1]
+    return (rotz(yaw)@(T[:3,:3]@o+T[:3,3]))[:2]
+def in_tray(xy,tray):
+    """True when the point xy (pelvis frame, m) lies inside the measured tray rectangle."""
+    x,y,ax,ay,a,b,_=ARMMOD.tray_geom(tray);d=np.asarray(xy,float)[:2]-(x,y)
+    return abs(d@(ax,ay))<=b/2 and abs(d@(-ay,ax))<=a/2
 def plan_place(A,q_from,tx,ty,top,fallback=None,tray_h=TRAY_H,obj_off=None):
     """Release pose over (tx,ty) at the lowest feasible height -> (q_place, q_up, q_carry) or None.
     q_carry: straight-up lift from q_from to the release height (carry high over the tray walls), None if not needed
