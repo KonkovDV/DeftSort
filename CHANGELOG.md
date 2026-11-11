@@ -1,52 +1,45 @@
-# Changelog
+# История изменений
 
-Changes to the team 048 solution, grouped by topic. Run labels (v5–v11b) name our recorded simulator runs; see
-[README.en.md](README.en.md#simulator-runs) for their results.
+Возможности решения по темам. Метки v5–v11b — номера наших записанных прогонов в симуляторе организаторов, а не версии кода.
 
-## Perception
-- Table plane by RANSAC on the head camera point cloud, objects as coloured segments above it, identified by size.
-- Trays found by colour and depth; the long-axis sign is canonical (`trays.canonical_axis`), so a 0°/90° tie
-  no longer depends on the last bit of rounding.
-- `bgr8` frames are converted to RGB before colour checks.
-- An empty depth frame is rejected before it reaches the Rust kernel.
-- A camera frame is reused only if it is at most two camera periods old.
+## 2026-11-11 — версия для сдачи
 
-## Grasping and hand control
-- Hold rule from finger positions and effort after closing; the older finger criteria are only logged.
-- Guarded approach: when an open finger is off its command by more than `GUARD_DEV` (a contact), the approach
-  stops without closing and the scene is observed again.
-- Finger targets are clamped to the closed target and never exceed 1.0; jammed fingers keep the closed target.
-- Grasp centre shifted so that the open hand (point cloud from the hand meshes) does not cut the measured object box.
-- Rim pinch only when the object's weight torque on the rim is at most `RIM_TORQUE_MAX` (0.17 N·m); no rim pinch on a
-  closed top.
-- A dish taken by the rim is placed by its centre in the slot.
-- Finger force 0.3–0.5 (rule #648) is sent to both hands and re-sent until each hand answers (at most 5 sends); an
-  arm whose force request was never sent (service not found) is not used. `TEAM048_HAND_FORCE` is clamped to 0.3–0.5. Thumb rotation force stays 1.0
-  (see [docs/COMPLIANCE.md](docs/COMPLIANCE.md)).
+### Восприятие
+- Плоскость стола по RANSAC на облаке камеры головы, ближний край по торсовой камере.
+- Ящики по цвету и глубине: измеряются центр, длинная ось, размер и высота стенок. Знак оси приводится к канону (`trays.canonical_axis`), поэтому Rust и NumPy дают одну ось.
+- Предметы — сегменты над столом, опознаются по размерам венгерским алгоритмом.
+- Кадры `bgr8` переводятся в RGB до проверки цвета; пустой кадр глубины отсекается до Rust-ядра.
+- Кадр берётся, только если он не старше двух периодов камеры.
 
-## Planning and motion
-- Start posture reached by a certified escape path; the table model starts at the measured near edge; arm-to-torso
-  clearance is part of the collision model.
-- Light objects first; time per cycle includes the lift and the measured settling time per arm move.
-- Before a lift the remaining time must cover the worst-case holding time.
-- The wait for `/joint_states` is bounded by the time budget; a joint missing from `/joint_states` stops the arm
-  instead of being read as 0 rad.
+### Захват и кисть
+- Три вида захвата: сбоку, сверху, щипок за бортик открытой посуды.
+- Центр захвата сдвигается так, чтобы раскрытая кисть (облако по мешам) не входила в измеренный короб предмета.
+- Щипок за бортик только при моменте веса на бортике до `RIM_TORQUE_MAX` (0.17 Н·м) и только у открытой посуды. Посуда ставится в слот центром.
+- Двухфазное сжатие: до контакта, затем на `CLOSE_PAST` дальше. Цели пальцев не выходят за 1.0, заклинившие пальцы держат цель сжатия.
+- Правило удержания по положению и усилию пальцев после сжатия.
+- Контроль касания при подходе: палец, отогнутый больше чем на `GUARD_DEV`, останавливает подход, сцена снимается заново.
+- Сила 0.3–0.5 (правило #648) уходит обеим кистям и повторяется до ответа (не больше 5 отправок). `TEAM048_HAND_FORCE` обрезается до 0.3–0.5. Поворот большого пальца — 1.0 (см. [docs/COMPLIANCE.md](docs/COMPLIANCE.md#захват-648)).
 
-## Robustness
-- Camera pair buffer copied under a lock (callbacks run in another thread).
-- An exception during a pick opens the hands and returns the arms home; the run continues.
-- Setup errors and the end of the run always publish `/sim/task/done`.
-- A failed observation is retried once.
-- Hand state history is replaced atomically; tray components are sorted with a stable sort.
+### Планирование и движение
+- Проверка всего пути руки: рука, торс по мешу, голова, другая рука в измеренной позе, бёдра, стол, ящики.
+- Из стартовой позы руки уходят домой по проверенному пути (`certify_escape`, `roadmap_path`) уже после измерения сцены.
+- Лёгкие предметы первыми; время цикла включает подъём и измеренное время успокоения руки.
+- Перед подъёмом остаток времени должен покрывать худший случай удержания.
+- Ожидание `/joint_states` ограничено бюджетом; пропавший сустав останавливает руку.
 
-## Rust acceleration
-- Optional `team048_accel` module (PyO3, abi3) for kinematics, collisions, perception and grasp kernels, with a NumPy
-  fallback for the rest of the process on any error. A prebuilt wheel with its SHA256 is in `vendor/`.
-- On 62 recorded frames the discrete results (object, grasp type, tray, slot, collision verdicts) match NumPy in all
-  5358 records.
+### Устойчивость
+- Буфер пар RGB-D защищён блокировкой.
+- Исключение во время захвата раскрывает кисти и уводит руки домой; прогон продолжается.
+- `/sim/task/done` публикуется всегда, в том числе при ошибке настройки.
+- Неудачное наблюдение повторяется.
+- История кисти заменяется атомарно; компоненты ящика сортируются устойчиво.
 
-## Tests and documentation
-- 237 offline tests; 16 of them need recorded frames (`TEAM048_V7_TRACE`), 8 more need the Rust module.
-- Test files are named by topic; fixtures describe the recorded run and log line they come from.
-- Comments explain why a rule exists instead of naming the development step that added it.
-- Docs reference code by file and line; the references and the parameter table are checked against the code.
+### Rust-ускоритель
+- Модуль `team048_accel` (PyO3, abi3): кинематика, столкновения, восприятие и ядра захвата. При любой ошибке процесс до конца работает на NumPy. Готовый wheel с SHA256 лежит в `vendor/`.
+- На 62 записанных кадрах восприятие совпадает с NumPy бит-в-бит, дискретные решения — во всех 5358 записях.
+- `tools/bench_accel.py` меряет скорость обоих режимов на входах из репозитория.
+
+### Тесты и документация
+- 237 офлайн-тестов; 16 из них требуют записанных кадров (`TEAM048_V7_TRACE`), ещё 8 — Rust-модуль. `tools/verify.sh` запускает всё одной командой.
+- Тестовые файлы названы по темам; у каждой фикстуры указан прогон и строка лога, из которых она взята.
+- Документы ссылаются на код по файлу и строке.
