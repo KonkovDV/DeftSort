@@ -7,7 +7,7 @@
   &nbsp;
   <img src="https://img.shields.io/badge/Rust-%E2%89%A51.89-000000?logo=rust&logoColor=white" alt="Rust 1.89+">
   &nbsp;
-  <img src="https://img.shields.io/badge/tests-245-2F6B55" alt="245 tests">
+  <img src="https://img.shields.io/badge/tests-261-2F6B55" alt="261 tests">
   &nbsp;
   <img src="https://img.shields.io/badge/license-Apache--2.0-2F6B55" alt="Apache-2.0">
 </p>
@@ -29,7 +29,7 @@ A TienKung 2.0 Pro humanoid with Inspire hands stands at a table. The objects go
 
 **Why it scores.** Points come from objects in their own trays, and an object lifted but not delivered costs −10. DeftSort lifts an object only when it has a checked path and the time to deliver it. Every lift aims at +10; a doubtful case costs 0.
 
-**Stage.** Hackathon prototype. The build is verified offline: 245 tests on recorded frames and logs of our runs in the organisers' simulator.
+**Stage.** Hackathon prototype. The build is verified offline: 261 tests on recorded frames and logs of our runs in the organisers' simulator.
 
 ## Key strengths
 
@@ -38,12 +38,12 @@ A TienKung 2.0 Pro humanoid with Inspire hands stands at a table. The objects go
 - **Lift only with time to spare.** An object is lifted only if the remaining time covers the worst-case holding time with every step timing out. Otherwise the hand opens in place and the object stays on the table ([test_hold_time.py](src/team048_solution/test/test_hold_time.py)).
 - **Rust accelerator, same answers.** On 62 frames from our runs (the frames are not in the repository) perception is bit-identical to NumPy and the discrete decisions match in all 5358 records. Perception runs 15x faster, grasp planning 223x ([benchmark](#rust-accelerator); [test_accel_equivalence.py](src/team048_solution/test/test_accel_equivalence.py), [test_accel_kernels.py](src/team048_solution/test/test_accel_kernels.py)).
 - **Force within the rules.** All six `SetForce` channels of both hands are within 0.3–0.5: 0.4 on the squeezing fingers, 0.5 on thumb rotation; any override is clamped to 0.3–0.5 ([test_rules_edges.py](src/team048_solution/test/test_rules_edges.py), [test_hand_settings.py](src/team048_solution/test/test_hand_settings.py), [docs/COMPLIANCE.md](docs/COMPLIANCE.md#захват-648)).
-- **245 offline tests without ROS.** The node runs on stubs with real simulator frames; one command checks everything: `bash tools/verify.sh`.
+- **261 offline tests without ROS.** The node runs on stubs with real simulator frames; one command checks everything: `bash tools/verify.sh`.
 
 ## What already works
 
-- **Perception.** RANSAC table plane, near table edge from the torso camera, trays by colour and depth with measured size, axis and wall height. Objects are identified by size: segments and task objects are matched as an assignment problem.
-- **Grasping.** Three kinds: side, top-down and a rim pinch on open dishes. The grasp centre is shifted so the open hand clears the object on the way in.
+- **Perception.** RANSAC table plane, near table edge from the torso camera, trays by colour and depth with measured size, axis and wall height. Objects are identified by size: segments and task objects are matched as an assignment problem. The number of RANSAC samples grows when the table covers a small share of the frame.
+- **Grasping.** Three kinds: side, top-down and a rim pinch on open dishes. The grasp centre is shifted so the open hand clears the object on the way in. A grasp that was executed and failed goes last among the candidates on the next try.
 - **Hand.** Two-phase close: to contact, then 0.15 of the stroke further. Before the lift the node checks that the hand is not empty.
 - **Placing.** The hand opens when the TCP is within 4 cm of the plan or the release point lies inside the measured tray rectangle. Otherwise one more approach; then the object is carried back along the travelled path and put down on the table above the pick spot. A transfer counts only if the hand is not empty over the tray.
 - **Time.** Budget on `/clock`, launch time included; light objects first.
@@ -69,7 +69,7 @@ python3 -m pytest -q                      # with the Rust module, if installed
 TEAM048_ACCEL=0 python3 -m pytest -q      # NumPy only
 ```
 
-In a clean clone: with Rust 229 passed, 16 skipped; with `TEAM048_ACCEL=0` 221 passed, 24 skipped. The skipped tests are equivalence tests on recorded frames of run v7; those frames are not in the repository and are found through `TEAM048_V7_TRACE`. With them all 245 pass.
+In a clean clone: with Rust 245 passed, 16 skipped; with `TEAM048_ACCEL=0` 237 passed, 24 skipped. The skipped tests are equivalence tests on recorded frames of run v7; those frames are not in the repository and are found through `TEAM048_V7_TRACE`. With them all 261 pass.
 
 `setup.sh` installs the module for `/usr/bin/python3`, the ROS 2 Humble interpreter. In a virtualenv: `TEAM048_PY=$(which python3) bash setup.sh`. `scipy==1.13.1` needs NumPy ≥ 1.22.4.
 
@@ -145,15 +145,15 @@ First the robot looks at the table and the trays with its head (yaw 0 and ±0.6 
 
 | Module (`src/team048_solution/team048_solution/`) | Lines | What it does |
 |---|---:|---|
-| `node.py` | 1027 | ROS node, task state machine, scene survey, execution, error recovery, TRACE |
+| `node.py` | 1037 | ROS node, task state machine, scene survey, execution, error recovery, TRACE |
 | `arm.py` | 594 | URDF, collision envelopes (arm, torso, head, other arm, thighs, table, trays), open-hand point cloud, pick and place planning |
-| `perception.py` | 297 | Deprojection, RANSAC table plane, near edge, depth-connectivity segmentation |
+| `perception.py` | 360 | Deprojection, RANSAC table plane, near edge, depth-connectivity segmentation |
 | `planning.py` | 285 | Spheres, `CollisionModel`: `valid`, `certify`, `certify_escape` |
 | `grip.py` | 272 | Hand force and speed, two-phase close, contact check on approach, hold rule |
 | `kinematics.py` | 239 | Chain from URDF, FK, Jacobian, DLS IK with null space |
 | `trays.py` | 189 | Trays by colour and depth: centre, axis, size, wall height; slots inside |
 | `_accel.py` | 167 | Rust ↔ NumPy switch with automatic fallback |
-| `grasp.py` | 138 | Grasp candidates: side, rim of open dishes, top-down |
+| `grasp.py` | 166 | Grasp candidates: side, rim of open dishes, top-down |
 | `budget.py`, `geometry.py`, `sensing.py` | 89 / 80 / 51 | Time limit, geometry, RGB-D pairs by time stamp |
 
 ### Rust accelerator
@@ -178,11 +178,14 @@ The hand, time and perception thresholds are calibrated on our runs of the organ
 
 ## Where the methods come from
 
+The DeftSort pipeline is the classic RoboCup@Home scheme: a RANSAC table plane, segments above it, top-down and side grasps from the point cloud (Cosero: Stückler, Schwarz, Behnke, 2016). On top of it sit the methods of the Amazon Picking and Robotics Challenge winners: a hold check after the lift, a fresh frame after a contact and a postponed retry (APC 2016, Team Delft: Hernández Corbato et al., 2018; ARC 2017, Cartman: Morrison et al., 2018).
+
 The table lists only methods that are in the code. Where our implementation differs from the classic algorithm, it says how ours works.
 
 | Method | Source | Code |
 |---|---|---|
 | Table plane: RANSAC, then the normal by SVD | RANSAC: Fischler, Bolles, 1981. Plane refinement by orthogonal regression: Pearson, 1901 | `perception.py` |
+| Number of RANSAC samples | Adaptive: Hartley, Zisserman, 2004, eq. 4.18. After 120 samples the same seeded stream continues while the miss probability is above 10⁻³ (at most 480) | `perception.py` |
 | Camera deprojection | Pinhole model; textbook Hartley, Zisserman, 2004 | `perception.py` |
 | Segments by depth connectivity | 4-connected flood fill with a depth-jump limit; component labelling: Rosenfeld, Pfaltz, 1966 | `perception.py` |
 | Matching segments to objects | Assignment problem: Kuhn, 1955. Solver: `scipy.optimize.linear_sum_assignment`, modified Jonker–Volgenant after Crouse, 2016 | `node.py` |
@@ -196,6 +199,9 @@ The table lists only methods that are in the code. Where our implementation diff
 | Arm motion | Synchronous straight line in joint space: all joints arrive together | `node.py` |
 | Getting out of a low posture | Dijkstra's algorithm, 1959, on a small grid of shoulder and elbow poses | `arm.py` |
 | Side, top-down and rim grasp candidates | Our rules on the visible cloud, the hand width and the rim torque m·g·r | `grasp.py` |
+| Hold check after the lift | As in Team Delft (APC 2016) and Cartman (ARC 2017): two independent signals, the fingers at the close and deflection with effort after the lift | `grip.py`, `node.py` |
+| Fresh frame after a contact, postponed retry | Team Delft, APC 2016: retry under different conditions or later | `node.py` |
+| Failure memory | Ours: an executed grasp that failed (kind, centre within 2 cm, axis within 30°) goes to the end of the candidate list; nothing is removed | `grasp.py`, `node.py` |
 | Two-phase close, thumb first | Organiser advice #648 | `grip.py`, `node.py` |
 | Time budget | Our scheme for the scoring rule: cycle estimate that rises at once and decays slowly, lift only with a margin for the worst case | `budget.py`, `node.py` |
 
@@ -205,11 +211,14 @@ Robot geometry: UBTECH URDF and meshes (Apache-2.0). No neural networks.
 
 | Area | Now | Next step |
 |---|---|---|
-| Isaac Sim validation | Offline: 245 tests, recorded frames and logs of our runs | Run of the current build in Isaac Sim, `sort2` and `sort3` |
+| Isaac Sim validation | Offline: 261 tests, recorded frames and logs of our runs | Run of the current build in Isaac Sim, `sort2` and `sort3` |
 | Heavy objects (≥ 0.22 kg) | Scheduled last; holding at force 0.4 needs μ ≥ m·g/(2N) | Calibrate the simulator friction from TRACE |
 | Dishes by the rim | Pinch when the torque m·g·r ≤ 0.17 N·m | Two-point grasp for heavy dishes |
 | Collision model | Arm, torso, head, other arm, thighs, table, trays | Held object and already placed objects |
 | Pool 6 | Razer mouse (10.0 cm) is wider than the grasp limit of 9.5 cm (hand opening from the URDF, 10.5 cm, minus a 1 cm margin) | Wide-hand grasp for objects wider than 9.5 cm |
+| Trajectories | Straight joint-space segments that stop at each waypoint | Time parameterisation without stops (TOPP-RA, TOTG) |
+| Grasp scoring | Footprint geometry and finger clearance to neighbours | Robustness to pose noise (Dex-Net 2.0 idea) and antipodal check on normals (Nguyen, 1988) |
+| Place check | From the arm pose and the measured tray rectangle | Confirmation from a tray frame |
 | Test tubes | Outside this version: the node publishes `/sim/task/done` at once | Racks and cabinet found by camera too |
 
 ## Hard questions
