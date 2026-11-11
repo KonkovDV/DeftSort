@@ -294,3 +294,14 @@ probe всё ещё QUEUED (TpuV5E8, слот 1/1, ~6+ ч). Alt-типы TpuV5E1
   - pytest Rust — 221 passed, 16 skipped;
   - pytest `TEAM048_ACCEL=0` — 213 passed, 24 skipped;
   - `cargo test` и `clippy` OK.
+## 2026-11-11 09:40 MSK — v17: гигиена дерева сдачи (ветка fix/v17 от main `326c592`, CPU, push нет)
+- Поведение не менялось. Коммиты:
+  - `4430a98`: метки версий кода (v8 fix N, v9fix, v10–v15) в комментариях и докстрингах заменены объяснениями «почему»; метки прогонов v5–v11b оставлены как ссылки на данные.
+  - `ae1eb9d`: в JSON-фикстурах поля источника описывают записанный прогон и строку лога вместо путей Kaggle и хэшей; числа не менялись (проверено разбором JSON).
+  - `a9d8e8d`: 9 тестовых файлов переименованы по темам (`git mv`): `test_grip_rules`, `test_start_posture`, `test_hold_time`, `test_hand_clearance`, `test_hand_settings`, `test_rim_torque`, `test_run_robustness`, `test_rules_edges`, `test_topics_motion`. Ссылки в коде, docs, обоих README и PREPUSH_CHECKLIST обновлены; число тестов по файлам то же (237).
+  - `c7a2b1a`: фикстура `rim_dishes` (была `v12_rim_dishes`), примечание в `v9b_hand_settings.json`, докстринг `arm.py` без меток версий.
+  - `2c69258`: `CHANGELOG.md` по темам, ссылка из обоих README.
+- Проверки: `doc_refs.py --check` — 110 ссылок, 0 проблем; `md_links.py` на дереве сдачи — 37 ссылок, 0 проблем; ruff `F,E9` чистый; `cargo clippy --all-targets --features python -- -D warnings` — 0; `cargo test --release` — 18 passed.
+- Тесты, последовательно: Rust с кадрами v7 — 237 passed; `TEAM048_ACCEL=0` с кадрами — 213 passed, 24 skipped.
+- Планы `326c592` → `2c69258` на 62 кадрах: 0 различий из 5358 (Python 3.10 / NumPy 1.26 и Python 3.13 / NumPy 2).
+- Orphan `submit-048` = `e29b95e` (дерево `4faf77e`) из `2c69258`: 88 файлов, 2.45 МБ. Чистая сборка в Python 3.10.22 (NumPy 1.26.4, scipy 1.13.1): `pip -r`, `setup.sh` (wheel 0.2.0, API 2), `colcon build` — OK; pytest Rust — 221 passed, 16 skipped; `TEAM048_ACCEL=0` — 213 passed, 24 skipped; `cargo test` 18 passed, clippy `-D warnings` OK.
