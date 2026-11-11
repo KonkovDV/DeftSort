@@ -20,7 +20,14 @@ A TienKung 2.0 Pro humanoid with Inspire hands stands at a table. The objects go
 
 **Task.** ROS Humanoid Hack, manipulation track: Isaac Sim 5.0 / Isaac Lab 2.2, team 048.
 
-**What DeftSort does.** One ROS 2 node in Python. It measures the table and the trays with the cameras, identifies the objects from `/sim/task`, picks a grasp and checks the whole arm path for collisions. An object is lifted only if it can reach its tray before the limit even in the worst case.
+**What DeftSort does.** One ROS 2 node in Python takes every object through one chain:
+
+1. **See.** The table, the trays and the objects are measured with the head and torso cameras. The code holds no scene coordinates.
+2. **Choose a grasp.** The object is identified by its size from `/sim/task`; a side, top-down or rim grasp is built from the point cloud.
+3. **Check the path.** The arm path to the object and to the tray is checked for collisions with a sphere model of the robot and the measured scene.
+4. **Lift with time to spare.** A lift is allowed if the hand is not empty and the remaining time covers the worst-case carry. Otherwise the hand opens in place.
+
+**Why it scores.** Points come from objects in their own trays, and an object lifted but not delivered costs −10. DeftSort lifts an object only when it has a checked path and the time to deliver it. Every lift aims at +10; a doubtful case costs 0.
 
 **Stage.** Hackathon prototype. The build is verified offline: 239 tests on recorded frames and logs of our runs in the organisers' simulator.
 
@@ -201,6 +208,8 @@ Robot geometry: UBTECH URDF and meshes (Apache-2.0). No neural networks.
 | What if there is not enough time to carry the object? | A lift is allowed only if the remaining time covers the worst-case holding time with every step timing out. Otherwise the hand opens in place and the object is not lifted. |
 | Why Rust if there is NumPy? | Faster perception and planning, same answers: the kernel tests on shipped inputs and the equivalence tests on 62 frames from our runs check it. Without the module the whole solution runs on NumPy. |
 | Why no neural networks? | Few objects, sizes known from the task. Geometry is deterministic, testable and needs no GPU. |
+| What happens to a malformed message? | The callback logs and drops it, and the executor keeps running. A `/sim/task` message with broken JSON or not a JSON object is skipped and the node waits for a valid one. `test_node_stub.py` checks it. |
+| Why are test tubes not handled? | This version solves `sort2` and `sort3`. For other tasks the node publishes `/sim/task/done` at once. Racks and the cabinet are the next step, found by camera too. |
 
 ## Documents
 
