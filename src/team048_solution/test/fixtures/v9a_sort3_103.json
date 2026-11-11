@@ -1,5 +1,5 @@
 {
-"source": "recorded simulator run v9a, sort3 pool 3 seed 103, HACK_SELF_COLLISION=1, solution of that time; extracted from the node log (TRACE/HAND JSON lines + plain log lines)",
+"source": "recorded simulator run v9a, sort3 pool 3 seed 103, HACK_SELF_COLLISION=1; extracted from the node log (TRACE/HAND JSON lines + plain log lines)",
 "trace": [
 {
 "t": 23.19,

@@ -4,6 +4,7 @@ import json,os,sys,glob,numpy as np
 HERE=os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0,os.path.join(HERE,'..','..','..','src','team048_solution'))
 from team048_solution import arm as ARM
+# synthetic benchmark scene (plane like run v7, three tray centres); not used by the solution
 A=ARM.Arm('l');n=np.array([-.0699,0,.9976]);A.set_scene((n/np.linalg.norm(n),.1788/np.linalg.norm(n)),[(.34,.69),(.34,-.69),(.53,0.)])
 ch=A.chain;col=A.col;rng=np.random.default_rng(0)
 index={ch.base:0};[index.__setitem__(j.child,i+1) for i,j in enumerate(ch.joints)]
