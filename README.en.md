@@ -7,7 +7,7 @@
   &nbsp;
   <img src="https://img.shields.io/badge/Rust-%E2%89%A51.89-000000?logo=rust&logoColor=white" alt="Rust 1.89+">
   &nbsp;
-  <img src="https://img.shields.io/badge/tests-261-2F6B55" alt="261 tests">
+  <img src="https://img.shields.io/badge/tests-269-2F6B55" alt="269 tests">
   &nbsp;
   <img src="https://img.shields.io/badge/license-Apache--2.0-2F6B55" alt="Apache-2.0">
 </p>
@@ -15,6 +15,8 @@
 [Русский](README.md) | English
 
 # DeftSort
+
+[Strengths](#key-strengths) · [What works](#what-already-works) · [Run](#run) · [How it works](#how-it-works) · [Method sources](#where-the-methods-come-from) · [Scope](#scope) · [Hard questions](#hard-questions) · [Documents](#documents) · [Licence](#licence)
 
 A TienKung 2.0 Pro humanoid with Inspire hands stands at a table. The objects go into the trays of their categories within 270 s (`sort2`) or 405 s (`sort3`) of simulation time. Where the table and the trays are and what lies on the table, the robot learns from its own cameras only.
 
@@ -29,7 +31,7 @@ A TienKung 2.0 Pro humanoid with Inspire hands stands at a table. The objects go
 
 **Why it scores.** Points come from objects in their own trays, and an object lifted but not delivered costs −10. DeftSort lifts an object only when it has a checked path and the time to deliver it. Every lift aims at +10; a doubtful case costs 0.
 
-**Stage.** Hackathon prototype. The build is verified offline: 261 tests on recorded frames and logs of our runs in the organisers' simulator.
+**Stage.** Hackathon prototype. The build is verified offline: 269 tests on recorded frames and logs of our runs in the organisers' simulator.
 
 ## Key strengths
 
@@ -38,7 +40,7 @@ A TienKung 2.0 Pro humanoid with Inspire hands stands at a table. The objects go
 - **Lift only with time to spare.** An object is lifted only if the remaining time covers the worst-case holding time with every step timing out. Otherwise the hand opens in place and the object stays on the table ([test_hold_time.py](src/team048_solution/test/test_hold_time.py)).
 - **Rust accelerator, same answers.** On 62 frames from our runs (the frames are not in the repository) perception is bit-identical to NumPy and the discrete decisions match in all 5358 records. Perception runs 15x faster, grasp planning 223x ([benchmark](#rust-accelerator); [test_accel_equivalence.py](src/team048_solution/test/test_accel_equivalence.py), [test_accel_kernels.py](src/team048_solution/test/test_accel_kernels.py)).
 - **Force within the rules.** All six `SetForce` channels of both hands are within 0.3–0.5: 0.4 on the squeezing fingers, 0.5 on thumb rotation; any override is clamped to 0.3–0.5 ([test_rules_edges.py](src/team048_solution/test/test_rules_edges.py), [test_hand_settings.py](src/team048_solution/test/test_hand_settings.py), [docs/COMPLIANCE.md](docs/COMPLIANCE.md#захват-648)).
-- **261 offline tests without ROS.** The node runs on stubs with real simulator frames; one command checks everything: `bash tools/verify.sh`.
+- **269 offline tests without ROS.** The node runs on stubs with real simulator frames; one command checks everything: `bash tools/verify.sh`.
 
 ## What already works
 
@@ -47,7 +49,7 @@ A TienKung 2.0 Pro humanoid with Inspire hands stands at a table. The objects go
 - **Hand.** Two-phase close: to contact, then 0.15 of the stroke further. Before the lift the node checks that the hand is not empty.
 - **Placing.** The hand opens when the TCP is within 4 cm of the plan or the release point lies inside the measured tray rectangle. Otherwise one more approach; then the object is carried back along the travelled path and put down on the table above the pick spot. A transfer counts only if the hand is not empty over the tray.
 - **Time.** Budget on `/clock`, launch time included; light objects first.
-- **Robustness.** An error on one object opens the hands and returns the arms home; the run goes on. ROS callbacks drop malformed messages and log them; an invalid task on `/sim/task` is skipped and the node waits for the next one. `/sim/task/done` is published at the end of the run, also after a setup error.
+- **Robustness.** An error on one object opens the hands and returns the arms home; the run goes on. ROS callbacks drop malformed messages and log them; an invalid task on `/sim/task` is skipped and the node waits for the next one. `/sim/task/done` is published once at the end of the run, also after a setup error and after an error outside the task loop.
 
 ## Run
 
@@ -61,17 +63,19 @@ source install/setup.bash
 bash run.sh                         # one episode: waits for /sim/task, sorts, publishes /sim/task/done
 ```
 
+`run.sh` sources `install/setup.bash` itself when `install/` lies next to it, so the launch does not depend on the calling shell having sourced the workspace.
+
 Checks without ROS or the simulator:
 
 ```bash
-bash tools/verify.sh                      # tests in both modes, one summary line per mode
+bash tools/verify.sh                      # tests in both modes, docs check, lint, cargo test: one line per step
 python3 -m pytest -q                      # with the Rust module, if installed
 TEAM048_ACCEL=0 python3 -m pytest -q      # NumPy only
 ```
 
-In a clean clone: with Rust 245 passed, 16 skipped; with `TEAM048_ACCEL=0` 237 passed, 24 skipped. The skipped tests are equivalence tests on recorded frames of run v7; those frames are not in the repository and are found through `TEAM048_V7_TRACE`. With them all 261 pass.
+In a clean clone: with Rust 253 passed, 16 skipped; with `TEAM048_ACCEL=0` 245 passed, 24 skipped. The skipped tests are equivalence tests on recorded frames of run v7; those frames are not in the repository and are found through `TEAM048_V7_TRACE`. With them all 269 pass.
 
-`setup.sh` installs the module for `/usr/bin/python3`, the ROS 2 Humble interpreter. In a virtualenv: `TEAM048_PY=$(which python3) bash setup.sh`. `scipy==1.13.1` needs NumPy ≥ 1.22.4.
+CI runs the same checks ([.github/workflows/ci.yml](.github/workflows/ci.yml)): the tests in both modes on two dependency sets, the linter (`ruff.toml`), the documents against the repository (`tools/check_docs.py`), `shellcheck`, `cargo fmt`, `clippy`, `cargo test` and a build of the Rust module from source.
 
 | Variable | Default | Purpose |
 |---|---|---|
@@ -81,6 +85,13 @@ In a clean clone: with Rust 245 passed, 16 skipped; with `TEAM048_ACCEL=0` 237 p
 | `TEAM048_ACCEL` | 1 | `0` disables the Rust module |
 | `TEAM048_ACCEL_PARALLEL` | 0 | `1` enables rayon threads |
 | `TEAM048_TRACE_DIR` | — | Debugging: JSON trace and RGB-D frames per object |
+| `TEAM048_PY` | `/usr/bin/python3` | Interpreter for which `setup.sh` installs the Rust module |
+| `TEAM048_NO_BUILD` | 0 | `1` forbids `setup.sh` to build the Rust module from source |
+| `TEAM048_FORCE_BUILD` | 0 | `1` skips the prebuilt wheel, `setup.sh` builds the module from source |
+| `TEAM048_ACCEL_NO_AVX2` | — | Any value disables the AVX2 kernels of the Rust module |
+| `TEAM048_V7_TRACE` | — | Directory of recorded run-v7 frames for the equivalence tests |
+| `TEAM048_TORSO_MESH` | 1 | `0` drops the mesh-fitted torso spheres; offline comparisons only |
+| `TEAM048_FRAME_TOOLS` | — | Frame-helper directory for `rust/team048_accel/benches/export_model.py` |
 
 ## How it works
 
@@ -145,7 +156,7 @@ First the robot looks at the table and the trays with its head (yaw 0 and ±0.6 
 
 | Module (`src/team048_solution/team048_solution/`) | Lines | What it does |
 |---|---:|---|
-| `node.py` | 1037 | ROS node, task state machine, scene survey, execution, error recovery, TRACE |
+| `node.py` | 1051 | ROS node, task state machine, scene survey, execution, error recovery, TRACE |
 | `arm.py` | 594 | URDF, collision envelopes (arm, torso, head, other arm, thighs, table, trays), open-hand point cloud, pick and place planning |
 | `perception.py` | 360 | Deprojection, RANSAC table plane, near edge, depth-connectivity segmentation |
 | `planning.py` | 285 | Spheres, `CollisionModel`: `valid`, `certify`, `certify_escape` |
@@ -211,7 +222,7 @@ Robot geometry: UBTECH URDF and meshes (Apache-2.0). No neural networks.
 
 | Area | Now | Next step |
 |---|---|---|
-| Isaac Sim validation | Offline: 261 tests, recorded frames and logs of our runs | Run of the current build in Isaac Sim, `sort2` and `sort3` |
+| Isaac Sim validation | Offline: 269 tests, recorded frames and logs of our runs | Run of the current build in Isaac Sim, `sort2` and `sort3` |
 | Heavy objects (≥ 0.22 kg) | Scheduled last; holding at force 0.4 needs μ ≥ m·g/(2N) | Calibrate the simulator friction from TRACE |
 | Dishes by the rim | Pinch when the torque m·g·r ≤ 0.17 N·m | Two-point grasp for heavy dishes |
 | Collision model | Arm, torso, head, other arm, thighs, table, trays | Held object and already placed objects |
@@ -248,4 +259,4 @@ Documents in `docs/` are in Russian.
 
 ## Licence
 
-Apache-2.0, text in [LICENSE](LICENSE). `data/tiangong_pro_with_hands.urdf` comes from the simulator repository (Apache-2.0, UBTECH) and serves only as the robot's kinematic model. The torso and thumb spheres were fitted offline (`tools/fit_spheres.py`, `tools/hand_from_meshes.py`) to the UBTECH-Robot/tiangong2pro_tf STL meshes (Apache-2.0). All other code was written by the team.
+Apache-2.0, text in [LICENSE](LICENSE). `data/tiangong_pro_with_hands.urdf` comes from the simulator repository (Apache-2.0, UBTECH) and serves only as the robot's kinematic model. The torso and thumb spheres were fitted offline (`tools/fit_spheres.py`, `tools/hand_from_meshes.py`) to the UBTECH-Robot/tiangong2pro_tf STL meshes (Apache-2.0). All other code was written by the team. Third-party material and the licences of the Rust module's dependencies are listed in [NOTICE](NOTICE).
