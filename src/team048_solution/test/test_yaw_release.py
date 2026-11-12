@@ -33,6 +33,61 @@ class Yaw(unittest.TestCase):
         A.set_scene(pl,list(SF.TRAYS.values()));e0=repr(A.col.environment)
         N.plan_place_yaw(A,A.home,*SF.TRAYS['tray_right'],pl,list(SF.TRAYS.values()))
         self.assertEqual(e0,repr(A.col.environment))
+    def test_turned_scene_keeps_the_table_edge_in_the_pelvis_frame(self):
+        """body_yaw_joint turns the torso and the arms, not the table, the trays or the hips. Rebuilding the table from
+        a rotated plane put its near edge in front of the turned torso: for a 2.2 rad turn the modelled table
+        reached 0.24 m behind the real near edge, and the real table beside the arm was missing."""
+        A=ARM.Arm('r');n=np.array([-.0699,0,.9976]);pl=(n/np.linalg.norm(n),.1788/np.linalg.norm(n));edge=.24
+        trays=list(SF.TRAYS.values())
+        A.set_scene(pl,trays,table_x=(edge,ARM.TABLE_X_FAR));C0=A.col._env_centers.copy();R0=A.col._env_radii.copy()
+        nb=len(A.body);h=ARM.HIP_SPHERES;nt=len(ARM.table_env(pl,(edge,ARM.TABLE_X_FAR)))
+        for th in (1.1,-2.2):
+            A.set_scene(pl,trays,yaw=th);C=A.col._env_centers;Rt=N.rotz(-th)
+            self.assertTrue(np.array_equal(A.col._env_radii,R0))
+            self.assertTrue(np.array_equal(C[:nb-h],C0[:nb-h]))                       # torso, head, other arm turn along
+            self.assertTrue(np.allclose(C[nb-h:],C0[nb-h:]@Rt.T,atol=1e-12))          # hips, table, trays stay
+            back=C[nb:nb+nt]@N.rotz(th).T                                            # table, back in the pelvis frame
+            self.assertGreaterEqual(back[:,0].min(),edge-1e-9)
+        A.set_scene((N.rotz(-2.2)@pl[0],pl[1]),[])                                  # the former construction, yaw 2.2
+        old=A.col._env_centers[nb:nb+nt]@N.rotz(2.2).T
+        self.assertLess(old[:,0].min(),edge-.2)
+        A.set_scene(pl,trays);self.assertTrue(np.array_equal(A.col._env_centers,C0))
+    def test_at_yaw_restores_the_previous_scene(self):
+        A=ARM.Arm('l');A.set_other(np.zeros(7));A.set_scene(SF.plane(),list(SF.TRAYS.values()));e0=A.col._env_centers.copy()
+        with A.at_yaw(.8):
+            self.assertAlmostEqual(A._yaw,.8)
+            with A.at_yaw(.8):self.assertAlmostEqual(A._yaw,.8)
+            A.set_other(np.r_[.2,np.zeros(6)]);self.assertAlmostEqual(A._yaw,.8)      # other-arm update keeps the yaw
+        self.assertEqual(A._yaw,0.);A.set_other(np.zeros(7))
+        self.assertTrue(np.array_equal(A.col._env_centers,e0))
+class TurnSweep(unittest.TestCase):
+    """The hold posture is carried through the whole torso turn. Five sampled yaws left 0.6 rad between checks, a
+    tray wall band is about 0.15 rad wide at the hand's radius."""
+    def setUp(s):
+        s.pl=SF.plane();s.trays=list(SF.TRAYS.values())
+    def valid_at(s,A,q,a):
+        A.set_scene(s.pl,s.trays,yaw=a)
+        try:return A.col.valid(q)
+        finally:A.set_scene(s.pl,s.trays)
+    def test_wall_between_samples_is_caught(s):
+        A=ARM.Arm('l');A.set_scene(s.pl,s.trays);x,y=.42,.30
+        q=A.solve(A.grasp_pose(np.array([x,y,ARM.plane_height(s.pl,x,y)+.05]),np.array([1.,0,0]),np.array([0,0,-1.]),'pinch'))
+        s.assertIsNotNone(q);s.assertTrue(A.col.valid(q))
+        s.assertTrue(all(s.valid_at(A,q,a) for a in np.linspace(0,-2.5,5)))   # the former 5-sample check passed
+        s.assertFalse(s.valid_at(A,q,-.2))                                   # the hand meets the centre tray wall
+        s.assertFalse(A.certify_turn(q,0.,-2.5))
+    def test_home_turns_through_the_whole_yaw_range(s):
+        # go_home runs before waist(0) after a yawed place: the turn back happens at the home posture
+        for side in 'lr':
+            A=ARM.Arm(side);A.set_scene(s.pl,s.trays)
+            for th in (N.YAW_MAX,-N.YAW_MAX):s.assertTrue(A.certify_turn(A.home,0.,th),(side,th))
+    def test_accepted_turn_is_clear_on_a_dense_sweep(s):
+        A=ARM.Arm('r');A.set_scene(s.pl,s.trays);rng=np.random.default_rng(3);checked=0
+        for _ in range(40):
+            q=rng.uniform(A.chain.lower,A.chain.upper)*.6;th=float(rng.uniform(-N.YAW_MAX,N.YAW_MAX))
+            if not A.col.valid(q) or not A.certify_turn(q,0.,th):continue
+            checked+=1;s.assertTrue(all(s.valid_at(A,q,a) for a in np.linspace(0,th,300)))
+        s.assertGreater(checked,3)
 class FarTray(unittest.TestCase):
     def test_far_tray_sides(self):
         L,R,C=SF.TRAYS['tray_left'][1],SF.TRAYS['tray_right'][1],SF.TRAYS['tray_center'][1]

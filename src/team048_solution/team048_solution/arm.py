@@ -2,7 +2,7 @@
 Frames: pelvis, z up, x forward. Uses kinematics.Chain (bounded DLS IK) and planning.CollisionModel (swept sphere certification).
 Limitations: the URDF STL meshes are absent, so link envelopes are spheres sized from the URDF inertial tensors
 (equivalent-cylinder radius, inflated) -- an approximation, not mesh collision."""
-import os,numpy as np,xml.etree.ElementTree as ET
+import contextlib,os,numpy as np,xml.etree.ElementTree as ET
 
 from .kinematics import Chain
 from .planning import Sphere,CollisionModel,joint_path,spheres_bulk
@@ -19,6 +19,8 @@ TABLE_Z_BAND=(-.45,-.05)    # m, pelvis frame: accepted table-top height at x=0.
 TABLE_X_FAR=1.0             # m, far bound of the table obstacle (search bound)
 TABLE_Y_HALF=1.0            # m, half width of the table obstacle (search bound)
 TABLE_X_NEAR_MIN=.12        # m, the table obstacle never starts closer than this (robot body region, robot geometry)
+YAW_SAME=1e-3               # rad, Arm.at_yaw: a measured torso yaw this close to the scene's yaw keeps the scene
+TURN_STEP=.005              # m, Arm.certify_turn: largest arc an arm sphere travels between two checked torso yaws
 SIDE={'l':dict(tip='left_tcp_link',hand='L_base_link',pre='left'),'r':dict(tip='right_tcp_link',hand='R_base_link',pre='right')}
 ARM=['shoulder_pitch','shoulder_roll','shoulder_yaw','elbow_pitch','elbow_yaw','wrist_pitch','wrist_roll']
 REQUIRED_LINKS=('pelvis','left_tcp_link','right_tcp_link','L_base_link','R_base_link','head_yaw_link','camera_head_link',
@@ -259,9 +261,25 @@ def body_env(side,other_q=None):
     # (arm_spheres), mapped to pelvis by FK -- not one sphere per joint origin.
     for sp in arm_spheres(o,None,mesh=False):
         E.append(Sphere('pelvis',(fk_link(sp.link,q)@np.r_[sp.center,1])[:3],sp.radius))
-    # legs/hips below the table are fixed: one sphere per hip
+    # legs/hips below the table are fixed: one sphere per hip. They must stay the last HIP_SPHERES entries: they are on
+    # the pelvis and do not turn with body_yaw_joint (Arm.set_scene, yaw).
     for hs in ('l','r'):E.append(Sphere('pelvis',P(f'hip_pitch_{hs}_link'),.07))
     return E
+HIP_SPHERES=2
+def _rotz(a):
+    c,s=np.cos(a),np.sin(a);return np.array([[c,-s,0.],[s,c,0.],[0.,0.,1.]])
+def _turned(parts,yaw,hips=HIP_SPHERES):
+    """Scene parts [(spheres, centres, radii) of the body, then pelvis-fixed parts] as seen from the torso turned by yaw
+    about pelvis z (body_yaw_joint sits at the pelvis origin, URDF). Torso, head and the other arm turn with the arm
+    and stay; the hips, the table and the trays stay in the pelvis frame and are rotated by -yaw. The table is built
+    in the pelvis frame first: its near edge is a pelvis-frame line, not an edge of the turned torso frame."""
+    Rt=_rotz(-yaw).T;out=[]
+    for k,(_,C,R) in enumerate(parts):
+        C=np.array(C,dtype=float)
+        if k==0:C[len(C)-hips:]=C[len(C)-hips:]@Rt
+        else:C=C@Rt
+        C.setflags(write=False);out.append((tuple(spheres_bulk('pelvis',C,R)),C,R))
+    return out
 _ENV_CACHE={}
 def _cached_entry(key,build):
     """(tuple of Spheres, centers (n,3) read-only, radii (n,) read-only); scene sphere lists are pure functions of
@@ -324,12 +342,6 @@ def tray_geom(t,size=(.22,.32),height=.07):
                 float(t['size'][0]),float(t['size'][1]),float(t.get('height',height)))
     t=tuple(float(v) for v in t)
     return t if len(t)==7 else (t[0],t[1],0.,1.,float(size[0]),float(size[1]),float(height))
-def rotate_trays(trays,R):
-    """Trays expressed in a frame rotated by R (3x3 about z): centre and long axis rotate."""
-    out=[]
-    for t in trays:
-        x,y,ax,ay,a,b,h=tray_geom(t);c=R@np.r_[x,y,0.];u=R@np.r_[ax,ay,0.];out.append((c[0],c[1],u[0],u[1],a,b,h))
-    return out
 def _tray_entry(trays,plane,size=(.22,.32),height=.07,r=.02,step=.03):
     G=tuple(tray_geom(t,size,height) for t in trays)
     key=('tray',np.asarray(G,float).tobytes(),np.asarray(plane[0],float).tobytes(),float(plane[1]),_key(r,step))
@@ -377,22 +389,25 @@ class Arm:
         q=home_dict(side)   # a forward-reaching elbow-bent seed
         self.seeds.insert(0,np.clip([q.get(n,0.) for n in self.chain.names],self.chain.lower,self.chain.upper))
         self.home=self.seeds[0]
-    def set_scene(self,plane,trays=(),table_x=None):
+    def set_scene(self,plane,trays=(),table_x=None,yaw=0.):
         """Obstacles from the latest observation: measured table plane (+ measured near edge table_x=(near,far)) and
-        the detected tray walls (body unchanged).
-        Equivalent to  col.environment = body + table_env(plane, table_x) + tray_env(trays, plane)  (same spheres, same
-        order); the assembled arrays and the Rust grid are memoised per scene (the torso-yaw search revisits the same
-        rotated scenes for every object of an observation)."""
+        the detected tray walls (body unchanged), all in the pelvis frame. yaw (rad): the torso is turned by
+        body_yaw_joint and the arm chain (built with that joint at 0) sees the pelvis-fixed scene rotated by -yaw.
+        At yaw 0 equivalent to  col.environment = body + table_env(plane, table_x) + tray_env(trays, plane)  (same
+        spheres, same order); the assembled arrays and the Rust grid are memoised per scene (the torso-yaw search
+        revisits the same scenes for every object of an observation)."""
         if table_x is not None:self.table_x=table_x
-        self._scene=(plane,list(trays))
+        yaw=float(yaw)
+        self._scene=(plane,list(trays));self._yaw=yaw
         tx=getattr(self,'table_x',None)
         bt,bC,bR=self._body_entry()
         G=np.asarray([tray_geom(t) for t in trays],float).tobytes() if trays else None
-        key=(np.asarray(plane[0],float).tobytes(),float(plane[1]),G,_key(*_table_args(plane,tx,None)),bC.tobytes(),bR.tobytes())
+        key=(np.asarray(plane[0],float).tobytes(),float(plane[1]),G,_key(*_table_args(plane,tx,None)),bC.tobytes(),bR.tobytes(),yaw)
         cache=self.__dict__.setdefault('_scenes',{})
         e=cache.get(key)
         if e is None:
             parts=[(bt,bC,bR),_table_entry(plane,tx)]+([_tray_entry(trays,plane)] if trays else [])
+            if yaw:parts=_turned(parts,yaw)
             t=tuple(x for p in parts for x in p[0])
             if not t or any(s.link!=self.chain.base for s in t):raise ValueError("nonempty base-frame environment required")
             C=np.concatenate([p[1] for p in parts]);R=np.concatenate([p[2] for p in parts]);C.setflags(write=False);R.setflags(write=False)
@@ -418,8 +433,46 @@ class Arm:
         if key==getattr(self,'_other_key',None):return
         self._other_key=key
         self.body=_cached(('body',self.side,key),lambda:body_env(self.side,dict(zip([f'{n}_{o}_joint' for n in ARM],key))))
-        if getattr(self,'_scene',None) is not None:self.set_scene(*self._scene)
+        if getattr(self,'_scene',None) is not None:self.set_scene(*self._scene,yaw=getattr(self,'_yaw',0.))
         else:self.col.environment=list(self.body)
+    def certify_turn(self,q,th0,th1,step=TURN_STEP):
+        """True when posture q (rad) stays clear of the pelvis-fixed scene (hips, table, trays) while the torso turns
+        from th0 to th1 (rad) about pelvis z. An arm sphere centre c turns with the torso: |R(a)c - R(b)c| <= rho*|a-b|,
+        rho = distance of c from the axis (chord <= arc). Samples dA apart with rho_max*dA <= step, each sphere
+        inflated by its own rho*dA as certify does along a joint segment, so the whole arc is covered, not only the
+        samples. Torso, head and the other arm turn with the arm and are not part of this check (col.valid covers
+        them). Pairs that cannot meet on any yaw (height or radial distance apart) are dropped first."""
+        sc=getattr(self,'_scene',None)
+        if sc is None:raise ValueError('certify_turn needs a measured scene (set_scene)')
+        plane,trays=sc;q=self.chain.validate_q(q)
+        bt,bC,bR=self._body_entry()
+        parts=[(bC[len(bC)-HIP_SPHERES:],bR[len(bR)-HIP_SPHERES:]),_table_entry(plane,getattr(self,'table_x',None))[1:]]
+        if trays:parts.append(_tray_entry(trays,plane)[1:])
+        E=np.concatenate([p[0] for p in parts]);ER=np.concatenate([p[1] for p in parts])
+        col=self.col;frames=self.chain.frames_py(q)
+        W=np.array([frames[s.link][:3,:3]@s.center+frames[s.link][:3,3] for s in col.spheres])
+        r=col._sph_radii;rho=np.hypot(W[:,0],W[:,1]);span=abs(float(th1)-float(th0))
+        n=max(1,int(np.ceil(float(rho.max())*span/step)));dA=span/n;infl=rho*dA
+        reach=r[:,None]+ER[None,:]+col.margin+infl[:,None]
+        near=(np.abs(W[:,None,2]-E[None,:,2])<=reach)&(np.abs(rho[:,None]-np.hypot(E[:,0],E[:,1])[None,:])<=reach)
+        i,j=np.nonzero(near)
+        if not len(i):return True
+        Wi,Ej,lim=W[i],E[j],reach[i,j]
+        for a in np.linspace(float(th0),float(th1),n+1):
+            c,s_=np.cos(a),np.sin(a)
+            P=np.stack([c*Wi[:,0]-s_*Wi[:,1],s_*Wi[:,0]+c*Wi[:,1],Wi[:,2]],axis=1)
+            if np.any(np.sqrt(((P-Ej)**2).sum(axis=1))<=lim):return False
+        return True
+    @contextlib.contextmanager
+    def at_yaw(self,yaw):
+        """Checks inside the block see the scene from the torso turned by yaw (rad, measured body_yaw_joint); the
+        previous yaw comes back on exit. Without a scene nothing changes."""
+        sc=getattr(self,'_scene',None);prev=getattr(self,'_yaw',0.);yaw=float(yaw)
+        if sc is None or abs(yaw-prev)<YAW_SAME:
+            yield;return
+        self.set_scene(sc[0],sc[1],yaw=yaw)
+        try:yield
+        finally:self.set_scene(sc[0],sc[1],yaw=prev)
     def path_home(self,q):
         """Certified way home from q (#625: never an uncertified move when a certified one exists):
         [home] if the straight joint path is collision-free, else [lift(q), home], else the shortest path through the

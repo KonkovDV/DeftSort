@@ -171,6 +171,17 @@ class MotionMethods(unittest.TestCase):
         ok,e=bounded(lambda:sol.retreat('r'));s.assertTrue(ok);s.assertIsNone(e)
         s.assertEqual(lifted,[N.RETREAT_DZ]);in_limits(s,sol,fr)
         s.assertTrue(np.allclose(sol.q_now('r'),A.home,atol=.05))
+    def test_way_home_is_checked_at_the_measured_torso_yaw(s):
+        """After a yawed place the arm goes home before the waist turns back: the path is certified against the scene
+        seen from the turned torso, and the retreat lift as well; the scene is back at yaw 0 afterwards."""
+        sol,logs,fr=robot();A=sol.arms['r'];sol.js['body_yaw_joint']=1.1;seen=[]
+        orig_home,orig_lift=A.path_home,A.lift
+        A.path_home=lambda q:seen.append(('home',A._yaw)) or orig_home(q)
+        A.lift=lambda q,dz:seen.append(('lift',A._yaw)) or orig_lift(q,dz)
+        sol.plane=(np.array([0,0,1.]),-10.)                              # table far above: TCP counts as low
+        ok,e=bounded(lambda:sol.retreat('r'));s.assertTrue(ok);s.assertIsNone(e)
+        s.assertEqual([k for k,_ in seen],['lift','home']);s.assertTrue(all(abs(y-1.1)<1e-12 for _,y in seen))
+        s.assertEqual(A._yaw,0.);in_limits(s,sol,fr)
     def test_waist_settles_and_times_out(s):
         sol,logs,fr=robot();sol.js['body_yaw_joint']=.4
         ok,e=bounded(lambda:sol.waist(0.));s.assertTrue(ok);s.assertIsNone(e)

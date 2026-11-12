@@ -15,6 +15,12 @@ K=np.array([[343.16,0,320.],[0,343.16,180.],[0,0,1]])
 # (xy@u) with a different kernel (FMA): there the reference itself moves by <= 1 ulp, so floats are compared to
 # 1e-12 and every discrete result (None, flags, counts, kinds, chosen axis) must still match exactly.
 EXACT=np.lib.NumpyVersion(np.__version__)<'2.0.0'
+def rotate_trays(trays,R):
+    """Trays in a frame rotated by R (3x3 about z): centre and long axis rotate (scene cache keys over many trays)."""
+    out=[]
+    for t in trays:
+        x,y,ax,ay,a,b,h=arm.tray_geom(t);c=R@np.r_[x,y,0.];u=R@np.r_[ax,ay,0.];out.append((c[0],c[1],u[0],u[1],a,b,h))
+    return out
 def same(a,b):
     if isinstance(a,dict) and isinstance(b,dict):return a.keys()==b.keys() and all(same(a[k],b[k]) for k in a)
     if isinstance(a,(list,tuple)) and isinstance(b,(list,tuple)) and len(a)==len(b) and not all(isinstance(x,(int,float,np.number)) for x in a):
@@ -158,7 +164,7 @@ class Api2Kernels(unittest.TestCase):
         A=arm.Arm('l');rng=np.random.default_rng(4)
         dets=[dict(center=(.34,.69),size=(.22,.32),axis=(.1,.995),height=.068),(.53,0.),(.34,-.69,0.,1.,.21,.31,.07)]
         for th in (0.,.7,-1.3):
-            R=NODE.rotz(-th);pl=(R@s.plane[0],s.plane[1]);tr=arm.rotate_trays(dets,R)
+            R=NODE.rotz(-th);pl=(R@s.plane[0],s.plane[1]);tr=rotate_trays(dets,R)
             for trays,tx in ((tr,None),([],None),(tr,(.25,1.)),(tr[:1],(.05,.9))):
                 A.set_scene(pl,trays,table_x=tx);env=A.col.environment;C,Rr=A.col._env_centers.copy(),A.col._env_radii.copy()
                 qs=[rng.uniform(A.chain.lower,A.chain.upper) for _ in range(80)];va=[A.col.valid(q) for q in qs]

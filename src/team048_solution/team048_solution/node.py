@@ -703,22 +703,26 @@ class Sol(Node):
         a low pose) and the event is logged for the trajectory review."""
         A=s.arms[side];o='r' if side=='l' else 'l'
         if o in s.arms:A.set_other(s.q_now(o))
-        q=s.q_now(side);path=A.path_home(q)
+        q=s.q_now(side)
+        with A.at_yaw(s.body_yaw()):path=A.path_home(q)   # after a yawed place the torso is still turned
         if path is None:s.log('WARNING uncertified path home',side,'from',[round(float(x),3) for x in q]);path=[A.home]
         elif len(path)>1:s.log('path home',side,'via',len(path)-1,'waypoint(s)')
         for q in path[:-1]:s.move_arm(side,q,tol=.03)
         s.move_arm(side,path[-1],tol=.05)
     def retreat(s,side):
         """Lift straight up first if the TCP is low (near table/tray walls), then go home."""
-        A=s.arms[side];q=s.q_now(side)
+        A=s.arms[side];q=s.q_now(side);yaw=s.body_yaw()
         try:
-            p=A.tcp(np.clip(q,A.chain.lower,A.chain.upper))[:3,3]
+            p=rotz(yaw)@A.tcp(np.clip(q,A.chain.lower,A.chain.upper))[:3,3]   # torso frame -> pelvis (the table frame)
             low=True if s.plane is None else bool(p[2]<ARMMOD.plane_height(s.plane,p[0],p[1])+LOW_ABOVE_TABLE)
         except ValueError:low=True    # unknown -> the safe choice: lift first
         if low:
-            qu=A.lift(np.clip(q,A.chain.lower,A.chain.upper),RETREAT_DZ)
+            with A.at_yaw(yaw):qu=A.lift(np.clip(q,A.chain.lower,A.chain.upper),RETREAT_DZ)
             if qu is not None:s.move_arm(side,qu,tol=.03)
         s.go_home(side)
+    def body_yaw(s):
+        """Measured body_yaw_joint (rad), 0 before it is reported."""
+        with s.lock:return float(s.js.get('body_yaw_joint',0.))
     def finger_dev(s,side,kind):
         """Deviation of this grasp kind's closing fingers from the current (open) command."""
         h=s.hstate.get(side)
@@ -984,8 +988,9 @@ def far_tray(side,ty):
     return (side=='l' and ty<-FAR_TRAY_Y) or (side=='r' and ty>FAR_TRAY_Y)
 def plan_place_yaw(A,q_from,tx,ty,plane,trays,fallback=None,tray_h=TRAY_H,obj_off=None):
     """(theta, (q_place,q_up,q_carry)) or None. theta=0 first; otherwise the torso is yawed by theta while the arm holds
-    q_carry (or q_from); the scene (table plane, trays) is expressed in the rotated torso frame. The hold posture is
-    checked against the rotated scene at 5 intermediate angles (sampled, not swept)."""
+    q_carry (or q_from); the pelvis-fixed scene (table, trays, hips) is rotated into the turned torso frame
+    (Arm.set_scene yaw), and the tray target and table height are expressed in that frame. The hold posture is
+    certified over the whole turn 0 -> theta (Arm.certify_turn)."""
     n,d=np.asarray(plane[0],float),float(plane[1])
     zt=lambda x,y,n=n:-(d+n[0]*x+n[1]*y)/n[2]
     kw={} if obj_off is None else {'obj_off':obj_off}    # side/top grasps: no object offset
@@ -995,16 +1000,12 @@ def plan_place_yaw(A,q_from,tx,ty,plane,trays,fallback=None,tray_h=TRAY_H,obj_of
     try:
         for th in yaw_candidates(A.side,tx,ty):
             R=rotz(-th);n2=R@n
-            A.set_scene((n2,d),ARMMOD.rotate_trays(trays,R))
+            A.set_scene((n,d),trays,yaw=th)
             t2=(R@np.r_[tx,ty,0.])[:2];fb=None if fallback is None else tuple((R@np.r_[fallback[0],fallback[1],0.])[:2])
             r=plan_place(A,q_from,t2[0],t2[1],zt(t2[0],t2[1],n2),fb,tray_h,**kw)
             if r is None:continue
             hold=r[2] if r[2] is not None else q_from
-            ok=True
-            for a in np.linspace(0,th,5):
-                Ra=rotz(-a);A.set_scene((Ra@n,d),ARMMOD.rotate_trays(trays,Ra))
-                if not A.col.valid(hold):ok=False;break
-            if ok:return th,r
+            if A.col.valid(hold) and A.certify_turn(hold,0.,th):return th,r
         return None
     finally:
         A.set_scene((n,d),list(trays))
