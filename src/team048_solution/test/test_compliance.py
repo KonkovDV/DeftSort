@@ -183,3 +183,14 @@ class TimeLimit595(unittest.TestCase):
         self.assertAlmostEqual(B.start_time(50.,10.,4.),44.)          # 6 s wall of start-up at RTF<=1 -> 6 s sim
     def test_run_sh_uses_sim_time(self):
         self.assertIn('use_sim_time:=true',open(os.path.join(HERE,'..','..','..','run.sh')).read())
+    def test_run_sh_stays_the_parent_of_the_node(self):
+        # budget.launch_age_s() ages the ancestor process whose command line contains 'run.sh'. With `exec ros2 run`
+        # the shell would be replaced, the start-up before the node would no longer be charged to the limit.
+        import re
+        code=[l.split('#')[0] for l in open(os.path.join(HERE,'..','..','..','run.sh')).read().splitlines()[1:]]
+        self.assertFalse(any(re.search(r'\bexec\b',l) for l in code))
+        self.assertEqual(sum('ros2 run team048_solution solution' in l for l in code),1)
+    def test_run_sh_sources_the_workspace_overlay_when_present(self):
+        # a caller that did not `source install/setup.bash` must still find the package (ros2 run would fail otherwise)
+        txt=open(os.path.join(HERE,'..','..','..','run.sh')).read()
+        self.assertIn('install/setup.bash',txt);self.assertLess(txt.index('install/setup.bash'),txt.index('ros2 run'))
