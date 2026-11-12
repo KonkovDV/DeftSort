@@ -2,7 +2,7 @@
 Frames: pelvis, z up, x forward. Uses kinematics.Chain (bounded DLS IK) and planning.CollisionModel (swept sphere certification).
 Limitations: the URDF STL meshes are absent, so link envelopes are spheres sized from the URDF inertial tensors
 (equivalent-cylinder radius, inflated) -- an approximation, not mesh collision."""
-import contextlib,os,numpy as np,xml.etree.ElementTree as ET
+import os,numpy as np,xml.etree.ElementTree as ET
 
 from .kinematics import Chain
 from .planning import Sphere,CollisionModel,joint_path,spheres_bulk
@@ -373,6 +373,18 @@ def home_dict(side):
 def other_home(side):
     """The other arm at ITS home posture (the default while this arm plans; updated from /joint_states by set_other)."""
     return home_dict('r' if side=='l' else 'l')
+class _YawScene:
+    """`with arm.at_yaw(yaw)`: checks see the pelvis-fixed scene from a torso turned by yaw (rad), restored on exit."""
+    def __init__(self,arm,yaw):
+        self.arm=arm;self.yaw=float(yaw)
+        self.sc=getattr(arm,'_scene',None);self.prev=getattr(arm,'_yaw',0.)
+        self.skip=self.sc is None or abs(self.yaw-self.prev)<YAW_SAME
+    def __enter__(self):
+        if not self.skip:self.arm.set_scene(self.sc[0],self.sc[1],yaw=self.yaw)
+        return self
+    def __exit__(self,*exc):
+        if not self.skip:self.arm.set_scene(self.sc[0],self.sc[1],yaw=self.prev)
+        return False
 class Arm:
     """One arm of the robot: chain, IK, collision model (body, other arm, measured table and trays) and planning."""
     def __init__(self,side,margin=.015,table=True):
@@ -463,16 +475,10 @@ class Arm:
             P=np.stack([c*Wi[:,0]-s_*Wi[:,1],s_*Wi[:,0]+c*Wi[:,1],Wi[:,2]],axis=1)
             if np.any(np.sqrt(((P-Ej)**2).sum(axis=1))<=lim):return False
         return True
-    @contextlib.contextmanager
     def at_yaw(self,yaw):
-        """Checks inside the block see the scene from the torso turned by yaw (rad, measured body_yaw_joint); the
-        previous yaw comes back on exit. Without a scene nothing changes."""
-        sc=getattr(self,'_scene',None);prev=getattr(self,'_yaw',0.);yaw=float(yaw)
-        if sc is None or abs(yaw-prev)<YAW_SAME:
-            yield;return
-        self.set_scene(sc[0],sc[1],yaw=yaw)
-        try:yield
-        finally:self.set_scene(sc[0],sc[1],yaw=prev)
+        """Checks inside `with arm.at_yaw(yaw)` see the scene from the torso turned by yaw (rad, measured
+        body_yaw_joint); the previous yaw comes back on exit. Without a scene nothing changes."""
+        return _YawScene(self,yaw)
     def path_home(self,q):
         """Certified way home from q (#625: never an uncertified move when a certified one exists):
         [home] if the straight joint path is collision-free, else [lift(q), home], else the shortest path through the

@@ -171,6 +171,17 @@ class MotionMethods(unittest.TestCase):
         ok,e=bounded(lambda:sol.retreat('r'));s.assertTrue(ok);s.assertIsNone(e)
         s.assertEqual(lifted,[N.RETREAT_DZ]);in_limits(s,sol,fr)
         s.assertTrue(np.allclose(sol.q_now('r'),A.home,atol=.05))
+    def test_joints_arrive_together_on_the_certified_line(s):
+        """A speed floor made nearly static joints arrive early: with a floor of 0.05 rad/s a joint moving 0.1 rad in
+        a 2 rad move arrived after 2 s instead of 2.5 s, up to 0.025 rad off the straight line certify checked."""
+        sol,logs,fr=robot();A=sol.arms['l'];q0=np.asarray(A.home,float)
+        q1=q0.copy();q1[0]-=1.;q1[3]+=.04;q1[5]+=.002
+        q1=np.clip(q1,A.chain.lower,A.chain.upper);dq=np.abs(q1-q0);m=dq.max()
+        ok,e=bounded(lambda:sol.move_arm('l',q1,refine=0));s.assertTrue(ok);s.assertIsNone(e)
+        first=fr.arm_cmds('l')[:7];spd=np.array([x[4] for x in first])
+        moving=dq>1e-3*m/.8
+        s.assertTrue(np.allclose(dq[moving]/spd[moving],m/.8,rtol=1e-9))
+        s.assertTrue(np.all(spd>0) and np.all(spd<=.8))
     def test_way_home_is_checked_at_the_measured_torso_yaw(s):
         """After a yawed place the arm goes home before the waist turns back: the path is certified against the scene
         seen from the turned torso, and the retreat lift as well; the scene is back at yaw 0 afterwards."""

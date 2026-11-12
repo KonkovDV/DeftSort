@@ -206,7 +206,10 @@ class Sol(Node):
         measured joints), stores it in s.guard_trip and returns False (guarded approach)."""
         vmax=min(.8,vmax)
         q=np.asarray(q,float);q0=s.q_now(side);dq=np.abs(q-q0);m=max(dq.max(),1e-3)
-        spd=np.maximum(vmax*dq/m,.05*vmax/.8)     # synchronized: every joint arrives together (straight joint-space line)
+        # Synchronized: every joint arrives together, so the arm follows the certified straight joint-space line. Only
+        # cmd's 1e-3 rad/s clip (spd 0 means maximum speed in the sim) lets a joint with dq < 1e-3*m/vmax arrive
+        # early, at most 2.5e-3 rad off the line, inside certify's 3e-3 rad step.
+        spd=vmax*dq/m
         T=timeout or (m/vmax*1.6+MOVE_T_PAD)
         s.cmd('arm',IDS[side],q,spd);t=s.now();goal=q.copy()
         for k in range(refine+1):
