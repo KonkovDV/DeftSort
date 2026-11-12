@@ -182,6 +182,8 @@ class MotionMethods(unittest.TestCase):
         moving=dq>1e-3*m/.8
         s.assertTrue(np.allclose(dq[moving]/spd[moving],m/.8,rtol=1e-9))
         s.assertTrue(np.all(spd>0) and np.all(spd<=.8))
+        span=float(np.max(A.chain.upper-A.chain.lower))   # cmd floor 1e-3 rad/s at 0.8 rad/s, whole joint range
+        s.assertLess(A.col.reach*1e-3*span/.8, A.col.margin)
     def test_way_home_is_checked_at_the_measured_torso_yaw(s):
         """After a yawed place the arm goes home before the waist turns back: the path is certified against the scene
         seen from the turned torso, and the retreat lift as well; the scene is back at yaw 0 afterwards."""
