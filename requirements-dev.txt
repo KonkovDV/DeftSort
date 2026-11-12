@@ -1,0 +1,4 @@
+# Development and CI only. The solution itself needs requirements.txt (plus ROS 2 Humble at run time).
+-r requirements.txt
+pytest>=7,<9
+ruff>=0.6

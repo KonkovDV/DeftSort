@@ -1,0 +1,9 @@
+# Lint gate (CI and tools/verify.sh): real defects only -- undefined names, unused imports and variables, syntax
+# errors, invalid comparisons and calls. The code keeps a compact house style, so the pycodestyle layout rules
+# (E1-E7, W) and the formatter are deliberately not applied; behaviour is held by the test suite instead.
+target-version = "py310"
+line-length = 200
+extend-exclude = ["build", "install", "log", "research", "rust/team048_accel/target"]
+
+[lint]
+select = ["F", "E9", "PLE", "B006", "B012", "B015", "B018", "B020"]

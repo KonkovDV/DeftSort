@@ -1,0 +1,15 @@
+# Shell scripts must keep LF endings on every platform (a CRLF run.sh/setup.sh does not start on the evaluation host).
+*.sh    text eol=lf
+*.py    text eol=lf
+*.rs    text eol=lf
+*.toml  text eol=lf
+*.md    text eol=lf
+# Binary artefacts: never normalised or diffed as text.
+*.whl   binary
+*.npz   binary
+*.png   binary
+# Generated data and lock files are collapsed in diffs.
+Cargo.lock                                              linguist-generated=true
+src/team048_solution/team048_solution/data/*.json       linguist-generated=true
+src/team048_solution/team048_solution/data/*.urdf       linguist-vendored=true
+vendor/**                                               linguist-vendored=true

@@ -1,0 +1,34 @@
+DeftSort -- team 048 solution, ROS Humanoid Hack, manipulation track
+Copyright 2026 Team 048
+
+Licensed under the Apache License, Version 2.0 (the "License"); the full text is in LICENSE.
+
+This repository includes or is derived from the following third-party material.
+
+1. TienKung 2.0 Pro robot model (URDF)
+   File:    src/team048_solution/team048_solution/data/tiangong_pro_with_hands.urdf
+   Origin:  UBTECH Robotics, distributed with the organisers' simulator (UBT Sim)
+   Licence: Apache License 2.0
+   Use:     kinematic model of the robot only (joint origins, axes, limits, inertials)
+
+2. Data derived from the TienKung 2.0 Pro STL meshes
+   Files:   src/team048_solution/team048_solution/data/torso_spheres.json      (tools/fit_spheres.py)
+            src/team048_solution/team048_solution/data/hand_mesh_geometry.json (tools/hand_from_meshes.py)
+            src/team048_solution/team048_solution/data/hand_open_points.json   (tools/hand_open_points.py)
+   Origin:  github.com/UBTECH-Robot/tiangong2pro_tf (package tiangong2pro_urdf), UBTECH Robotics
+   Licence: Apache License 2.0
+   Use:     collision spheres and open-hand sample points fitted offline; the meshes themselves are not included
+
+3. Rust crates linked into the optional extension team048_accel
+   (vendor/team048_accel-*.whl and builds of rust/team048_accel)
+   pyo3, pyo3-ffi, rayon, rayon-core, ndarray, matrixmultiply, num-traits, num-complex, num-integer, num-rational,
+   num-bigint, crossbeam-deque, crossbeam-epoch, crossbeam-utils, either, glam, libc, once_cell, portable-atomic,
+   portable-atomic-util, rawpointer, rustc-hash, typenum
+            -- MIT OR Apache-2.0
+   nalgebra, simba, approx                    -- Apache-2.0
+   numpy (rust-numpy)                         -- BSD-2-Clause
+   bytemuck, safe_arch, wide                  -- Zlib OR Apache-2.0 OR MIT
+   Exact versions: rust/team048_accel/Cargo.lock; the wheel carries a CycloneDX SBOM in its dist-info/sboms/.
+
+Run-time Python dependencies (NumPy, SciPy, ROS 2 Humble packages, bodyctrl_msgs) are installed separately and are
+not redistributed here.

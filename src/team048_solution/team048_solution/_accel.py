@@ -4,7 +4,7 @@ Every accelerated function keeps its NumPy reference implementation in the same 
 path is used only when the extension imports, the model is supported (7 active joints, <=24 joints) and
 TEAM048_ACCEL != "0". Any unexpected error inside the extension disables it for the process and the NumPy
 reference takes over (logged once to stderr), so a missing or broken wheel can never stop the solution.
-Equivalence (tests/test_accel_equivalence.py): FK/Jacobian/frames <= 1e-12, IK solutions <= 1e-9 on thousands of
+Equivalence (test/test_accel_equivalence.py, test/test_accel_kernels.py): FK/Jacobian/frames <= 1e-12, IK solutions <= 1e-9 on thousands of
 random targets, collision verdicts identical, RANSAC plane and segments identical on the recorded simulator frames.
 """
 import os, sys

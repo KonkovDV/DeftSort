@@ -1,0 +1,105 @@
+# Offline checks of the solution: no ROS and no simulator are needed (the node runs on stubs with recorded frames).
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: pytest (${{ matrix.deps.name }}, ${{ matrix.accel.name }})
+    runs-on: ubuntu-22.04
+    timeout-minutes: ${{ matrix.accel.timeout }}
+    strategy:
+      fail-fast: false
+      matrix:
+        deps:
+          # requirements.txt as installed on the evaluation host
+          - { name: "requirements.txt", pip: "-r requirements.txt" }
+          # the NumPy / SciPy that Ubuntu 22.04 (ROS 2 Humble) ships as python3-numpy / python3-scipy
+          - { name: "Ubuntu 22.04 apt versions", pip: "numpy==1.21.5 scipy==1.8.0" }
+        accel:
+          - { name: "Rust module", env: "1", timeout: 20 }
+          - { name: "NumPy reference", env: "0", timeout: 90 }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"   # the interpreter of ROS 2 Humble
+      - name: Install dependencies
+        run: python -m pip install ${{ matrix.deps.pip }} "pytest>=7,<9"
+      - name: Install the vendored Rust module (checksum verified)
+        if: matrix.accel.env == '1'
+        run: |
+          (cd vendor && sha256sum -c --strict SHA256SUMS)
+          python -m pip install --no-deps --no-index vendor/team048_accel-*.whl
+      - name: Run the tests
+        env:
+          TEAM048_ACCEL: ${{ matrix.accel.env }}
+        run: python -m pytest -q -p no:cacheprovider
+
+  static:
+    name: lint, docs, scripts
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - run: python -m pip install -r requirements-dev.txt
+      - name: Lint (ruff.toml)
+        run: python -m ruff check .
+      - name: Documentation facts match the repository
+        run: python tools/check_docs.py
+      - name: Shell scripts
+        run: |
+          bash -n run.sh setup.sh tools/verify.sh
+          shellcheck --severity=warning run.sh setup.sh tools/verify.sh
+      - name: Vendored wheel checksum
+        run: cd vendor && sha256sum -c --strict SHA256SUMS
+
+  rust:
+    name: Rust crate
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: rust/team048_accel
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - run: cargo fmt --check
+      - run: cargo clippy --locked --all-targets --features python -- -D warnings
+      - run: cargo test --locked --release
+
+  source-build:
+    name: Rust module built from source passes the kernel tests
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Build the wheel from rust/team048_accel (the fallback path of setup.sh)
+        run: |
+          python -m pip install -r requirements.txt "pytest>=7,<9" "maturin>=1.7,<2"
+          (cd rust/team048_accel && maturin build --release --locked -o "$RUNNER_TEMP/wheel")
+          python -m pip install --no-deps "$RUNNER_TEMP"/wheel/team048_accel-*.whl
+      - name: Kernel equivalence tests against the NumPy reference
+        run: python -m pytest -q -p no:cacheprovider src/team048_solution/test/test_accel_kernels.py src/team048_solution/test/test_accel_equivalence.py
