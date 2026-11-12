@@ -39,7 +39,7 @@ class CollisionModel:
     """Sphere model of an arm chain against a base-frame environment, with a safety margin (m)."""
     def __init__(self, chain, spheres, environment, ignored_pairs=(), *, audited_complete=False, margin=.015):
         if not audited_complete or not spheres or not environment:
-            raise ValueError('complete audited robot/hand/payload and environment envelopes mandatory')
+            raise ValueError('complete audited robot and hand envelope and a non-empty environment are mandatory')
         if not np.isfinite(margin) or margin <= 0:
             raise ValueError('positive safety margin required')
         self._fast = None

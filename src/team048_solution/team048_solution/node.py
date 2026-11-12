@@ -1010,13 +1010,18 @@ def move_bound(a,b,vmax=.8,refine=2):
 def hold_time_bound(q_grasp,q_lift,place,yaw,vmax=.8):
     """#595: upper bound of the sim time from the lift command to the end of the release when every step times out:
     lift (+0.3 s pause), carry, waist (WAIST_TMAX), place, one TCP correction (A.correct max_step 0.15 rad, refine 1),
-    release with one re-open (2 x RELEASE_WAIT). Lifting only when this fits guarantees no object in the hand at the
-    limit regardless of the typical-time model place_time."""
+    then PLACE_RETRIES re-approaches of the release pose (move_arm(q_place), refine 2, from the corrected command, which
+    lies within max_step of q_place, plus the residual) each with its own correction, and the release with one re-open
+    (2 x RELEASE_WAIT; release_off_tray opens the hand within the same waits when it releases in place). Lifting only
+    when this fits guarantees no object in the hand at the limit regardless of the typical-time model place_time; the
+    way back to the pick spot (release_off_tray) is started only when the remaining time covers it as well."""
     q_place,q_up,q_carry=place
     seq=[q_grasp,q_lift]+([q_carry] if q_carry is not None else [])+[q_place]
     t=sum(move_bound(a,b,vmax) for a,b in zip(seq,seq[1:]))+.3
     t+=WAIST_TMAX if yaw else 0.
-    t+=(.15+2*MOVE_RES)/vmax*1.6+MOVE_T_PAD+REFINE_T   # correction move_arm(qc, refine=1): |qc-q_measured| <= residual + max_step
+    corr=(.15+2*MOVE_RES)/vmax*1.6+MOVE_T_PAD+REFINE_T   # correction move_arm(qc, refine=1): |qc-q_measured| <= residual + max_step
+    reapproach=(.15+2*MOVE_RES)/vmax*1.6+MOVE_T_PAD+2*REFINE_T   # move_arm(q_place), refine 2: |q_place-q_now| <= max_step + residual
+    t+=corr+PLACE_RETRIES*(reapproach+corr)
     return t+2*RELEASE_WAIT
 def lift_allowed(remaining,need,hold,safety):
     """#595 lift decision: the typical-time model (place_time + safety: lift, transport, release, retreat home) AND the

@@ -36,4 +36,37 @@ class HoldBound(unittest.TestCase):
         self.assertIn('MOVE_T_PAD',src);self.assertIn('REFINE_T',src)
         self.assertEqual(inspect.signature(N.Sol.waist).parameters['tmax'].default,N.WAIST_TMAX)
         self.assertIn('tmax=RELEASE_WAIT',inspect.getsource(N.Sol.pick_place))
+class PlaceReapproachBound(unittest.TestCase):
+    """The off-tray branch of pick_place (one more move_arm(q_place) and one more A.correct per PLACE_RETRIES) is inside
+    hold_time_bound, with the node's own timeouts; the lift margins stay HOLD_MARGIN_S and SAFETY_S."""
+    pl=(q('over_tray'),None,q('carry'))
+    def bound(s,retries,yaw=0.):
+        old=N.PLACE_RETRIES;N.PLACE_RETRIES=retries
+        try:return N.hold_time_bound(q('closed'),q('lifted'),s.pl,yaw)
+        finally:N.PLACE_RETRIES=old
+    def corr(s):
+        return (.15+2*N.MOVE_RES)/.8*1.6+N.MOVE_T_PAD+N.REFINE_T
+    def test_each_retry_adds_one_place_move_and_one_correction(s):
+        d=np.r_[.15+N.MOVE_RES,np.zeros(6)]   # start: the corrected command (within max_step 0.15 of q_place) + residual
+        step=N.move_bound(q('over_tray')+d,q('over_tray'))+s.corr()
+        for yaw in (0.,1.1):
+            s.assertAlmostEqual(s.bound(1,yaw)-s.bound(0,yaw),step)
+            s.assertAlmostEqual(s.bound(2,yaw)-s.bound(1,yaw),step)
+    def test_bound_is_the_sum_of_the_coded_timeouts(s):
+        seq=[q('closed'),q('lifted'),q('carry'),q('over_tray')]
+        moves=sum(N.move_bound(a,b) for a,b in zip(seq,seq[1:]))+.3
+        reapproach=(.15+2*N.MOVE_RES)/.8*1.6+N.MOVE_T_PAD+2*N.REFINE_T
+        want=moves+s.corr()+N.PLACE_RETRIES*(reapproach+s.corr())+2*N.RELEASE_WAIT
+        s.assertAlmostEqual(N.hold_time_bound(q('closed'),q('lifted'),s.pl,0.),want)
+        s.assertAlmostEqual(N.hold_time_bound(q('closed'),q('lifted'),s.pl,1.1),want+N.WAIST_TMAX)
+    def test_bound_mirrors_the_place_loop(s):
+        import inspect
+        src=inspect.getsource(N.Sol.pick_place)
+        s.assertIn('range(1+PLACE_RETRIES)',src);s.assertIn('max_step=.15',src)
+        s.assertEqual(N.PLACE_RETRIES,1)
+    def test_margins_unchanged(s):
+        s.assertEqual(N.HOLD_MARGIN_S,1.);s.assertEqual(BUD.SAFETY_S,8.)
+        hold=N.hold_time_bound(q('closed'),q('lifted'),s.pl,0.)
+        s.assertFalse(N.lift_allowed(hold+N.HOLD_MARGIN_S-.01,0.,hold,BUD.SAFETY_S))
+        s.assertTrue(N.lift_allowed(hold+N.HOLD_MARGIN_S,0.,hold,BUD.SAFETY_S))
 if __name__=='__main__':unittest.main()
