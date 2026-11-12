@@ -16,6 +16,15 @@
 
 ## Модули
 
+```mermaid
+flowchart LR
+  node --> perception & trays & grasp & grip & budget & sensing & arm
+  arm --> kinematics & planning
+  kinematics & planning & perception --> geometry
+  arm & kinematics & planning & perception & trays & grasp -.-> A["_accel"]
+  A -. "если установлен" .-> R["team048_accel (Rust)"]
+```
+
 | Модуль | Что делает |
 |---|---|
 | `node.py` | ROS-узел, автомат задачи, обзор сцены, исполнение, TRACE; после исключения раскрывает кисти и уводит руки (`recover`, `end_safe`) |

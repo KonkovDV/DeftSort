@@ -213,7 +213,7 @@ The table lists only methods that are in the code. Where our implementation diff
 | Arm motion | Synchronous straight line in joint space: all joints arrive together | `node.py` |
 | Getting out of a low posture | Dijkstra's algorithm, 1959, on a small grid of shoulder and elbow poses | `arm.py` |
 | Side, top-down and rim grasp candidates | Our rules on the visible cloud, the hand width and the rim torque m·g·r | `grasp.py` |
-| Hold check after the lift | As in Team Delft (APC 2016) and Cartman (ARC 2017): two checks: the fingers after the close, before the lift, and finger deflection with effort after the lift | `grip.py`, `node.py` |
+| Hold check after the lift | As in Team Delft (APC 2016) and Cartman (ARC 2017), in two checks: the fingers after the close, before the lift, and finger deflection with effort after the lift | `grip.py`, `node.py` |
 | Fresh frame after a contact, postponed retry | Team Delft, APC 2016: retry under different conditions or later | `node.py` |
 | Failure memory | Ours: an executed grasp that failed (kind, centre within 2 cm, axis within 30°) goes to the end of the candidate list; nothing is removed | `grasp.py`, `node.py` |
 | Two-phase close, thumb first | Organiser advice #648 | `grip.py`, `node.py` |
