@@ -234,7 +234,9 @@ class Sol(Node):
                     with A.at_yaw(s.body_yaw()):clear=bool(A.col.certify(qn,nxt))
                 except ValueError:clear=False
                 goal=nxt if clear else q.copy()
-                s.cmd('arm',IDS[side],goal,np.full(7,.3));t=s.now();T=REFINE_T
+                # Same straight-line speeds as the first command. A flat 0.3 rad/s on every joint lets the short
+                # joints arrive and stop while a long joint is still moving, so the arm leaves the certified segment.
+                dq=np.abs(goal-qn);mr=max(float(dq.max()),1e-3);s.cmd('arm',IDS[side],goal,.3*dq/mr);t=s.now();T=REFINE_T
         return np.abs(q-s.q_now(side)).max()<.06
     def hand_set(s,side,v):
         """Command the six hand DOF of one side (normalised positions, 1 = open)."""

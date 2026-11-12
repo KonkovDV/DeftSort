@@ -202,6 +202,23 @@ class MotionMethods(unittest.TestCase):
         s.assertTrue(all(q1[0]-N.MOVE_RES-1e-9<=v<=q0[0]+1e-9 for v in cmds),cmds)
         s.assertTrue(seen);s.assertTrue(all(abs(y-1.1)<1e-9 for y in seen),seen)
         s.assertEqual(A._yaw,0.)
+    def test_refine_speeds_keep_every_joint_on_the_certified_line(s):
+        """A flat 0.3 rad/s on every joint lets a short joint finish and wait while a long one is still moving.
+        The certified path is the straight line, so the re-command uses the same speed ratios as the first command."""
+        sol,logs,fr=robot();A=sol.arms['l'];q0=np.asarray(A.home,float)
+        q1=np.clip(q0+np.array([-1.,.25,0,0,0,0,0]),A.chain.lower,A.chain.upper)
+        rec=[];ids=dict(zip(N.IDS['l'],A.chain.names))
+        def freeze(m):
+            rec.append({ids[c.name]:(c.pos,c.spd) for c in m.cmds})
+        sol.pub['arm'].publish=freeze
+        ok,e=bounded(lambda:sol.move_arm('l',q1,refine=2));s.assertTrue(ok);s.assertIsNone(e)
+        s.assertGreaterEqual(len(rec),2)
+        for cmd in rec[1:]:
+            dq=np.array([abs(cmd[n][0]-q0[i]) for i,n in enumerate(A.chain.names)])
+            spd=np.array([cmd[n][1] for n in A.chain.names]);m=max(float(dq.max()),1e-3)
+            moving=dq>1e-3*m/.3
+            s.assertTrue(moving.any())
+            s.assertTrue(np.allclose(dq[moving]/spd[moving],m/.3,rtol=1e-6),spd)
     def test_way_home_is_checked_at_the_measured_torso_yaw(s):
         """After a yawed place the arm goes home before the waist turns back: the path is certified against the scene
         seen from the turned torso, and the retreat lift as well; the scene is back at yaw 0 afterwards."""
