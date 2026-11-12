@@ -223,8 +223,18 @@ class Sol(Node):
                         s.cmd('arm',IDS[side],s.q_now(side),np.full(7,.3));s.guard_trip=g;return False
                 time.sleep(.02)
             e=q-s.q_now(side)
-            if k<refine:   # PD undershoot under gravity: bias the target by the residual (bounded by joint limits)
-                goal=np.clip(goal+e,s.arms[side].chain.lower,s.arms[side].chain.upper);s.cmd('arm',IDS[side],goal,np.full(7,.3));t=s.now();T=REFINE_T
+            if k<refine:
+                # PD undershoot is a small bias past the certified target. Adding the whole residual when the arm is
+                # stuck used to command q+(q-q_now), up to a second full segment past the endpoint and deeper into
+                # whatever it had jammed against. The bias is capped at MOVE_RES and sent only if that segment is
+                # clear in the scene the torso is actually turned to; otherwise the original target is sent again.
+                A=s.arms[side];bias=np.clip(e,-MOVE_RES,MOVE_RES)
+                nxt=np.clip(q+bias,A.chain.lower,A.chain.upper);qn=s.q_now(side)
+                try:
+                    with A.at_yaw(s.body_yaw()):clear=bool(A.col.certify(qn,nxt))
+                except ValueError:clear=False
+                goal=nxt if clear else q.copy()
+                s.cmd('arm',IDS[side],goal,np.full(7,.3));t=s.now();T=REFINE_T
         return np.abs(q-s.q_now(side)).max()<.06
     def hand_set(s,side,v):
         """Command the six hand DOF of one side (normalised positions, 1 = open)."""
@@ -835,7 +845,7 @@ class Sol(Node):
                 if s.guard_trip:return s.guard_abort(side,name,'approach',s.guard_trip)
                 qm=s.q_now(side);s.trace('at_grasp',side,name,Tg)
                 if A.position_error(np.clip(qm,A.chain.lower,A.chain.upper),Tg)>TCP_TOL:
-                    qc=A.correct(np.clip(qm,A.chain.lower,A.chain.upper),p['q_grasp'])
+                    with A.at_yaw(s.body_yaw()):qc=A.correct(np.clip(qm,A.chain.lower,A.chain.upper),p['q_grasp'])
                     if qc is None:s.log('TCP correction: no solution',name,'err',round(float(A.position_error(np.clip(qm,A.chain.lower,A.chain.upper),Tg)),4))
                     else:
                         s.move_arm(side,qc,tol=.01,vmax=APPROACH_VMAX,refine=0,guard=lambda side=side,kind=g['kind']:s.approach_guard(side,kind))
@@ -877,7 +887,7 @@ class Sol(Node):
                     s.move_arm(side,q_place,tol=.03)
                     qm=np.clip(s.q_now(side),A.chain.lower,A.chain.upper)
                     if A.position_error(qm,Tq)>PLACE_TOL:
-                        qc=A.correct(qm,q_place,max_step=.15)
+                        with A.at_yaw(s.body_yaw()):qc=A.correct(qm,q_place,max_step=.15)
                         if qc is not None:s.move_arm(side,qc,tol=.02,refine=1)
                     if at_tray():break
                 else:

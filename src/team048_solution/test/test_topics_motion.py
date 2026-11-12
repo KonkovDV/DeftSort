@@ -184,6 +184,24 @@ class MotionMethods(unittest.TestCase):
         s.assertTrue(np.all(spd>0) and np.all(spd<=.8))
         span=float(np.max(A.chain.upper-A.chain.lower))   # cmd floor 1e-3 rad/s at 0.8 rad/s, whole joint range
         s.assertLess(A.col.reach*1e-3*span/.8, A.col.margin)
+    def test_stuck_refine_stays_within_one_residual_of_the_target(s):
+        """A jammed arm used to be re-commanded to q+(q-q_now): one full segment past the certified endpoint,
+        and again on the next refine. The bias is at most MOVE_RES, and only along a segment certify accepts."""
+        sol,logs,fr=robot();A=sol.arms['l'];q0=np.asarray(A.home,float)
+        q1=np.clip(q0+np.array([-1.,0,0,0,0,0,0]),A.chain.lower,A.chain.upper)
+        jid=N.IDS['l'][0];cmds=[]
+        def freeze(m):
+            for c in m.cmds:
+                if c.name==jid:cmds.append(c.pos)
+        sol.pub['arm'].publish=freeze
+        sol.js['body_yaw_joint']=1.1;seen=[]
+        orig=A.col.certify
+        A.col.certify=lambda a,b,max_step=.003:seen.append(A._yaw) or orig(a,b,max_step)
+        ok,e=bounded(lambda:sol.move_arm('l',q1,refine=2));s.assertTrue(ok);s.assertIsNone(e)
+        s.assertTrue(cmds)
+        s.assertTrue(all(q1[0]-N.MOVE_RES-1e-9<=v<=q0[0]+1e-9 for v in cmds),cmds)
+        s.assertTrue(seen);s.assertTrue(all(abs(y-1.1)<1e-9 for y in seen),seen)
+        s.assertEqual(A._yaw,0.)
     def test_way_home_is_checked_at_the_measured_torso_yaw(s):
         """After a yawed place the arm goes home before the waist turns back: the path is certified against the scene
         seen from the turned torso, and the retreat lift as well; the scene is back at yaw 0 afterwards."""

@@ -88,6 +88,22 @@ class TurnSweep(unittest.TestCase):
             if not A.col.valid(q) or not A.certify_turn(q,0.,th):continue
             checked+=1;s.assertTrue(all(s.valid_at(A,q,a) for a in np.linspace(0,th,300)))
         s.assertGreater(checked,3)
+class CorrectionYaw(unittest.TestCase):
+    """A TCP correction is certified in whatever scene is installed. During a yawed place the torso is turned and the
+    scene on the arm is back at yaw 0, so the correction has to be asked for inside at_yaw(measured)."""
+    def test_yaw0_correction_crosses_the_tray_wall_once_the_torso_is_turned(s):
+        import inspect
+        A=ARM.Arm('l');pl=SF.plane();trays=list(SF.TRAYS.values());A.set_scene(pl,trays)
+        x,y=.42,.30
+        q=A.solve(A.grasp_pose(np.array([x,y,ARM.plane_height(pl,x,y)+.05]),np.array([1.,0,0]),np.array([0,0,-1.]),'pinch'))
+        qm=q.copy();qm[0]+=.04
+        yaw0=A.correct(qm,q,max_step=.15);s.assertIsNotNone(yaw0)
+        A.set_scene(pl,trays,yaw=-.2);s.assertFalse(A.col.certify(qm,yaw0))   # the yaw-0 command hits the wall on the way
+        A.set_scene(pl,trays)
+        with A.at_yaw(-.2):s.assertIsNone(A.correct(qm,q,max_step=.15))
+        s.assertEqual(A._yaw,0.)
+        src=inspect.getsource(N.Sol.pick_place)
+        s.assertEqual(src.count('at_yaw(s.body_yaw())'),2)   # grasp correction and place correction
 class FarTray(unittest.TestCase):
     def test_far_tray_sides(self):
         L,R,C=SF.TRAYS['tray_left'][1],SF.TRAYS['tray_right'][1],SF.TRAYS['tray_center'][1]
