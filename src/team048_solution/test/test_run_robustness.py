@@ -103,6 +103,45 @@ class RunSafety(unittest.TestCase):
         sol,logs,calls=run_stub(observe=obs)
         s.assertTrue(any('reason: observe failed' in l for l in logs));s.assertTrue(sol.pubs['/sim/task/done'].sent)
 
+class DoneOnce(unittest.TestCase):
+    """/sim/task/done is published once per run, and also after an error outside run()'s guarded task loop."""
+    def main_with(s,run):
+        made=[]
+        class Stub(N.Sol):
+            def __init__(b):super().__init__();made.append(b)
+        Stub.run=run
+        ex=types.SimpleNamespace(add_node=lambda n:None,spin=lambda:None)
+        with mock.patch.object(N,'Sol',Stub),mock.patch.object(N,'MultiThreadedExecutor',lambda k:ex), \
+             mock.patch.object(N.rclpy,'ok',lambda:False,create=True),mock.patch.object(N.time,'sleep',lambda dt:None):
+            try:N.main()
+            except Exception as e:return made[0],e
+        return made[0],None
+    def test_publish_done_is_idempotent(s):
+        sol=N.Sol();s.assertTrue(sol.publish_done());s.assertFalse(sol.publish_done())
+        s.assertEqual(len(sol.pubs['/sim/task/done'].sent),1)
+    def test_run_publishes_done_once(s):
+        sol,logs,calls=run_stub(pick_place=lambda *a:(setattr(TS.Clock,'t',TS.Clock.t+1.) or True))
+        s.assertEqual(len(sol.pubs['/sim/task/done'].sent),1)
+    def test_unsupported_task_publishes_done_once(s):
+        sol=N.Sol();sol.task={'task':'tubes'};TS.Clock.t=50.
+        try:sol.run()
+        finally:TS.Clock.t=100.
+        s.assertEqual(len(sol.pubs['/sim/task/done'].sent),1)
+    def test_main_publishes_done_after_an_error_outside_the_task_loop(s):
+        # e.g. /sim/task {"task": ["sort2"]}: `not in LIMITS` raises TypeError before run()'s guarded block. The stub
+        # logger has no error(): the publish must not depend on the log call.
+        def run(b):raise TypeError('unhashable type')
+        sol,err=s.main_with(run)
+        s.assertIsInstance(err,TypeError)                          # re-raised: non-zero exit with the traceback
+        s.assertEqual(len(sol.pubs['/sim/task/done'].sent),1)
+    def test_main_does_not_publish_done_twice(s):
+        def run(b):b.publish_done();raise RuntimeError('end-of-run log line failed')
+        sol,err=s.main_with(run)
+        s.assertIsInstance(err,RuntimeError);s.assertEqual(len(sol.pubs['/sim/task/done'].sent),1)
+    def test_main_without_error_leaves_done_to_run(s):
+        sol,err=s.main_with(lambda b:None)
+        s.assertIsNone(err);s.assertEqual(sol.pubs['/sim/task/done'].sent,[])
+
 class StartupPin(unittest.TestCase):
     def test_flaky_cause(s):
         # Node-wiring tests must pin WALL_LAUNCH to the node creation: otherwise the suite's wall time since import is

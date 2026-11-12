@@ -544,7 +544,7 @@ class Sol(Node):
         t0=BUD.start_time(s.now(),getattr(s,'wall_ready',time.monotonic()),WALL_LAUNCH)
         task=s.task;s.log('task',task.get('task'),task.get('objects_from'))
         if task.get('task') not in BUD.LIMITS:
-            s.done.publish(Empty());return
+            s.publish_done();return
         s.budget=BUD.TimeBudget(BUD.LIMITS[task['task']],t0)
         handled=set();fails={};why='time budget';s.arms={}
         s.failed_grasps={}   # name -> [(kind, centre xy, closing axis xy)] of executed attempts that failed (grasp.demote_failed); kept across retry rounds
@@ -623,10 +623,15 @@ class Sol(Node):
             why=f'exception {type(e).__name__}: {e}';s.log('run loop failed:',why)
         s.end_safe()
         if getattr(s,'hand_cfg_stop',None) is not None:s.hand_cfg_stop.set()
-        s.done.publish(Empty());s.log('done at',round(s.budget.elapsed(s.now()),1),'handled',sorted(handled),'reason:',why,
+        s.publish_done();s.log('done at',round(s.budget.elapsed(s.now()),1),'handled',sorted(handled),'reason:',why,
                                       'fails',json.dumps({k[:24]:v for k,v in fails.items()}))
         s.log('accel at end',*accel_status())
         s.log('hand settings at end',json.dumps(s.hand_cfg_summary()))
+    def publish_done(s):
+        """Publish /sim/task/done at most once per run. Returns True when this call published it (main() calls it
+        again as a last resort after an error outside run()'s guarded task loop)."""
+        if getattr(s,'done_sent',False):return False
+        s.done.publish(Empty());s.done_sent=True;return True
     def end_safe(s):
         """End of run: both arms up and home, waist back to 0. Every step is guarded on its own, so a failing step
         (planner, TF, a missing arm model) cannot keep /sim/task/done from being published."""
@@ -1033,5 +1038,14 @@ def main():
                 time.sleep(.01)
     th=threading.Thread(target=spin,daemon=True);th.start()
     try:n.run()
+    except Exception as e:
+        # run() guards its task loop itself. This is the last resort for an error outside it (before the loop starts
+        # or in the end-of-run log lines): the harness still gets /sim/task/done instead of waiting for the limit,
+        # and the error is re-raised so the process exits non-zero with its traceback.
+        try:sent=n.publish_done()
+        except Exception:sent=False
+        try:n.get_logger().error(f'run failed: {type(e).__name__}: {e}'+('; /sim/task/done published' if sent else ''))
+        except Exception:pass
+        raise
     finally:
         time.sleep(.5);rclpy.shutdown()
