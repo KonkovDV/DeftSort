@@ -13,7 +13,7 @@ OPEN=types.SimpleNamespace(position=[1.,1.,1.,1.,1.,0.],effort=[0]*6,velocity=[0
 CLOUD=np.c_[np.random.default_rng(0).uniform(.33,.39,400),np.random.default_rng(1).uniform(.17,.23,400),
             np.random.default_rng(2).uniform(-.18,-.08,400)]
 
-def run(ignore=lambda st,q:False,empty_after_lift=False):
+def run(ignore=lambda st,q:False,empty_after_lift=False,fingers=None):
     """pick_place of the sugar box into tray_left on the synthetic scene with stubbed motion. ignore(st, q) -> True
     makes move_arm leave the arm where it is (not reached)."""
     s=N.Sol();s.arms={k:ARM.Arm(k) for k in 'lr'};s.hand_settings_step()
@@ -36,7 +36,7 @@ def run(ignore=lambda st,q:False,empty_after_lift=False):
     s.move_arm=move_arm;s.hand_set=hand_set;s.trace=trace
     s.wait_fingers=lambda side,**k:True;s.wait_thumb=lambda side,**k:True;s.sleep=lambda dt:None
     s.retreat=lambda side:None;s.go_home=lambda side:st['moves'].append(('home',None))
-    s.waist=lambda th,**k:True;s.fingers_open=lambda side:True
+    s.waist=lambda th,**k:True;s.fingers_open=fingers or (lambda side:True)
     s.hstate={'l':OPEN,'r':OPEN}
     for k in 'lr':
         A=s.arms[k];st['q'][k]=np.asarray(A.home,float);s.js.update(zip(A.chain.names,A.home))
@@ -106,6 +106,27 @@ class Release(unittest.TestCase):
         finally:N.Sol.release_off_tray=orig;TS.Clock.t=100.
         self.assertIs(r,False);self.assertEqual(dict(tr)['release_off_tray']['where'],'in_place')
         self.assertEqual(len(st['opens']),1)
+    def test_fingers_staying_closed_are_not_counted(self):
+        r,s,st,ph,_=run(fingers=lambda side:False)
+        self.assertIs(r,False);self.assertEqual(s.placed,{});self.assertEqual(s.still_holding,'l')
+        self.assertNotIn('released',ph);self.assertFalse(any(p=='home' for p,_ in st['moves']))
+        self.assertEqual(len(st['opens']),2)                       # open, then the one re-open; the arm is not taken home
+    def test_return_uses_the_worst_case_bound(self):
+        from team048_solution import grip as G
+        orig=N.Sol.release_off_tray;seen={};saved=TS.Clock.t
+        def timed(self,A,side,name,q_lift,q_carry,yaw,gr):
+            qm=np.clip(self.q_now(side),A.chain.lower,A.chain.upper)
+            typical=(N.move_time(qm,q_carry)+N.move_time(q_carry,q_lift) if q_carry is not None else N.move_time(qm,q_lift))
+            typical+=(2*abs(float(yaw))/.8+1. if yaw else 0.)+G.finger_stroke_time()
+            worst=N.return_hold_bound(qm,q_lift,q_carry,yaw);seen.update(typical=typical,worst=worst)
+            mid=.5*(typical+worst)                                 # typical model would carry back; the worst case must not
+            TS.Clock.t=self.budget.t0+(self.budget.limit-(mid+self.budget.safety))
+            return orig(self,A,side,name,q_lift,q_carry,yaw,gr)
+        N.Sol.release_off_tray=timed
+        try:r,s,st,ph,tr=run(lambda st,q:st['phase']=='carry')
+        finally:N.Sol.release_off_tray=orig;TS.Clock.t=saved
+        self.assertGreater(seen['worst'],seen['typical'])
+        self.assertIs(r,False);self.assertEqual(dict(tr)['release_off_tray']['where'],'in_place')
 
 class CarryCheck(unittest.TestCase):
     def test_empty_over_tray_not_counted(self):

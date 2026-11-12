@@ -228,6 +228,15 @@ class Sol(Node):
     def hand_open(s,side):
         """Open the fingers and rotate the thumb into opposition (DOF 6 = 0)."""
         s.hand_set(side,[1,1,1,1,1,0.])      # fingers open, thumb rotated into opposition (DOF 6 = 0)
+    def open_hand(s,side,name=''):
+        """Command the hand open and wait until the measured fingers are not closed. One re-open if the first wait
+        still reads closed. False only when the fingers stay closed; no hand state (None) is not a stuck hand."""
+        s.hand_open(side)
+        if s.fingers_open(side) is not False:return True
+        s.wait_fingers(side,tmin=.4,tmax=RELEASE_WAIT)
+        if s.fingers_open(side) is False:
+            s.log('fingers not open after release, re-open',name,side);s.hand_open(side);s.wait_fingers(side,tmin=.4,tmax=RELEASE_WAIT)
+        return s.fingers_open(side) is not False
     def fingers_open(s,side,min_open=RELEASE_OPEN_MIN):
         """/inspire_hand/state position is a fraction, 1.0 open / 0.0 closed (INTERFACES.md); v7 releases read 0.96-0.97."""
         h=s.hstate.get(side)
@@ -560,7 +569,7 @@ class Sol(Node):
             # ends as soon as no object cycle could be finished any more (the same can_start rule as the task loop),
             # which goes to end_safe (no arm motion without joint states) and publishes done inside the budget.
             while not s.js:
-                if not s.budget.can_start(s.now()):raise RuntimeError('no /joint_states while an object cycle still fit the budget')
+                if not s.budget.can_start(s.now()):raise RuntimeError('no /joint_states and an object cycle no longer fits the budget')
                 time.sleep(.05)
             for k in 'lr':s.hand_open(k)
             # Survey first with the arms in the start posture (v7 s102 start frames: table plane, near edge and
@@ -596,18 +605,21 @@ class Sol(Node):
                     if tray not in s.trays:
                         s.log('no plan:',name,json.dumps({'reason':'tray not found by the cameras','tray':tray}));continue
                     others=[P[d.pixels[:,0],d.pixels[:,1]] for d in dets if d is not det]   # every segment is an obstacle
-                    t=s.now();s.last_infeasible=False;s.last_contact=False;s.last_attempt=None
+                    t=s.now();s.last_infeasible=False;s.last_contact=False;s.last_attempt=None;s.still_holding=None
                     try:ok=s.pick_place(name,cat,cloud,plane,others,tray)
                     except Exception as e:      # recover (hands open, arms home) and go on with a fresh observation
                         s.log('pick failed with exception',name,type(e).__name__,e);s.recover();ok=False;s.last_contact=True
                     remember_failure(s.failed_grasps,name,ok,s.last_attempt)
                     if ok is False and s.last_infeasible:nofeas[name]=len(handled)
                     if ok is None:stop=True;break           # budget: no time to finish another object
+                    if s.still_holding:why='fingers stayed closed';stop=True;break   # do not pick the next object while holding
                     if ok:handled.add(name);did=True;s.budget.record_cycle(s.now()-t);break
                     fails[name]=fails.get(name,0)+1
                     if s.last_contact:           # the hand touched the scene -> the other clouds are stale
                         s.log('re-observe after contact',name);touched=True;break
-                if stop:why='time budget (next object would not finish)';break
+                if stop:
+                    if not getattr(s,'still_holding',None):why='time budget (next object would not finish)'
+                    break
                 if not did and resurveys<TRAY_RESURVEY_MAX and any(cats.get(objs.get(x[1],x[2])) not in s.trays for x in ids):
                     resurveys+=1;s.log('needed tray missing: re-survey');t_head=s.survey();continue
                 empty=0 if (did or touched) else empty+1
@@ -633,8 +645,13 @@ class Sol(Node):
         if getattr(s,'done_sent',False):return False
         s.done.publish(Empty());s.done_sent=True;return True
     def end_safe(s):
-        """End of run: both arms up and home, waist back to 0. Every step is guarded on its own, so a failing step
-        (planner, TF, a missing arm model) cannot keep /sim/task/done from being published."""
+        """End of run: open both hands first (an object still grasped drops before the arm moves), then both arms up
+        and home, waist back to 0. Every step is guarded on its own, so a failing step (planner, TF, a missing arm
+        model) cannot keep /sim/task/done from being published."""
+        for k in 'lr':
+            try:
+                if not s.open_hand(k):s.log('end: fingers stayed closed',k)
+            except Exception as e:s.log('end: open failed',k,type(e).__name__,e)
         for k in 'lr':
             if k not in (getattr(s,'arms',None) or {}):continue   # no arm model built (failure before the robot moved)
             try:s.retreat(k)
@@ -722,8 +739,7 @@ class Sol(Node):
         must come down on the table, not on the floor: carry it back along the planned path (reverse order) to the lift
         pose above the spot it was picked from and open there. Without time for the way back, open where the hand is."""
         qm=np.clip(s.q_now(side),A.chain.lower,A.chain.upper)
-        back=(move_time(qm,q_carry)+move_time(q_carry,q_lift) if q_carry is not None else move_time(qm,q_lift))
-        back+=(2*abs(yaw)/.8+1. if yaw else 0.)+GRIP.finger_stroke_time()
+        back=return_hold_bound(qm,q_lift,q_carry,yaw)   # worst-case timeouts, not the typical move_time
         if s.hand_verdict(side,gr) is False:
             s.log('place not reached, hand already empty: open here',name);where='empty_hand'
         elif s.budget.remaining(s.now())-s.budget.safety>=back:
@@ -736,8 +752,8 @@ class Sol(Node):
             s.log('place not reached and no time to carry back: release here',name);where='in_place'
         s.trace('release_off_tray',side,name,A.tcp(np.clip(s.q_now(side),A.chain.lower,A.chain.upper)),where=where,
                 verdict=s.hand_verdict(side,gr))
-        s.hand_open(side);s.wait_fingers(side,tmin=.4,tmax=RELEASE_WAIT)
-        if s.fingers_open(side) is False:s.hand_open(side);s.wait_fingers(side,tmin=.4,tmax=RELEASE_WAIT)
+        if not s.open_hand(side,name):
+            s.log('fingers stayed closed, arm stays put',name);s.still_holding=side;s.last_contact=True;return False
         s.go_home(side)
         if yaw:s.waist(0.)
         s.last_contact=True;return False
@@ -857,8 +873,8 @@ class Sol(Node):
                 old=s.hand_shadow(side,gr);over=s.hand_verdict(side,gr)
                 s.trace('over_tray',side,name,Tq,tray=tray,tray_xy=[round(sx,3),round(sy,3)],yaw=round(yaw,3),
                         verdict=over,verdict_past=old['past'],verdict_v7=old['v7'])   # slip during transport shows up here
-                s.hand_open(side);s.wait_fingers(side,tmin=.4,tmax=RELEASE_WAIT)
-                if s.fingers_open(side) is False:s.log('fingers not open after release, re-open',name);s.hand_open(side);s.wait_fingers(side,tmin=.4,tmax=RELEASE_WAIT)
+                if not s.open_hand(side,name):
+                    s.log('fingers stayed closed over the tray',name);s.still_holding=side;s.last_contact=True;return False
                 s.trace('released',side,name,A.tcp(q_place))
                 if q_up is not None:s.move_arm(side,q_up,tol=.03)
                 s.go_home(side)
@@ -1014,7 +1030,7 @@ def hold_time_bound(q_grasp,q_lift,place,yaw,vmax=.8):
     lies within max_step of q_place, plus the residual) each with its own correction, and the release with one re-open
     (2 x RELEASE_WAIT; release_off_tray opens the hand within the same waits when it releases in place). Lifting only
     when this fits guarantees no object in the hand at the limit regardless of the typical-time model place_time; the
-    way back to the pick spot (release_off_tray) is started only when the remaining time covers it as well."""
+    way back to the pick spot is started only when remaining - safety covers return_hold_bound as well."""
     q_place,q_up,q_carry=place
     seq=[q_grasp,q_lift]+([q_carry] if q_carry is not None else [])+[q_place]
     t=sum(move_bound(a,b,vmax) for a,b in zip(seq,seq[1:]))+.3
@@ -1022,6 +1038,18 @@ def hold_time_bound(q_grasp,q_lift,place,yaw,vmax=.8):
     corr=(.15+2*MOVE_RES)/vmax*1.6+MOVE_T_PAD+REFINE_T   # correction move_arm(qc, refine=1): |qc-q_measured| <= residual + max_step
     reapproach=(.15+2*MOVE_RES)/vmax*1.6+MOVE_T_PAD+2*REFINE_T   # move_arm(q_place), refine 2: |q_place-q_now| <= max_step + residual
     t+=corr+PLACE_RETRIES*(reapproach+corr)
+    return t+2*RELEASE_WAIT
+def return_hold_bound(qm,q_lift,q_carry,yaw,vmax=.8):
+    """Worst-case sim seconds of release_off_tray's way back while the object is still in the hand. The order matches
+    the motion: a carry pose, then the lift pose; without one, the lift pose is commanded before the waist and again
+    after it. Each move_arm is move_bound, the waist is WAIST_TMAX, and the release is two RELEASE_WAIT. The way back
+    starts only when remaining - safety covers this; otherwise the hand opens where it is."""
+    if q_carry is not None:
+        t=move_bound(qm,q_carry,vmax)+move_bound(q_carry,q_lift,vmax)
+    else:
+        t=move_bound(qm,q_lift,vmax)
+        if yaw:t+=move_bound(qm,q_lift,vmax)
+    if yaw:t+=WAIST_TMAX
     return t+2*RELEASE_WAIT
 def lift_allowed(remaining,need,hold,safety):
     """#595 lift decision: the typical-time model (place_time + safety: lift, transport, release, retreat home) AND the

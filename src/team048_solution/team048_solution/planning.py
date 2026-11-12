@@ -193,32 +193,69 @@ class CollisionModel:
             (no deeper penetration than the start posture itself; 1 mm < the 2.9 mm real mesh clearance of the
             start posture), and
           * `b` is fully valid.
-        If `a` is valid this is exactly certify(a, b). Implementation: environment spheres touched at `a` are removed
-        for a normal (Rust/NumPy) certify of the rest, and checked separately on the same samples."""
+        If `a` is valid this is exactly certify(a, b). Environment spheres within one sample of the start are removed
+        so certify's inflated first sample can pass, and checked here: a pair already inside the margin may close by
+        at most ESCAPE_TOL; a pair that is still clear may not cross into the margin anywhere on the segment
+        (endpoint gaps plus the per-step travel bound, subdivided when that bound does not prove it)."""
         a=self.chain.validate_q(a); b=self.chain.validate_q(b)
         if self.valid(a): return self.certify(a,b,max_step)
         if not self.valid(b): return False
         ge0,gs0=self.gaps(a)
         if len(gs0) and np.any(gs0<=0): return self._certify_escape_full(a,b,max_step,ge0,gs0)
         steps=max(1,int(np.ceil(np.max(abs(b-a))/max_step))); inf=self.levers@abs(b-a)/steps
-        # start set: environment spheres within the sweep bound of the start (in contact, or so close that the
-        # swept-sphere test of certify cannot pass its first sample) -> held to the no-deeper rule instead
+        # Within one sample of the start the inflated certify cannot accept its first sample. Those spheres come
+        # out of certify and are checked below. Spheres already clear and further than that stay in certify.
         J=np.unique(np.nonzero(ge0<=inf[:,None])[1]); keep=np.ones(len(self._environment),bool); keep[J]=False
         saved=(self._environment,self._env_centers,self._env_radii)
         try:
             if keep.any():
                 self.environment=[e for e,k in zip(self._environment,keep) if k]
                 if not self.certify(a,b,max_step): return False
+            elif not self._certify_self(a,b,max_step): return False   # no env left in certify: self-pairs still count
         finally:
             self.install_environment(*saved)
-        Cj=self._env_centers[J]; Rj=self._env_radii[J]; g0=ge0[:,J]; bad=g0<=inf[:,None]
+        if not len(J): return True
+        g0=ge0[:,J]; pen=g0<=0; near=(g0>0)&(g0<=inf[:,None]); far=g0>inf[:,None]; prev=g0
         for i in range(1,steps+1):
+            g=self._env_gap(a+(b-a)*(i/steps),J)
+            if np.any((g<=inf[:,None])&far): return False
+            if np.any(g[pen]<g0[pen]-ESCAPE_TOL): return False
+            if np.any(near&(g<=0)): return False
+            unsure=near&(prev+g<=inf[:,None])
+            if np.any(unsure) and not self._near_stays_clear(a,b,steps,(i-1)/steps,i/steps,inf,J,unsure,prev,g): return False
+            left=(pen|near)&(g>inf[:,None]); far=far|left; pen=pen&~left; near=near&~left; prev=g
+        return True
+
+    def _env_gap(self, q, J):
+        """Signed env clearances (n_spheres, len(J)) at q, same expression as gaps()."""
+        frames=self.chain.frames_py(q)
+        R=np.array([frames[l][:3,:3] for l in self._sph_links]); t=np.array([frames[l][:3,3] for l in self._sph_links])
+        W=np.einsum('kij,kj->ki',R,self._sph_centers)+t
+        return np.sqrt(((self._env_centers[J][None,:,:]-W[:,None,:])**2).sum(axis=2))-((self._sph_radii[:,None]+self._env_radii[J][None,:])+self.margin)
+
+    def _near_stays_clear(self, a, b, steps, u0, u1, inf, J, mask, g0, g1, depth=0):
+        """Pairs in `mask` (clear, but within a sample of the margin) stay strictly clear on the joint segment
+        u in [u0, u1]. A sphere moves at most inf*(u1-u0)*steps on that segment; endpoint gaps that sum to more
+        than this cannot have crossed 0. Otherwise the segment is halved, at most eight times."""
+        if not np.any(mask): return True
+        um=.5*(u0+u1); gm=self._env_gap(a+(b-a)*um,J)
+        if np.any(gm[mask]<=0): return False
+        motion=inf[:,None]*((u1-u0)*steps*.5); left=mask&(g0+gm<=motion); right=mask&(gm+g1<=motion)
+        if not np.any(left|right): return True
+        if depth>=8: return False
+        return (self._near_stays_clear(a,b,steps,u0,um,inf,J,left,g0,gm,depth+1)
+                and self._near_stays_clear(a,b,steps,um,u1,inf,J,right,gm,g1,depth+1))
+
+    def _certify_self(self, a, b, max_step):
+        """Self-pairs along a->b at certify's samples and inflation, when every environment sphere was removed."""
+        if not len(self._pi): return True
+        steps=max(1,int(np.ceil(np.max(np.abs(b-a))/max_step))); inf=self.levers@np.abs(b-a)/steps
+        thr=(self._sph_radii[self._pi]+self._sph_radii[self._pk])+self.margin+inf[self._pi]+inf[self._pk]
+        for i in range(steps+1):
             frames=self.chain.frames_py(a+(b-a)*(i/steps))
             R=np.array([frames[l][:3,:3] for l in self._sph_links]); t=np.array([frames[l][:3,3] for l in self._sph_links])
             W=np.einsum('kij,kj->ki',R,self._sph_centers)+t
-            g=np.sqrt(((Cj[None,:,:]-W[:,None,:])**2).sum(axis=2))-((self._sph_radii[:,None]+Rj[None,:])+self.margin)
-            if np.any((g<=inf[:,None])&~bad) or np.any(g[bad]<g0[bad]-ESCAPE_TOL): return False
-            bad=bad&(g<=inf[:,None])
+            if np.any(np.sqrt(((W[self._pi]-W[self._pk])**2).sum(axis=1))<=thr): return False
         return True
 
     def _certify_escape_full(self, a, b, max_step, ge0, gs0):

@@ -65,6 +65,26 @@ def run_stub(pick_place=None,observe=None,identify=None,retreat=None):
     return sol,logs,calls
 
 class RunSafety(unittest.TestCase):
+    def test_fingers_staying_closed_stops_before_the_next_object(s):
+        picks=[]
+        sol=N.Sol();sol.arms={k:ARM.Arm(k) for k in 'lr'};logs=[]
+        sol.log=lambda *a:logs.append(' '.join(str(x) for x in a))
+        sol.task={'task':'sort2','categories':{'box':'tray_left'},'objects':{'a':'box','b':'box'},'trays':{'tray_left':'red'}}
+        sol.trays={'tray_left':SF.TRAYS['tray_left']}
+        TS.Clock.t=50.;sol.survey=lambda *a,**k:TS.Clock.t;sol.look=lambda *a,**k:TS.Clock.t
+        P=np.zeros((2,2,3));D=[types.SimpleNamespace(pixels=np.array([[0,0]])) for _ in range(2)]
+        sol.observe=lambda nb=None:(P,None,None,D)
+        sol.identify=lambda dets,P,plane,names:[(d,n,'box',5.-i,None,0.) for i,(d,n) in enumerate(zip(dets,['a','b'])) if n in names]
+        def pp(name,*a):
+            picks.append(name);sol.still_holding='l';return False
+        sol.pick_place=pp;sol.retreat=lambda k:None;sol.go_home=lambda k:None;sol.hand_open=lambda k:None
+        sol.fingers_open=lambda k:True;sol.js={'x':0.};sol.robot_description='<robot/>'
+        try:
+            with mock.patch.object(N,'WALL_LAUNCH',sol.wall_ready):sol.run()
+        finally:TS.Clock.t=100.
+        s.assertEqual(picks,['a'])                                 # b is not picked while a is still in the hand
+        s.assertTrue(any('reason: fingers stayed closed' in l for l in logs))
+        s.assertTrue(sol.pubs['/sim/task/done'].sent)
     def test_exception_in_pick_place_recovers_and_continues(s):
         picks=[]
         def pp(name,*a):

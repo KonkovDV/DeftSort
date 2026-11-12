@@ -35,7 +35,8 @@ class HoldBound(unittest.TestCase):
         src=inspect.getsource(N.Sol.move_arm)
         self.assertIn('MOVE_T_PAD',src);self.assertIn('REFINE_T',src)
         self.assertEqual(inspect.signature(N.Sol.waist).parameters['tmax'].default,N.WAIST_TMAX)
-        self.assertIn('tmax=RELEASE_WAIT',inspect.getsource(N.Sol.pick_place))
+        self.assertIn('tmax=RELEASE_WAIT',inspect.getsource(N.Sol.open_hand))
+        self.assertIn('open_hand',inspect.getsource(N.Sol.pick_place))
 class PlaceReapproachBound(unittest.TestCase):
     """The off-tray branch of pick_place (one more move_arm(q_place) and one more A.correct per PLACE_RETRIES) is inside
     hold_time_bound, with the node's own timeouts; the lift margins stay HOLD_MARGIN_S and SAFETY_S."""
@@ -64,6 +65,13 @@ class PlaceReapproachBound(unittest.TestCase):
         src=inspect.getsource(N.Sol.pick_place)
         s.assertIn('range(1+PLACE_RETRIES)',src);s.assertIn('max_step=.15',src)
         s.assertEqual(N.PLACE_RETRIES,1)
+    def test_way_back_is_the_sum_of_the_coded_timeouts(s):
+        qm,ql,qc=q('over_tray'),q('lifted'),q('carry')
+        s.assertAlmostEqual(N.return_hold_bound(qm,ql,None,0.),N.move_bound(qm,ql)+2*N.RELEASE_WAIT)
+        s.assertAlmostEqual(N.return_hold_bound(qm,ql,qc,0.),N.move_bound(qm,qc)+N.move_bound(qc,ql)+2*N.RELEASE_WAIT)
+        s.assertAlmostEqual(N.return_hold_bound(qm,ql,None,1.1),2*N.move_bound(qm,ql)+N.WAIST_TMAX+2*N.RELEASE_WAIT)
+        s.assertAlmostEqual(N.return_hold_bound(qm,ql,qc,1.1),N.move_bound(qm,qc)+N.move_bound(qc,ql)+N.WAIST_TMAX+2*N.RELEASE_WAIT)
+        s.assertGreater(N.return_hold_bound(qm,ql,qc,0.),N.move_time(qm,qc)+N.move_time(qc,ql))
     def test_margins_unchanged(s):
         s.assertEqual(N.HOLD_MARGIN_S,1.);s.assertEqual(BUD.SAFETY_S,8.)
         hold=N.hold_time_bound(q('closed'),q('lifted'),s.pl,0.)

@@ -194,6 +194,15 @@ class MotionMethods(unittest.TestCase):
             s.assertTrue(np.allclose(sol.q_now(k),sol.arms[k].home,atol=.05))
         first_arm=next(i for i,x in enumerate(fr.log) if x[0]=='arm');last_open=max(i for i,x in enumerate(fr.log) if x[0]=='hand')
         s.assertLess(last_open,first_arm,'an arm moved before both hands were opened');in_limits(s,sol,fr)
+    def test_end_safe_opens_closed_hands_before_any_arm_motion(s):
+        sol,logs,fr=robot()
+        for k in 'lr':sol.hand_set(k,[0,0,0,0,0,0.])               # measured closed, still holding
+        fr.log.clear()
+        ok,e=bounded(sol.end_safe);s.assertTrue(ok);s.assertIsNone(e)
+        hands=[i for i,x in enumerate(fr.log) if x[0]=='hand'];arms=[i for i,x in enumerate(fr.log) if x[0]=='arm']
+        s.assertTrue(hands and arms);s.assertLess(max(hands),min(arms),'an arm moved before the hands were opened')
+        for k in 'lr':s.assertTrue(sol.fingers_open(k))
+        in_limits(s,sol,fr)
     def test_end_safe_hands_empty_arms_home_waist_zero(s):
         sol,logs,fr=robot();sol.js['body_yaw_joint']=.3
         ok,e=bounded(sol.end_safe);s.assertTrue(ok);s.assertIsNone(e)
