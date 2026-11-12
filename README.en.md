@@ -37,7 +37,7 @@ A TienKung 2.0 Pro humanoid with Inspire hands stands at a table. The objects go
 
 - **Robot sensors only.** No scene coordinates in the code: AST tests check every subscription, publisher, import and scene layout literal ([test_compliance.py](src/team048_solution/test/test_compliance.py), [test_rules_edges.py](src/team048_solution/test/test_rules_edges.py)).
 - **The whole arm path is checked.** Spheres for the arm, the torso (fitted to its mesh), the head and the other arm in its measured pose; check step ≤ 0.003 rad with every sphere inflated by the joint travel ([planning.py](src/team048_solution/team048_solution/planning.py), [test_start_posture.py](src/team048_solution/test/test_start_posture.py)).
-- **Lift only with time to spare.** An object is lifted only if the remaining time covers the worst-case holding time with every step timing out. Otherwise the hand opens in place and the object stays on the table ([test_hold_time.py](src/team048_solution/test/test_hold_time.py)).
+- **Lift only with time to spare.** An object is lifted only if the remaining time covers the worst-case holding time: lift, carry, torso turn, placing with a correction and the release, each step up to its timeout. Otherwise the hand opens in place and the object stays on the table ([test_hold_time.py](src/team048_solution/test/test_hold_time.py)).
 - **Rust accelerator, same answers.** On 62 frames from our runs (the frames are not in the repository) perception is bit-identical to NumPy and the discrete decisions match in all 5358 records. Perception runs 15x faster, grasp planning 223x ([benchmark](#rust-accelerator); [test_accel_equivalence.py](src/team048_solution/test/test_accel_equivalence.py), [test_accel_kernels.py](src/team048_solution/test/test_accel_kernels.py)).
 - **Force within the rules.** All six `SetForce` channels of both hands are within 0.3–0.5: 0.4 on the squeezing fingers, 0.5 on thumb rotation; any override is clamped to 0.3–0.5 ([test_rules_edges.py](src/team048_solution/test/test_rules_edges.py), [test_hand_settings.py](src/team048_solution/test/test_hand_settings.py), [docs/COMPLIANCE.md](docs/COMPLIANCE.md#захват-648)).
 - **269 offline tests without ROS.** The node runs on stubs with real simulator frames; one command checks everything: `bash tools/verify.sh`.
@@ -47,7 +47,7 @@ A TienKung 2.0 Pro humanoid with Inspire hands stands at a table. The objects go
 - **Perception.** RANSAC table plane, near table edge from the torso camera, trays by colour and depth with measured size, axis and wall height. Objects are identified by size: segments and task objects are matched as an assignment problem. The number of RANSAC samples grows when the table covers a small share of the frame.
 - **Grasping.** Three kinds: side, top-down and a rim pinch on open dishes. The grasp centre is shifted so the open hand clears the object on the way in. A grasp that was executed and failed goes last among the candidates on the next try.
 - **Hand.** Two-phase close: to contact, then 0.15 of the stroke further. Before the lift the node checks that the hand is not empty.
-- **Placing.** The hand opens when the TCP is within 4 cm of the plan or the release point lies inside the measured tray rectangle. Otherwise one more approach; then the object is carried back along the travelled path and put down on the table above the pick spot. A transfer counts only if the hand is not empty over the tray.
+- **Placing.** The hand opens when the TCP is within 4 cm of the plan or the release point lies inside the measured tray rectangle. Otherwise one more approach; then the object is carried back along the travelled path and put down on the table above the pick spot, where it can be picked again. A transfer counts only if the hand is not empty over the tray.
 - **Time.** Budget on `/clock`, launch time included; light objects first.
 - **Robustness.** An error on one object opens the hands and returns the arms home; the run goes on. ROS callbacks drop malformed messages and log them; an invalid task on `/sim/task` is skipped and the node waits for the next one. `/sim/task/done` is published once at the end of the run, also after a setup error and after an error outside the task loop.
 
@@ -92,6 +92,9 @@ CI runs the same checks ([.github/workflows/ci.yml](.github/workflows/ci.yml)): 
 | `TEAM048_V7_TRACE` | — | Directory of recorded run-v7 frames for the equivalence tests |
 | `TEAM048_TORSO_MESH` | 1 | `0` drops the mesh-fitted torso spheres; offline comparisons only |
 | `TEAM048_FRAME_TOOLS` | — | Frame-helper directory for `rust/team048_accel/benches/export_model.py` |
+| `HACK_URDF` | `data/tiangong_pro_with_hands.urdf` | Default robot URDF; a complete `/robot_description` replaces it |
+| `CARGO_HOME`, `RUSTUP_HOME` | `/opt/team048/cargo`, `/opt/team048/rustup` | Where `setup.sh` installs Rust when it builds the module from source |
+| `PYTHON` | `python3` | Interpreter for `tools/verify.sh` |
 
 ## How it works
 
@@ -210,7 +213,7 @@ The table lists only methods that are in the code. Where our implementation diff
 | Arm motion | Synchronous straight line in joint space: all joints arrive together | `node.py` |
 | Getting out of a low posture | Dijkstra's algorithm, 1959, on a small grid of shoulder and elbow poses | `arm.py` |
 | Side, top-down and rim grasp candidates | Our rules on the visible cloud, the hand width and the rim torque m·g·r | `grasp.py` |
-| Hold check after the lift | As in Team Delft (APC 2016) and Cartman (ARC 2017): two independent signals, the fingers at the close and deflection with effort after the lift | `grip.py`, `node.py` |
+| Hold check after the lift | As in Team Delft (APC 2016) and Cartman (ARC 2017): two checks: the fingers after the close, before the lift, and finger deflection with effort after the lift | `grip.py`, `node.py` |
 | Fresh frame after a contact, postponed retry | Team Delft, APC 2016: retry under different conditions or later | `node.py` |
 | Failure memory | Ours: an executed grasp that failed (kind, centre within 2 cm, axis within 30°) goes to the end of the candidate list; nothing is removed | `grasp.py`, `node.py` |
 | Two-phase close, thumb first | Organiser advice #648 | `grip.py`, `node.py` |
@@ -226,7 +229,7 @@ Robot geometry: UBTECH URDF and meshes (Apache-2.0). No neural networks.
 | Heavy objects (≥ 0.22 kg) | Scheduled last; holding at force 0.4 needs μ ≥ m·g/(2N) | Calibrate the simulator friction from TRACE |
 | Dishes by the rim | Pinch when the torque m·g·r ≤ 0.17 N·m | Two-point grasp for heavy dishes |
 | Collision model | Arm, torso, head, other arm, thighs, table, trays | Held object and already placed objects |
-| Pool 6 | Razer mouse (10.0 cm) is wider than the grasp limit of 9.5 cm (hand opening from the URDF, 10.5 cm, minus a 1 cm margin) | Wide-hand grasp for objects wider than 9.5 cm |
+| Pool 6 | Razer mouse (9.8 cm at its narrowest, `objects.yaml`) is wider than the grasp limit of 9.5 cm (hand opening from the URDF, 10.5 cm, minus a 1 cm margin) | Wide-hand grasp for objects wider than 9.5 cm |
 | Trajectories | Straight joint-space segments that stop at each waypoint | Time parameterisation without stops (TOPP-RA, TOTG) |
 | Grasp scoring | Footprint geometry and finger clearance to neighbours | Robustness to pose noise (Dex-Net 2.0 idea) and antipodal check on normals (Nguyen, 1988) |
 | Place check | From the arm pose and the measured tray rectangle | Confirmation from a tray frame |
@@ -238,9 +241,9 @@ Robot geometry: UBTECH URDF and meshes (Apache-2.0). No neural networks.
 |---|---|
 | What force goes to the hands? | Six `SetForce` ratios per hand, all within 0.3–0.5 (#648): 0.4 on DOF 1–5, 0.5 on thumb rotation. `test_rules_edges.py` and `test_compliance.py` check it. |
 | How does the robot know where the trays are? | It measures them: colour from `/sim/task`, depth, minimum-area rectangle. The code only has wide windows "left", "right", "centre" and the documented size as a ±40 % plausibility bound. |
-| What if there is not enough time to carry the object? | A lift is allowed only if the remaining time covers the worst-case holding time with every step timing out. Otherwise the hand opens in place and the object is not lifted. |
+| What if there is not enough time to carry the object? | A lift is allowed only if the remaining time covers the worst-case holding time: lift, carry, torso turn, placing with a correction and the release, each step up to its timeout. Otherwise the hand opens in place and the object is not lifted. |
 | Why Rust if there is NumPy? | Faster perception and planning, same answers: the kernel tests on shipped inputs and the equivalence tests on 62 frames from our runs check it. Without the module the whole solution runs on NumPy. |
-| What if the arm does not reach the tray? | One more approach. If the release point is still off the tray, the arm carries the object back along the checked path and opens above the pick spot, on the table. The object never stays in the hand. `test_place_release.py` checks it. |
+| What if the arm does not reach the tray? | One more approach. If the release point is still off the tray, the arm carries the object back along the checked path and opens above the pick spot, on the table. The object never stays in the hand, and the next observation round can pick it again. `test_place_release.py` checks it. |
 | Why no neural networks? | Few objects, sizes known from the task. Geometry is deterministic, testable and needs no GPU. |
 | What happens to a malformed message? | The callback logs and drops it, and the executor keeps running. A `/sim/task` message with broken JSON or not a JSON object is skipped and the node waits for a valid one. `test_node_stub.py` checks it. |
 | Why are test tubes not handled? | This version solves `sort2` and `sort3`. For other tasks the node publishes `/sim/task/done` at once. Racks and the cabinet are the next step, found by camera too. |
