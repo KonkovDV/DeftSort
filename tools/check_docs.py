@@ -5,7 +5,10 @@
 
 Checked:
   * relative links in the Markdown files point at existing files, and `#anchors` at existing headings;
-  * `file.py:LINE` references name a file of the package and a line inside it;
+  * `file.py:LINE` references (and a `:LINE` that continues the file named earlier on the same line) name a file of
+    the package and a non-blank line inside it; a line that is `def name` must name that function, and a citation
+    inside a function must not name only other functions of that file;
+  * `research/**/*.md` is an archive of past runs and is not checked;
   * the per-module line counts in the README tables equal the files' line counts;
   * the number of tests stated in README / CHANGELOG equals what pytest collects;
   * vendor/SHA256SUMS matches the vendored wheel;
@@ -24,7 +27,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 PKG = ROOT / 'src' / 'team048_solution' / 'team048_solution'
 CRATE = ROOT / 'rust' / 'team048_accel'
-DOCS = [ROOT / 'README.md', ROOT / 'README.en.md', ROOT / 'CHANGELOG.md', *sorted((ROOT / 'docs').glob('*.md'))]
+DOCS = [ROOT / 'README.md', ROOT / 'README.en.md', ROOT / 'CHANGELOG.md', ROOT / 'HANDOFF.md',
+        *sorted((ROOT / 'docs').glob('*.md'))]
 READMES = [ROOT / 'README.md', ROOT / 'README.en.md']
 
 errors = []
@@ -69,14 +73,90 @@ def check_links():
                 fail(rel(doc), f'image not found: {src}')
 
 
+def function_spans(text):
+    """Half-open line ranges [start, end) of every function. A nested function is the later start."""
+    lines = text.splitlines()
+    defs = []
+    for i, line in enumerate(lines, 1):
+        m = re.match(r'^(\s*)(?:async\s+)?def\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(', line)
+        if m:
+            defs.append((len(m.group(1)), m.group(2), i))
+    spans = []
+    for k, (ind, name, start) in enumerate(defs):
+        end = len(lines) + 1
+        for ind2, _, start2 in defs[k + 1:]:
+            if ind2 <= ind:
+                end = start2
+                break
+        spans.append((name, start, end))
+    return spans
+
+
+def owner_at(spans, line):
+    hit = [span for span in spans if span[1] <= line < span[2]]
+    return max(hit, key=lambda span: span[1])[0] if hit else None
+
+
+def line_citations(text):
+    """(markdown line, markdown text, filename, source line). A `:N` continues the file named earlier on that line."""
+    ref = re.compile(r'\b([a-z_]+\.py):(\d+)(?:-(\d+))?|(?<![\w.])\:(\d+)\b')
+    out = []
+    for i, line in enumerate(text.splitlines(), 1):
+        current = None
+        for m in ref.finditer(line):
+            if m.group(1):
+                current = m.group(1)
+                out.append((i, line, current, int(m.group(2))))
+                if m.group(3):
+                    out.append((i, line, current, int(m.group(3))))
+            else:
+                out.append((i, line, current, int(m.group(4))))
+    return out
+
+
+def mentioned_functions(md_line, names):
+    """Function names of this file that the sentence puts in their own backticks."""
+    found = set()
+    for tick in re.findall(r'`([^`]+)`', md_line):
+        if re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', tick) and tick in names:
+            found.add(tick)
+    return found
+
+
 def check_line_refs():
+    loaded = {}
     for doc in DOCS:
-        for name, line in re.findall(r'`?\b([a-z_]+\.py):(\d+)', doc.read_text(encoding='utf-8')):
-            path = PKG / name
-            if not path.exists():
-                fail(rel(doc), f'{name}:{line} names a file that is not in the package')
-            elif int(line) > len(path.read_text(encoding='utf-8').splitlines()):
-                fail(rel(doc), f'{name}:{line} is past the end of the file')
+        for md_i, md_line, name, n in line_citations(doc.read_text(encoding='utf-8')):
+            where = f'{rel(doc)}:{md_i}'
+            if name is None:
+                fail(where, f':{n} does not follow a file.py reference on the same line')
+                continue
+            if name not in loaded:
+                path = PKG / name
+                if path.exists():
+                    text = path.read_text(encoding='utf-8')
+                    loaded[name] = (text.splitlines(), function_spans(text))
+                else:
+                    loaded[name] = None
+            src = loaded[name]
+            if src is None:
+                fail(where, f'{name}:{n} names a file that is not in the package')
+                continue
+            lines, spans = src
+            if n < 1 or n > len(lines):
+                fail(where, f'{name}:{n} is past the end of the file ({len(lines)} lines)')
+                continue
+            code = lines[n - 1].strip()
+            if not code:
+                fail(where, f'{name}:{n} is a blank line')
+                continue
+            owner = owner_at(spans, n)
+            mentioned = mentioned_functions(md_line, {span[0] for span in spans})
+            named = bool(owner and re.search(r'\b' + re.escape(owner) + r'\b', md_line))
+            if owner and re.match(r'(?:async\s+)?def\s+' + re.escape(owner) + r'\s*\(', code) and not named:
+                fail(where, f'{name}:{n} is def {owner}, and the sentence does not name it')
+            if owner and mentioned and owner not in mentioned and not named:
+                fail(where, f'{name}:{n} is inside {owner}; the sentence names {", ".join(sorted(mentioned))}')
 
 
 def check_module_table():

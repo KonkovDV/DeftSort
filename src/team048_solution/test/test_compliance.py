@@ -141,7 +141,7 @@ class EndOfRun595(unittest.TestCase):
         self.assertGreater(t0,G.finger_stroke_time());self.assertAlmostEqual(t1-t0,2/.8+1.,6)
     def test_no_lift_when_place_does_not_fit(self):
         """A lifted object outside a tray at the limit is -10, untouched 0: with time for the grasp but not for the
-        transport, the hand opens at the object and the arm retreats without lifting."""
+        transport, the hand opens at the object. This fixture's fingers read open, so the arm retreats and the run stops."""
         from team048_solution import budget as B
         s=N.Sol();s.arms={k:ARM.Arm(k) for k in 'lr'};s.hand_settings_step()
         for A in s.arms.values():A.set_scene(SF.plane(),list(SF.TRAYS.values()))
@@ -174,6 +174,41 @@ class EndOfRun595(unittest.TestCase):
         self.assertIsNone(r)                                    # stopped for lack of time
         self.assertTrue(any(isinstance(m,str) and m=='retreat' for m in moves))
         self.assertEqual(hand[-1][:5],[1,1,1,1,1])             # opened at the object
+    def test_no_lift_does_not_retreat_a_closed_hand(self):
+        """Same deadline, but the fingers still read closed: retreat would lift the object the time check refused to
+        lift. The arm stays; end_safe opens the hands before any later motion."""
+        from team048_solution import budget as B
+        s=N.Sol();s.arms={k:ARM.Arm(k) for k in 'lr'};s.hand_settings_step()
+        for A in s.arms.values():A.set_scene(SF.plane(),list(SF.TRAYS.values()))
+        s.trays=dict(SF.TRAYS);moves=[];hand=[]
+        s.move_arm=lambda side,q,**k:moves.append(np.asarray(q).copy()) or True
+        s.hand_set=lambda side,v:hand.append(list(v))
+        s.wait_fingers=lambda side,**k:True;s.wait_thumb=lambda side,**k:True;s.sleep=lambda dt:None
+        s.retreat=lambda side:moves.append('retreat');s.trace=lambda *a,**k:None
+        s.hstate={'l':types.SimpleNamespace(position=[.8,.8,.8,.8,.5,0.],effort=[1]*6,velocity=[0]*6),
+                  'r':types.SimpleNamespace(position=[.8,.8,.8,.8,.5,0.],effort=[1]*6,velocity=[0]*6)}
+        A=s.arms['l'];s.js=dict(zip(A.chain.names,A.home));s.js.update(zip(s.arms['r'].chain.names,s.arms['r'].home))
+        rng=np.random.default_rng(0);cl=np.c_[rng.uniform(.33,.39,400),rng.uniform(.17,.23,400),rng.uniform(-.18,-.08,400)]
+        orig_pp=N.plan_place_yaw
+        N.plan_place_yaw=lambda *a,**k:orig_pp(*a,**k)
+        saved=TS.Clock.t
+        try:
+            s.budget=B.TimeBudget(270,t0=TS.Clock.t)
+            orig_close=s.grasp_close
+            def close_and_age(side,kind):
+                r=orig_close(side,kind);TS.Clock.t+=268.
+                s.hstate[side]=types.SimpleNamespace(position=[0.]*6,effort=[1]*6,velocity=[0]*6)
+                return r
+            s.grasp_close=close_and_age
+            s.q_now=lambda side:next((np.asarray(m) for m in reversed(moves) if not isinstance(m,str)),np.asarray(s.arms[side].home))
+            r=s.pick_place('004_sugar_box','box',cl,SF.plane(),[],'tray_left')
+        finally:
+            N.plan_place_yaw=orig_pp;TS.Clock.t=saved
+        self.assertIsNone(r)
+        self.assertEqual(s.still_holding,'l')
+        self.assertFalse(any(isinstance(m,str) and m=='retreat' for m in moves))
+        self.assertEqual(hand[-1][:5],[1,1,1,1,1])
+        self.assertEqual(hand[-2][:5],[1,1,1,1,1])             # open, then the one re-open
 
 class TimeLimit595(unittest.TestCase):
     def test_launch_age_counts_process_start(self):

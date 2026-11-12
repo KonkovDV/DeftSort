@@ -3,7 +3,7 @@ object identity by assignment of segmented blobs to the task's object list using
 sphere self-collision checks, 0.8 rad/s-capped synchronized joint moves, Inspire hand pinch/side grasps.
 Per-layout time budget (startup included), grasp check from the hand state (grip.held_rule, approach guard; the
 wrist F/T is logged only), slots inside trays, trays confirmed by camera colour, straight-up retreats, TCP check
-before closing. Hand force/speed (#648) are sent to each hand as soon as its service appears, re-sent until the call
+before closing. With no time to lift, the hand opens first; a hand that stays closed is not retreated. Hand force/speed (#648) are sent to each hand as soon as its service appears, re-sent until the call
 returns, and an arm whose hand never got the force limit is not used.
 Tubes: not solved -> immediate /sim/task/done (0 points, allowed by SCORING).
 Debug topics (/sim/task/check, /sim/objects/*) are never used.
@@ -611,8 +611,8 @@ class Sol(Node):
                         s.log('pick failed with exception',name,type(e).__name__,e);s.recover();ok=False;s.last_contact=True
                     remember_failure(s.failed_grasps,name,ok,s.last_attempt)
                     if ok is False and s.last_infeasible:nofeas[name]=len(handled)
-                    if ok is None:stop=True;break           # budget: no time to finish another object
                     if s.still_holding:why='fingers stayed closed';stop=True;break   # do not pick the next object while holding
+                    if ok is None:stop=True;break           # budget: no time to finish another object
                     if ok:handled.add(name);did=True;s.budget.record_cycle(s.now()-t);break
                     fails[name]=fails.get(name,0)+1
                     if s.last_contact:           # the hand touched the scene -> the other clouds are stale
@@ -845,7 +845,11 @@ class Sol(Node):
                 need=place_time(A,p['q_lift'],place,yaw,q_from=p['q_grasp']);hold=hold_time_bound(p['q_grasp'],p['q_lift'],place,yaw)
                 if not lift_allowed(s.budget.remaining(s.now()),need,hold,s.budget.safety):
                     s.log('deadline: not lifting',name,'need',round(need,1),'hold bound',round(hold,1),'s left',round(s.budget.remaining(s.now()),1))
-                    s.hand_open(side);s.wait_fingers(side,tmin=.3);s.retreat(side);return None
+                    # retreat() lifts a low TCP. Open first, and do not retreat a hand that still reads closed:
+                    # end_safe opens again before any arm motion. A hand that opens retreats, and the run stops.
+                    if not s.open_hand(side,name):
+                        s.log('fingers stayed closed, not retreating',name);s.still_holding=side;s.last_contact=True;return None
+                    s.retreat(side);return None
                 s.move_arm(side,p['q_lift']);s.sleep(.3)
                 held=s.hand_verdict(side,gr);old=s.hand_shadow(side,gr)
                 F=s.wrench.get(side);f0=s.monitor.f0

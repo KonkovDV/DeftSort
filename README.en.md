@@ -7,7 +7,7 @@
   &nbsp;
   <img src="https://img.shields.io/badge/Rust-%E2%89%A51.89-000000?logo=rust&logoColor=white" alt="Rust 1.89+">
   &nbsp;
-  <img src="https://img.shields.io/badge/tests-282-2F6B55" alt="282 tests">
+  <img src="https://img.shields.io/badge/tests-283-2F6B55" alt="283 tests">
   &nbsp;
   <img src="https://img.shields.io/badge/license-Apache--2.0-2F6B55" alt="Apache-2.0">
 </p>
@@ -27,29 +27,29 @@ A TienKung 2.0 Pro humanoid with Inspire hands stands at a table. The objects go
 1. **See.** The table, the trays and the objects are measured with the head and torso cameras. The code holds no scene coordinates.
 2. **Choose a grasp.** The object is identified by its size from `/sim/task`; a side, top-down or rim grasp is built from the point cloud.
 3. **Check the path.** The arm path to the object and to the tray is checked for collisions with a sphere model of the robot and the measured scene.
-4. **Lift with time to spare.** A lift is allowed if the hand is not empty and the remaining time covers the worst-case carry. Otherwise the hand opens in place.
+4. **Lift with time to spare.** A lift is allowed if the hand is not empty and the remaining time covers the worst-case carry. Otherwise the hand opens. Fingers that open: the arm goes home. The episode ends, and the next object is not started.
 
 **Why it scores.** Points come from objects in their own trays, and an object lifted but not delivered costs −10. DeftSort lifts an object only when it has a checked path and the time to deliver it. Every lift aims at +10; a doubtful case costs 0.
 
-**Stage.** Hackathon prototype. The build is verified offline: 282 tests on recorded frames and logs of our runs in the organisers' simulator.
+**Stage.** Hackathon prototype. The build is verified offline: 283 tests on recorded frames and logs of our runs in the organisers' simulator.
 
 ## Key strengths
 
 - **Robot sensors only.** No scene coordinates in the code: AST tests check every subscription, publisher, import and scene layout literal ([test_compliance.py](src/team048_solution/test/test_compliance.py), [test_rules_edges.py](src/team048_solution/test/test_rules_edges.py)).
-- **The whole arm path is checked.** Spheres for the arm, the torso (fitted to its mesh), the head and the other arm in its measured pose; check step ≤ 0.003 rad with every sphere inflated by the joint travel ([planning.py](src/team048_solution/team048_solution/planning.py), [test_start_posture.py](src/team048_solution/test/test_start_posture.py)).
-- **Lift only with time to spare.** An object is lifted only if the remaining time covers the worst-case holding time: lift, carry, torso turn, placing with a correction, the re-approach to the tray with its correction and the release, each step up to its timeout. Otherwise the hand opens in place and the object stays on the table ([test_hold_time.py](src/team048_solution/test/test_hold_time.py)).
+- **The whole arm path is checked.** Spheres for the arm, the torso (fitted to its mesh), the head and the other arm in its measured pose; check step ≤ 0.003 rad with every sphere inflated by the joint travel. A pair that is clear at the start stays clear on the whole segment, including the way home from the start posture ([planning.py](src/team048_solution/team048_solution/planning.py), [test_start_posture.py](src/team048_solution/test/test_start_posture.py)).
+- **Lift only with time to spare.** An object is lifted only if the remaining time covers the worst-case holding time: lift, carry, torso turn, placing with a correction, the re-approach to the tray with its correction and the release, each step up to its timeout. Otherwise the hand opens, the object stays on the table, and the episode ends. A hand that still reads closed is not taken home from that pose ([test_hold_time.py](src/team048_solution/test/test_hold_time.py), [test_compliance.py](src/team048_solution/test/test_compliance.py)).
 - **Rust accelerator, same answers.** On 62 frames from our runs (the frames are not in the repository) perception is bit-identical to NumPy and the discrete decisions match in all 5358 records. Perception runs 15x faster, grasp planning 223x ([benchmark](#rust-accelerator); [test_accel_equivalence.py](src/team048_solution/test/test_accel_equivalence.py), [test_accel_kernels.py](src/team048_solution/test/test_accel_kernels.py)).
 - **Force within the rules.** All six `SetForce` channels of both hands are within 0.3–0.5: 0.4 on the squeezing fingers, 0.5 on thumb rotation; any override is clamped to 0.3–0.5 ([test_rules_edges.py](src/team048_solution/test/test_rules_edges.py), [test_hand_settings.py](src/team048_solution/test/test_hand_settings.py), [docs/COMPLIANCE.md](docs/COMPLIANCE.md#захват-648)).
-- **282 offline tests without ROS.** The node runs on stubs with real simulator frames; one command checks everything: `bash tools/verify.sh`.
+- **283 offline tests without ROS.** The node runs on stubs with real simulator frames; one command checks everything: `bash tools/verify.sh`.
 
 ## What already works
 
 - **Perception.** RANSAC table plane, near table edge from the torso camera, trays by colour and depth with measured size, axis and wall height. Objects are identified by size: segments and task objects are matched as an assignment problem. The number of RANSAC samples grows when the table covers a small share of the frame.
 - **Grasping.** Three kinds: side, top-down and a rim pinch on open dishes. The grasp centre is shifted so the open hand clears the object on the way in. A grasp that was executed and failed goes last among the candidates on the next try.
 - **Hand.** Two-phase close: to contact, then 0.15 of the stroke further. Before the lift the node checks that the hand is not empty.
-- **Placing.** The hand opens when the TCP is within 4 cm of the plan or the release point lies inside the measured tray rectangle. Otherwise one more approach; then the object is carried back along the travelled path and put down on the table above the pick spot, where it can be picked again. A transfer counts only if the hand is not empty over the tray.
+- **Placing.** The hand opens when the TCP is within 4 cm of the plan or the release point lies inside the measured tray rectangle. Otherwise one more approach. If the point is still outside the tray, the object is carried back to the table only when the remaining time minus 8 s covers the worst-case return; otherwise the hand opens where it is. A transfer counts only if the hand is not empty over the tray and the fingers do not stay closed after the release. Fingers that stay closed stop the run.
 - **Time.** Budget on `/clock`, launch time included; light objects first.
-- **Robustness.** An error on one object opens the hands and returns the arms home; the run goes on. ROS callbacks drop malformed messages and log them; an invalid task on `/sim/task` is skipped and the node waits for the next one. `/sim/task/done` is published once at the end of the run, also after a setup error and after an error outside the task loop.
+- **Robustness.** An error on one object opens the hands and returns the arms home; the run goes on. If the fingers still read closed after a release, the run stops before the next object; at the end the hands open again, and only then do the arms go home. ROS callbacks drop malformed messages and log them; an invalid task on `/sim/task` is skipped and the node waits for the next one. `/sim/task/done` is published once at the end of the run, also after a setup error and after an error outside the task loop.
 
 ## Run
 
@@ -73,7 +73,7 @@ python3 -m pytest -q                      # with the Rust module, if installed
 TEAM048_ACCEL=0 python3 -m pytest -q      # NumPy only
 ```
 
-In a clean clone: with Rust 266 passed, 16 skipped; with `TEAM048_ACCEL=0` 258 passed, 24 skipped. The skipped tests are equivalence tests on recorded frames of run v7; those frames are not in the repository and are found through `TEAM048_V7_TRACE`. With them all 282 pass.
+In a clean clone: with Rust 267 passed, 16 skipped; with `TEAM048_ACCEL=0` 259 passed, 24 skipped. 16 skips are equivalence tests on recorded frames of run v7 (those frames are not in the repository; the directory is `TEAM048_V7_TRACE`), and 8 more are Rust-module tests, skipped when `TEAM048_ACCEL=0`. With the frames and the module, all 283 pass.
 
 CI runs the same checks ([.github/workflows/ci.yml](.github/workflows/ci.yml)): the tests in both modes on two dependency sets, the linter (`ruff.toml`), the documents against the repository (`tools/check_docs.py`), `shellcheck`, `cargo fmt`, `clippy`, `cargo test` and a build of the Rust module from source.
 
@@ -141,10 +141,13 @@ stateDiagram-v2
   Approach --> Close: no contact
   Approach --> Observe: contact before closing, retreat
   Close --> Carry: hand not empty and time for the lift
-  Close --> Observe: empty or no time, hand opened in place
-  Carry --> Observe: object in tray, arm home
-  Carry --> Observe: tray not reached, object put back on the table
-  End --> [*]: arms home, /sim/task/done
+  Close --> Observe: empty hand, retreat
+  Close --> End: no time to lift and the fingers opened, arm home
+  Close --> End: no time to lift and the fingers stayed closed, arm stays
+  Carry --> Observe: released over the tray, arm home
+  Carry --> Observe: put down on the table, fingers opened
+  Carry --> End: fingers stayed closed
+  End --> [*]: hands open, arms home, /sim/task/done
 ```
 
 ![Head camera frame: table, trays, segments](docs/img/perception.png)
@@ -155,11 +158,11 @@ Head camera frame from run v7 at the start of the episode. Yellow: points in the
 
 The same scene in the collision model: table and tray walls built from this frame, grey spheres are obstacles, blue spheres the left arm at the grasp pose. The red line is the TCP path: home, pre-grasp, grasp, lift; the whole path is checked. Both figures come from `tools/make_figures.py` and the fixture `test/fixtures/v7_s102_start_frames.npz`.
 
-First the robot looks at the table and the trays with its head (yaw 0 and ±0.6 rad), and only then moves the arms. The arms go home along a path checked against the measured scene. Then objects one by one: look, identify, pick a grasp, check the time. Approach while watching for contact, close in two phases, check the hand is not empty before the lift, carry and release. Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (in Russian).
+First the robot looks at the table and the trays with its head (yaw 0 and ±0.6 rad), and only then moves the arms. The arms go home along a path checked against the measured scene. Then objects one by one: look, identify, pick a grasp, check the time. It approaches while watching for contact, closes in two phases, and checks before the lift that the hand is not empty and that the time is there. An empty hand retreats, and the robot looks again. If there is no time to lift, the hand opens and the episode ends. It carries and releases over the tray only once the fingers have opened. If the tray is not reached, the way back starts only when the time allows it. Fingers that stay closed stop the run. Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (in Russian).
 
 | Module (`src/team048_solution/team048_solution/`) | Lines | What it does |
 |---|---:|---|
-| `node.py` | 1084 | ROS node, task state machine, scene survey, execution, error recovery, TRACE |
+| `node.py` | 1088 | ROS node, task state machine, scene survey, execution, error recovery, TRACE |
 | `arm.py` | 594 | URDF, collision envelopes (arm, torso, head, other arm, thighs, table, trays), open-hand point cloud, pick and place planning |
 | `perception.py` | 360 | Deprojection, RANSAC table plane, near edge, depth-connectivity segmentation |
 | `planning.py` | 322 | Spheres, `CollisionModel`: `valid`, `certify`, `certify_escape` |
@@ -225,7 +228,7 @@ Robot geometry: UBTECH URDF and meshes (Apache-2.0). No neural networks.
 
 | Area | Now | Next step |
 |---|---|---|
-| Isaac Sim validation | Offline: 282 tests, recorded frames and logs of our runs | Run of the current build in Isaac Sim, `sort2` and `sort3` |
+| Isaac Sim validation | Offline: 283 tests, recorded frames and logs of our runs | Run of the current build in Isaac Sim, `sort2` and `sort3` |
 | Heavy objects (≥ 0.22 kg) | Scheduled last; holding at force 0.4 needs μ ≥ m·g/(2N) | Calibrate the simulator friction from TRACE |
 | Dishes by the rim | Pinch when the torque m·g·r ≤ 0.17 N·m | Two-point grasp for heavy dishes |
 | Collision model | Arm, torso, head, other arm, thighs, table, trays | Held object and already placed objects |
@@ -241,9 +244,9 @@ Robot geometry: UBTECH URDF and meshes (Apache-2.0). No neural networks.
 |---|---|
 | What force goes to the hands? | Six `SetForce` ratios per hand, all within 0.3–0.5 (#648): 0.4 on DOF 1–5, 0.5 on thumb rotation. `test_rules_edges.py` and `test_compliance.py` check it. |
 | How does the robot know where the trays are? | It measures them: colour from `/sim/task`, depth, minimum-area rectangle. The code only has wide windows "left", "right", "centre" and the documented size as a ±40 % plausibility bound. |
-| What if there is not enough time to carry the object? | A lift is allowed only if the remaining time covers the worst-case holding time: lift, carry, torso turn, placing with a correction, the re-approach to the tray with its correction and the release, each step up to its timeout. Otherwise the hand opens in place and the object is not lifted. |
+| What if there is not enough time to carry the object? | A lift is allowed only if the remaining time covers the worst-case holding time: lift, carry, torso turn, placing with a correction, the re-approach to the tray with its correction and the release, each step up to its timeout. Otherwise the hand opens. If the fingers open, the arm goes home and the episode ends, so the next object is not started. If the fingers still read closed, the arm is not moved away from the grasp; at the end the hands open again, and only then do the arms go home. |
 | Why Rust if there is NumPy? | Faster perception and planning, same answers: the kernel tests on shipped inputs and the equivalence tests on 62 frames from our runs check it. Without the module the whole solution runs on NumPy. |
-| What if the arm does not reach the tray? | One more approach. If the release point is still off the tray, the arm carries the object back along the checked path and opens above the pick spot, on the table. The object never stays in the hand, and the next observation round can pick it again. `test_place_release.py` checks it. |
+| What if the arm does not reach the tray? | One more approach. If the release point is still off the tray, the way back starts only when the remaining time minus 8 s covers the worst-case return (`return_hold_bound`); otherwise the hand opens where it is. The object can be picked again once the fingers open. If they still read closed, the slot is not counted and the run stops, so the next object is not picked. `test_place_release.py` checks it. |
 | Why no neural networks? | Few objects, sizes known from the task. Geometry is deterministic, testable and needs no GPU. |
 | What happens to a malformed message? | The callback logs and drops it, and the executor keeps running. A `/sim/task` message with broken JSON or not a JSON object is skipped and the node waits for a valid one. `test_node_stub.py` checks it. |
 | Why are test tubes not handled? | This version solves `sort2` and `sort3`. For other tasks the node publishes `/sim/task/done` at once. Racks and the cabinet are the next step, found by camera too. |
@@ -259,6 +262,8 @@ Documents in `docs/` are in Russian.
 | [docs/MATH_PHYSICS.md](docs/MATH_PHYSICS.md) | Formulas with code references: frames, deprojection, grasping, IK, collisions, time |
 | [docs/PARAMETERS.md](docs/PARAMETERS.md) | Every parameter, its value and where it comes from |
 | [CHANGELOG.md](CHANGELOG.md) | Features by topic (in Russian) |
+
+The `research/` directory keeps analyses of past runs and old snapshots of the solution. Current behaviour is this file and `docs/`.
 
 ## Licence
 
