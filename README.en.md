@@ -7,7 +7,7 @@
   &nbsp;
   <img src="https://img.shields.io/badge/Rust-%E2%89%A51.89-000000?logo=rust&logoColor=white" alt="Rust 1.89+">
   &nbsp;
-  <img src="https://img.shields.io/badge/tests-269-2F6B55" alt="269 tests">
+  <img src="https://img.shields.io/badge/tests-273-2F6B55" alt="273 tests">
   &nbsp;
   <img src="https://img.shields.io/badge/license-Apache--2.0-2F6B55" alt="Apache-2.0">
 </p>
@@ -31,16 +31,16 @@ A TienKung 2.0 Pro humanoid with Inspire hands stands at a table. The objects go
 
 **Why it scores.** Points come from objects in their own trays, and an object lifted but not delivered costs −10. DeftSort lifts an object only when it has a checked path and the time to deliver it. Every lift aims at +10; a doubtful case costs 0.
 
-**Stage.** Hackathon prototype. The build is verified offline: 269 tests on recorded frames and logs of our runs in the organisers' simulator.
+**Stage.** Hackathon prototype. The build is verified offline: 273 tests on recorded frames and logs of our runs in the organisers' simulator.
 
 ## Key strengths
 
 - **Robot sensors only.** No scene coordinates in the code: AST tests check every subscription, publisher, import and scene layout literal ([test_compliance.py](src/team048_solution/test/test_compliance.py), [test_rules_edges.py](src/team048_solution/test/test_rules_edges.py)).
 - **The whole arm path is checked.** Spheres for the arm, the torso (fitted to its mesh), the head and the other arm in its measured pose; check step ≤ 0.003 rad with every sphere inflated by the joint travel ([planning.py](src/team048_solution/team048_solution/planning.py), [test_start_posture.py](src/team048_solution/test/test_start_posture.py)).
-- **Lift only with time to spare.** An object is lifted only if the remaining time covers the worst-case holding time: lift, carry, torso turn, placing with a correction and the release, each step up to its timeout. Otherwise the hand opens in place and the object stays on the table ([test_hold_time.py](src/team048_solution/test/test_hold_time.py)).
+- **Lift only with time to spare.** An object is lifted only if the remaining time covers the worst-case holding time: lift, carry, torso turn, placing with a correction, the re-approach to the tray with its correction and the release, each step up to its timeout. Otherwise the hand opens in place and the object stays on the table ([test_hold_time.py](src/team048_solution/test/test_hold_time.py)).
 - **Rust accelerator, same answers.** On 62 frames from our runs (the frames are not in the repository) perception is bit-identical to NumPy and the discrete decisions match in all 5358 records. Perception runs 15x faster, grasp planning 223x ([benchmark](#rust-accelerator); [test_accel_equivalence.py](src/team048_solution/test/test_accel_equivalence.py), [test_accel_kernels.py](src/team048_solution/test/test_accel_kernels.py)).
 - **Force within the rules.** All six `SetForce` channels of both hands are within 0.3–0.5: 0.4 on the squeezing fingers, 0.5 on thumb rotation; any override is clamped to 0.3–0.5 ([test_rules_edges.py](src/team048_solution/test/test_rules_edges.py), [test_hand_settings.py](src/team048_solution/test/test_hand_settings.py), [docs/COMPLIANCE.md](docs/COMPLIANCE.md#захват-648)).
-- **269 offline tests without ROS.** The node runs on stubs with real simulator frames; one command checks everything: `bash tools/verify.sh`.
+- **273 offline tests without ROS.** The node runs on stubs with real simulator frames; one command checks everything: `bash tools/verify.sh`.
 
 ## What already works
 
@@ -73,7 +73,7 @@ python3 -m pytest -q                      # with the Rust module, if installed
 TEAM048_ACCEL=0 python3 -m pytest -q      # NumPy only
 ```
 
-In a clean clone: with Rust 253 passed, 16 skipped; with `TEAM048_ACCEL=0` 245 passed, 24 skipped. The skipped tests are equivalence tests on recorded frames of run v7; those frames are not in the repository and are found through `TEAM048_V7_TRACE`. With them all 269 pass.
+In a clean clone: with Rust 257 passed, 16 skipped; with `TEAM048_ACCEL=0` 249 passed, 24 skipped. The skipped tests are equivalence tests on recorded frames of run v7; those frames are not in the repository and are found through `TEAM048_V7_TRACE`. With them all 273 pass.
 
 CI runs the same checks ([.github/workflows/ci.yml](.github/workflows/ci.yml)): the tests in both modes on two dependency sets, the linter (`ruff.toml`), the documents against the repository (`tools/check_docs.py`), `shellcheck`, `cargo fmt`, `clippy`, `cargo test` and a build of the Rust module from source.
 
@@ -159,7 +159,7 @@ First the robot looks at the table and the trays with its head (yaw 0 and ±0.6 
 
 | Module (`src/team048_solution/team048_solution/`) | Lines | What it does |
 |---|---:|---|
-| `node.py` | 1051 | ROS node, task state machine, scene survey, execution, error recovery, TRACE |
+| `node.py` | 1056 | ROS node, task state machine, scene survey, execution, error recovery, TRACE |
 | `arm.py` | 594 | URDF, collision envelopes (arm, torso, head, other arm, thighs, table, trays), open-hand point cloud, pick and place planning |
 | `perception.py` | 360 | Deprojection, RANSAC table plane, near edge, depth-connectivity segmentation |
 | `planning.py` | 285 | Spheres, `CollisionModel`: `valid`, `certify`, `certify_escape` |
@@ -225,7 +225,7 @@ Robot geometry: UBTECH URDF and meshes (Apache-2.0). No neural networks.
 
 | Area | Now | Next step |
 |---|---|---|
-| Isaac Sim validation | Offline: 269 tests, recorded frames and logs of our runs | Run of the current build in Isaac Sim, `sort2` and `sort3` |
+| Isaac Sim validation | Offline: 273 tests, recorded frames and logs of our runs | Run of the current build in Isaac Sim, `sort2` and `sort3` |
 | Heavy objects (≥ 0.22 kg) | Scheduled last; holding at force 0.4 needs μ ≥ m·g/(2N) | Calibrate the simulator friction from TRACE |
 | Dishes by the rim | Pinch when the torque m·g·r ≤ 0.17 N·m | Two-point grasp for heavy dishes |
 | Collision model | Arm, torso, head, other arm, thighs, table, trays | Held object and already placed objects |
@@ -241,7 +241,7 @@ Robot geometry: UBTECH URDF and meshes (Apache-2.0). No neural networks.
 |---|---|
 | What force goes to the hands? | Six `SetForce` ratios per hand, all within 0.3–0.5 (#648): 0.4 on DOF 1–5, 0.5 on thumb rotation. `test_rules_edges.py` and `test_compliance.py` check it. |
 | How does the robot know where the trays are? | It measures them: colour from `/sim/task`, depth, minimum-area rectangle. The code only has wide windows "left", "right", "centre" and the documented size as a ±40 % plausibility bound. |
-| What if there is not enough time to carry the object? | A lift is allowed only if the remaining time covers the worst-case holding time: lift, carry, torso turn, placing with a correction and the release, each step up to its timeout. Otherwise the hand opens in place and the object is not lifted. |
+| What if there is not enough time to carry the object? | A lift is allowed only if the remaining time covers the worst-case holding time: lift, carry, torso turn, placing with a correction, the re-approach to the tray with its correction and the release, each step up to its timeout. Otherwise the hand opens in place and the object is not lifted. |
 | Why Rust if there is NumPy? | Faster perception and planning, same answers: the kernel tests on shipped inputs and the equivalence tests on 62 frames from our runs check it. Without the module the whole solution runs on NumPy. |
 | What if the arm does not reach the tray? | One more approach. If the release point is still off the tray, the arm carries the object back along the checked path and opens above the pick spot, on the table. The object never stays in the hand, and the next observation round can pick it again. `test_place_release.py` checks it. |
 | Why no neural networks? | Few objects, sizes known from the task. Geometry is deterministic, testable and needs no GPU. |
