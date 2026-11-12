@@ -1,7 +1,7 @@
 """Conservative enclosing-sphere collision checks, including swept-path bound.
 
-Requires an audited complete envelope (robot + hand + payload) and environment.
-A partial chain model alone is not a whole-robot collision model.
+Requires the complete robot and hand envelope (audited_complete=True) and a non-empty base-frame environment.
+A partial chain model alone is not a whole-robot collision model. The held object is not part of the envelope.
 """
 from dataclasses import dataclass
 import numpy as np
